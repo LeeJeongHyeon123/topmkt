@@ -2,7 +2,7 @@
 -- 데이터베이스: topmkt
 -- 사용자가 직접 실행해야 함
 
-USE topmkt;
+USE TOPMKT;
 
 CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,

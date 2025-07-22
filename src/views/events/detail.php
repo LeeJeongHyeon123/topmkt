@@ -397,6 +397,94 @@ if (!isset($_SESSION['csrf_token'])) {
     transform: none;
 }
 
+/* 행사 신청 상태 메시지 스타일 */
+.event-status-message {
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.event-status-message .status-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.event-status-message .status-icon {
+    font-size: 20px;
+    margin-top: 2px;
+    width: 24px;
+    text-align: center;
+}
+
+.event-status-message .status-text {
+    flex: 1;
+}
+
+.event-status-message .status-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.event-status-message .status-description {
+    font-size: 14px;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+/* 승인 상태 스타일 */
+.event-status-message.approved {
+    background: #f0f9ff;
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+.event-status-message.approved .status-icon {
+    color: #0ea5e9;
+}
+
+/* 거절 상태 스타일 */
+.event-status-message.rejected {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.event-status-message.rejected .status-icon {
+    color: #ef4444;
+}
+
+/* 대기 상태 스타일 */
+.event-status-message.pending {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.event-status-message.pending .status-icon {
+    color: #f59e0b;
+}
+
+/* 대기열 상태 스타일 */
+.event-status-message.waiting {
+    background: #f8fafc;
+    border-color: #64748b;
+    color: #475569;
+}
+
+.event-status-message.waiting .status-icon {
+    color: #64748b;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .instructor-card {
     text-align: center;
 }
@@ -1579,7 +1667,26 @@ if (!isset($_SESSION['csrf_token'])) {
                         <button class="register-btn" disabled style="background: #9ca3af; cursor: not-allowed;">
                             신청 마감됨
                         </button>
+                    <?php elseif (!$event['allow_online_registration'] || $event['allow_online_registration'] == 0): ?>
+                        <div class="no-registration-notice" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; color: #64748b;">
+                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                            온라인 참가 신청을 받지 않는 행사입니다<br>
+                            <small style="color: #94a3b8;">참가 문의는 주최자에게 별도 연락하세요</small>
+                        </div>
                     <?php else: ?>
+                        <!-- 행사 신청 상태 메시지 영역 -->
+                        <div id="event-status-message" class="event-status-message" style="display: none; margin-bottom: 15px;">
+                            <div class="status-content">
+                                <div class="status-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="status-text">
+                                    <div class="status-title" id="event-status-title"></div>
+                                    <div class="status-description" id="event-status-description"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <button id="event-register-btn" class="register-btn" onclick="registerEvent()">
                             참가 신청하기
                         </button>
@@ -1592,6 +1699,12 @@ if (!isset($_SESSION['csrf_token'])) {
                         <button class="register-btn" disabled style="background: #9ca3af; cursor: not-allowed;">
                             신청 마감됨
                         </button>
+                    <?php elseif (!$event['allow_online_registration'] || $event['allow_online_registration'] == 0): ?>
+                        <div class="no-registration-notice" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; color: #64748b;">
+                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                            온라인 참가 신청을 받지 않는 행사입니다<br>
+                            <small style="color: #94a3b8;">참가 문의는 주최자에게 별도 연락하세요</small>
+                        </div>
                     <?php else: ?>
                         <button class="register-btn" onclick="redirectToLogin()">
                             로그인 후 신청하기
@@ -1665,11 +1778,25 @@ if (!isset($_SESSION['csrf_token'])) {
             </div>
 
             <!-- 강사/연사 정보 -->
-            <?php if (!empty($event['instructors']) && is_array($event['instructors'])): ?>
+            <?php 
+            // 다중 강사 정보 중에서 유효한 강사가 있는지 확인
+            $hasValidInstructors = false;
+            if (!empty($event['instructors']) && is_array($event['instructors'])) {
+                foreach ($event['instructors'] as $instructor) {
+                    if ((!empty($instructor['name']) && $instructor['name'] !== '미정') || 
+                        (!empty($instructor['info']) && trim($instructor['info']) !== '')) {
+                        $hasValidInstructors = true;
+                        break;
+                    }
+                }
+            }
+            ?>
+            <?php if ($hasValidInstructors): ?>
             <div class="info-card instructors-card">
                 <h3><i class="fas fa-users"></i> 강사/연사 정보</h3>
                 <div class="instructors-list">
                     <?php foreach ($event['instructors'] as $instructor): ?>
+                    <?php if ((!empty($instructor['name']) && $instructor['name'] !== '미정') || (!empty($instructor['info']) && trim($instructor['info']) !== '')): ?>
                     <div class="instructor-item">
                         <div class="instructor-header">
                             <div class="instructor-avatar">
@@ -1695,10 +1822,11 @@ if (!isset($_SESSION['csrf_token'])) {
                         <div class="instructor-bio"><?= htmlspecialchars($instructor['info']) ?></div>
                         <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
-            <?php elseif (!empty($event['instructor_name']) || !empty($event['instructor_info'])): ?>
+            <?php elseif ((!empty($event['instructor_name']) && $event['instructor_name'] !== '미정') || (!empty($event['instructor_info']) && trim($event['instructor_info']) !== '')): ?>
             <!-- 기본 강사 정보 표시 (instructor_name, instructor_info 필드 사용) -->
             <div class="info-card instructors-card">
                 <h3><i class="fas fa-user"></i> 강사 정보</h3>
@@ -2159,22 +2287,39 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
 });
 
+
+// JWT 인증 헤더 생성 함수
+function getAuthHeaders() {
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+    
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
+}
+
 // 행사 신청 상태 확인
 async function checkEventRegistrationStatus() {
     try {
         const response = await fetch(`/api/events/${eventId}/registration-status?event_id=${eventId}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            headers: getAuthHeaders()
         });
         
         const result = await response.json();
         
-        if (result.status === 'success' && result.data.registration) {
+        if (response.ok && result.status === 'success' && result.data.registration) {
             const registration = result.data.registration;
             updateEventRegistrationUI(registration.status, registration);
+        } else if (response.status === 401) {
+            console.log('🔐 등록 상태 확인을 위해 로그인이 필요합니다.');
+        } else {
+            console.log('📊 등록 상태 정보 없음:', result.message || '알 수 없는 오류');
         }
     } catch (error) {
         console.error('행사 신청 상태 확인 오류:', error);
@@ -2185,8 +2330,18 @@ async function checkEventRegistrationStatus() {
 function updateEventRegistrationUI(status, registration) {
     const registerBtn = document.getElementById('event-register-btn');
     const cancelBtn = document.getElementById('event-cancel-btn');
+    const statusMessage = document.getElementById('event-status-message');
+    const statusTitle = document.getElementById('event-status-title');
+    const statusDescription = document.getElementById('event-status-description');
+    const statusIcon = statusMessage?.querySelector('.status-icon i');
     
     if (!registerBtn || !cancelBtn) return;
+    
+    // 상태 메시지 초기화
+    if (statusMessage) {
+        statusMessage.className = 'event-status-message';
+        statusMessage.style.display = 'none';
+    }
     
     switch (status) {
         case 'pending':
@@ -2194,33 +2349,85 @@ function updateEventRegistrationUI(status, registration) {
             cancelBtn.style.display = 'block';
             cancelBtn.textContent = '신청 취소 (승인 대기중)';
             cancelBtn.style.background = '#dc3545';
+            
+            // 대기 상태 메시지 표시
+            showStatusMessage('pending', '🕒', '신청 검토 중입니다', 
+                '신청이 접수되었습니다. 승인 결과를 기다려주세요.');
             break;
+            
         case 'approved':
             registerBtn.style.display = 'none';
             cancelBtn.style.display = 'block';
             cancelBtn.textContent = '신청 취소 (승인됨)';
             cancelBtn.style.background = '#dc3545';
+            
+            // 승인 상태 메시지 표시
+            const approvedMessage = registration?.admin_notes || '신청이 승인되었습니다. 행사에 참석해주세요.';
+            showStatusMessage('approved', '✅', '신청이 승인되었습니다', approvedMessage);
             break;
+            
         case 'waiting':
             registerBtn.style.display = 'none';
             cancelBtn.style.display = 'block';
             cancelBtn.textContent = `신청 취소 (대기: ${registration.waiting_order}번)`;
             cancelBtn.style.background = '#dc3545';
+            
+            // 대기열 상태 메시지 표시
+            showStatusMessage('waiting', '⏳', `대기열 ${registration.waiting_order}번입니다`, 
+                '정원이 초과되어 대기열에 등록되었습니다. 승인 시 알림을 드리겠습니다.');
             break;
+            
         case 'rejected':
             registerBtn.style.display = 'block';
             registerBtn.textContent = '다시 신청하기';
             cancelBtn.style.display = 'none';
+            
+            // 거절 상태 메시지 표시
+            const rejectedMessage = registration?.admin_notes || '신청이 거절되었습니다. 다시 신청하실 수 있습니다.';
+            showStatusMessage('rejected', '❌', '신청이 거절되었습니다', rejectedMessage);
             break;
+            
         case 'cancelled':
             registerBtn.style.display = 'block';
             registerBtn.textContent = '다시 신청하기';
             cancelBtn.style.display = 'none';
+            hideStatusMessage();
             break;
+            
         default:
             registerBtn.style.display = 'block';
             registerBtn.textContent = '참가 신청하기';
             cancelBtn.style.display = 'none';
+            hideStatusMessage();
+    }
+    
+    // 상태 메시지 표시 함수
+    function showStatusMessage(statusClass, iconClass, title, description) {
+        if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) return;
+        
+        statusMessage.className = `event-status-message ${statusClass}`;
+        statusMessage.style.display = 'block';
+        statusIcon.className = `fas ${getIconClass(iconClass)}`;
+        statusTitle.textContent = title;
+        statusDescription.textContent = description;
+    }
+    
+    // 상태 메시지 숨김 함수
+    function hideStatusMessage() {
+        if (statusMessage) {
+            statusMessage.style.display = 'none';
+        }
+    }
+    
+    // 아이콘 클래스 매핑
+    function getIconClass(iconText) {
+        const iconMap = {
+            '🕒': 'fa-clock',
+            '✅': 'fa-check-circle',
+            '⏳': 'fa-hourglass-half',
+            '❌': 'fa-times-circle'
+        };
+        return iconMap[iconText] || 'fa-info-circle';
     }
 }
 
@@ -2252,10 +2459,7 @@ async function loadEventUserInfo() {
         // 사용자 정보 가져오기
         const userResponse = await fetch('/auth/me', {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            headers: getAuthHeaders()
         });
         
         if (userResponse.ok) {
@@ -2268,17 +2472,27 @@ async function loadEventUserInfo() {
         // 이전 신청 데이터 가져오기
         const prevResponse = await fetch(`/api/events/${eventId}/previous-registration`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            headers: getAuthHeaders()
         });
         
-        if (prevResponse.ok) {
-            const prevData = await prevResponse.json();
-            if (prevData.status === 'success' && prevData.data) {
-                fillEventRegistrationForm(prevData.data);
-            }
+        // 응답 처리 - 401 오류도 정상적으로 처리
+        const prevData = await prevResponse.json();
+        
+        if (prevResponse.ok && prevData.status === 'success' && prevData.data) {
+            // 성공적인 응답: 이전 신청 데이터로 폼 채우기
+            fillEventRegistrationForm(prevData.data);
+        } else if (prevResponse.status === 401 || prevData.message === '로그인이 필요합니다.') {
+            // 인증 필요: 정상적인 상황이므로 로그만 출력
+            console.log('🔐 인증이 필요합니다. 로그인 후 이전 신청 데이터를 불러올 수 있습니다.');
+        } else if (prevData.status === 'success' && prevData.data === null) {
+            // 성공적인 응답이지만 데이터가 없는 경우 (정상 상황)
+            console.log('📝 이전 신청 데이터 없음:', prevData.message);
+        } else if (prevData.status === 'error') {
+            // 기타 오류: 자세한 로그 출력
+            console.log('📝 이전 신청 데이터 없음:', prevData.message);
+        } else {
+            // 예상치 못한 응답
+            console.warn('⚠️ 예상치 못한 응답:', prevData);
         }
     } catch (error) {
         console.error('사용자 정보 로드 오류:', error);
@@ -2328,10 +2542,7 @@ async function submitEventRegistration() {
         
         const response = await fetch(`/api/events/${eventId}/registration?event_id=${eventId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
         
@@ -2371,13 +2582,12 @@ async function cancelEventRegistration() {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         
+        const headers = getAuthHeaders();
+        headers['X-CSRF-TOKEN'] = csrfToken;
+        
         const response = await fetch(`/api/events/${eventId}/registration?event_id=${eventId}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            },
+            headers: headers,
             body: JSON.stringify({
                 csrf_token: csrfToken
             })

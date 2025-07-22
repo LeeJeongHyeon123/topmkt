@@ -3,6 +3,9 @@
  * SMS 관련 헬퍼 함수들
  */
 
+// 🔥 Ultra Think Mode: SMS 설정을 위한 config.php 포함
+require_once SRC_PATH . '/config/config.php';
+
 /**
  * SMS 헬퍼 클래스
  */
@@ -121,7 +124,7 @@ function sendLectureApplicationSms($phone)
  */
 function sendLectureApprovalSms($phone, $lectureTitle, $lectureDate) 
 {
-    $message = "[탑마케팅] 강의 신청이 승인되었습니다. ({$lectureDate}) 참석 부탁드립니다.";
+    $message = "[탑마케팅] 강의 신청이 승인되었습니다. 참석 부탁드립니다.";
     return sendSms($phone, $message);
 }
 
@@ -130,15 +133,12 @@ function sendLectureApprovalSms($phone, $lectureTitle, $lectureDate)
  * 
  * @param string $phone 수신자 전화번호
  * @param string $lectureTitle 강의 제목
- * @param string $reason 거절 사유
+ * @param string $reason 거절 사유 (사용하지 않음)
  * @return array 발송 결과
  */
 function sendLectureRejectionSms($phone, $lectureTitle, $reason = '') 
 {
-    $message = "[탑마케팅] 강의 신청이 취소되었습니다.";
-    if ($reason) {
-        $message .= " 사유: {$reason}";
-    }
+    $message = "[탑마케팅] 강의 신청이 거절되었습니다.";
     return sendSms($phone, $message);
 }
 
@@ -164,7 +164,7 @@ function sendEventApplicationSms($phone)
  */
 function sendEventApprovalSms($phone, $eventTitle, $eventDate) 
 {
-    $message = "[탑마케팅] 행사 신청이 승인되었습니다. ({$eventDate}) 참석 부탁드립니다.";
+    $message = "[탑마케팅] 행사 신청이 승인되었습니다. 참석 부탁드립니다.";
     return sendSms($phone, $message);
 }
 
@@ -173,15 +173,12 @@ function sendEventApprovalSms($phone, $eventTitle, $eventDate)
  * 
  * @param string $phone 수신자 전화번호
  * @param string $eventTitle 행사 제목
- * @param string $reason 거절 사유
+ * @param string $reason 거절 사유 (사용하지 않음)
  * @return array 발송 결과
  */
 function sendEventRejectionSms($phone, $eventTitle, $reason = '') 
 {
-    $message = "[탑마케팅] 행사 신청이 취소되었습니다.";
-    if ($reason) {
-        $message .= " 사유: {$reason}";
-    }
+    $message = "[탑마케팅] 행사 신청이 거절되었습니다.";
     return sendSms($phone, $message);
 }
 

@@ -20,8 +20,7 @@ date_default_timezone_set('Asia/Seoul');
 define('DEFAULT_LANG', 'ko');
 define('SUPPORTED_LANGS', ['ko', 'en', 'zh', 'ja', 'vi', 'th']);
 
-// 업로드 설정
-define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
+// 업로드 설정 (upload.php에서 정의됨)
 define('UPLOAD_PATH', ROOT_PATH . '/public/assets/uploads');
 define('PROFILE_PATH', UPLOAD_PATH . '/profiles');
 
@@ -49,4 +48,31 @@ define('ALIGO_REMAIN_URL', 'https://apis.aligo.in/remain/');   // 잔여 건수 
 
 // SMS 실제 모드 설정 (Mock 모드 완전 제거)
 define('SMS_MOCK_MODE', false);                        // 항상 실제 발송
-define('SMS_TEST_PHONE', '010-2659-1346');            // 테스트용 전화번호 
+define('SMS_TEST_PHONE', '010-2659-1346');            // 테스트용 전화번호
+
+// ===================================
+// 로깅 시스템 설정
+// ===================================
+
+// 통합 로깅 설정
+define('LOG_USE_UNIFIED', true);                       // 통합 로그 파일 사용 여부
+define('LOG_UNIFIED_FILE', 'topmkt_errors.log');       // 통합 로그 파일명
+define('LOG_MAX_FILE_SIZE', 20 * 1024 * 1024);         // 최대 로그 파일 크기 (20MB)
+define('LOG_ENABLE_ROTATION', true);                   // 로그 로테이션 활성화
+define('LOG_KEEP_DAYS', 30);                           // 로그 보관 일수
+
+// 로그 레벨 설정 (운영/개발 환경별)
+if (APP_DEBUG || strpos($_SERVER['SERVER_NAME'] ?? '', 'localhost') !== false) {
+    // 개발 환경: 모든 로그 레벨 활성화
+    define('LOG_MIN_LEVEL', 100);                      // DEBUG 레벨부터
+    define('LOG_CONSOLE_OUTPUT', true);                // 콘솔 출력 활성화
+} else {
+    // 운영 환경: INFO 레벨부터만 기록
+    define('LOG_MIN_LEVEL', 200);                      // INFO 레벨부터
+    define('LOG_CONSOLE_OUTPUT', false);               // 콘솔 출력 비활성화
+}
+
+// 성능 로깅 설정
+define('LOG_SLOW_QUERY_THRESHOLD', 1.0);               // 느린 쿼리 임계값 (초)
+define('LOG_SLOW_REQUEST_THRESHOLD', 3.0);             // 느린 요청 임계값 (초)
+define('LOG_MEMORY_USAGE', true);                      // 메모리 사용량 로깅 

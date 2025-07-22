@@ -15,7 +15,7 @@ date_default_timezone_set('Asia/Seoul');
 // 데이터베이스 설정
 define('DB_HOST', 'localhost');
 define('DB_PORT', '3306');
-define('DB_NAME', 'topmkt_staging');
+define('DB_NAME', 'TOPMKT_staging');
 define('DB_USER', 'topmkt_staging');
 define('DB_PASS', 'staging_password_here');
 define('DB_CHARSET', 'utf8mb4');

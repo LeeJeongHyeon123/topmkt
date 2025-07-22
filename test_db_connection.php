@@ -71,6 +71,6 @@ try {
     echo "❌ 데이터베이스 연결 실패: " . $e->getMessage() . "\n";
     echo "\n디버그 정보:\n";
     echo "- 호스트: " . (defined('DB_HOST') ? DB_HOST : 'localhost') . "\n";
-    echo "- 데이터베이스: " . (defined('DB_NAME') ? DB_NAME : 'topmkt') . "\n";
+    echo "- 데이터베이스: " . (defined('DB_NAME') ? DB_NAME : 'TOPMKT') . "\n";
     echo "- 사용자: " . (defined('DB_USERNAME') ? DB_USERNAME : 'root') . "\n";
 }

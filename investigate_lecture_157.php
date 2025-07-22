@@ -8,7 +8,7 @@
 $host = 'localhost';
 $port = 3306;
 $socket = '/var/lib/mysql/mysql.sock';
-$database = 'topmkt';
+$database = 'TOPMKT';
 $username = 'root';
 $password = 'Dnlszkem1!';
 

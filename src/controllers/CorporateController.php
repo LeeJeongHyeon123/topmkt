@@ -8,6 +8,7 @@ require_once SRC_PATH . '/config/database.php';
 require_once SRC_PATH . '/models/Corporate.php';
 require_once SRC_PATH . '/helpers/CorporateFileUpload.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
+require_once SRC_PATH . '/config/upload.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
 use App\Helpers\ValidationHelper;
@@ -326,10 +327,9 @@ class CorporateController {
                 throw new Exception('파일 업로드 중 오류가 발생했습니다.');
             }
             
-            // 파일 크기 검증 (10MB)
-            $maxSize = 10 * 1024 * 1024;
-            if ($file['size'] > $maxSize) {
-                throw new Exception('파일 크기는 10MB를 초과할 수 없습니다.');
+            // 파일 크기 검증 (공통 설정 사용: 30MB)
+            if (!UploadConfig::validateFileSize($file['size'])) {
+                throw new Exception(UploadConfig::getErrorMessage('file_too_large'));
             }
             
             // 파일 타입 검증

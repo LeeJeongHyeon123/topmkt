@@ -1,7 +1,7 @@
 -- comments 테이블 status 컬럼 추가 (없는 경우)
 -- 실행 방법: MariaDB 콘솔에서 다음 명령어 실행
 -- mysql -u root -p
--- USE topmkt;
+-- USE TOPMKT;
 -- SOURCE /var/www/html/topmkt/database/update_comments_table.sql;
 
 -- status 컬럼이 없으면 추가

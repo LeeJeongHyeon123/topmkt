@@ -264,7 +264,7 @@ PHP 버전: <?php echo PHP_VERSION; ?>
 <?php
 try {
     echo "연결 시도 중...\n";
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
     
     if ($mysqli->connect_error) {
         echo "❌ 연결 실패: " . $mysqli->connect_error . "\n";

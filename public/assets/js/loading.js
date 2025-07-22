@@ -397,25 +397,106 @@ if (typeof $ !== 'undefined') {
 
 // Fetch API 인터셉터
 if (window.fetch) {
-    const originalFetch = window.fetch;
-    window.originalFetch = originalFetch; // 전역에 원본 fetch 저장
-    let activeRequests = 0;
     
-    window.fetch = function(...args) {
-        activeRequests++;
-        if (activeRequests === 1) {
-            window.TopMarketingLoading.show();
-        }
-        
-        return originalFetch.apply(this, args)
-            .finally(() => {
-                activeRequests--;
-                if (activeRequests === 0) {
-                    setTimeout(() => {
-                        window.TopMarketingLoading.hide();
-                    }, 500);
+// 🔥 Ultra Think Mode: Enhanced Fetch Wrapper with Debugging
+const originalFetch = window.fetch;
+window.originalFetch = originalFetch; // 전역에 원본 fetch 저장
+let activeRequests = 0;
+
+window.fetch = function(...args) {
+    activeRequests++;
+    if (activeRequests === 1) {
+        window.TopMarketingLoading.show();
+    }
+    
+    // 🔍 요청 정보 로깅
+    const [url, options] = args;
+    if (url && url.includes && url.includes("previous-registration")) {
+        console.log("🚀 [FETCH DEBUG] 요청 시작:", url);
+        console.log("🚀 [FETCH DEBUG] 요청 옵션:", options);
+    }
+    
+    return originalFetch.apply(this, args)
+        .then(response => {
+            // 🔍 응답 정보 상세 로깅
+            if (url && url.includes && url.includes("previous-registration")) {
+                console.log("📥 [FETCH DEBUG] 응답 수신:");
+                console.log("  - URL:", response.url);
+                console.log("  - Status:", response.status);
+                console.log("  - StatusText:", response.statusText);
+                console.log("  - OK:", response.ok);
+                console.log("  - Headers:", Object.fromEntries(response.headers));
+                
+                // 응답 내용 미리보기 (클론해서 원본 손상 방지)
+                if (response.headers.get("content-type")?.includes("application/json")) {
+                    response.clone().json().then(data => {
+                        console.log("📦 [FETCH DEBUG] JSON 응답:", data);
+                    }).catch(e => {
+                        console.log("❌ [FETCH DEBUG] JSON 파싱 실패:", e);
+                    });
                 }
-            });
-    };
+                
+                // 404 특별 처리
+                if (response.status === 404) {
+                    console.error("🚨 [FETCH DEBUG] 실제 404 오류 확인!");
+                    console.log("🔍 [FETCH DEBUG] 404 원인 분석 필요");
+                } else if (response.status === 401) {
+                    console.log("🔐 [FETCH DEBUG] 401 인증 오류 (정상)");
+                } else if (response.status >= 200 && response.status < 300) {
+                    console.log("✅ [FETCH DEBUG] 성공 응답");
+                } else {
+                    console.log("⚠️ [FETCH DEBUG] 기타 응답:", response.status);
+                }
+            }
+            
+            return response;
+        })
+        .catch(error => {
+            // 🔍 네트워크 오류 상세 로깅
+            if (url && url.includes && url.includes("previous-registration")) {
+                console.error("💥 [FETCH DEBUG] 네트워크 오류:", error);
+                console.log("🔍 [FETCH DEBUG] 오류 타입:", error.name);
+                console.log("🔍 [FETCH DEBUG] 오류 메시지:", error.message);
+            }
+            throw error;
+        })
+        .finally(() => {
+            activeRequests--;
+            if (activeRequests === 0) {
+                setTimeout(() => {
+                    window.TopMarketingLoading.hide();
+                }, 500);
+            }
+        });
+};
 }
 
+
+
+// 🔥 Ultra Think Mode: 수동 테스트 함수
+window.testPreviousRegistration = function() {
+    console.log("🧪 [TEST] 수동 API 테스트 시작");
+    
+    return fetch("/api/events/198/previous-registration", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(response => {
+        console.log("🧪 [TEST] 응답 받음:", response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log("🧪 [TEST] 최종 데이터:", data);
+        return data;
+    })
+    .catch(error => {
+        console.error("🧪 [TEST] 오류:", error);
+        throw error;
+    });
+};
+
+console.log("🔥 Ultra Think Mode: Enhanced Fetch Wrapper 로드 완료!");
+console.log("📋 사용법: testPreviousRegistration() 함수로 수동 테스트 가능");

@@ -96,7 +96,7 @@ try {
     
     // 데이터베이스 연결 테스트 (debug_fixed.php에서 사용하는 부분)
     echo "\n=== 데이터베이스 연결 테스트 ===\n";
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
     
     if ($mysqli->connect_error) {
         echo "<span class='warning'>⚠️ DB 연결 실패: {$mysqli->connect_error}</span>\n";

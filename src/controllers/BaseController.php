@@ -5,6 +5,7 @@
  */
 
 require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/config/upload.php';
 
 class BaseController
 {
@@ -166,8 +167,8 @@ class BaseController
             return false;
         }
         
-        // 파일 크기 검증 (5MB 제한)
-        if ($fileSize > 5 * 1024 * 1024) {
+        // 파일 크기 검증 (공통 설정 사용: 30MB)
+        if (!UploadConfig::validateFileSize($fileSize)) {
             return false;
         }
         

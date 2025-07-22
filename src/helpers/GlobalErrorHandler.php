@@ -166,8 +166,7 @@ class GlobalErrorHandler {
      * 예외 처리
      */
     public static function handleException($exception) {
-        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        $isAjax = self::isApiRequest();
         
         try {
             if ($exception instanceof ApplicationException) {
@@ -200,8 +199,7 @@ class GlobalErrorHandler {
             if (!headers_sent()) {
                 http_response_code(500);
                 
-                $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                          strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+                $isAjax = self::isApiRequest();
                 
                 if ($isAjax) {
                     header('Content-Type: application/json; charset=utf-8');
@@ -354,5 +352,28 @@ class GlobalErrorHandler {
         ];
         
         return $severities[$severity] ?? 'UNKNOWN';
+    }
+    
+    /**
+     * API 요청인지 판단
+     */
+    private static function isApiRequest() {
+        // AJAX 요청 헤더 확인
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        
+        // API 경로 확인
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        $isApiPath = strpos($uri, '/api/') !== false;
+        
+        // Content-Type 헤더 확인 (JSON 요청)
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        $isJsonRequest = strpos($contentType, 'application/json') !== false;
+        
+        // Accept 헤더 확인 (JSON 응답 요청)
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        $acceptsJson = strpos($accept, 'application/json') !== false;
+        
+        return $isAjax || $isApiPath || $isJsonRequest || $acceptsJson;
     }
 }

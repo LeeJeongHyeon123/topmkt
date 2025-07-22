@@ -1242,10 +1242,76 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// 프로필 페이지 로드 완료 로그
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 프로필 페이지 로드 완료');
-    console.log('👤 사용자:', '<?= htmlspecialchars($user['nickname'] ?? '') ?>');
-    console.log('📊 통계:', <?= json_encode($stats) ?>);
-});
+// 프로필 페이지 성능 측정 및 로깅
+(function() {
+    // 성능 측정 시작
+    const performanceStart = performance.now();
+    const navigationStart = performance.timing.navigationStart;
+    const loadStart = performance.timing.loadEventStart;
+    
+    // 페이지 로드 시간 측정
+    window.addEventListener('load', function() {
+        const loadTime = performance.now() - performanceStart;
+        const totalLoadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        
+        console.log('🚀 프로필 페이지 성능 분석');
+        console.log('👤 사용자:', '<?= htmlspecialchars($user['nickname'] ?? '') ?>');
+        console.log('📊 통계:', <?= json_encode($stats) ?>);
+        console.log('');
+        console.log('⏱️ 로딩 시간 분석:');
+        console.log('├─ DNS 조회:', (performance.timing.domainLookupEnd - performance.timing.domainLookupStart) + 'ms');
+        console.log('├─ TCP 연결:', (performance.timing.connectEnd - performance.timing.connectStart) + 'ms');
+        console.log('├─ 서버 응답:', (performance.timing.responseEnd - performance.timing.requestStart) + 'ms');
+        console.log('├─ DOM 생성:', (performance.timing.domContentLoadedEventEnd - performance.timing.domLoading) + 'ms');
+        console.log('├─ 리소스 로딩:', (performance.timing.loadEventEnd - performance.timing.domContentLoadedEventEnd) + 'ms');
+        console.log('└─ 총 로딩 시간:', totalLoadTime + 'ms');
+        
+        // 리소스별 로딩 시간
+        const resources = performance.getEntriesByType('resource');
+        console.log('');
+        console.log('📁 리소스 로딩 시간:');
+        
+        let slowResources = [];
+        resources.forEach(function(resource) {
+            const loadTime = resource.responseEnd - resource.startTime;
+            if (loadTime > 100) { // 100ms 이상 소요된 리소스만
+                slowResources.push({
+                    name: resource.name.split('/').pop(),
+                    time: Math.round(loadTime),
+                    type: resource.initiatorType
+                });
+            }
+        });
+        
+        // 느린 리소스 상위 10개
+        slowResources.sort((a, b) => b.time - a.time);
+        slowResources.slice(0, 10).forEach(function(resource, index) {
+            console.log(`${index + 1}. ${resource.name} (${resource.type}): ${resource.time}ms`);
+        });
+        
+        // 메모리 사용량 (가능한 경우)
+        if (performance.memory) {
+            console.log('');
+            console.log('💾 메모리 사용량:');
+            console.log('├─ 사용 중:', Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB');
+            console.log('├─ 할당됨:', Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + 'MB');
+            console.log('└─ 한계:', Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024) + 'MB');
+        }
+        
+        // 성능 경고
+        if (totalLoadTime > 2000) {
+            console.warn('🐌 페이지 로딩이 2초 이상 걸렸습니다!');
+        } else if (totalLoadTime > 1000) {
+            console.warn('⚠️ 페이지 로딩이 1초 이상 걸렸습니다.');
+        } else {
+            console.log('✅ 페이지 로딩 속도 양호');
+        }
+    });
+    
+    // DOM 준비 완료 시간
+    document.addEventListener('DOMContentLoaded', function() {
+        const domReadyTime = performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart;
+        console.log('📄 DOM 준비 완료:', domReadyTime + 'ms');
+    });
+})();
 </script>

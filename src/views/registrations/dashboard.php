@@ -626,7 +626,7 @@
                             <div class="lecture-meta">
                                 <span>📅 <?= date('Y-m-d H:i', strtotime($lecture['start_date'] . ' ' . $lecture['start_time'])) ?></span>
                                 <span>👥 
-                                    <?= number_format($lecture['current_participants']) ?>/<?= 
+                                    <?= number_format($lecture['approved_count']) ?>/<?= 
                                         $lecture['max_participants'] ? number_format($lecture['max_participants']) . '명' : '무제한' 
                                     ?>
                                 </span>
@@ -663,7 +663,7 @@
                                 <a href="/registrations/lectures/<?= $lecture['id'] ?>" class="btn btn-primary">
                                     👥 신청자 관리
                                 </a>
-                                <a href="<?= $lecture['content_type'] === 'event' ? '/events/' : '/lectures/' ?><?= $lecture['id'] ?>" class="btn btn-outline">
+                                <a href="<?= $lecture['content_type'] === 'event' ? '/events/detail?id=' : '/lectures/' ?><?= $lecture['id'] ?>" class="btn btn-outline">
                                     📋 <?= $lecture['content_type'] === 'event' ? '행사' : '강의' ?> 상세
                                 </a>
                             </div>
@@ -708,7 +708,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="<?= ($contentType ?? 'lecture') === 'event' ? '/events/' : '/lectures/' ?><?= $registration['lecture_id'] ?>" 
+                                        <a href="<?= ($contentType ?? 'lecture') === 'event' ? '/events/detail?id=' : '/lectures/' ?><?= $registration['lecture_id'] ?>" 
                                            style="color: #667eea; text-decoration: none;">
                                             <?= htmlspecialchars($registration['lecture_title']) ?>
                                         </a>

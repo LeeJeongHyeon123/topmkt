@@ -5,6 +5,7 @@
 
 // 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/config/upload.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -481,6 +482,9 @@ html #quill-editor .ql-editor * {
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 
+<!-- 공통 업로드 설정 (validateFileSize 함수 사용 전에 로드) -->
+<?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
+
 <div class="write-container">
     <!-- 헤더 섹션 -->
     <div class="write-header">
@@ -589,22 +593,45 @@ document.addEventListener('DOMContentLoaded', function() {
             const file = input.files[0];
             if (!file) return;
             
-            // 파일 크기 검증 (10MB)
-            const maxSize = 10 * 1024 * 1024;
-            if (file.size > maxSize) {
-                alert('파일 크기는 10MB를 초과할 수 없습니다.');
+            // 파일 크기 검증 (공통 설정 사용: 30MB)
+            if (!window.validateFileSize || !window.validateFileSize(file.size)) {
+                alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
                 return;
             }
             
-            // 로딩 표시
-            const range = quill.getSelection();
-            quill.insertText(range.index, '이미지 업로드 중...', 'italic', true);
+            let range = null;
+            let loadingTextInserted = false;
             
             try {
+                // Quill 에디터 상태 확인
+                if (typeof quill === 'undefined' || !quill) {
+                    throw new Error('Quill 에디터가 초기화되지 않았습니다.');
+                }
+                
+                // 현재 선택 범위 가져오기
+                range = quill.getSelection();
+                if (!range) {
+                    // 선택 범위가 없으면 에디터 끝으로 설정
+                    range = { index: quill.getLength() };
+                }
+                
+                // 로딩 표시
+                quill.insertText(range.index, '이미지 업로드 중...', 'italic', true);
+                loadingTextInserted = true;
+                
+                // CSRF 토큰 확인
+                const csrfTokenElement = document.querySelector('input[name="csrf_token"]');
+                if (!csrfTokenElement) {
+                    throw new Error('CSRF 토큰을 찾을 수 없습니다. 페이지를 새로고침해주세요.');
+                }
+                
                 // FormData 생성
                 const formData = new FormData();
                 formData.append('image', file);
-                formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+                formData.append('csrf_token', csrfTokenElement.value);
+                formData.append('upload_type', 'posts');
+                
+                console.log('🔄 이미지 업로드 시작:', file.name, 'Size:', file.size);
                 
                 // 업로드 요청
                 const response = await fetch('/api/media/upload-image', {
@@ -612,10 +639,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: formData
                 });
                 
+                console.log('📡 서버 응답 상태:', response.status, response.statusText);
+                
+                // 응답 상태 코드 확인
+                if (!response.ok) {
+                    throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
+                }
+                
                 const result = await response.json();
+                console.log('📦 응답 데이터:', result);
                 
                 // 업로드 중 텍스트 제거
-                quill.deleteText(range.index, '이미지 업로드 중...'.length);
+                if (loadingTextInserted) {
+                    quill.deleteText(range.index, '이미지 업로드 중...'.length);
+                    loadingTextInserted = false;
+                }
                 
                 if (result.success) {
                     // 이미지 삽입
@@ -623,14 +661,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     quill.setSelection(range.index + 1);
                     console.log('✅ 이미지 업로드 성공:', result.data.url);
                 } else {
-                    alert('이미지 업로드 실패: ' + result.message);
+                    throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
                 }
                 
             } catch (error) {
-                // 업로드 중 텍스트 제거
-                quill.deleteText(range.index, '이미지 업로드 중...'.length);
-                console.error('이미지 업로드 오류:', error);
-                alert('이미지 업로드 중 오류가 발생했습니다.');
+                console.error('❌ 이미지 업로드 오류 상세:', error);
+                
+                // 업로드 중 텍스트 제거 (오류 발생 시)
+                if (loadingTextInserted && range && typeof quill !== 'undefined' && quill) {
+                    try {
+                        quill.deleteText(range.index, '이미지 업로드 중...'.length);
+                    } catch (deleteError) {
+                        console.error('로딩 텍스트 제거 실패:', deleteError);
+                    }
+                }
+                
+                // 구체적인 오류 메시지 표시
+                let errorMessage = '이미지 업로드 중 오류가 발생했습니다.';
+                if (error.message) {
+                    errorMessage += '\n상세: ' + error.message;
+                }
+                
+                alert(errorMessage);
             }
         };
         
@@ -1080,4 +1132,7 @@ document.addEventListener('DOMContentLoaded', function() {
     //     }
     // }, 30000); // 30초마다
 });
+</script>
+
+<script>
 </script>

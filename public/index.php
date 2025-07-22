@@ -13,6 +13,16 @@ define('CONFIG_PATH', SRC_PATH . '/config');
 // paths.php 로드
 require_once CONFIG_PATH . '/paths.php';
 
+// 강의 신청 API 디버깅을 위한 로그
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['REQUEST_URI'], '/api/lectures/') !== false && strpos($_SERVER['REQUEST_URI'], '/registration') !== false) {
+    error_log("=== API 강의 신청 요청 디버깅 ===");
+    error_log("REQUEST_URI: " . $_SERVER['REQUEST_URI']);
+    error_log("REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
+    error_log("CONTENT_TYPE: " . ($_SERVER['CONTENT_TYPE'] ?? 'NOT_SET'));
+    error_log("POST 데이터 존재: " . (empty($_POST) ? 'NO' : 'YES'));
+    error_log("INPUT 스트림: " . file_get_contents('php://input'));
+}
+
 // 강의 등록 디버깅을 위한 로그
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['REQUEST_URI'], '/lectures/store') !== false) {
     file_put_contents(DEBUG_STORE_FLOW_LOG, "=== INDEX.PHP에서 캐치 ===\n", FILE_APPEND);
@@ -42,8 +52,12 @@ try {
     // 글로벌 에러 핸들러 등록
     GlobalErrorHandler::register();
     
-    // 로깅 시스템 초기화
-    WebLogger::init();
+    // 로깅 시스템 초기화 (설정 적용)
+    WebLogger::init([
+        'useUnifiedLog' => defined('LOG_USE_UNIFIED') ? LOG_USE_UNIFIED : true,
+        'unifiedLogFile' => defined('LOG_UNIFIED_FILE') ? LOG_UNIFIED_FILE : 'topmkt_errors.log',
+        'maxFileSize' => defined('LOG_MAX_FILE_SIZE') ? LOG_MAX_FILE_SIZE : 20 * 1024 * 1024
+    ]);
 
     // 기본 세션 시작
     if (session_status() === PHP_SESSION_NONE) {
@@ -86,8 +100,21 @@ try {
         'referer' => $_SERVER['HTTP_REFERER'] ?? ''
     ]);
     
+    
     // 라우팅 처리
-    $router = new Router();
+    
+// 🔥 Ultra Think Mode: API 요청 디버깅
+if (strpos($_SERVER['REQUEST_URI'], '/api/events/') !== false && strpos($_SERVER['REQUEST_URI'], 'previous-registration') !== false) {
+    error_log("=== API 요청 추적 ===");
+    error_log("URI: " . $_SERVER['REQUEST_URI']);
+    error_log("METHOD: " . $_SERVER['REQUEST_METHOD']);
+    error_log("HOST: " . ($_SERVER['HTTP_HOST'] ?? 'UNKNOWN'));
+    error_log("USER_AGENT: " . ($_SERVER['HTTP_USER_AGENT'] ?? 'UNKNOWN'));
+    error_log("AUTHORIZATION: " . ($_SERVER['HTTP_AUTHORIZATION'] ?? 'NOT_SET'));
+    error_log("Time: " . date('Y-m-d H:i:s'));
+}
+
+$router = new Router();
     $router->dispatch();
     
     // 요청 완료 로그

@@ -9,6 +9,7 @@ require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/config/upload.php';
 
 class LectureController {
     private $db;
@@ -187,30 +188,9 @@ class LectureController {
         try {
             $categories = $this->getCategories();
             
-            // 현재 사용자의 임시저장된 강의 조회
-            $draftLecture = $this->getLatestDraftLecture($currentUserId);
-            
-            // 임시저장 데이터 디버깅
-            if ($draftLecture) {
-                error_log("=== 강의 생성 페이지 로딩 ===");
-                error_log("임시저장 강의 발견: ID=" . $draftLecture['id']);
-                error_log("임시저장 강의 이미지 데이터: " . (is_array($draftLecture['lecture_images']) ? 'ARRAY[' . count($draftLecture['lecture_images']) . ']' : ($draftLecture['lecture_images'] ?? 'NULL')));
-                if (!empty($draftLecture['lecture_images'])) {
-                    if (is_array($draftLecture['lecture_images'])) {
-                        $imageArray = $draftLecture['lecture_images'];
-                    } else {
-                        $imageArray = json_decode($draftLecture['lecture_images'], true);
-                    }
-                    error_log("강의 이미지 배열 개수: " . (is_array($imageArray) ? count($imageArray) : 'NOT_ARRAY'));
-                }
-            } else {
-                error_log("=== 강의 생성 페이지 로딩 ===");
-                error_log("임시저장 강의 없음");
-            }
             
             $viewData = [
                 'categories' => $categories,
-                'draftLecture' => $draftLecture,
                 'defaultData' => [
                     'location_type' => 'offline',
                     'category' => 'seminar',
@@ -283,13 +263,9 @@ class LectureController {
             }
             file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "CSRF 토큰 검증 통과\n", FILE_APPEND);
             
-            // 임시저장 여부 확인
-            $isDraft = isset($_POST['status']) && $_POST['status'] === 'draft';
-            
             // 상세 디버깅 로그
             $debugLog = '/var/www/html/topmkt/debug_store_flow.log';
             file_put_contents($debugLog, "=== store() 메서드 시작 - " . date('Y-m-d H:i:s') . " ===\n", FILE_APPEND);
-            file_put_contents($debugLog, "isDraft: " . ($isDraft ? 'YES' : 'NO') . "\n", FILE_APPEND);
             file_put_contents($debugLog, "POST keys: " . implode(', ', array_keys($_POST)) . "\n", FILE_APPEND);
             file_put_contents($debugLog, "FILES keys: " . implode(', ', array_keys($_FILES)) . "\n", FILE_APPEND);
             file_put_contents($debugLog, "existing_lecture_images in POST: " . (isset($_POST['existing_lecture_images']) ? 'YES - ' . strlen($_POST['existing_lecture_images']) . ' chars' : 'NO') . "\n", FILE_APPEND);
@@ -307,7 +283,6 @@ class LectureController {
                 'timestamp' => date('Y-m-d H:i:s'),
                 'action' => 'store_request',
                 'method' => $_SERVER['REQUEST_METHOD'],
-                'isDraft' => $isDraft,
                 'registration_deadline' => $_POST['registration_deadline'] ?? 'NOT_SET',
                 'youtube_video' => $_POST['youtube_video'] ?? 'NOT_SET',
                 'status' => $_POST['status'] ?? 'NOT_SET',
@@ -506,6 +481,41 @@ class LectureController {
                 error_log("강사 이미지 없음 - FILES에서 찾지 못함");
             }
             
+            // 강사 데이터 구조 변환 (instructor_names[], instructor_infos[] → instructors[][])
+            if ((isset($_POST['instructor_names']) && is_array($_POST['instructor_names'])) ||
+                (isset($_POST['instructor_infos']) && is_array($_POST['instructor_infos']))) {
+                
+                error_log("=== 강사 데이터 구조 변환 시작 ===");
+                $instructorNames = $_POST['instructor_names'] ?? [];
+                $instructorInfos = $_POST['instructor_infos'] ?? [];
+                $instructorTitles = $_POST['instructor_titles'] ?? [];
+                
+                error_log("변환 전 - names: " . json_encode($instructorNames));
+                error_log("변환 전 - infos: " . json_encode($instructorInfos));
+                error_log("변환 전 - titles: " . json_encode($instructorTitles));
+                
+                $_POST['instructors'] = [];
+                $maxCount = max(count($instructorNames), count($instructorInfos), count($instructorTitles));
+                
+                for ($i = 0; $i < $maxCount; $i++) {
+                    $name = isset($instructorNames[$i]) ? trim($instructorNames[$i]) : '';
+                    $info = isset($instructorInfos[$i]) ? trim($instructorInfos[$i]) : '';
+                    $title = isset($instructorTitles[$i]) ? trim($instructorTitles[$i]) : '';
+                    
+                    // 이름이 있거나 정보가 있는 경우만 추가
+                    if (!empty($name) || !empty($info)) {
+                        $_POST['instructors'][] = [
+                            'name' => $name,
+                            'info' => $info,
+                            'title' => $title
+                        ];
+                    }
+                }
+                
+                error_log("변환 후 - instructors: " . json_encode($_POST['instructors']));
+                error_log("=== 강사 데이터 구조 변환 완료 ===");
+            }
+
             // 입력 데이터 검증 (임시저장 여부 전달)
             error_log("=== 데이터 검증 시작 ===");
             error_log("POST에 existing_lecture_images 포함: " . (isset($_POST['existing_lecture_images']) ? 'YES' : 'NO'));
@@ -516,7 +526,6 @@ class LectureController {
             error_log("- start_time: " . (isset($_POST['start_time']) ? $_POST['start_time'] : 'MISSING'));
             error_log("- end_time: " . (isset($_POST['end_time']) ? $_POST['end_time'] : 'MISSING'));
             error_log("- location_type: " . (isset($_POST['location_type']) ? $_POST['location_type'] : 'MISSING'));
-            error_log("- isDraft: " . ($isDraft ? 'TRUE' : 'FALSE'));
             error_log("- status: " . (isset($_POST['status']) ? $_POST['status'] : 'MISSING'));
             
             // 강사 이미지 정보가 POST 데이터에 반영되었는지 확인
@@ -527,7 +536,7 @@ class LectureController {
                 }
             }
             
-            $validationResult = $this->validateLectureData($_POST, $isDraft);
+            $validationResult = $this->validateLectureData($_POST);
             
             error_log("=== 검증 결과 ===");
             error_log("검증 성공 여부: " . ($validationResult['valid'] ? 'SUCCESS' : 'FAILED'));
@@ -553,88 +562,16 @@ class LectureController {
             try {
                 error_log("=== 강의 저장 프로세스 시작 ===");
                 
-                // 임시저장된 강의가 있으면 UPDATE, 없으면 INSERT
-                $draftLecture = $this->getLatestDraftLecture($currentUserId);
-                error_log("현재 사용자 ID: " . $currentUserId);
-                error_log("기존 임시저장 강의: " . ($draftLecture ? 'ID=' . $draftLecture['id'] . ', user_id=' . $draftLecture['user_id'] : 'NONE'));
-                error_log("요청 상태: " . ($validationResult['data']['status'] ?? 'NULL'));
-                
-                // 저장 전 마지막 데이터 확인
-                error_log("=== 저장 직전 최종 데이터 확인 ===");
-                error_log("최종 registration_deadline: " . ($validationResult['data']['registration_deadline'] ?? 'NULL'));
-                error_log("최종 youtube_video: " . ($validationResult['data']['youtube_video'] ?? 'NULL'));
-                
-                // 분기 결정 로깅
-                $branchData = [
-                    'timestamp' => date('Y-m-d H:i:s'),
-                    'action' => 'branch_decision',
-                    'user_id' => $currentUserId,
-                    'draftLecture_exists' => $draftLecture ? true : false,
-                    'draftLecture_id' => $draftLecture ? $draftLecture['id'] : null,
-                    'status_is_draft' => ($validationResult['data']['status'] === 'draft'),
-                    'final_registration_deadline' => $validationResult['data']['registration_deadline'] ?? 'NULL',
-                    'final_youtube_video' => $validationResult['data']['youtube_video'] ?? 'NULL'
-                ];
-                file_put_contents('/var/www/html/topmkt/public/debug.log', json_encode($branchData) . "\n", FILE_APPEND);
-                
-                if ($draftLecture && $validationResult['data']['status'] === 'draft') {
-                    file_put_contents('/var/www/html/topmkt/public/debug.log', json_encode(['timestamp' => date('Y-m-d H:i:s'), 'action' => 'calling_updateLecture', 'lecture_id' => $draftLecture['id']]) . "\n", FILE_APPEND);
-                    $lectureId = $this->updateLecture($draftLecture['id'], $validationResult['data'], $currentUserId);
-                } else {
-                    file_put_contents('/var/www/html/topmkt/public/debug.log', json_encode(['timestamp' => date('Y-m-d H:i:s'), 'action' => 'calling_createLecture']) . "\n", FILE_APPEND);
-                    $lectureId = $this->createLecture($validationResult['data'], $currentUserId);
-                }
+                $lectureId = $this->createLecture($validationResult['data'], $currentUserId);
                 
                 if ($lectureId) {
-                    $status = $validationResult['data']['status'] ?? 'draft';
-                    
-                    if ($status === 'published') {
-                        // 정식 등록인 경우 강의 상세 페이지로 이동
-                        $message = '강의가 성공적으로 등록되었습니다.';
-                        ResponseHelper::json([
-                            'success' => true,
-                            'message' => $message,
-                            'redirectUrl' => '/lectures/' . $lectureId
-                        ]);
-                    } else {
-                        // 임시저장인 경우 현재 페이지에 머물기
-                        $message = '강의가 임시저장되었습니다.';
-                        
-                        // 응답 전 finalLectureImages 상태 확인
-                        error_log("=== 응답 직전 finalLectureImages 상태 ===");
-                        error_log("finalLectureImages 변수 정의됨: " . (isset($finalLectureImages) ? 'YES' : 'NO'));
-                        if (isset($finalLectureImages)) {
-                            error_log("finalLectureImages 개수: " . count($finalLectureImages));
-                            error_log("finalLectureImages 내용: " . json_encode($finalLectureImages));
-                        } else {
-                            error_log("finalLectureImages가 정의되지 않음");
-                        }
-                        
-                        // 디버깅을 위한 임시 응답 (나중에 제거)
-                        ResponseHelper::json([
-                            'success' => true,
-                            'message' => $message,
-                            'isDraft' => true,
-                            'lectureId' => $lectureId,
-                            'debug' => [
-                                'post_registration_deadline' => $_POST['registration_deadline'] ?? 'NOT_SET',
-                                'post_youtube_video' => $_POST['youtube_video'] ?? 'NOT_SET',
-                                'validated_registration_deadline' => $validationResult['data']['registration_deadline'] ?? 'NOT_SET',
-                                'validated_youtube_video' => $validationResult['data']['youtube_video'] ?? 'NOT_SET',
-                                'user_id' => $currentUserId,
-                                'draft_lecture_found' => $draftLecture ? $draftLecture['id'] : 'NONE',
-                                'method_called' => $draftLecture && $validationResult['data']['status'] === 'draft' ? 'updateLecture' : 'createLecture',
-                                'sql_result' => $GLOBALS['debug_sql_result'] ?? 'NOT_SET',
-                                'update_binding' => [
-                                    'params' => isset($finalLectureImages) ? $finalLectureImages : [],
-                                    'variable_status' => isset($finalLectureImages) ? 'DEFINED' : 'UNDEFINED',
-                                    'image_count' => isset($finalLectureImages) ? count($finalLectureImages) : 0
-                                ],
-                                'last_binding' => $GLOBALS['debug_last_binding'] ?? 'NOT_SET',
-                                'before_execute' => $GLOBALS['debug_before_execute'] ?? 'NOT_SET'
-                            ]
-                        ]);
-                    }
+                    // 강의 등록 성공 - 강의 상세 페이지로 이동
+                    $message = '강의가 성공적으로 등록되었습니다.';
+                    ResponseHelper::json([
+                        'success' => true,
+                        'message' => $message,
+                        'redirectUrl' => '/lectures/' . $lectureId
+                    ]);
                 } else {
                     error_log("강의 생성 실패 - lectureId가 null입니다.");
                     ResponseHelper::error('강의 등록 중 오류가 발생했습니다.', 500);
@@ -674,6 +611,7 @@ class LectureController {
                 FROM lectures l
                 JOIN users u ON l.user_id = u.id
                 WHERE l.status = 'published'
+                AND l.content_type = 'lecture'
                 AND YEAR(l.start_date) = :year
                 AND MONTH(l.start_date) = :month
                 ORDER BY l.start_date ASC, l.start_time ASC
@@ -760,13 +698,16 @@ class LectureController {
                 u.profile_image_profile,
                 COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
                 u.bio as author_bio,
+                COUNT(DISTINCT CASE WHEN lr.status = 'approved' THEN lr.id END) as current_participants,
                 CASE WHEN l.max_participants IS NULL THEN '무제한' 
-                     ELSE CONCAT(l.registration_count, '/', l.max_participants) 
+                     ELSE CONCAT(COUNT(DISTINCT CASE WHEN lr.status = 'approved' THEN lr.id END), '/', l.max_participants) 
                 END as capacity_info,
                 CASE WHEN l.registration_deadline IS NULL OR l.registration_deadline > NOW() THEN 1 ELSE 0 END as can_register
             FROM lectures l
             JOIN users u ON l.user_id = u.id
+            LEFT JOIN lecture_registrations lr ON l.id = lr.lecture_id
             WHERE l.id = :id
+            GROUP BY l.id, u.nickname, u.email, u.profile_image_original, u.profile_image_profile, u.bio, l.max_participants, l.registration_deadline
         ";
         
         return $this->db->fetch($sql, [':id' => $id]);
@@ -857,6 +798,7 @@ class LectureController {
                 FROM lectures l
                 JOIN users u ON l.user_id = u.id
                 WHERE l.status = 'published'
+                AND l.content_type = 'lecture'
                 AND DATE(l.start_date) = CURDATE()
                 ORDER BY l.start_time ASC
                 LIMIT 5
@@ -884,6 +826,7 @@ class LectureController {
                 FROM lectures l
                 JOIN users u ON l.user_id = u.id
                 WHERE l.status = 'published'
+                AND l.content_type = 'lecture'
                 AND l.start_date > CURDATE()
                 ORDER BY l.start_date ASC, l.start_time ASC
                 LIMIT :limit
@@ -1004,50 +947,48 @@ class LectureController {
     /**
      * 강의 데이터 검증
      */
-    private function validateLectureData($data, $isDraft = false) {
+    private function validateLectureData($data) {
         $errors = [];
         
-        // 임시저장이 아닌 경우에만 필수 필드 검증
-        if (!$isDraft) {
-            error_log("=== PUBLISHED 상태 필수 필드 검증 시작 ===");
-            if (empty($data['title'])) {
-                $errors[] = '강의 제목을 입력해주세요.';
-                error_log("검증 실패: title 누락");
-            } else {
-                error_log("검증 성공: title = " . $data['title']);
-            }
-            if (empty($data['description'])) {
-                $errors[] = '강의 설명을 입력해주세요.';
-                error_log("검증 실패: description 누락");
-            } else {
-                error_log("검증 성공: description 길이 = " . strlen($data['description']));
-            }
-            if (empty($data['start_date'])) {
-                $errors[] = '시작 날짜를 입력해주세요.';
-                error_log("검증 실패: start_date 누락");
-            } else {
-                error_log("검증 성공: start_date = " . $data['start_date']);
-            }
-            if (empty($data['end_date'])) {
-                $errors[] = '종료 날짜를 입력해주세요.';
-                error_log("검증 실패: end_date 누락");
-            } else {
-                error_log("검증 성공: end_date = " . $data['end_date']);
-            }
-            if (empty($data['start_time'])) {
-                $errors[] = '시작 시간을 입력해주세요.';
-                error_log("검증 실패: start_time 누락");
-            } else {
-                error_log("검증 성공: start_time = " . $data['start_time']);
-            }
-            if (empty($data['end_time'])) {
-                $errors[] = '종료 시간을 입력해주세요.';
-                error_log("검증 실패: end_time 누락");
-            } else {
-                error_log("검증 성공: end_time = " . $data['end_time']);
-            }
-            error_log("=== PUBLISHED 필수 필드 검증 완료, 현재 오류 수: " . count($errors) . " ===");
+        // 필수 필드 검증
+        error_log("=== 필수 필드 검증 시작 ===");
+        if (empty($data['title'])) {
+            $errors[] = '강의 제목을 입력해주세요.';
+            error_log("검증 실패: title 누락");
+        } else {
+            error_log("검증 성공: title = " . $data['title']);
         }
+        if (empty($data['description'])) {
+            $errors[] = '강의 설명을 입력해주세요.';
+            error_log("검증 실패: description 누락");
+        } else {
+            error_log("검증 성공: description 길이 = " . strlen($data['description']));
+        }
+        if (empty($data['start_date'])) {
+            $errors[] = '시작 날짜를 입력해주세요.';
+            error_log("검증 실패: start_date 누락");
+        } else {
+            error_log("검증 성공: start_date = " . $data['start_date']);
+        }
+        if (empty($data['end_date'])) {
+            $errors[] = '종료 날짜를 입력해주세요.';
+            error_log("검증 실패: end_date 누락");
+        } else {
+            error_log("검증 성공: end_date = " . $data['end_date']);
+        }
+        if (empty($data['start_time'])) {
+            $errors[] = '시작 시간을 입력해주세요.';
+            error_log("검증 실패: start_time 누락");
+        } else {
+            error_log("검증 성공: start_time = " . $data['start_time']);
+        }
+        if (empty($data['end_time'])) {
+            $errors[] = '종료 시간을 입력해주세요.';
+            error_log("검증 실패: end_time 누락");
+        } else {
+            error_log("검증 성공: end_time = " . $data['end_time']);
+        }
+        error_log("=== 필수 필드 검증 완료, 현재 오류 수: " . count($errors) . " ===");
         
         // 복수 강사 데이터 구성 및 검증
         $instructors = [];
@@ -1057,7 +998,7 @@ class LectureController {
         
         // 디버깅용 직접 파일 로그
         file_put_contents('/var/www/html/topmkt/debug_instructor_validation.log', "=== 강사 데이터 검증 시작 (" . date('Y-m-d H:i:s') . ") ===\n", FILE_APPEND);
-        file_put_contents('/var/www/html/topmkt/debug_instructor_validation.log', "isDraft: " . ($isDraft ? 'true' : 'false') . "\n", FILE_APPEND);
+        file_put_contents('/var/www/html/topmkt/debug_instructor_validation.log', "강의 등록 모드: published\n", FILE_APPEND);
         file_put_contents('/var/www/html/topmkt/debug_instructor_validation.log', "전달받은 강사 데이터: " . json_encode($data['instructors'] ?? 'NOT_SET') . "\n", FILE_APPEND);
         
         // 기존 강사 이미지 정보 보존 (임시저장 및 최종등록 모두)
@@ -1129,10 +1070,10 @@ class LectureController {
             }
         }
         
-        if (!$isDraft && empty($instructors)) {
+        if (empty($instructors)) {
             $errors[] = '최소 1명의 강사 정보를 입력해주세요.';
             error_log("검증 실패: 강사 정보 누락 (강사 수: " . count($instructors) . ")");
-        } else if (!$isDraft) {
+        } else {
             error_log("검증 성공: 강사 정보 있음 (강사 수: " . count($instructors) . ")");
         }
         
@@ -1187,18 +1128,7 @@ class LectureController {
                 file_put_contents(DEBUG_LECTURE_IMAGES_LOG, "기존 강의 이미지 파싱 오류: " . $e->getMessage() . "\n", FILE_APPEND);
             }
         }
-        // 마지막으로 DB에서 조회 (다른 모든 방법이 실패한 경우)
-        else if ($isDraft && !empty($currentUserId)) {
-            file_put_contents(DEBUG_LECTURE_IMAGES_LOG, "DB에서 기존 이미지 조회 시도 - user_id: $currentUserId\n", FILE_APPEND);
-            $existingLectureResult = $this->db->fetch("SELECT lecture_images FROM lectures WHERE user_id = ? AND status = 'draft' ORDER BY updated_at DESC LIMIT 1", [':user_id' => $currentUserId]);
-            if ($existingLectureResult && !empty($existingLectureResult['lecture_images'])) {
-                $existingImages = json_decode($existingLectureResult['lecture_images'], true);
-                if (is_array($existingImages)) {
-                    $finalLectureImages = $existingImages;
-                    file_put_contents(DEBUG_LECTURE_IMAGES_LOG, "DB에서 기존 강의 이미지 로드됨: " . count($existingImages) . "개\n", FILE_APPEND);
-                }
-            }
-        }
+        // 기존 이미지 조회 로직 제거 (draft 기능 제거)
         
         // 최종 강의 이미지 저장
         file_put_contents(DEBUG_LECTURE_IMAGES_LOG, "최종 이미지 배열 크기: " . count($finalLectureImages) . "\n", FILE_APPEND);
@@ -1220,8 +1150,8 @@ class LectureController {
             }
         }
         
-        // 시간 유효성 검증 (임시저장이 아니고 시간이 모두 입력된 경우에만)
-        if (!$isDraft && !empty($data['start_time']) && !empty($data['end_time']) && !empty($data['start_date']) && !empty($data['end_date'])) {
+        // 시간 유효성 검증 (시간이 모두 입력된 경우에만)
+        if (!empty($data['start_time']) && !empty($data['end_time']) && !empty($data['start_date']) && !empty($data['end_date'])) {
             // 디버깅을 위한 로그
             error_log("시간 검증: start_date={$data['start_date']}, end_date={$data['end_date']}, start_time={$data['start_time']}, end_time={$data['end_time']}");
             
@@ -1242,8 +1172,6 @@ class LectureController {
             } else {
                 error_log("날짜시간 객체 생성 실패");
             }
-        } else if ($isDraft) {
-            error_log("임시저장이므로 시간 검증 건너뜀");
         }
         
         // 정원 검증
@@ -1353,11 +1281,11 @@ class LectureController {
             error_log("youtube_video가 비어있음");
         }
         
-        // status 값 처리 (임시저장 vs 등록)
-        $data['status'] = isset($data['status']) && in_array($data['status'], ['draft', 'published']) ? $data['status'] : 'draft';
+        // status 값 처리 - 항상 published로 설정
+        $data['status'] = 'published';
         
-        // 중복 강의 검증 (제목, 날짜, 시간이 동일한 경우) - 임시저장이 아닌 경우에만
-        if (!$isDraft && !empty($data['title']) && !empty($data['start_date']) && !empty($data['start_time'])) {
+        // 중복 강의 검증 (제목, 날짜, 시간이 동일한 경우)
+        if (!empty($data['title']) && !empty($data['start_date']) && !empty($data['start_time'])) {
             error_log("=== 중복 강의 검증 시작 ===");
             $duplicateCheck = $this->checkDuplicateLecture($data);
             if (!$duplicateCheck['valid']) {
@@ -1366,7 +1294,7 @@ class LectureController {
             } else {
                 error_log("검증 성공: 중복 강의 없음");
             }
-        } else if (!$isDraft) {
+        } else {
             error_log("중복 강의 검증 건너뜀 - 필수 데이터 누락 (title:" . (!empty($data['title']) ? 'OK' : 'MISSING') . ", start_date:" . (!empty($data['start_date']) ? 'OK' : 'MISSING') . ", start_time:" . (!empty($data['start_time']) ? 'OK' : 'MISSING') . ")");
         }
         
@@ -1716,9 +1644,9 @@ class LectureController {
                     continue; // 허용되지 않는 파일 형식은 건너뛰기
                 }
                 
-                // 파일 크기 검증 (5MB 제한)
-                if ($fileSize > 5 * 1024 * 1024) {
-                    continue; // 5MB 초과 파일은 건너뛰기
+                // 파일 크기 검증 (공통 설정 사용: 30MB)
+                if (!UploadConfig::validateFileSize($fileSize)) {
+                    continue; // 용량 초과 파일은 건너뛰기
                 }
                 
                 // 안전한 파일명 생성 (한글 지원)
@@ -1756,7 +1684,7 @@ class LectureController {
     /**
      * 강사 이미지 업로드 처리
      */
-    private function handleInstructorImageUploads($files) {
+    protected function handleInstructorImageUploads($files) {
         // 직접 파일에 로그 기록 (디버깅용) - 권한 문제 해결
         $logFile = DEBUG_INSTRUCTOR_IMAGES_LOG;
         file_put_contents($logFile, "=== handleInstructorImageUploads 함수 호출됨 ===\n", FILE_APPEND);
@@ -1810,8 +1738,8 @@ class LectureController {
                                 continue;
                             }
                             
-                            // 파일 크기 검증 (2MB 제한)
-                            if ($fileSize > 2 * 1024 * 1024) {
+                            // 파일 크기 검증 (공통 설정 사용: 30MB)
+                            if (!UploadConfig::validateFileSize($fileSize)) {
                                 file_put_contents($logFile, "강사 {$index} 이미지 크기 초과: {$fileSize}\n", FILE_APPEND);
                                 continue;
                             }
@@ -1838,6 +1766,68 @@ class LectureController {
             }
         }
         
+        // 새로운 구조 처리 (instructor_images[] 배열 형태)
+        // 구조: {"name":["file1.jpg","file2.jpg"], "type":["image/jpeg","image/jpeg"], ...}
+        if (empty($instructorImages) && isset($files['name']) && is_array($files['name'])) {
+            file_put_contents($logFile, "=== 새로운 파일 구조 처리 (instructor_images[]) ===\n", FILE_APPEND);
+            
+            $fileNames = $files['name'];
+            $tmpNames = $files['tmp_name'] ?? [];
+            $fileTypes = $files['type'] ?? [];
+            $fileErrors = $files['error'] ?? [];
+            $fileSizes = $files['size'] ?? [];
+            
+            for ($i = 0; $i < count($fileNames); $i++) {
+                $fileName = $fileNames[$i];
+                $tmpName = $tmpNames[$i] ?? '';
+                $fileType = $fileTypes[$i] ?? '';
+                $fileError = $fileErrors[$i] ?? UPLOAD_ERR_NO_FILE;
+                $fileSize = $fileSizes[$i] ?? 0;
+                
+                file_put_contents($logFile, "강사 {$i} 이미지 처리 시작: {$fileName}\n", FILE_APPEND);
+                file_put_contents($logFile, "파일 정보: tmp={$tmpName}, error={$fileError}, size={$fileSize}\n", FILE_APPEND);
+                
+                if ($fileError === UPLOAD_ERR_OK && !empty($tmpName) && is_uploaded_file($tmpName)) {
+                    $uploadDir = INSTRUCTORS_UPLOAD_PATH . '/';
+                    $webPath = INSTRUCTORS_WEB_PATH . '/';
+                    
+                    // 업로드 디렉토리 생성
+                    if (!is_dir($uploadDir)) {
+                        @mkdir($uploadDir, 0755, true);
+                    }
+                    
+                    // 파일 확장자 검증
+                    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                    
+                    if (!in_array($fileExt, $allowedTypes)) {
+                        file_put_contents($logFile, "강사 {$i} 파일 확장자 불허: {$fileExt}\n", FILE_APPEND);
+                        continue;
+                    }
+                    
+                    // 안전한 파일명 생성
+                    $timestamp = time();
+                    $randomId = uniqid();
+                    $safeName = "instructor_{$i}_{$timestamp}_file_{$randomId}.{$fileExt}";
+                    $uploadPath = $uploadDir . $safeName;
+                    
+                    // 파일 업로드
+                    if (move_uploaded_file($tmpName, $uploadPath)) {
+                        $instructorImages[$i] = $webPath . $safeName;
+                        file_put_contents($logFile, "강사 {$i} 이미지 업로드 성공: {$webPath}{$safeName}\n", FILE_APPEND);
+                        error_log("강사 {$i} 이미지 업로드 성공: " . $webPath . $safeName);
+                    } else {
+                        file_put_contents($logFile, "강사 {$i} 이미지 업로드 실패: move_uploaded_file 실패\n", FILE_APPEND);
+                        error_log("강사 {$i} 이미지 업로드 실패: move_uploaded_file 실패");
+                    }
+                } else {
+                    file_put_contents($logFile, "강사 {$i} 파일 에러 또는 임시파일 없음: error={$fileError}\n", FILE_APPEND);
+                }
+            }
+            
+            file_put_contents($logFile, "새로운 구조 처리 완료. 업로드된 이미지 수: " . count($instructorImages) . "\n", FILE_APPEND);
+        }
+        
         error_log("강사 이미지 처리 결과: " . json_encode($instructorImages));
         return $instructorImages;
     }
@@ -1845,146 +1835,7 @@ class LectureController {
     /**
      * 강의 이미지 업데이트 (삭제 처리)
      */
-    public function updateImages() {
-        // 오류 출력 방지
-        ini_set('display_errors', 0);
-        error_reporting(0);
-        
-        header('Content-Type: application/json');
-        
-        try {
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                echo json_encode(['success' => false, 'message' => '허용되지 않은 요청 방식입니다.']);
-                exit;
-            }
-            
-            // 로그인 상태 확인
-            require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
-            if (!AuthMiddleware::isLoggedIn()) {
-                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
-                exit;
-            }
-            
-            $userId = AuthMiddleware::getCurrentUserId();
-            if (!$userId) {
-                echo json_encode(['success' => false, 'message' => '사용자 정보를 찾을 수 없습니다.']);
-                exit;
-            }
-            
-            // 기업회원 권한 확인
-            require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
-            $permission = CorporateMiddleware::checkLectureEventPermission();
-            if (!$permission['hasPermission']) {
-                echo json_encode(['success' => false, 'message' => $permission['message']]);
-                exit;
-            }
-            
-            // CSRF 토큰 검증
-            if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
-                echo json_encode(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.']);
-                exit;
-            }
-            
-            $action = $_POST['action'] ?? '';
-            
-            if ($action === 'update_images') {
-                $lectureImages = $_POST['lecture_images'] ?? '[]';
-                
-                // 사용자의 최신 draft 강의 조회
-                $draftLecture = $this->getLatestDraftLecture($userId);
-                
-                if (!$draftLecture) {
-                    echo json_encode(['success' => false, 'message' => '임시저장된 강의를 찾을 수 없습니다.']);
-                    exit;
-                }
-                
-                // 강의 이미지 업데이트
-                $sql = "UPDATE lectures SET lecture_images = ?, updated_at = NOW() WHERE id = ? AND user_id = ?";
-                $result = $this->db->execute($sql, [$lectureImages, $draftLecture['id'], $userId]);
-                
-                if ($result) {
-                    echo json_encode(['success' => true, 'message' => '이미지가 성공적으로 업데이트되었습니다.']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => '이미지 업데이트에 실패했습니다.']);
-                }
-            } else {
-                echo json_encode(['success' => false, 'message' => '유효하지 않은 액션입니다.']);
-            }
-        } catch (Exception $e) {
-            error_log('이미지 업데이트 오류: ' . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => '서버 오류가 발생했습니다.']);
-        }
-    }
     
-    /**
-     * 가장 최근 임시저장된 강의 조회
-     */
-    private function getLatestDraftLecture($userId) {
-        try {
-            $sql = "
-                SELECT * FROM lectures 
-                WHERE status = 'draft' 
-                AND content_type = 'lecture'
-                AND user_id = :user_id
-                ORDER BY updated_at DESC, created_at DESC 
-                LIMIT 1
-            ";
-            
-            $result = $this->db->fetch($sql, [':user_id' => $userId]);
-            
-            if ($result) {
-                // 디버깅: 데이터베이스에서 로드된 원본 데이터 확인
-                error_log("=== getLatestDraftLecture 디버깅 ===");
-                error_log("DB에서 로드된 lecture_images 원본: " . $result['lecture_images']);
-                error_log("lecture_images 길이: " . strlen($result['lecture_images']));
-                
-                // instructors_json 파싱 및 이미지 파일 검증
-                if (!empty($result['instructors_json'])) {
-                    $instructors = json_decode($result['instructors_json'], true);
-                    
-                    // 강사 이미지 파일 존재 여부 검증
-                    if (is_array($instructors)) {
-                        foreach ($instructors as &$instructor) {
-                            if (!empty($instructor['image'])) {
-                                $filePath = ROOT_PATH . '/public' . $instructor['image'];
-                                if (!file_exists($filePath)) {
-                                    error_log("임시저장 강사 이미지 파일 없음: " . $filePath);
-                                    unset($instructor['image']);
-                                }
-                            }
-                        }
-                        unset($instructor);
-                    }
-                    
-                    $result['instructors'] = $instructors;
-                }
-                
-                // lecture_images도 파싱
-                if (!empty($result['lecture_images'])) {
-                    try {
-                        $parsed = json_decode($result['lecture_images'], true);
-                        error_log("파싱된 lecture_images: " . json_encode($parsed));
-                        error_log("파싱된 이미지 개수: " . (is_array($parsed) ? count($parsed) : 'NOT_ARRAY'));
-                        $result['lecture_images'] = $parsed;
-                    } catch (Exception $e) {
-                        error_log("강의 이미지 JSON 파싱 오류: " . $e->getMessage());
-                        $result['lecture_images'] = null;
-                    }
-                } else {
-                    error_log("lecture_images 필드가 비어있음");
-                    $result['lecture_images'] = null;
-                }
-                
-                return $result;
-            }
-            
-            return null;
-            
-        } catch (Exception $e) {
-            error_log("임시저장 강의 조회 오류: " . $e->getMessage());
-            return null;
-        }
-    }
     
     /**
      * CSRF 토큰 검증
@@ -2395,30 +2246,6 @@ class LectureController {
     /**
      * 사용자의 임시저장(draft) 강의들을 삭제
      */
-    private function deleteDraftLectures($userId, $excludeId = null) {
-        try {
-            $sql = "DELETE FROM lectures WHERE user_id = :user_id AND status = 'draft'";
-            $params = [':user_id' => $userId];
-            
-            // 현재 생성된 강의는 제외
-            if ($excludeId) {
-                $sql .= " AND id != :exclude_id";
-                $params[':exclude_id'] = $excludeId;
-            }
-            
-            $result = $this->db->execute($sql, $params);
-            
-            if ($result) {
-                error_log("사용자 {$userId}의 임시저장 강의들이 삭제되었습니다. (제외: {$excludeId})");
-            }
-            
-            return $result;
-            
-        } catch (Exception $e) {
-            error_log("임시저장 강의 삭제 중 오류: " . $e->getMessage());
-            return false;
-        }
-    }
     
     /**
      * Process legacy image merging logic (existing behavior)
@@ -3162,6 +2989,42 @@ class LectureController {
         } catch (Exception $e) {
             error_log("강의 파일 삭제 오류: " . $e->getMessage());
             // 파일 삭제 실패는 치명적이지 않으므로 예외를 다시 던지지 않음
+        }
+    }
+    
+    /**
+     * 사용자의 드래프트 강의들을 삭제 (published 상태로 등록 시 정리용)
+     * @param int $userId 사용자 ID
+     * @param int $excludeLectureId 삭제에서 제외할 강의 ID (현재 등록 중인 강의)
+     */
+    private function deleteDraftLectures($userId, $excludeLectureId = null) {
+        try {
+            error_log("deleteDraftLectures 호출: userId={$userId}, excludeLectureId={$excludeLectureId}");
+            
+            // 해당 사용자의 draft 상태 강의들을 조회 (현재 등록 중인 강의는 제외)
+            $sql = "SELECT id, lecture_images, instructors_json FROM lectures WHERE user_id = ? AND status = 'draft'";
+            $params = [$userId];
+            
+            if ($excludeLectureId) {
+                $sql .= " AND id != ?";
+                $params[] = $excludeLectureId;
+            }
+            
+            $draftLectures = $this->db->fetchAll($sql, $params);
+            error_log("삭제 대상 draft 강의 수: " . count($draftLectures));
+            
+            foreach ($draftLectures as $lecture) {
+                // 강의 관련 파일들 삭제
+                $this->deleteLectureFiles($lecture);
+                
+                // 데이터베이스에서 강의 삭제
+                $this->db->execute("DELETE FROM lectures WHERE id = ?", [$lecture['id']]);
+                error_log("Draft 강의 삭제 완료: ID=" . $lecture['id']);
+            }
+            
+        } catch (Exception $e) {
+            error_log("deleteDraftLectures 오류: " . $e->getMessage());
+            // draft 정리 실패는 치명적이지 않으므로 예외를 다시 던지지 않음
         }
     }
 }

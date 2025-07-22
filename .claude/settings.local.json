@@ -74,7 +74,12 @@
       "Bash(git init:*)",
       "Bash(sudo systemctl:*)",
       "Bash(sudo systemctl status:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(yum search:*)",
+      "Bash(ln:*)",
+      "Bash(/var/www/html/topmkt/mysql_cnf_demo.sh:*)",
+      "Bash(./scripts/mysql_connect.sh:*)",
+      "Bash(telnet:*)"
     ],
     "deny": []
   }

@@ -4,9 +4,11 @@
  * 기업 인증 관련 파일 업로드 보안 처리
  */
 
+require_once SRC_PATH . '/config/upload.php';
+
 class CorporateFileUpload {
     private const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-    private const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    // MAX_SIZE는 UploadConfig::getMaxFileSize()를 사용 (30MB)
     private const UPLOAD_PATH = '/assets/uploads/corp_docs/';
     
     /**
@@ -73,8 +75,8 @@ class CorporateFileUpload {
         }
         
         // 파일 크기 검증
-        if ($file['size'] > self::MAX_SIZE) {
-            return ['success' => false, 'message' => '파일 크기는 10MB를 초과할 수 없습니다.'];
+        if (!UploadConfig::validateFileSize($file['size'])) {
+            return ['success' => false, 'message' => UploadConfig::getErrorMessage('file_too_large')];
         }
         
         if ($file['size'] <= 0) {

@@ -29,12 +29,17 @@ class RegistrationController extends BaseController
             // 강의 정보 조회
             $lectureQuery = "
                 SELECT 
-                    id, title, start_date, start_time, end_date, end_time,
-                    max_participants, current_participants, auto_approval,
-                    registration_start_date, registration_end_date, allow_waiting_list,
-                    status as lecture_status
-                FROM lectures 
-                WHERE id = ? AND status = 'published'
+                    l.id, l.title, l.start_date, l.start_time, l.end_date, l.end_time,
+                    l.max_participants, l.auto_approval,
+                    l.registration_start_date, l.registration_end_date, l.allow_waiting_list,
+                    l.status as lecture_status,
+                    COUNT(DISTINCT CASE WHEN lr.status = 'approved' THEN lr.id END) as current_participants
+                FROM lectures l
+                LEFT JOIN lecture_registrations lr ON l.id = lr.lecture_id
+                WHERE l.id = ? AND l.status = 'published'
+                GROUP BY l.id, l.title, l.start_date, l.start_time, l.end_date, l.end_time,
+                         l.max_participants, l.auto_approval, l.registration_start_date, 
+                         l.registration_end_date, l.allow_waiting_list, l.status
             ";
             
             $stmt = $this->db->prepare($lectureQuery);
@@ -97,8 +102,41 @@ class RegistrationController extends BaseController
             
             $userId = AuthMiddleware::getCurrentUserId();
             
-            // JSON 데이터 파싱
-            $input = json_decode(file_get_contents('php://input'), true);
+            // 데이터 파싱 (JSON 또는 폼 데이터 지원)
+            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+            error_log("📝 Content-Type: " . $contentType);
+            
+            $input = [];
+            if (strpos($contentType, 'application/json') !== false) {
+                // JSON 데이터 처리
+                $rawInput = file_get_contents('php://input');
+                error_log("📝 Raw JSON input length: " . strlen($rawInput));
+                
+                // php://input이 비어있으면 $_POST 사용 (fallback)
+                if (empty($rawInput)) {
+                    error_log("📝 php://input 비어있음, _POST 사용");
+                    $input = $_POST;
+                } else {
+                    $decoded = json_decode($rawInput, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                        $input = $decoded;
+                        error_log("✅ JSON 디코딩 성공");
+                    } else {
+                        error_log("❌ JSON 디코딩 실패: " . json_last_error_msg());
+                        error_log("❌ Raw input: " . substr($rawInput, 0, 100)); // 처음 100자만
+                        $input = $_POST; // fallback
+                    }
+                }
+            } else {
+                // 폼 데이터 처리
+                $input = $_POST;
+                error_log("📝 Form data input: " . json_encode($_POST, JSON_UNESCAPED_UNICODE));
+            }
+            
+            if (empty($input)) {
+                error_log("❌ 입력 데이터가 비어있음");
+                return ResponseHelper::json(null, 400, '입력 데이터가 없습니다.');
+            }
             
             // CSRF 토큰 검증
             if (!$this->validateCsrfToken($input['csrf_token'] ?? '')) {
@@ -138,6 +176,16 @@ class RegistrationController extends BaseController
             
             if ($existing && in_array($existing['status'], ['pending', 'approved', 'waiting'])) {
                 return ResponseHelper::json(null, 400, '이미 신청하셨습니다.');
+            }
+            
+            // 취소되거나 거절된 신청이 있으면 삭제 (재신청을 위해)
+            if ($existing && in_array($existing['status'], ['cancelled', 'rejected'])) {
+                error_log("재신청 가능한 기존 신청 발견 (ID: {$existing['id']}, 상태: {$existing['status']}), 재신청을 위해 삭제");
+                $deleteQuery = "DELETE FROM lecture_registrations WHERE id = ?";
+                $stmt = $this->db->prepare($deleteQuery);
+                $stmt->bind_param("i", $existing['id']);
+                $stmt->execute();
+                error_log("기존 신청 삭제 완료 (재신청 허용)");
             }
             
             // 신청 기간 확인
@@ -202,11 +250,20 @@ class RegistrationController extends BaseController
                 $status = 'approved';
             }
             
+            // 디버깅: 입력 데이터 로깅
+            error_log("=== 강의 신청 디버깅 시작 ===");
+            error_log("강의 ID: " . $lectureId);
+            error_log("사용자 ID: " . $userId);
+            error_log("입력 데이터: " . json_encode($input, JSON_UNESCAPED_UNICODE));
+            error_log("사용자 정보: " . json_encode($user, JSON_UNESCAPED_UNICODE));
+            
             // 입력 데이터 검증
             $validationErrors = $this->validateRegistrationData($input, $user);
             if (!empty($validationErrors)) {
+                error_log("검증 오류: " . json_encode($validationErrors, JSON_UNESCAPED_UNICODE));
                 return ResponseHelper::json(['errors' => $validationErrors], 400, '입력 데이터에 오류가 있습니다.');
             }
+            error_log("✅ 입력 데이터 검증 통과");
             
             // 신청 데이터 구성
             $registrationData = [
@@ -222,7 +279,9 @@ class RegistrationController extends BaseController
                 'how_did_you_know' => trim($input['how_did_you_know'] ?? ''),
                 'status' => $status,
                 'is_waiting_list' => $isWaitingList,
-                'waiting_order' => $waitingOrder
+                'waiting_order' => $waitingOrder,
+                'processed_by' => null,
+                'processed_at' => null
             ];
             
             // 자동 승인인 경우 처리자 정보 설정
@@ -231,20 +290,56 @@ class RegistrationController extends BaseController
                 $registrationData['processed_at'] = date('Y-m-d H:i:s');
             }
             
+            // 디버깅: 신청 데이터 로깅
+            error_log("📋 구성된 신청 데이터: " . json_encode($registrationData, JSON_UNESCAPED_UNICODE));
+            error_log("📋 신청 상태: " . $status);
+            error_log("📋 대기자 여부: " . ($isWaitingList ? 'true' : 'false'));
+            
             // 트랜잭션 시작
-            $this->db->begin_transaction();
+            error_log("🔄 데이터베이스 트랜잭션 시작");
+            $this->db->beginTransaction();
             
             try {
                 // 신청 등록
                 $insertQuery = "
                     INSERT INTO lecture_registrations 
-                    (lecture_id, user_id, participant_name, participant_email, participant_phone,
+                    (lecture_id, user_id, registration_date, participant_name, participant_email, participant_phone,
                      company_name, position, motivation, special_requests, how_did_you_know,
                      status, is_waiting_list, waiting_order, processed_by, processed_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ";
                 
+                error_log("📝 준비된 INSERT 쿼리: " . $insertQuery);
+                
                 $stmt = $this->db->prepare($insertQuery);
+                if (!$stmt) {
+                    $error = $this->db->getConnection()->error;
+                    error_log("❌ Prepare 실패: " . $error);
+                    throw new Exception('쿼리 준비에 실패했습니다: ' . $error);
+                }
+                error_log("✅ 쿼리 Prepare 성공");
+                
+                // 바인딩할 값들 로깅
+                $bindValues = [
+                    $registrationData['lecture_id'],
+                    $registrationData['user_id'],
+                    $registrationData['participant_name'],
+                    $registrationData['participant_email'],
+                    $registrationData['participant_phone'],
+                    $registrationData['company_name'],
+                    $registrationData['position'],
+                    $registrationData['motivation'],
+                    $registrationData['special_requests'],
+                    $registrationData['how_did_you_know'],
+                    $registrationData['status'],
+                    $registrationData['is_waiting_list'],
+                    $registrationData['waiting_order'],
+                    $registrationData['processed_by'],
+                    $registrationData['processed_at']
+                ];
+                error_log("📋 바인딩 값들: " . json_encode($bindValues, JSON_UNESCAPED_UNICODE));
+                error_log("📋 바인딩 타입: iisssssssssiiis");
+                
                 $stmt->bind_param(
                     "iisssssssssiiis",
                     $registrationData['lecture_id'],
@@ -263,15 +358,25 @@ class RegistrationController extends BaseController
                     $registrationData['processed_by'],
                     $registrationData['processed_at']
                 );
+                error_log("✅ 파라미터 바인딩 완료");
                 
+                error_log("🚀 쿼리 실행 시작...");
                 if (!$stmt->execute()) {
-                    throw new Exception('신청 등록에 실패했습니다.');
+                    $error = $stmt->error;
+                    error_log("❌ 신청 등록 쿼리 실행 실패: " . $error);
+                    error_log("❌ affected_rows: " . $stmt->affected_rows);
+                    error_log("❌ errno: " . $stmt->errno);
+                    throw new Exception('신청 등록에 실패했습니다: ' . $error);
                 }
+                error_log("✅ 쿼리 실행 성공! affected_rows: " . $stmt->affected_rows);
                 
-                $registrationId = $this->db->insert_id;
+                $registrationId = $this->db->lastInsertId();
+                error_log("✅ 생성된 신청 ID: " . $registrationId);
                 
                 // 커밋
+                error_log("💾 트랜잭션 커밋 시작");
                 $this->db->commit();
+                error_log("✅ 트랜잭션 커밋 완료");
                 
                 // 신청 확인 SMS 발송
                 try {
@@ -299,13 +404,20 @@ class RegistrationController extends BaseController
                 ], 200, $message);
                 
             } catch (Exception $e) {
+                error_log("❌ 트랜잭션 내부 오류: " . $e->getMessage());
+                error_log("❌ 파일: " . $e->getFile() . ", 라인: " . $e->getLine());
+                error_log("🔄 트랜잭션 롤백 시작");
                 $this->db->rollback();
+                error_log("✅ 트랜잭션 롤백 완료");
                 throw $e;
             }
             
         } catch (Exception $e) {
-            error_log("신청 등록 오류: " . $e->getMessage());
-            error_log("신청 등록 스택 추적: " . $e->getTraceAsString());
+            error_log("❌❌❌ 최종 신청 등록 오류: " . $e->getMessage());
+            error_log("❌ 파일: " . $e->getFile());
+            error_log("❌ 라인: " . $e->getLine());
+            error_log("❌ 스택 추적: " . $e->getTraceAsString());
+            error_log("=== 강의 신청 디버깅 종료 ===");
             return ResponseHelper::json(null, 500, '신청 처리 중 오류가 발생했습니다: ' . $e->getMessage());
         }
     }
@@ -330,11 +442,21 @@ class RegistrationController extends BaseController
             
             $userId = AuthMiddleware::getCurrentUserId();
             
-            // JSON 데이터 파싱
-            $input = json_decode(file_get_contents('php://input'), true);
+            // 데이터 파싱 (JSON 또는 쿼리 파라미터 지원)
+            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
             
-            // CSRF 토큰 검증
-            if (!$this->validateCsrfToken($input['csrf_token'] ?? '')) {
+            if (strpos($contentType, 'application/json') !== false) {
+                // JSON 데이터 처리
+                $input = json_decode(file_get_contents('php://input'), true);
+            } else {
+                // 쿼리 파라미터나 POST 데이터 처리
+                $input = array_merge($_GET, $_POST);
+            }
+            
+            // CSRF 토큰 검증 (다양한 방식 지원)
+            $csrfToken = $input['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+            
+            if (!$this->validateCsrfToken($csrfToken)) {
                 return ResponseHelper::json(null, 403, 'CSRF 토큰이 유효하지 않습니다.');
             }
             
@@ -373,14 +495,28 @@ class RegistrationController extends BaseController
             ";
             
             $stmt = $this->db->prepare($updateQuery);
+            if (!$stmt) {
+                error_log("취소 쿼리 prepare 실패: " . $this->db->getConnection()->error);
+                return ResponseHelper::json(null, 500, '신청 취소 준비에 실패했습니다.');
+            }
+            
             $stmt->bind_param("i", $registration['id']);
             
             if ($stmt->execute()) {
-                return ResponseHelper::json([
-                    'registration_id' => $registration['id']
-                ], 200, '신청이 취소되었습니다.');
+                $affectedRows = $stmt->affected_rows;
+                error_log("신청 취소 성공 - 영향받은 행: " . $affectedRows . ", 신청 ID: " . $registration['id']);
+                
+                if ($affectedRows > 0) {
+                    return ResponseHelper::json([
+                        'registration_id' => $registration['id']
+                    ], 200, '신청이 취소되었습니다.');
+                } else {
+                    error_log("신청 취소 실패 - 업데이트된 행이 없음");
+                    return ResponseHelper::json(null, 500, '신청 정보를 업데이트할 수 없습니다.');
+                }
             } else {
-                return ResponseHelper::json(null, 500, '신청 취소에 실패했습니다.');
+                error_log("취소 쿼리 실행 실패: " . $stmt->error);
+                return ResponseHelper::json(null, 500, '신청 취소에 실패했습니다: ' . $stmt->error);
             }
             
         } catch (Exception $e) {
@@ -462,6 +598,49 @@ class RegistrationController extends BaseController
         
         // 한국 휴대폰 번호 형식 검증
         return preg_match('/^(010|011|016|017|018|019)[-]?\d{3,4}[-]?\d{4}$/', $phone);
+    }
+    
+    /**
+     * 이전 신청 데이터 조회 API
+     */
+    public function getPreviousRegistration($lectureId)
+    {
+        header('Content-Type: application/json');
+        
+        try {
+            // 로그인 확인
+            if (!AuthMiddleware::isLoggedIn()) {
+                return ResponseHelper::json(null, 401, '로그인이 필요합니다.');
+            }
+            
+            $userId = AuthMiddleware::getCurrentUserId();
+            
+            // 가장 최근 취소된 또는 거절된 신청 정보 조회
+            $query = "
+                SELECT 
+                    participant_name, participant_email, participant_phone,
+                    company_name, position, motivation, special_requests, how_did_you_know
+                FROM lecture_registrations 
+                WHERE lecture_id = ? AND user_id = ? AND status IN ('cancelled', 'rejected')
+                ORDER BY created_at DESC 
+                LIMIT 1
+            ";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->bind_param("ii", $lectureId, $userId);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            
+            if ($result) {
+                return ResponseHelper::json($result, 200, '이전 신청 데이터 조회 완료');
+            } else {
+                return ResponseHelper::json(null, 200, '이전 신청 데이터가 없습니다.');
+            }
+            
+        } catch (Exception $e) {
+            error_log("이전 신청 데이터 조회 오류: " . $e->getMessage());
+            return ResponseHelper::json(null, 500, '이전 신청 데이터 조회 중 오류가 발생했습니다.');
+        }
     }
     
     /**

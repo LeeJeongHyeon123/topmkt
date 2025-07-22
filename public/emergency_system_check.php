@@ -74,9 +74,9 @@ echo "=== 데이터베이스 연결 테스트 ===\n";
 try {
     // 여러 연결 방법 시도
     $connections = [
-        ['localhost', 'root', 'Dnlszkem1!', 'topmkt'],
-        ['127.0.0.1', 'root', 'Dnlszkem1!', 'topmkt'],
-        ['localhost', 'root', '', 'topmkt']
+        ['localhost', 'root', 'Dnlszkem1!', 'TOPMKT'],
+        ['127.0.0.1', 'root', 'Dnlszkem1!', 'TOPMKT'],
+        ['localhost', 'root', '', 'TOPMKT']
     ];
     
     $connected = false;

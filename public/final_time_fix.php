@@ -35,7 +35,7 @@ echo "=== 시간 필드 오류 수정 시작 ===\n";
 echo "시간: " . date('Y-m-d H:i:s') . "\n\n";
 
 // 데이터베이스 연결
-$mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+$mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
 
 if ($mysqli->connect_error) {
     echo "<span class='error'>❌ 데이터베이스 연결 실패</span>\n";

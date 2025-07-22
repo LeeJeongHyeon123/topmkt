@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>캐시 테스트</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<body>
+    <h1>🧪 JavaScript 함수 테스트</h1>
+    <div id="result"></div>
+    
+    <script>
+    // 탑마케팅 업로드 설정 (공통)
+    window.TOPMKT_UPLOAD_CONFIG = {"maxFileSize":31457280,"maxFileSizeMB":30,"allowedImageExtensions":["jpg","jpeg","png","gif","webp"],"allowedAllExtensions":["jpg","jpeg","png","gif","webp","pdf"],"errorMessages":{"file_too_large":"파일 크기는 30MB를 초과할 수 없습니다.","invalid_extension":"허용되지 않는 파일 형식입니다.","invalid_mime_type":"파일 형식이 올바르지 않습니다.","upload_failed":"파일 업로드에 실패했습니다.","no_file":"업로드할 파일이 선택되지 않았습니다.","directory_creation_failed":"업로드 디렉토리 생성에 실패했습니다."}};
+
+    window.validateFileSize = function(fileSize) {
+        return fileSize > 0 && fileSize <= window.TOPMKT_UPLOAD_CONFIG.maxFileSize;
+    };
+
+    window.getFileSizeErrorMessage = function() {
+        return window.TOPMKT_UPLOAD_CONFIG.errorMessages.file_too_large;
+    };
+
+    // 테스트 실행
+    const testSize = 78657; // 76.8KB
+    const result = window.validateFileSize(testSize);
+    
+    document.getElementById('result').innerHTML = `
+        <h2>테스트 결과</h2>
+        <p><strong>파일 크기:</strong> ${testSize.toLocaleString()} bytes (76.8KB)</p>
+        <p><strong>최대 허용:</strong> ${window.TOPMKT_UPLOAD_CONFIG.maxFileSize.toLocaleString()} bytes (30MB)</p>
+        <p><strong>검증 결과:</strong> <span style="color: ${result ? 'green' : 'red'}; font-weight: bold;">${result ? '✅ 통과' : '❌ 실패'}</span></p>
+        <p><strong>오류 메시지:</strong> ${window.getFileSizeErrorMessage()}</p>
+        <p><strong>현재 시간:</strong> ${new Date().toLocaleString()}</p>
+    `;
+    
+    console.log('🧪 캐시 우회 테스트 완료');
+    console.log('validateFileSize(78657):', result);
+    </script>
+</body>
+</html>

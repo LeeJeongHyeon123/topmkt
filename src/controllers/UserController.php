@@ -4,15 +4,19 @@
  */
 
 require_once SRC_PATH . '/models/User.php';
+require_once SRC_PATH . '/models/UserOptimized.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
+require_once SRC_PATH . '/config/upload.php';
 
 class UserController {
     private $userModel;
+    private $userOptimized;
     
     public function __construct() {
         $this->userModel = new User();
+        $this->userOptimized = new UserOptimized();
     }
     
     /**
@@ -28,21 +32,51 @@ class UserController {
         $currentUserId = AuthMiddleware::getCurrentUserId();
         
         try {
-            // 프로필 정보 조회
-            $user = $this->userModel->getFullProfile($currentUserId);
+            // 성능 모니터링 시작
+            $startTime = microtime(true);
+            $memoryStart = memory_get_usage(true);
+            
+            // 데이터베이스 쿼리 시간 측정 (최적화된 방식 사용)
+            $dbStart = microtime(true);
+            $user = $this->userOptimized->getOptimizedProfileDataWithCache($currentUserId);
+            $dbTime = (microtime(true) - $dbStart) * 1000;
+            
             if (!$user) {
                 header('Location: /auth/login');
                 return;
             }
             
-            // 활동 통계 조회
-            $stats = $this->userModel->getProfileStats($currentUserId);
+            // 최적화된 데이터에서 통계와 최근 활동 분리
+            $stats = $user['stats'];
+            $recentPosts = $user['recent_posts'] ?? [];
+            $recentComments = $user['recent_comments'] ?? [];
             
-            // 최근 게시글
-            $recentPosts = $this->userModel->getRecentPosts($currentUserId, 5);
+            // 성능 측정 완료
+            $totalTime = (microtime(true) - $startTime) * 1000;
+            $memoryUsed = memory_get_usage(true) - $memoryStart;
+            $peakMemory = memory_get_peak_usage(true);
             
-            // 최근 댓글
-            $recentComments = $this->userModel->getRecentComments($currentUserId, 5);
+            // 상세 성능 로깅
+            $performanceLog = [
+                'user_id' => $currentUserId,
+                'total_time' => round($totalTime, 2),
+                'db_time' => round($dbTime, 2),
+                'memory_used' => round($memoryUsed / 1024 / 1024, 2),
+                'peak_memory' => round($peakMemory / 1024 / 1024, 2),
+                'post_count' => count($recentPosts),
+                'comment_count' => count($recentComments),
+                'timestamp' => date('Y-m-d H:i:s')
+            ];
+            
+            // 성능 로그 기록 (항상 기록)
+            error_log("Profile Performance: " . json_encode($performanceLog));
+            
+            // 느린 경우 경고 로그
+            if ($totalTime > 500) {
+                error_log("⚠️ SLOW PROFILE: {$totalTime}ms for user {$currentUserId}");
+            } else if ($totalTime > 200) {
+                error_log("⚠️ MODERATE PROFILE: {$totalTime}ms for user {$currentUserId}");
+            }
             
             // 페이지 변수 설정
             $pageSection = 'profile';
@@ -315,6 +349,9 @@ class UserController {
             $result = $this->userModel->updateProfile($currentUserId, $profileData);
             
             if ($result) {
+                // 프로필 캐시 무효화
+                $this->userOptimized->invalidateProfileCache($currentUserId);
+                
                 // 세션 정보 업데이트
                 if (isset($profileData['nickname'])) {
                     $_SESSION['username'] = $profileData['nickname'];
@@ -376,9 +413,9 @@ class UserController {
             
             $file = $_FILES['profile_image'];
             
-            // 파일 크기 확인 (최대 5MB)
-            if ($file['size'] > 5 * 1024 * 1024) {
-                ResponseHelper::json(['error' => '파일 크기는 5MB 이하여야 합니다.'], 400);
+            // 파일 크기 확인 (공통 설정 사용: 30MB)
+            if (!UploadConfig::validateFileSize($file['size'])) {
+                ResponseHelper::json(['error' => UploadConfig::getErrorMessage('file_too_large')], 400);
                 return;
             }
             
@@ -586,9 +623,9 @@ class UserController {
     private function handleProfileImageUpload($userId) {
         $file = $_FILES['profile_image'];
         
-        // 파일 크기 확인 (최대 5MB)
-        if ($file['size'] > 5 * 1024 * 1024) {
-            return ['success' => false, 'error' => '파일 크기는 5MB 이하여야 합니다.'];
+        // 파일 크기 확인 (공통 설정 사용: 30MB)
+        if (!UploadConfig::validateFileSize($file['size'])) {
+            return ['success' => false, 'error' => UploadConfig::getErrorMessage('file_too_large')];
         }
         
         // 파일 형식 확인

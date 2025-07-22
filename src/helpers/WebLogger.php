@@ -16,16 +16,32 @@ class LogLevel {
 }
 
 class WebLogger {
-    private static $logDir = '/workspace/logs/';
+    private static $logDir = null;
     private static $maxFileSize = 10 * 1024 * 1024; // 10MB
     private static $isInitialized = false;
+    private static $useUnifiedLog = true;  // 통합 로그 사용 여부
+    private static $unifiedLogFile = 'topmkt_errors.log';  // 통합 로그 파일명
     
     /**
      * 로거 초기화
      */
-    public static function init() {
+    public static function init($config = []) {
         if (self::$isInitialized) {
             return;
+        }
+        
+        // 로그 디렉토리 설정 (LOGS_PATH 상수 사용)
+        self::$logDir = defined('LOGS_PATH') ? LOGS_PATH : '/var/www/html/topmkt/logs';
+        
+        // 설정 옵션 적용
+        if (isset($config['useUnifiedLog'])) {
+            self::$useUnifiedLog = $config['useUnifiedLog'];
+        }
+        if (isset($config['unifiedLogFile'])) {
+            self::$unifiedLogFile = $config['unifiedLogFile'];
+        }
+        if (isset($config['maxFileSize'])) {
+            self::$maxFileSize = $config['maxFileSize'];
         }
         
         // 로그 디렉토리 생성
@@ -208,24 +224,30 @@ class WebLogger {
      * 로그 파일 경로 결정
      */
     private static function getLogFile($level) {
+        // 통합 로그 사용 시
+        if (self::$useUnifiedLog) {
+            return self::$logDir . '/' . self::$unifiedLogFile;
+        }
+        
+        // 기존 날짜별 분리 로그
         $date = date('Y-m-d');
         
         switch ($level) {
             case LogLevel::DEBUG:
-                return self::$logDir . "debug-{$date}.log";
+                return self::$logDir . "/debug-{$date}.log";
             case LogLevel::INFO:
             case LogLevel::NOTICE:
-                return self::$logDir . "info-{$date}.log";
+                return self::$logDir . "/info-{$date}.log";
             case LogLevel::WARNING:
-                return self::$logDir . "warning-{$date}.log";
+                return self::$logDir . "/warning-{$date}.log";
             case LogLevel::ERROR:
-                return self::$logDir . "error-{$date}.log";
+                return self::$logDir . "/error-{$date}.log";
             case LogLevel::CRITICAL:
             case LogLevel::ALERT:
             case LogLevel::EMERGENCY:
-                return self::$logDir . "critical-{$date}.log";
+                return self::$logDir . "/critical-{$date}.log";
             default:
-                return self::$logDir . "app-{$date}.log";
+                return self::$logDir . "/app-{$date}.log";
         }
     }
     
@@ -380,5 +402,74 @@ class WebLogger {
                 'duration_ms' => round($duration * 1000, 2)
             ]));
         }
+    }
+    
+    /**
+     * 빠른 로깅을 위한 헬퍼 메소드들
+     */
+    
+    /**
+     * 컨트롤러 시작 로그
+     */
+    public static function controllerStart($controller, $action, $context = []) {
+        self::info("Controller started: {$controller}::{$action}", array_merge($context, [
+            'controller' => $controller,
+            'action' => $action
+        ]));
+    }
+    
+    /**
+     * 컨트롤러 종료 로그
+     */
+    public static function controllerEnd($controller, $action, $duration = null, $context = []) {
+        self::info("Controller finished: {$controller}::{$action}", array_merge($context, [
+            'controller' => $controller,
+            'action' => $action,
+            'duration_ms' => $duration ? round($duration * 1000, 2) : null
+        ]));
+    }
+    
+    /**
+     * 예외 로그 (자동으로 스택 트레이스 포함)
+     */
+    public static function exception($exception, $context = []) {
+        $level = $exception instanceof Error ? LogLevel::CRITICAL : LogLevel::ERROR;
+        
+        self::log($level, "Exception: " . $exception->getMessage(), array_merge($context, [
+            'exception_type' => get_class($exception),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $exception->getTraceAsString()
+        ]));
+    }
+    
+    /**
+     * 설정 변경
+     */
+    public static function setConfig($key, $value) {
+        switch ($key) {
+            case 'useUnifiedLog':
+                self::$useUnifiedLog = $value;
+                break;
+            case 'unifiedLogFile':
+                self::$unifiedLogFile = $value;
+                break;
+            case 'maxFileSize':
+                self::$maxFileSize = $value;
+                break;
+        }
+    }
+    
+    /**
+     * 현재 설정 반환
+     */
+    public static function getConfig() {
+        return [
+            'logDir' => self::$logDir,
+            'useUnifiedLog' => self::$useUnifiedLog,
+            'unifiedLogFile' => self::$unifiedLogFile,
+            'maxFileSize' => self::$maxFileSize,
+            'isInitialized' => self::$isInitialized
+        ];
     }
 }

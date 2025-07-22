@@ -1,7 +1,7 @@
 <?php
 // 133번 강의 description 디버깅 스크립트
 try {
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt', 3306, '/var/lib/mysql/mysql.sock');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT', 3306, '/var/lib/mysql/mysql.sock');
     
     if ($mysqli->connect_error) {
         throw new Exception('연결 실패: ' . $mysqli->connect_error);

@@ -55,7 +55,7 @@ try {
                 REFERENCED_TABLE_NAME,
                 REFERENCED_COLUMN_NAME
             FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
-            WHERE REFERENCED_TABLE_SCHEMA = 'topmkt'
+            WHERE REFERENCED_TABLE_SCHEMA = 'TOPMKT'
             AND TABLE_NAME LIKE '%lecture%'
         ")->fetchAll();
         

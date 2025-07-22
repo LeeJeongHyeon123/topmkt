@@ -17,5 +17,5 @@
     RewriteRule ^favicon\.ico$ public/favicon.ico [L]
     
     # 기타 모든 요청을 라우터로 전달
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
 </IfModule> 

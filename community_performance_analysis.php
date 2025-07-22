@@ -156,7 +156,7 @@ require_once SRC_PATH . '/config/database.php';
             $stmt = $db->query("
                 SELECT INDEX_NAME, COLUMN_NAME, CARDINALITY, INDEX_TYPE
                 FROM information_schema.STATISTICS 
-                WHERE TABLE_SCHEMA = 'topmkt' 
+                WHERE TABLE_SCHEMA = 'TOPMKT' 
                   AND TABLE_NAME = 'posts'
                   AND INDEX_NAME != 'PRIMARY'
                 ORDER BY INDEX_NAME

@@ -6,14 +6,16 @@
 
 require_once SRC_PATH . '/config/database.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/config/upload.php';
 
 class MediaController {
     private $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    private $maxFileSize = 10 * 1024 * 1024; // 10MB
+    private $maxFileSize; // 공통 설정에서 가져옴
     private $uploadBasePath;
     
     public function __construct() {
         $this->uploadBasePath = ROOT_PATH . '/public/assets/uploads';
+        $this->maxFileSize = UploadConfig::getMaxFileSize(); // 공통 설정에서 가져옴 (30MB)
     }
     
     /**
@@ -152,7 +154,10 @@ class MediaController {
     private function createUploadDirectory() {
         $year = date('Y');
         $month = date('m');
-        $uploadDir = $this->uploadBasePath . "/posts/{$year}/{$month}";
+        
+        // 업로드 타입을 결정
+        $uploadType = $this->determineUploadType();
+        $uploadDir = $this->uploadBasePath . "/{$uploadType}/{$year}/{$month}";
         
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0755, true)) {
@@ -165,6 +170,42 @@ class MediaController {
         }
         
         return $uploadDir;
+    }
+    
+    /**
+     * 업로드 타입 결정
+     */
+    private function determineUploadType() {
+        // POST 데이터나 Referer 헤더에서 컨텍스트 판단
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        $uploadType = $_POST['upload_type'] ?? '';
+        
+        // 디버깅을 위한 로깅
+        error_log("MediaController uploadType 디버깅:");
+        error_log("- POST upload_type: " . ($uploadType ?: 'NULL'));
+        error_log("- HTTP_REFERER: " . $referer);
+        
+        // 명시적으로 upload_type이 전달된 경우
+        if (!empty($uploadType)) {
+            error_log("- 최종 결정: $uploadType (명시적 파라미터)");
+            return $uploadType;
+        }
+        
+        // Referer 헤더로 판단
+        if (strpos($referer, '/events/') !== false) {
+            error_log("- 최종 결정: events (Referer 기반)");
+            return 'events';
+        } elseif (strpos($referer, '/lectures/') !== false) {
+            error_log("- 최종 결정: lectures (Referer 기반)");
+            return 'lectures';
+        } elseif (strpos($referer, '/community/') !== false) {
+            error_log("- 최종 결정: posts (Referer 기반)");
+            return 'posts';
+        }
+        
+        // 기본값은 posts
+        error_log("- 최종 결정: posts (기본값)");
+        return 'posts';
     }
     
     /**

@@ -6,7 +6,7 @@
 $servername = "localhost";
 $username = "root"; 
 $password = "Dnlszkem1!";
-$dbname = "topmkt";
+$dbname = "TOPMKT";
 $socket = "/var/lib/mysql/mysql.sock";
 
 try {

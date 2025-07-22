@@ -917,19 +917,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     color: #718096;
 }
 
-/* 임시 파일 배지 스타일 */
-.temp-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: #fed7d7;
-    color: #c53030;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 4px;
-    z-index: 10;
-}
 
 /* 드래그 중 상태 표시 */
 .sortable-container.drag-active {
@@ -996,6 +983,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     padding: 10px;
 }
 </style>
+
+<!-- 공통 업로드 설정 (validateFileSize 함수 사용 전에 로드) -->
+<?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
 
 <div class="lecture-create-container">
     <!-- 헤더 섹션 -->
@@ -1267,7 +1257,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                             <div class="upload-placeholder" id="lectureImagePlaceholder">
                                 <i class="fas fa-images upload-icon"></i>
                                 <p>클릭하여 강의 이미지 업로드</p>
-                                <span class="upload-help">JPG, PNG, GIF, WebP 파일 (최대 5MB, 최대 8장)</span>
+                                <span class="upload-help">JPG, PNG, GIF, WebP 파일 (최대 30MB, 최대 8장)</span>
                             </div>
                         </div>
                         <div class="image-preview-container sortable-container" id="lectureImagePreview">
@@ -1328,11 +1318,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
             </a>
             
             <div style="display: flex; gap: 15px;">
-                <?php if (!$isEditMode): ?>
-                <button type="submit" name="status" value="draft" class="btn btn-draft">
-                    💾 임시저장
-                </button>
-                <?php endif; ?>
                 <button type="submit" name="status" value="published" class="btn btn-primary">
                     <?= $isEditMode ? '✏️ 수정완료' : '🚀 등록하기' ?>
                 </button>
@@ -1489,7 +1474,7 @@ function updateImageUploadPlaceholder() {
         const remainingCount = maxLectureImages - totalImageCount;
         const uploadHelp = placeholder.querySelector('.upload-help');
         if (uploadHelp) {
-            uploadHelp.textContent = `JPG, PNG, GIF, WebP 파일 (최대 5MB, ${remainingCount}장 더 추가 가능)`;
+            uploadHelp.textContent = `JPG, PNG, GIF, WebP 파일 (최대 30MB, ${remainingCount}장 더 추가 가능)`;
         }
     }
 }
@@ -1518,7 +1503,6 @@ function updateLectureImagesDisplay(updatedImages) {
             '</div>' +
             '<div class="image-info">' +
             '<div style="font-size: 12px; color: #666; margin-bottom: 2px;">' + (image.original_name || '알 수 없는 파일') + '</div>' +
-            '<div style="font-size: 10px; color: #999;">임시저장된 이미지</div>' +
             '</div>';
         
         // 삭제 버튼 이벤트 추가
@@ -1559,9 +1543,9 @@ function handleInstructorImage(index, input) {
         return;
     }
     
-    const maxSize = 2 * 1024 * 1024; // 2MB
-    if (file.size > maxSize) {
-        alert('파일 크기는 2MB 이하여야 합니다.');
+    // 파일 크기 검증 (공통 설정 사용: 30MB)
+    if (!window.validateFileSize || !window.validateFileSize(file.size)) {
+        alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
         input.value = '';
         return;
     }
@@ -1997,9 +1981,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (file.size > maxSize) {
-            alert('파일 크기는 5MB 이하여야 합니다.');
+        // 파일 크기 검증 (공통 설정 사용: 30MB)
+        if (!window.validateFileSize || !window.validateFileSize(file.size)) {
+            alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             return false;
         }
         
@@ -2469,10 +2453,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         
-        // 파일 크기 검사 (5MB)
-        const maxSize = 5 * 1024 * 1024;
-        if (file.size > maxSize) {
-            alert('파일 크기는 5MB 이하여야 합니다.');
+        // 파일 크기 검사 (공통 설정 사용: 30MB)
+        if (!window.validateFileSize || !window.validateFileSize(file.size)) {
+            alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             return false;
         }
         
@@ -2532,7 +2515,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // console.log(`처리 중: DOM 순서 ${actualOrder}, 클래스: ${item.className}`);
                 
                 if (item.classList.contains('existing-image')) {
-                    // 기존 이미지 (임시저장된 이미지)
+                    // 기존 이미지
                     const img = item.querySelector('img');
                     const infoDiv = item.querySelector('.image-info div');
                     if (img && infoDiv) {
@@ -2556,7 +2539,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const fileExtension = file.name.split('.').pop().toLowerCase();
                         const timestamp = Date.now();
                         const imageData = {
-                            original_name: `temp_${timestamp}_${fileIndex}.${fileExtension}`,  // 확장자 포함한 임시 이름
+                            original_name: `${timestamp}_${fileIndex}.${fileExtension}`,
                             file_name: `temp_${timestamp}_${fileIndex}.${fileExtension}`,     // 서버에서 실제 파일명으로 매칭
                             file_size: file.size,
                             is_new: true,
@@ -2665,92 +2648,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 showSuccessMessage(responseData.message || data.message);
                 hasUnsavedChanges = false;
                 
-                if (responseData.isDraft) {
-                    // 임시저장인 경우 현재 페이지에 머물기
-                    // console.log('임시저장 완료, 강의 ID:', responseData.lectureId);
-                    
-                    // 임시저장 후 최신 이미지 데이터로 업데이트
-                    // console.log('=== 임시저장 응답 처리 시작 ===');
-                    // console.log('data.debug 존재:', !!data.debug);
-                    // console.log('data.debug.update_binding 존재:', !!(data.debug && data.debug.update_binding));
-                    // console.log('data.debug.update_binding.params 존재:', !!(data.debug && data.debug.update_binding && data.debug.update_binding.params));
-                    
-                    if (data.debug && data.debug.update_binding && data.debug.update_binding.params) {
-                        const updatedImages = data.debug.update_binding.params;
-                        // console.log('서버에서 받은 업데이트된 이미지 데이터:', updatedImages);
-                        // console.log('업데이트된 이미지 개수:', updatedImages.length);
-                        // console.log('각 이미지 상세 정보:');
-                        updatedImages.forEach((img, idx) => {
-                            // console.log(`이미지 ${idx}:`, img.original_name, img.file_path);
-                        });
-                        
-                        // 전역 변수 업데이트
-                        const previousCount = currentImageData ? currentImageData.length : 0;
-                        currentImageData = [...updatedImages];
-                        // console.log(`currentImageData 업데이트: ${previousCount}개 -> ${currentImageData.length}개`);
-                        
-                        // 히든 필드도 즉시 업데이트하여 다음 제출 시 올바른 데이터가 전송되도록 함
-                        const hiddenField = document.querySelector('#existing_lecture_images_hidden');
-                        if (hiddenField) {
-                            hiddenField.value = JSON.stringify(currentImageData);
-                            // console.log('히든 필드 업데이트 완료:', currentImageData.length + '개 이미지');
-                        } else {
-                            console.warn('히든 필드를 찾을 수 없음');
-                        }
-                        
-                        // 화면과 데이터 동기화 확인 후 필요시 화면 업데이트
-                        let currentScreenImages = document.querySelectorAll('.lecture-image-preview');
-                        // console.log('화면 업데이트 전 - 화면에 보이는 이미지 개수:', currentScreenImages.length);
-                        // console.log('currentImageData 이미지 개수:', currentImageData.length);
-                        
-                        if (currentScreenImages.length !== updatedImages.length) {
-                            // console.log('화면과 데이터가 불일치하므로 화면을 강제 업데이트합니다.');
-                            // 강의 이미지 화면 업데이트
-                            updateLectureImagesDisplay(updatedImages);
-                            
-                            // 화면 업데이트 후 다시 확인
-                            currentScreenImages = document.querySelectorAll('.lecture-image-preview');
-                            // console.log('화면 업데이트 후 - 화면에 보이는 이미지 개수:', currentScreenImages.length);
-                        } else {
-                            // console.log('화면과 데이터가 일치하므로 화면 업데이트를 건너뜁니다.');
-                        }
-                        
-                        // console.log('이미지 데이터 업데이트 완료:', currentImageData);
-                        
-                        // 최종 동기화 상태 확인
-                        if (currentScreenImages.length !== currentImageData.length) {
-                            console.error('⚠️ 최종 확인: 화면과 데이터가 불일치! 화면:', currentScreenImages.length, 'vs 데이터:', currentImageData.length);
-                        } else {
-                            // console.log('✅ 최종 확인: 화면과 데이터가 일치');
-                        }
+                // 강의 등록 성공 - 리다이렉트
+                setTimeout(() => {
+                    if (isEditMode && responseData.lectureId) {
+                        // 수정 모드인 경우 강의 상세 페이지의 수정 모드로 리다이렉트
+                        window.location.href = `/lectures/${responseData.lectureId}/edit`;
+                    } else if (responseData.lectureId) {
+                        // 새 강의 등록인 경우 강의 상세 페이지의 수정 모드로 리다이렉트
+                        window.location.href = `/lectures/${responseData.lectureId}/edit`;
                     } else {
-                        // console.log('⚠️ 서버 응답에 이미지 데이터가 없음');
-                        // console.log('data.debug:', data.debug);
+                        // 기본 리다이렉트
+                        window.location.href = responseData.redirectUrl || data.redirectUrl || '/lectures';
                     }
-                    
-                    // 디버깅 정보 출력
-                    if (data.debug) {
-                        // console.log('=== 서버 디버그 정보 ===');
-                        // console.log('POST registration_deadline:', data.debug.post_registration_deadline);
-                        // console.log('POST youtube_video:', data.debug.post_youtube_video);
-                        // console.log('검증된 registration_deadline:', data.debug.validated_registration_deadline);
-                        // console.log('검증된 youtube_video:', data.debug.validated_youtube_video);
-                    }
-                } else {
-                    // 정식 등록인 경우 리다이렉트
-                    setTimeout(() => {
-                        if (isEditMode && responseData.lectureId) {
-                            // 수정 모드인 경우 강의 상세 페이지의 수정 모드로 리다이렉트
-                            window.location.href = `/lectures/${responseData.lectureId}/edit`;
-                        } else if (responseData.lectureId) {
-                            // 새 강의 등록인 경우 강의 상세 페이지의 수정 모드로 리다이렉트
-                            window.location.href = `/lectures/${responseData.lectureId}/edit`;
-                        } else {
-                            // 기본 리다이렉트
-                            window.location.href = responseData.redirectUrl || data.redirectUrl || '/lectures';
-                        }
-                    }, 1500);
-                }
+                }, 1500);
             } else {
                 // 서버 검증 오류 처리
                 if (data.errors && Array.isArray(data.errors)) {
@@ -2974,19 +2884,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 자동 저장 (임시저장) 기능
-    let autoSaveTimeout;
+    // Form inputs for unsaved changes tracking
     const formInputs = form.querySelectorAll('input, textarea, select');
-    
-    formInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(() => {
-                // 여기에 자동 저장 로직 추가 가능
-                // console.log('자동 저장 가능한 상태');
-            }, 30000); // 30초 후 자동 저장
-        });
-    });
     
     // 페이지 이탈 경고
     let hasUnsavedChanges = false;
@@ -3008,341 +2907,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hasUnsavedChanges = false;
     });
     
-    // 임시저장된 데이터가 있는 경우 처리
-    <?php if ($draftLecture): ?>
-    if (confirm('임시저장된 내용이 있습니다. 이어서 진행하시겠습니까?')) {
-        loadDraftData();
-    }
     
-    function loadDraftData() {
-        const draftData = <?php echo json_encode($draftLecture, JSON_UNESCAPED_UNICODE); ?>;
-        
-        // console.log('=== 임시저장 데이터 확인 ===');
-        // console.log('전체 draftData:', draftData);
-        // console.log('prerequisites:', draftData ? draftData.prerequisites : 'NO DATA');
-        // console.log('what_to_bring:', draftData ? draftData.what_to_bring : 'NO DATA');
-        // console.log('additional_info:', draftData ? draftData.additional_info : 'NO DATA');
-        // console.log('benefits:', draftData ? draftData.benefits : 'NO DATA');
-        
-        if (!draftData) return; // draftData가 null이면 함수 종료
-        
-        // 기본 정보 채우기
-        if (draftData.title) {
-            const titleEl = document.getElementById('title');
-            if (titleEl) titleEl.value = draftData.title;
-        }
-        if (draftData.description) {
-            const descEl = document.getElementById('description');
-            if (descEl) descEl.value = draftData.description;
-        }
-        if (draftData.category) {
-            const catEl = document.getElementById('category');
-            if (catEl) catEl.value = draftData.category;
-        }
-        
-        // 일정 정보 채우기
-        if (draftData.start_date) {
-            const startDateEl = document.getElementById('start_date');
-            if (startDateEl) startDateEl.value = draftData.start_date;
-        }
-        if (draftData.end_date) {
-            const endDateEl = document.getElementById('end_date');
-            if (endDateEl) endDateEl.value = draftData.end_date;
-        }
-        if (draftData.start_time) {
-            const startTimeEl = document.getElementById('start_time');
-            if (startTimeEl) startTimeEl.value = draftData.start_time;
-        }
-        if (draftData.end_time) {
-            const endTimeEl = document.getElementById('end_time');
-            if (endTimeEl) endTimeEl.value = draftData.end_time;
-        }
-        if (draftData.timezone) {
-            const timezoneEl = document.getElementById('timezone');
-            if (timezoneEl) timezoneEl.value = draftData.timezone;
-        }
-        
-        // 장소 정보 채우기
-        if (draftData.location_type) {
-            const locationTypeEl = document.getElementById('location_type');
-            if (locationTypeEl) locationTypeEl.value = draftData.location_type;
-            
-            // 위치 타입 버튼 업데이트
-            document.querySelectorAll('.location-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.type === draftData.location_type) {
-                    btn.classList.add('active');
-                }
-            });
-            // 해당 필드 표시
-            document.querySelectorAll('.location-fields').forEach(field => field.classList.remove('active'));
-            const targetFieldsEl = document.getElementById(draftData.location_type + '-fields');
-            if (targetFieldsEl) targetFieldsEl.classList.add('active');
-        }
-        if (draftData.venue_name) {
-            const venueNameEl = document.getElementById('venue_name');
-            if (venueNameEl) venueNameEl.value = draftData.venue_name;
-        }
-        if (draftData.venue_address) {
-            const venueAddressEl = document.getElementById('venue_address');
-            if (venueAddressEl) venueAddressEl.value = draftData.venue_address;
-        }
-        if (draftData.online_link) {
-            const onlineLinkEl = document.getElementById('online_link');
-            if (onlineLinkEl) onlineLinkEl.value = draftData.online_link;
-        }
-        
-        // 강의 세부사항 채우기
-        if (draftData.max_participants) {
-            const maxParticipantsEl = document.getElementById('max_participants');
-            if (maxParticipantsEl) maxParticipantsEl.value = draftData.max_participants;
-        }
-        if (draftData.registration_fee) {
-            const registrationFeeEl = document.getElementById('registration_fee');
-            const registrationFeeDisplayEl = document.getElementById('registration_fee_display');
-            if (registrationFeeEl) registrationFeeEl.value = draftData.registration_fee;
-            if (registrationFeeDisplayEl) registrationFeeDisplayEl.value = numberWithCommas(draftData.registration_fee);
-        }
-        if (draftData.prerequisites) {
-            const prerequisitesEl = document.getElementById('prerequisites');
-            if (prerequisitesEl) prerequisitesEl.value = draftData.prerequisites;
-        }
-        if (draftData.what_to_bring) {
-            const whatToBringEl = document.getElementById('what_to_bring');
-            if (whatToBringEl) whatToBringEl.value = draftData.what_to_bring;
-        }
-        if (draftData.additional_info) {
-            const additionalInfoEl = document.getElementById('additional_info');
-            if (additionalInfoEl) additionalInfoEl.value = draftData.additional_info;
-        }
-        if (draftData.benefits) {
-            const benefitsEl = document.getElementById('benefits');
-            if (benefitsEl) benefitsEl.value = draftData.benefits;
-        }
-        if (draftData.youtube_video) {
-            const youtubeVideoEl = document.getElementById('youtube_video');
-            if (youtubeVideoEl) youtubeVideoEl.value = draftData.youtube_video;
-        }
-        
-        // 등록 마감일시 채우기
-        // console.log('등록 마감일시 데이터:', draftData.registration_deadline);
-        if (draftData.registration_deadline) {
-            const regDeadlineEl = document.getElementById('registration_deadline');
-            // console.log('등록 마감일시 엘리먼트:', regDeadlineEl);
-            if (regDeadlineEl) {
-                // MySQL datetime을 datetime-local 형식으로 변환 (타임존 문제 방지)
-                // MySQL datetime은 이미 로컬 타임존이므로 직접 변환
-                let localDateTime = draftData.registration_deadline;
-                if (localDateTime.includes(' ')) {
-                    // "2025-06-25 11:48:00" -> "2025-06-25T11:48"
-                    localDateTime = localDateTime.slice(0, 16).replace(' ', 'T');
-                } else if (localDateTime.length > 16) {
-                    // "2025-06-25T11:48:00" -> "2025-06-25T11:48"
-                    localDateTime = localDateTime.slice(0, 16);
-                }
-                // console.log('변환된 날짜:', localDateTime);
-                regDeadlineEl.value = localDateTime;
-            }
-        } else {
-            // console.log('등록 마감일시 데이터 없음');
-        }
-        
-        // 강사 정보 채우기
-        // console.log('강사 데이터:', draftData.instructors);
-        if (draftData.instructors && draftData.instructors.length > 0) {
-            // 기존 강사 필드 초기화하지 않고 데이터만 채우기
-            const instructorContainer = document.getElementById('instructors-container');
-            // console.log('강사 컨테이너:', instructorContainer);
-            if (instructorContainer) {
-                // 임시저장된 강사 데이터로 필드 채우기
-                draftData.instructors.forEach((instructor, index) => {
-                    if (index === 0) {
-                        // 첫 번째 강사는 기본 필드 사용
-                        if (instructor.name) {
-                            const nameInput = document.querySelector(`input[name="instructors[0][name]"]`);
-                            if (nameInput) nameInput.value = instructor.name;
-                        }
-                        if (instructor.title) {
-                            const titleInput = document.querySelector(`input[name="instructors[0][title]"]`);
-                            if (titleInput) titleInput.value = instructor.title;
-                        }
-                        if (instructor.info) {
-                            const infoTextarea = document.querySelector(`textarea[name="instructors[0][info]"]`);
-                            if (infoTextarea) infoTextarea.value = instructor.info;
-                        }
-                        // 첫 번째 강사 이미지 로딩
-                        if (instructor.image) {
-                            loadInstructorImage(0, instructor.image);
-                        }
-                    } else {
-                        // 두 번째 강사부터는 새로 추가
-                        if (typeof addInstructorField === 'function') {
-                            addInstructorField();
-                            const currentIndex = instructorCount - 1;
-                        
-                            if (instructor.name) {
-                                const nameInput = document.querySelector(`input[name="instructors[${currentIndex}][name]"]`);
-                                if (nameInput) nameInput.value = instructor.name;
-                            }
-                            if (instructor.title) {
-                                const titleInput = document.querySelector(`input[name="instructors[${currentIndex}][title]"]`);
-                                if (titleInput) titleInput.value = instructor.title;
-                            }
-                            if (instructor.info) {
-                                const infoTextarea = document.querySelector(`textarea[name="instructors[${currentIndex}][info]"]`);
-                                if (infoTextarea) infoTextarea.value = instructor.info;
-                            }
-                            // 추가된 강사 이미지 로딩
-                            if (instructor.image) {
-                                loadInstructorImage(currentIndex, instructor.image);
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        
-        // 강의 이미지 정보 표시 (기존 업로드된 이미지 정보)
-        if (draftData.lecture_images) {
-            try {
-                const imageData = typeof draftData.lecture_images === 'string' 
-                    ? JSON.parse(draftData.lecture_images) 
-                    : draftData.lecture_images;
-                
-                if (Array.isArray(imageData) && imageData.length > 0) {
-                    // 전역 변수에 현재 이미지 데이터 저장
-                    currentImageData = [...imageData];
-                    // console.log('현재 이미지 데이터 초기화:', currentImageData);
-                    
-                    const imagePreviewContainer = document.getElementById('lectureImagePreview');
-                    if (imagePreviewContainer) {
-                        imagePreviewContainer.innerHTML = ''; // 기존 내용 제거
-                        
-                        imageData.forEach((image, index) => {
-                            const imageItem = document.createElement('div');
-                            imageItem.className = 'lecture-image-item existing-image';
-                            imageItem.setAttribute('data-image-index', index);
-                            
-                            // temp_ 파일인지 확인하여 적절한 이미지 소스 설정
-                            const isTemp = image.file_path && image.file_path.includes('temp_');
-                            const imageSrc = isTemp ? 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjdGQUZDIi8+CjxwYXRoIGQ9Ik0xMDAgNzBDOTIuMjY4NiA3MCA4NiA3Ni4yNjg2IDg2IDg0Qzg2IDkxLjczMTQgOTIuMjY4NiA5OCAxMDAgOThDMTA3LjczMSA5OCAxMTQgOTEuNzMxNCAxMTQgODRDMTE0IDc2LjI2ODYgMTA3LjczMSA3MCAxMDAgNzBaIiBmaWxsPSIjQkVCRUJFIi8+CjxwYXRoIGQ9Ik0xNzAgMTQwSDMwVjE1MEg0MFYxNjBIMTYwVjE1MEgxNzBWMTQwWiIgZmlsbD0iI0JFQkVCRSIvPgo8dGV4dCB4PSIxMDAiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNzE4MDk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7Apt2DlKzshI08L3RleHQ+Cjwvc3ZnPgo=' : image.file_path;
-                            
-                            imageItem.innerHTML = `
-                                <div class="image-container">
-                                    <img src="${imageSrc}" alt="${image.original_name || '강의 이미지'}" 
-                                         onerror="this.src='<?= DEFAULT_AVATAR_PATH ?>';">
-                                    <button type="button" class="remove-existing-image">
-                                        ×
-                                    </button>
-                                    ${isTemp ? '<div class="temp-badge">임시</div>' : ''}
-                                </div>
-                                <div class="image-info">
-                                    <div style="font-size: 12px; color: #666; margin-bottom: 2px;">
-                                        ${image.original_name || '이미지'}
-                                    </div>
-                                    <div style="font-size: 11px; color: #999;">
-                                        ${isTemp ? '임시 파일' : '기존 업로드된 이미지'}
-                                    </div>
-                                </div>
-                            `;
-                            
-                            // 삭제 버튼 이벤트 추가
-                            const removeBtn = imageItem.querySelector('.remove-existing-image');
-                            removeBtn.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                if (confirm('이 이미지를 삭제하시겠습니까?')) {
-                                    removeExistingImage(index, imageItem);
-                                }
-                            });
-                            
-                            imagePreviewContainer.appendChild(imageItem);
-                        });
-                        
-                        // 기존 이미지 로딩 후 placeholder 업데이트
-                        updateImageUploadPlaceholder();
-                    }
-                }
-            } catch (e) {
-                // console.log('이미지 데이터 파싱 오류:', e);
-            }
-        }
-        
-        // 알림 표시
-        showAlert('임시저장된 내용을 불러왔습니다.', 'info');
-        
-        // 임시저장 데이터 불러온 후 소요시간 재계산
-        calculateDuration();
-    }
-    
-    
-    // 이미지 미리보기 화면 업데이트 함수
-    function updateImagePreviewDisplay(imageData) {
-        // console.log('=== updateImagePreviewDisplay 함수 시작 ===');
-        // console.log('전달받은 imageData:', imageData);
-        // console.log('전달받은 이미지 개수:', imageData ? imageData.length : 0);
-        
-        const imagePreviewContainer = document.getElementById('lectureImagePreview');
-        // console.log('imagePreviewContainer 찾기:', imagePreviewContainer ? 'SUCCESS' : 'FAILED');
-        if (!imagePreviewContainer) {
-            console.error('lectureImagePreview 컨테이너를 찾을 수 없습니다');
-            return;
-        }
-        
-        // 기존 이미지만 제거 (새로 업로드된 이미지는 유지)
-        const existingImages = imagePreviewContainer.querySelectorAll('.existing-image');
-        // console.log('제거할 기존 이미지 개수:', existingImages.length);
-        existingImages.forEach(img => img.remove());
-        // console.log('기존 이미지 제거 완료');
-        
-        // 업데이트된 이미지 데이터로 다시 생성
-        if (Array.isArray(imageData) && imageData.length > 0) {
-            // console.log('새 이미지 생성 시작, 개수:', imageData.length);
-            imageData.forEach((image, index) => {
-                const imageItem = document.createElement('div');
-                imageItem.className = 'lecture-image-item existing-image';
-                imageItem.setAttribute('data-image-index', index);
-                imageItem.innerHTML = `
-                    <div class="image-container">
-                        <img src="${image.file_path}" alt="${image.original_name || '강의 이미지'}">
-                        <button type="button" class="remove-existing-image">
-                            ×
-                        </button>
-                    </div>
-                    <div class="image-info">
-                        <div style="font-size: 12px; color: #666; margin-bottom: 2px;">
-                            ${image.original_name || '이미지'}
-                        </div>
-                        <div style="font-size: 11px; color: #999;">
-                            기존 업로드된 이미지
-                        </div>
-                    </div>
-                `;
-                
-                // 삭제 버튼 이벤트 추가
-                const removeBtn = imageItem.querySelector('.remove-existing-image');
-                removeBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (confirm('이 이미지를 삭제하시겠습니까?')) {
-                        removeExistingImage(index, imageItem);
-                    }
-                });
-                
-                imagePreviewContainer.appendChild(imageItem);
-            });
-        }
-        
-        // placeholder 업데이트
-        updateImageUploadPlaceholder();
-    }
-    
-    // 이미지 인덱스 업데이트 함수
-    
-
-    // updateImageListOnServer 함수는 전역 스코프에서 이미 정의됨
-    
-    
-    
-    <?php endif; ?>
     
     // 카카오 주소 검색 API 구현
     function initAddressSearch() {
@@ -3913,13 +3478,10 @@ function displayExistingImages(images) {
         imageItem.setAttribute('data-image-id', image.file_name || index);
         imageItem.setAttribute('data-image-index', index);
         
-        // temp_ 파일인지 확인하여 적절한 이미지 소스 설정
-        const isTemp = image.file_path && image.file_path.includes('temp_');
-        const imageSrc = isTemp ? 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjdGQUZDIi8+CjxwYXRoIGQ9Ik0xMDAgNzBDOTIuMjY4NiA3MCA4NiA3Ni4yNjg2IDg2IDg0Qzg2IDkxLjczMTQgOTIuMjY4NiA5OCAxMDAgOThDMTA3LjczMSA5OCAxMTQgOTEuNzMxNCAxMTQgODRDMTE0IDc2LjI2ODYgMTA3LjczMSA3MCAxMDAgNzBaIiBmaWxsPSIjQkVCRUJFIi8+CjxwYXRoIGQ9Ik0xNzAgMTQwSDMwVjE1MEg0MFYxNjBIMTYwVjE1MEgxNzBWMTQwWiIgZmlsbD0iI0JFQkVCRSIvPgo8dGV4dCB4PSIxMDAiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNzE4MDk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7Apt2DlKzshI08L3RleHQ+Cjwvc3ZnPgo=' : image.file_path;
         
         imageItem.innerHTML = `
             <div class="image-container">
-                <img src="${imageSrc}" alt="${image.original_name}" class="lecture-image-preview" 
+                <img src="${image.file_path}" alt="${image.original_name}" class="lecture-image-preview" 
                      style="width: 100%; height: 100%; object-fit: cover; display: block;" 
                      onerror="this.src='<?= DEFAULT_AVATAR_PATH ?>';">
                 <div class="drag-handle">
@@ -3929,14 +3491,13 @@ function displayExistingImages(images) {
                 <button type="button" class="remove-lecture-image" onclick="removeExistingImage(${index})">
                     <i class="fas fa-times"></i>
                 </button>
-                ${isTemp ? '<div class="temp-badge">임시</div>' : ''}
             </div>
             <div class="image-info">
                 <div style="font-size: 12px; color: #666; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     ${image.original_name}
                 </div>
                 <div style="font-size: 10px; color: #999;">
-                    ${formatFileSize(image.file_size)} • ${isTemp ? '임시 파일' : '기존 이미지'}
+                    ${formatFileSize(image.file_size)} • 기존 이미지
                 </div>
             </div>
         `;
@@ -4094,4 +3655,5 @@ function enableImageSorting() {
     }
 }
 </script>
+
 <?php endif; ?>

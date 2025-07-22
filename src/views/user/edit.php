@@ -30,6 +30,9 @@ if (!isset($_SESSION['csrf_token'])) {
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
+<!-- 공통 업로드 설정 (validateFileSize 함수 사용 전에 로드) -->
+<?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
+
 <style>
 /* 프로필 편집 페이지 전용 스타일 */
 .edit-container {
@@ -601,7 +604,7 @@ if (!isset($_SESSION['csrf_token'])) {
                         <h4>이미지 업로드 가이드</h4>
                         <ul>
                             <li>권장 크기: 400x400px 이상의 정사각형</li>
-                            <li>최대 파일 크기: 5MB</li>
+                            <li>최대 파일 크기: 30MB</li>
                             <li>지원 형식: JPG, PNG, GIF, WebP</li>
                             <li>업로드된 이미지는 자동으로 원형으로 표시됩니다</li>
                         </ul>
@@ -920,9 +923,9 @@ document.addEventListener('DOMContentLoaded', function() {
         input.onchange = function() {
             const file = input.files[0];
             if (file) {
-                // 파일 크기 체크 (2MB)
-                if (file.size > 2 * 1024 * 1024) {
-                    showAlert('이미지 크기는 2MB 이하여야 합니다.', 'error');
+                // 파일 크기 체크 (공통 설정 사용: 30MB)
+                if (!window.validateFileSize || !window.validateFileSize(file.size)) {
+                    showAlert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.', 'error');
                     return;
                 }
                 
@@ -978,9 +981,9 @@ document.addEventListener('DOMContentLoaded', function() {
     imageInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            // 파일 크기 검증 (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                showAlert('파일 크기는 5MB 이하여야 합니다.', 'error');
+            // 파일 크기 검증 (공통 설정 사용: 30MB)
+            if (!window.validateFileSize || !window.validateFileSize(file.size)) {
+                showAlert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.', 'error');
                 e.target.value = '';
                 return;
             }
@@ -1227,4 +1230,7 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+</script>
+
+<script>
 </script>

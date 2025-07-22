@@ -7,7 +7,7 @@ USE `topmkt`;
 -- 1. users 테이블에 기업 인증 관련 필드 추가 (이미 존재하는지 확인)
 SET @sql = (SELECT IF(
     (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'corp_status') > 0,
+     WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'corp_status') > 0,
     'SELECT "corp_status column already exists" as message',
     'ALTER TABLE `users` ADD COLUMN `corp_status` ENUM(''none'', ''pending'', ''approved'', ''rejected'') DEFAULT ''none'' AFTER `role`'
 ));
@@ -17,7 +17,7 @@ DEALLOCATE PREPARE stmt;
 
 SET @sql = (SELECT IF(
     (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'corp_approved_at') > 0,
+     WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'corp_approved_at') > 0,
     'SELECT "corp_approved_at column already exists" as message',
     'ALTER TABLE `users` ADD COLUMN `corp_approved_at` TIMESTAMP NULL AFTER `corp_status`'
 ));
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `company_application_history` (
 -- 4. 인덱스 추가 (이미 존재하는지 확인 후 추가)
 SET @sql = (SELECT IF(
     (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
-     WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'users' AND INDEX_NAME = 'idx_corp_status') > 0,
+     WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'users' AND INDEX_NAME = 'idx_corp_status') > 0,
     'SELECT "idx_corp_status index already exists" as message',
     'ALTER TABLE `users` ADD INDEX `idx_corp_status` (`corp_status`)'
 ));
@@ -89,7 +89,7 @@ DEALLOCATE PREPARE stmt;
 
 SET @sql = (SELECT IF(
     (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
-     WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'users' AND INDEX_NAME = 'idx_corp_approved_at') > 0,
+     WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'users' AND INDEX_NAME = 'idx_corp_approved_at') > 0,
     'SELECT "idx_corp_approved_at index already exists" as message',
     'ALTER TABLE `users` ADD INDEX `idx_corp_approved_at` (`corp_approved_at`)'
 ));
@@ -99,11 +99,11 @@ DEALLOCATE PREPARE stmt;
 
 -- 5. settings 테이블 존재 여부 확인 후 설정값 추가
 SET @settings_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
-                       WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'settings');
+                       WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'settings');
 
 -- settings 테이블이 존재하고 is_public 컬럼이 있는 경우
 SET @is_public_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                        WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'is_public');
+                        WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'is_public');
 
 -- 설정값 추가 (안전하게)
 INSERT IGNORE INTO `settings` (`key_name`, `value`, `description`, `type`) VALUES
@@ -115,8 +115,8 @@ INSERT IGNORE INTO `settings` (`key_name`, `value`, `description`, `type`) VALUE
 SELECT 
     '기업회원 시스템 마이그레이션 완료' as status,
     CURRENT_TIMESTAMP as completed_at,
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'company_profiles') as company_profiles_created,
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'company_application_history') as history_table_created,
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'corp_status') as corp_status_added;
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'company_profiles') as company_profiles_created,
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'company_application_history') as history_table_created,
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'users' AND COLUMN_NAME = 'corp_status') as corp_status_added;
 
 COMMIT;

@@ -317,9 +317,9 @@ echo "=== 데이터베이스 완전 진단 ===\n";
 debug_log("데이터베이스 진단 시작");
 
 $db_configs = [
-    ['localhost', 'root', 'Dnlszkem1!', 'topmkt'],
-    ['127.0.0.1', 'root', 'Dnlszkem1!', 'topmkt'],
-    ['localhost', 'root', '', 'topmkt']
+    ['localhost', 'root', 'Dnlszkem1!', 'TOPMKT'],
+    ['127.0.0.1', 'root', 'Dnlszkem1!', 'TOPMKT'],
+    ['localhost', 'root', '', 'TOPMKT']
 ];
 
 $successful_connection = null;

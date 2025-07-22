@@ -237,7 +237,7 @@ SELECT
     TABLE_NAME,
     TABLE_COMMENT
 FROM INFORMATION_SCHEMA.TABLES 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
 AND TABLE_NAME IN ('lecture_registrations', 'registration_history', 'notification_settings')
 ORDER BY TABLE_NAME;
 

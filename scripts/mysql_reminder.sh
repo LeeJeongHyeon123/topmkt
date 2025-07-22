@@ -1,0 +1,28 @@
+#!/bin/bash
+# MySQL 접속 리마인더 스크립트
+# Claude가 까먹지 않도록 도와주는 스크립트
+
+echo "🔥 MYSQL 접속 리마인더 🔥"
+echo "========================="
+echo ""
+echo "❌ 이렇게 하지 마세요:"
+echo "   mysql -u root -pDnlszkem1!"
+echo "   mysql -u root -p"
+echo ""
+echo "✅ 이렇게 하세요:"
+echo "   1) ./scripts/mysql_connect.sh"
+echo "   2) mysql --defaults-file=/var/www/html/topmkt/.my.cnf"
+echo "   3) mysql (홈 디렉토리에 .my.cnf 복사했다면)"
+echo ""
+echo "🎯 빠른 명령어들:"
+echo "   ./scripts/mysql_quick_commands.sh tables"
+echo "   ./scripts/mysql_quick_commands.sh users"
+echo "   ./scripts/mysql_quick_commands.sh backup"
+echo ""
+echo "📍 정확한 접속 정보:"
+echo "   호스트: 127.0.0.1"
+echo "   사용자: root"
+echo "   비밀번호: Dnlszkem1!"
+echo "   데이터베이스: topmkt"
+echo ""
+echo "💡 Claude 개발자님, 이 방법들을 사용하시면 비밀번호 틀릴 일이 없어요!"

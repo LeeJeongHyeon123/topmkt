@@ -97,13 +97,13 @@ if (!empty($critical_issues)) {
 echo "<span class='info'>=== 데이터베이스 실시간 테스트 ===</span>\n";
 
 try {
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
     
     if ($mysqli->connect_error) {
         echo "<span class='error'>❌ DB 연결 실패: {$mysqli->connect_error}</span>\n";
         
         // 대체 연결 시도
-        $mysqli = new mysqli('127.0.0.1', 'root', 'Dnlszkem1!', 'topmkt', 3306);
+        $mysqli = new mysqli('127.0.0.1', 'root', 'Dnlszkem1!', 'TOPMKT', 3306);
         if ($mysqli->connect_error) {
             echo "<span class='error'>❌ 대체 연결도 실패</span>\n";
             throw new Exception("데이터베이스 연결 불가능");

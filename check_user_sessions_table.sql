@@ -1,5 +1,5 @@
 -- user_sessions 테이블 구조 확인
-USE topmkt;
+USE TOPMKT;
 
 -- 테이블 구조 확인
 DESCRIBE user_sessions;

@@ -59,7 +59,7 @@ header('Content-Type: text/html; charset=UTF-8');
     <pre>
 <?php
 try {
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
     if ($mysqli->connect_error) {
         echo "❌ 연결 실패: " . $mysqli->connect_error;
     } else {

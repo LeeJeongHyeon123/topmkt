@@ -4,7 +4,7 @@
 -- 기존 필드 확인을 위한 쿼리
 SELECT COLUMN_NAME 
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
 AND TABLE_NAME = 'users' 
 AND COLUMN_NAME IN ('bio', 'birth_date', 'gender', 'profile_image_original', 'profile_image_profile', 'profile_image_thumb', 'website_url', 'social_links');
 

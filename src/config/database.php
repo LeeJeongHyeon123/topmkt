@@ -13,13 +13,18 @@ class Database {
     
     // 데이터베이스 설정 (환경변수 우선, 기본값 fallback)
     private const SOCKET_PATH = '/var/lib/mysql/mysql.sock'; // MySQL 소켓 파일 경로
-    private const DB_NAME = 'topmkt';
+    private const DB_NAME = 'TOPMKT';
     private const USERNAME = 'root';
     private const PASSWORD = ''; // 환경변수에서 로드
     private const CHARSET = 'utf8mb4';
     
     private function __construct() {
         try {
+            // MySQLi 확장 설치 여부 확인
+            if (!extension_loaded('mysqli')) {
+                throw new Exception('MySQLi 확장이 설치되어 있지 않습니다. 시스템 관리자에게 문의하세요.');
+            }
+            
             // 프로젝트별 로그 경로 설정
             $projectLogPath = '/var/www/html/topmkt/logs/topmkt_errors.log';
             ini_set('log_errors', 1);
@@ -31,21 +36,27 @@ class Database {
             $username = $_ENV['DB_USERNAME'] ?? self::USERNAME;
             $password = $_ENV['DB_PASSWORD'] ?? 'Dnlszkem1!'; // 새로운 비밀번호로 업데이트
             
-            // MySQLi 소켓 방식 연결 (Socket-based connection for better performance)
-            $this->connection = new mysqli('localhost', $username, $password, $dbname, 3306, $socket_path);
+            // MySQLi TCP 연결 (로컬 MySQL 서버)
+            $host = $_ENV['DB_HOST'] ?? '127.0.0.1'; // 로컬 데이터베이스 서버
+            $this->connection = new mysqli($host, $username, $password, $dbname, 3306);
             
             if ($this->connection->connect_error) {
                 throw new Exception('데이터베이스 연결에 실패했습니다: ' . $this->connection->connect_error);
             }
             
-            // 문자셋 설정
+            // 문자셋 설정 - 한국어 지원을 위한 강화된 utf8mb4 설정
             $this->connection->set_charset(self::CHARSET);
             
-            // UTF-8 세션 변수 강제 설정
+            // UTF-8 세션 변수 강제 설정 (한국어 인코딩 문제 해결)
             $this->connection->query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
             $this->connection->query("SET character_set_client = utf8mb4");
             $this->connection->query("SET character_set_connection = utf8mb4");
             $this->connection->query("SET character_set_results = utf8mb4");
+            $this->connection->query("SET character_set_database = utf8mb4");
+            $this->connection->query("SET character_set_server = utf8mb4");
+            $this->connection->query("SET collation_connection = utf8mb4_unicode_ci");
+            $this->connection->query("SET collation_database = utf8mb4_unicode_ci");
+            $this->connection->query("SET collation_server = utf8mb4_unicode_ci");
             
         } catch (Exception $e) {
             error_log('Database connection failed: ' . $e->getMessage());
@@ -159,8 +170,22 @@ class Database {
                 return $result;
             }
         } catch (Exception $e) {
-            error_log('Query failed: ' . $e->getMessage() . ' | SQL: ' . $sql);
-            throw new Exception('데이터베이스 쿼리 실행에 실패했습니다.');
+            $errorMsg = 'Query failed: ' . $e->getMessage() . ' | SQL: ' . $sql;
+            error_log($errorMsg);
+            
+            // WebLogger 사용 가능하면 더 상세한 로깅
+            if (class_exists('WebLogger')) {
+                WebLogger::error('Database Query Failed', [
+                    'error_message' => $e->getMessage(),
+                    'sql_query' => $sql,
+                    'params' => $params ?? 'NO_PARAMS',
+                    'error_code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]);
+            }
+            
+            throw new Exception('데이터베이스 쿼리 실행에 실패했습니다: ' . $e->getMessage());
         }
     }
     

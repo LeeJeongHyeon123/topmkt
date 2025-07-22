@@ -3,7 +3,7 @@
 
 -- 데이터베이스 생성 (필요한 경우)
 -- CREATE DATABASE IF NOT EXISTS topmkt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- USE topmkt;
+-- USE TOPMKT;
 
 -- 1. 회원 테이블 (users)
 CREATE TABLE IF NOT EXISTS users (

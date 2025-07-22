@@ -1,7 +1,7 @@
 -- 우리집탄이 사용자의 프로필 이미지 업데이트
 -- 실행 방법: MariaDB 콘솔에서 다음 명령어 실행
 -- mysql -u root -p
--- USE topmkt;
+-- USE TOPMKT;
 -- SOURCE /var/www/html/topmkt/update_profile_image.sql;
 
 UPDATE users 

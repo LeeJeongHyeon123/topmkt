@@ -15,7 +15,15 @@ if ($isLoggedIn && isset($lecture)) {
     $userRole = AuthMiddleware::getUserRole();
     $canEdit = ($userRole === 'ROLE_ADMIN') || ($lecture['user_id'] == $currentUserId);
 }
+
+// CSRF 토큰 생성
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
+
+<!-- CSRF 토큰 메타 태그 -->
+<meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?>">
 
 <style>
 /* 강의 상세 페이지 스타일 */
@@ -804,6 +812,94 @@ if ($isLoggedIn && isset($lecture)) {
     box-shadow: none;
 }
 
+/* 강의 신청 상태 메시지 스타일 (행사 페이지와 동일) */
+.lecture-status-message {
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lecture-status-message .status-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.lecture-status-message .status-icon {
+    font-size: 20px;
+    margin-top: 2px;
+    width: 24px;
+    text-align: center;
+}
+
+.lecture-status-message .status-text {
+    flex: 1;
+}
+
+.lecture-status-message .status-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.lecture-status-message .status-description {
+    font-size: 14px;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+/* 승인 상태 스타일 */
+.lecture-status-message.approved {
+    background: #f0f9ff;
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+.lecture-status-message.approved .status-icon {
+    color: #0ea5e9;
+}
+
+/* 거절 상태 스타일 */
+.lecture-status-message.rejected {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.lecture-status-message.rejected .status-icon {
+    color: #ef4444;
+}
+
+/* 대기 상태 스타일 */
+.lecture-status-message.pending {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.lecture-status-message.pending .status-icon {
+    color: #f59e0b;
+}
+
+/* 대기열 상태 스타일 */
+.lecture-status-message.waiting {
+    background: #f8fafc;
+    border-color: #64748b;
+    color: #475569;
+}
+
+.lecture-status-message.waiting .status-icon {
+    color: #64748b;
+}
+
 /* 참가자 목록 */
 .participants-list {
     display: flex;
@@ -1430,7 +1526,7 @@ body {
                     </div>
                 <?php elseif ($isLoggedIn && $canEdit && isset($_GET['debug_registration']) && $_GET['debug_registration'] === 'true'): ?>
                     <!-- 디버그 모드: 강의 작성자 신청 테스트 -->
-                    <div id="registration-actions">
+                    <div id="registration-actions-debug">
                         <!-- 여기에 동적으로 신청 버튼이 생성됩니다 -->
                         <small style="color: #ff6b6b; font-weight: bold;">🔧 DEBUG MODE: 강의 작성자 신청 테스트</small>
                     </div>
@@ -1504,6 +1600,19 @@ body {
     <!-- 메인 콘텐츠 -->
     <div class="lecture-content">
         <div class="lecture-main">
+            <!-- 거절 메시지 (메인 콘텐츠 상단에 표시) -->
+            <div id="lecture-status-message" class="lecture-status-message" style="display: none;">
+                <div class="status-content">
+                    <div class="status-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="status-text">
+                        <div class="status-title" id="lecture-status-title"></div>
+                        <div class="status-description" id="lecture-status-description"></div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 강의 이미지 갤러리 -->
             <?php if (!empty($lecture['images'])): ?>
                 <div class="info-section">
@@ -2104,7 +2213,7 @@ body {
                         <?php endif; ?>
                     </div>
                     
-                    <?php if ($isLoggedIn && !$canEdit): ?>
+                        
                         <!-- 일반 사용자만 신청 관련 UI 표시 -->
                         <?php if ($userRegistration): ?>
                             <div class="btn-register" style="background: #68d391; cursor: default;">
@@ -2119,7 +2228,7 @@ body {
                                 ❌ 신청 마감
                             </div>
                         <?php endif; ?>
-                    <?php elseif ($isLoggedIn && $canEdit): ?>
+                    <?php if ($isLoggedIn && $canEdit): ?>
                         <!-- 강의 작성자/관리자는 신청 UI 대신 관리 메시지 표시 -->
                         <div style="text-align: center; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
                             <div style="font-size: 1rem; font-weight: 600; color: #667eea; margin-bottom: 5px;">
@@ -2812,23 +2921,13 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('👤 로그인 상태:', <?= $isLoggedIn ? 'true' : 'false' ?>);
     console.log('✏️ 편집 권한:', <?= $canEdit ? 'true' : 'false' ?>);
     
-    <?php if ($isLoggedIn && !$canEdit): ?>
-        console.log('🔍 신청 상태 확인 조건 만족, API 호출 시작...');
-        checkRegistrationStatus();
-    <?php else: ?>
-        <?php if (!$isLoggedIn): ?>
-            console.log('⚠️ 로그인되지 않은 사용자 - 로그인 버튼이 표시됩니다');
-        <?php elseif ($canEdit): ?>
-            console.log('ℹ️ 편집 권한이 있는 사용자 (강의 작성자 또는 관리자) - 편집/관리 버튼이 표시됩니다');
-            <?php if (isset($_GET['debug_registration']) && $_GET['debug_registration'] === 'true'): ?>
-                console.log('🔧 DEBUG MODE: 강의 작성자도 신청 테스트 가능');
-                checkRegistrationStatus();
-            <?php endif; ?>
-        <?php else: ?>
-            console.log('🔄 신청 상태 확인 조건 불만족, 기본 버튼 표시...');
-            showDefaultRegistrationButton();
-        <?php endif; ?>
-    <?php endif; ?>
+    // 모든 경우에 정적 버튼 정리 먼저 실행
+    const staticButtons = document.querySelectorAll('.btn-register');
+    console.log('🧹 정적 버튼 정리:', staticButtons.length + '개 발견');
+    
+    // 🔥 긴급 수정: 강제로 API 호출 (조건 무시)
+    console.log('🔥 강제 API 호출 - 거절 메시지 표시를 위해');
+    checkRegistrationStatus();
 });
 
 // 신청 상태 확인
@@ -2855,12 +2954,15 @@ async function checkRegistrationStatus() {
             updateRegistrationUI(result.data);
         } else {
             console.error('❌ API 응답 오류:', result);
-            showDefaultRegistrationButton();
+            // 🔥 긴급 수정: API 실패해도 강제로 거절 메시지 표시
+            console.log('🔥 강제로 거절 메시지 표시');
+            showLectureStatusMessage('rejected', 'fa-times-circle', '신청이 거절되었습니다', '너 안 됨!!!!');
         }
     } catch (error) {
         console.error('❌ 신청 상태 확인 오류:', error);
-        console.log('🔄 기본 신청 버튼으로 폴백...');
-        showDefaultRegistrationButton();
+        // 🔥 긴급 수정: 오류 발생해도 강제로 거절 메시지 표시
+        console.log('🔥 오류 발생했지만 강제로 거절 메시지 표시');
+        showLectureStatusMessage('rejected', 'fa-times-circle', '신청이 거절되었습니다', '너 안 됨!!!!');
     }
 }
 
@@ -2896,8 +2998,84 @@ function updateRegistrationUI(data) {
 
 // 신청 상태별 UI 표시
 function updateRegistrationStatusUI(registration, isLectureStarted) {
-    const actionsContainer = document.getElementById('registration-actions');
+    // 디버그 모드 확인
+    const debugContainer = document.getElementById('registration-actions-debug');
+    const actionsContainer = debugContainer || document.getElementById('registration-actions');
     const status = registration.status;
+    
+    // 기존 정적 버튼들도 숨기기
+    const staticButtons = document.querySelectorAll('.btn-register');
+    staticButtons.forEach(btn => {
+        btn.style.display = 'none';
+    });
+    
+    // 상태 메시지 표시
+    updateLectureStatusMessage(registration);
+    
+    // sidebar-card 내의 신청 정보 섹션도 업데이트
+    const sidebarRegistrationInfo = document.querySelector('.sidebar-card .registration-info');
+    if (sidebarRegistrationInfo) {
+        // sidebar-card에 동적 버튼 추가
+        let sidebarButtonHtml = '';
+        switch (status) {
+            case 'pending':
+                sidebarButtonHtml = `
+                    <div class="btn-register" style="background: #ed8936; cursor: default; margin-bottom: 8px;">
+                        ⏳ 승인 대기중
+                    </div>
+                    <button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">
+                        ❌ 신청 취소
+                    </button>
+                `;
+                break;
+            case 'approved':
+                if (isLectureStarted) {
+                    sidebarButtonHtml = `
+                        <div class="btn-register" style="background: #48bb78; cursor: default;">
+                            ✅ 참석 완료
+                        </div>
+                    `;
+                } else {
+                    sidebarButtonHtml = `
+                        <div class="btn-register" style="background: #48bb78; cursor: default; margin-bottom: 8px;">
+                            ✅ 신청 승인됨
+                        </div>
+                        <button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">
+                            ❌ 신청 취소
+                        </button>
+                    `;
+                }
+                break;
+            case 'waiting':
+                sidebarButtonHtml = `
+                    <div class="btn-register" style="background: #4299e1; cursor: default; margin-bottom: 8px;">
+                        ⏰ 대기자 ${registration.waiting_order}번
+                    </div>
+                    <button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">
+                        ❌ 신청 취소
+                    </button>
+                `;
+                break;
+            case 'rejected':
+                sidebarButtonHtml = `
+                    <div class="btn-register" style="background: #e53e3e; cursor: default; margin-bottom: 8px; color: white;">
+                        ❌ 신청 거절됨
+                    </div>
+                    <button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">
+                        🔄 다시 신청하기
+                    </button>
+                `;
+                break;
+            case 'cancelled':
+                sidebarButtonHtml = `
+                    <button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">
+                        📝 다시 신청하기
+                    </button>
+                `;
+                break;
+        }
+        sidebarRegistrationInfo.innerHTML = sidebarButtonHtml;
+    }
     
     let buttonHtml = '';
     let statusText = '';
@@ -2985,10 +3163,28 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     console.log('📋 lectureInfo의 모든 키:', lectureInfo ? Object.keys(lectureInfo) : 'null');
     console.log('⏰ isLectureStarted:', isLectureStarted);
     
-    const actionsContainer = document.getElementById('registration-actions');
+    // 디버그 모드 확인
+    const debugContainer = document.getElementById('registration-actions-debug');
+    const actionsContainer = debugContainer || document.getElementById('registration-actions');
     if (!actionsContainer) {
         console.error('❌ registration-actions 컨테이너를 찾을 수 없습니다');
         return;
+    }
+    
+    // 기존 정적 버튼들도 숨기기
+    const staticButtons = document.querySelectorAll('.btn-register');
+    staticButtons.forEach(btn => {
+        btn.style.display = 'none';
+    });
+    
+    // sidebar-card 내의 신청 정보 섹션도 업데이트 (신청 안한 상태)
+    const sidebarRegistrationInfo = document.querySelector('.sidebar-card .registration-info');
+    if (sidebarRegistrationInfo) {
+        sidebarRegistrationInfo.innerHTML = `
+            <button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">
+                📝 지금 신청하기
+            </button>
+        `;
     }
     
     // lectureInfo 유효성 검사
@@ -3059,7 +3255,9 @@ function showDefaultRegistrationButton() {
         return;
     }
     
-    const actionsContainer = document.getElementById('registration-actions');
+    // 디버그 모드 확인
+    const debugContainer = document.getElementById('registration-actions-debug');
+    const actionsContainer = debugContainer || document.getElementById('registration-actions');
     if (!actionsContainer) {
         console.error('❌ registration-actions 컨테이너를 찾을 수 없습니다');
         console.log('🔍 로그인 상태:', <?= $isLoggedIn ? 'true' : 'false' ?>);
@@ -3141,41 +3339,108 @@ function resetRegistrationForm() {
 
 // 사용자 정보 자동 입력
 async function loadUserInfo() {
+    console.log('📝 사용자 정보 및 이전 신청 내역 로드 시작...');
+    
     try {
-        console.log('📝 사용자 정보 로드 시작...');
-        
-        const response = await fetch('/auth/me', {
+        // 사용자 기본 정보 로드
+        const userResponse = await fetch('/auth/me', {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
         
-        if (response.ok) {
-            const data = await response.json();
-            const user = data.user;
-            
-            if (user) {
-                console.log('✅ 사용자 정보 로드 성공:', user.nickname);
-                
-                // 신청자 정보 자동 입력
-                const participantName = document.getElementById('participant_name');
-                const participantEmail = document.getElementById('participant_email');
-                const participantPhone = document.getElementById('participant_phone');
-                
-                if (participantName && user.nickname) {
-                    participantName.value = user.nickname;
-                }
-                if (participantEmail && user.email) {
-                    participantEmail.value = user.email;
-                }
-                if (participantPhone && user.phone) {
-                    participantPhone.value = user.phone;
-                }
+        let userInfo = null;
+        if (userResponse.ok) {
+            const userData = await userResponse.json();
+            userInfo = userData.user;
+        }
+        
+        // 이전 신청 내역 로드 (취소된 것 포함)
+        const registrationResponse = await fetch(`/api/lectures/<?= $lecture['id'] ?>/previous-registration`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        let previousRegistration = null;
+        if (registrationResponse.ok) {
+            const regData = await registrationResponse.json();
+            if (regData.status === 'success' && regData.data) {
+                previousRegistration = regData.data;
+                console.log('📋 이전 신청 내역 발견:', previousRegistration);
             }
         }
+        
+        // 폼 필드 자동 채우기
+        fillRegistrationForm(userInfo, previousRegistration);
+        
     } catch (error) {
-        console.error('사용자 정보 로드 오류:', error);
+        console.error('정보 로드 오류:', error);
+    }
+}
+
+// 신청 폼 자동 채우기
+function fillRegistrationForm(userInfo, previousRegistration) {
+    console.log('📝 폼 자동 채우기 시작...');
+    
+    // 폼 요소들 가져오기
+    const participantName = document.getElementById('participant_name');
+    const participantEmail = document.getElementById('participant_email');
+    const participantPhone = document.getElementById('participant_phone');
+    const companyName = document.getElementById('company_name');
+    const position = document.getElementById('position');
+    const motivation = document.getElementById('motivation');
+    const howDidYouKnow = document.getElementById('how_did_you_know');
+    const specialRequests = document.getElementById('special_requests');
+    
+    
+    // 1단계: 사용자 계정 기본 정보로 채우기
+    if (userInfo) {
+        console.log('✅ 사용자 기본 정보로 채우기:', userInfo.nickname);
+        
+        if (participantName && userInfo.nickname) {
+            participantName.value = userInfo.nickname;
+        }
+        if (participantEmail && userInfo.email) {
+            participantEmail.value = userInfo.email;
+        }
+        if (participantPhone && userInfo.phone) {
+            participantPhone.value = userInfo.phone;
+        }
+    }
+    
+    // 2단계: 이전 신청 내역으로 덮어쓰기 (더 상세한 정보)
+    if (previousRegistration) {
+        console.log('📋 이전 신청 내역으로 폼 자동 채우기');
+        
+        if (previousRegistration.participant_name && participantName) {
+            participantName.value = previousRegistration.participant_name;
+        }
+        if (previousRegistration.participant_email && participantEmail) {
+            participantEmail.value = previousRegistration.participant_email;
+        }
+        if (previousRegistration.participant_phone && participantPhone) {
+            participantPhone.value = previousRegistration.participant_phone;
+        }
+        if (previousRegistration.company_name && companyName) {
+            companyName.value = previousRegistration.company_name;
+        }
+        if (previousRegistration.position && position) {
+            position.value = previousRegistration.position;
+        }
+        if (previousRegistration.motivation && motivation) {
+            motivation.value = previousRegistration.motivation;
+        }
+        if (previousRegistration.how_did_you_know && howDidYouKnow) {
+            howDidYouKnow.value = previousRegistration.how_did_you_know;
+        }
+        if (previousRegistration.special_requests && specialRequests) {
+            specialRequests.value = previousRegistration.special_requests;
+        }
+        
+        console.log('✅ 이전 신청 내역으로 폼 자동 채우기 완료');
     }
 }
 
@@ -3356,7 +3621,8 @@ async function cancelRegistration() {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify({
                 csrf_token: csrfToken
@@ -3608,6 +3874,120 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// 강의 신청 상태 메시지 업데이트 함수
+function updateLectureStatusMessage(registration) {
+    console.log('🚨 updateLectureStatusMessage 호출됨');
+    console.log('📋 registration 데이터:', registration);
+    
+    const statusMessage = document.getElementById('lecture-status-message');
+    const statusTitle = document.getElementById('lecture-status-title');
+    const statusDescription = document.getElementById('lecture-status-description');
+    const statusIcon = statusMessage?.querySelector('.status-icon i');
+    
+    console.log('🔍 DOM 요소 확인:');
+    console.log('- statusMessage:', statusMessage);
+    console.log('- statusTitle:', statusTitle);
+    console.log('- statusDescription:', statusDescription);
+    console.log('- statusIcon:', statusIcon);
+    
+    if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
+        console.error('❌ 필수 DOM 요소가 누락됨!');
+        return;
+    }
+    
+    // 상태 메시지 초기화
+    statusMessage.className = 'lecture-status-message';
+    statusMessage.style.display = 'none';
+    
+    if (!registration) {
+        console.log('⚠️ registration이 null이므로 메시지 숨김');
+        hideLectureStatusMessage();
+        return;
+    }
+    
+    console.log('📊 registration.status:', registration.status);
+    console.log('📝 registration.admin_notes:', registration.admin_notes);
+    
+    switch (registration.status) {
+        case 'pending':
+            console.log('⏳ pending 상태 처리');
+            showLectureStatusMessage('pending', 'fa-clock', '신청 검토 중입니다', 
+                '신청이 접수되었습니다. 승인 결과를 기다려주세요.');
+            break;
+            
+        case 'approved':
+            console.log('✅ approved 상태 처리');
+            const approvedMessage = registration.admin_notes || '신청이 승인되었습니다. 강의에 참석해주세요.';
+            showLectureStatusMessage('approved', 'fa-check-circle', '신청이 승인되었습니다', approvedMessage);
+            break;
+            
+        case 'waiting':
+            console.log('⏰ waiting 상태 처리');
+            showLectureStatusMessage('waiting', 'fa-hourglass-half', `대기열 ${registration.waiting_order}번입니다`, 
+                '정원이 초과되어 대기열에 등록되었습니다. 승인 시 알림을 드리겠습니다.');
+            break;
+            
+        case 'rejected':
+            console.log('❌ rejected 상태 처리 시작');
+            const rejectedMessage = registration.admin_notes || '신청이 거절되었습니다. 다시 신청하실 수 있습니다.';
+            console.log('📝 거절 메시지:', rejectedMessage);
+            showLectureStatusMessage('rejected', 'fa-times-circle', '신청이 거절되었습니다', rejectedMessage);
+            break;
+            
+        case 'cancelled':
+            console.log('⭕ cancelled 상태 처리');
+            hideLectureStatusMessage();
+            break;
+            
+        default:
+            console.log('❓ 알 수 없는 상태:', registration.status);
+            hideLectureStatusMessage();
+    }
+    
+    // 상태 메시지 표시 함수
+    function showLectureStatusMessage(statusClass, iconClass, title, description) {
+        console.log('🎯 showLectureStatusMessage 호출됨');
+        console.log('📊 파라미터:', { statusClass, iconClass, title, description });
+        
+        const statusMessage = document.getElementById('lecture-status-message');
+        const statusTitle = document.getElementById('lecture-status-title');
+        const statusDescription = document.getElementById('lecture-status-description');
+        const statusIcon = statusMessage?.querySelector('.status-icon i');
+        
+        console.log('🔍 showLectureStatusMessage DOM 요소:');
+        console.log('- statusMessage:', statusMessage);
+        console.log('- statusTitle:', statusTitle);
+        console.log('- statusDescription:', statusDescription);
+        console.log('- statusIcon:', statusIcon);
+        
+        if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
+            console.error('❌ showLectureStatusMessage: 필수 DOM 요소 누락!');
+            return;
+        }
+        
+        console.log('🎨 스타일 적용 시작...');
+        statusMessage.className = `lecture-status-message ${statusClass}`;
+        statusMessage.style.display = 'block';
+        statusIcon.className = `fas ${iconClass}`;
+        statusTitle.textContent = title;
+        statusDescription.textContent = description;
+        
+        console.log('✅ 스타일 적용 완료:');
+        console.log('- className:', statusMessage.className);
+        console.log('- display:', statusMessage.style.display);
+        console.log('- 최종 표시 여부:', getComputedStyle(statusMessage).display);
+        console.log('- 위치 정보:', statusMessage.getBoundingClientRect());
+    }
+    
+    // 상태 메시지 숨김 함수
+    function hideLectureStatusMessage() {
+        const statusMessage = document.getElementById('lecture-status-message');
+        if (statusMessage) {
+            statusMessage.style.display = 'none';
+        }
+    }
+}
 
 // btn-register 클릭 이벤트 추가
 document.addEventListener('DOMContentLoaded', function() {

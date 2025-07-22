@@ -8,7 +8,7 @@
 -- 3. 이 파일 실행:
 --    source /workspace/add_admin_memo_column.sql;
 
-USE topmkt;
+USE TOPMKT;
 
 -- company_profiles 테이블에 admin_memo 컬럼 추가
 ALTER TABLE company_profiles 
@@ -21,7 +21,7 @@ SELECT
     COLUMN_TYPE,
     COLUMN_COMMENT
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
   AND TABLE_NAME = 'company_profiles' 
   AND COLUMN_NAME IN ('admin_notes', 'admin_memo')
 ORDER BY ORDINAL_POSITION;

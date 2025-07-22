@@ -6,42 +6,42 @@ USE `topmkt`;
 
 -- 1. lectures 테이블에 누락된 필드만 추가 (이미 존재하는 필드는 건너뛰기)
 SET @sql = 'ALTER TABLE lectures ADD COLUMN current_participants INT DEFAULT 0 COMMENT ''현재 참가자 수''';
-SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
+SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
 SET @sql = IF(@field_exists = 0, @sql, 'SELECT ''current_participants already exists'' as message');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 SET @sql = 'ALTER TABLE lectures ADD COLUMN auto_approval BOOLEAN DEFAULT FALSE COMMENT ''자동 승인 여부''';
-SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'auto_approval');
+SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'auto_approval');
 SET @sql = IF(@field_exists = 0, @sql, 'SELECT ''auto_approval already exists'' as message');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 SET @sql = 'ALTER TABLE lectures ADD COLUMN registration_start_date DATETIME NULL COMMENT ''신청 시작일시''';
-SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'registration_start_date');
+SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'registration_start_date');
 SET @sql = IF(@field_exists = 0, @sql, 'SELECT ''registration_start_date already exists'' as message');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 SET @sql = 'ALTER TABLE lectures ADD COLUMN registration_end_date DATETIME NULL COMMENT ''신청 마감일시''';
-SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'registration_end_date');
+SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'registration_end_date');
 SET @sql = IF(@field_exists = 0, @sql, 'SELECT ''registration_end_date already exists'' as message');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 SET @sql = 'ALTER TABLE lectures ADD COLUMN allow_waiting_list BOOLEAN DEFAULT FALSE COMMENT ''대기자 명단 허용 여부''';
-SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'allow_waiting_list');
+SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'allow_waiting_list');
 SET @sql = IF(@field_exists = 0, @sql, 'SELECT ''allow_waiting_list already exists'' as message');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 2. 기존 강의들의 current_participants 초기화 (필드가 존재하는 경우에만)
-SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
+SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
 SET @sql = IF(@field_exists > 0, 'UPDATE lectures SET current_participants = 0 WHERE current_participants IS NULL', 'SELECT ''current_participants field not found'' as message');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
@@ -103,7 +103,7 @@ BEGIN
         VALUES (NEW.id, NEW.status, OLD.status, NEW.status, '상태 변경', COALESCE(NEW.processed_by, NEW.user_id));
         
         -- current_participants 업데이트 (필드가 존재하는 경우에만)
-        SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
+        SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
         IF @field_exists > 0 THEN
             UPDATE lectures 
             SET current_participants = (
@@ -134,7 +134,7 @@ BEGIN
     END IF;
     
     -- current_participants 업데이트 (필드가 존재하는 경우에만)
-    SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'topmkt' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
+    SET @field_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'TOPMKT' AND TABLE_NAME = 'lectures' AND COLUMN_NAME = 'current_participants');
     IF @field_exists > 0 THEN
         UPDATE lectures 
         SET current_participants = (
@@ -158,7 +158,7 @@ SELECT
     COLUMN_DEFAULT,
     COLUMN_COMMENT
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
 AND TABLE_NAME = 'lectures' 
 AND COLUMN_NAME IN ('max_participants', 'current_participants', 'auto_approval', 'registration_start_date', 'registration_end_date', 'allow_waiting_list')
 ORDER BY ORDINAL_POSITION;

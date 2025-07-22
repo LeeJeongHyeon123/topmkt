@@ -8,7 +8,7 @@
 -- 3. 이 파일 실행:
 --    source /workspace/add_suspended_status.sql;
 
-USE topmkt;
+USE TOPMKT;
 
 -- company_profiles 테이블의 status enum에 'suspended' 상태 추가
 ALTER TABLE company_profiles 
@@ -27,7 +27,7 @@ SELECT
     'company_profiles status enum updated' as message,
     COLUMN_TYPE 
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
   AND TABLE_NAME = 'company_profiles' 
   AND COLUMN_NAME = 'status'
 
@@ -37,7 +37,7 @@ SELECT
     'users corp_status enum updated' as message,
     COLUMN_TYPE 
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
   AND TABLE_NAME = 'users' 
   AND COLUMN_NAME = 'corp_status'
 
@@ -47,6 +47,6 @@ SELECT
     'company_application_history action_type enum updated' as message,
     COLUMN_TYPE 
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
   AND TABLE_NAME = 'company_application_history' 
   AND COLUMN_NAME = 'action_type';

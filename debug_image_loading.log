@@ -1,3 +1,0 @@
-=== getLectureImages 호출됨 (강의 ID: 129) - 2025-06-18 23:34:07 ===
-SQL 결과: {"lecture_images":"[{\"original_name\":\"\uace0\ud654\uc9c8.jpg\",\"file_name\":\"1750255023_0__________.jpg\",\"file_path\":\"\\\/assets\\\/uploads\\\/lectures\\\/1750255023_0__________.jpg\",\"file_size\":494803,\"upload_time\":\"2025-06-18 22:57:03\"},{\"original_name\":\"\uba54\uc77c\ud0dd.png\",\"file_name\":\"1750255023_1__________.png\",\"file_path\":\"\\\/assets\\\/uploads\\\/lectures\\\/1750255023_1__________.png\",\"file_size\":19548,\"upload_time\":\"2025-06-18 22:57:03\"}]"}
-

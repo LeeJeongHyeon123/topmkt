@@ -40,9 +40,9 @@ echo "시간: " . date('Y-m-d H:i:s') . "\n\n";
 // 데이터베이스 연결 시도
 $mysqli = null;
 $db_configs = [
-    ['localhost', 'root', 'Dnlszkem1!', 'topmkt'],
-    ['127.0.0.1', 'root', 'Dnlszkem1!', 'topmkt'],
-    ['localhost', 'root', '', 'topmkt']
+    ['localhost', 'root', 'Dnlszkem1!', 'TOPMKT'],
+    ['127.0.0.1', 'root', 'Dnlszkem1!', 'TOPMKT'],
+    ['localhost', 'root', '', 'TOPMKT']
 ];
 
 echo "<span class='info'>🔍 데이터베이스 연결 시도...</span>\n";

@@ -163,7 +163,7 @@ SELECT
     IS_NULLABLE,
     COLUMN_DEFAULT
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
 AND TABLE_NAME = 'lecture_registrations' 
 AND COLUMN_NAME IN ('processed_by', 'processed_at', 'admin_notes', 'motivation', 'is_waiting_list')
 ORDER BY ORDINAL_POSITION;

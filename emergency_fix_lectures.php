@@ -19,14 +19,14 @@ echo "=== 1. 데이터베이스 연결 테스트 ===\n";
 
 try {
     // 직접 MySQLi 연결 테스트
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
     
     if ($mysqli->connect_error) {
         echo "❌ 데이터베이스 연결 실패: " . $mysqli->connect_error . "\n";
         
         // 대안 연결 시도
         echo "🔄 대안 연결 시도...\n";
-        $mysqli = new mysqli('127.0.0.1', 'root', 'Dnlszkem1!', 'topmkt', 3306);
+        $mysqli = new mysqli('127.0.0.1', 'root', 'Dnlszkem1!', 'TOPMKT', 3306);
         
         if ($mysqli->connect_error) {
             echo "❌ 대안 연결도 실패: " . $mysqli->connect_error . "\n";

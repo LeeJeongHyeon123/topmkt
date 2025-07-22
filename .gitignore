@@ -1,28 +1,35 @@
-# 의존성 디렉토리
-/vendor/
-/node_modules/
-
-# 환경 파일
+# 환경 설정 파일
 .env
-.env.*
-!.env.example
+.env.local
+.env.production
 
 # 로그 파일
-/logs/*
-!logs/.gitkeep
+logs/
+*.log
 
-# 캐시 및 임시 파일
-.phpcs-cache
-.php_cs.cache
-composer.lock
-package-lock.json
-.DS_Store
+# 캐시 파일  
+cache/
+temp/
+vendor/
 
-# 업로드 디렉토리
-/public/assets/uploads/*
-!/public/assets/uploads/.gitkeep
+# 업로드된 파일
+public/assets/uploads/
+uploads/
+
+# Node modules
+node_modules/
+
+# Composer
+vendor/
 
 # IDE 설정
-.idea/
 .vscode/
-*.code-workspace 
+.idea/
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# 백업 파일
+*.backup
+*.bak

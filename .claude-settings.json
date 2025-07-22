@@ -1,0 +1,29 @@
+{
+  "model": "sonnet",
+  "autoExecute": true,
+  "confirmTools": false,
+  "interactiveMode": false,
+  "allowedTools": [
+    "Bash", 
+    "Edit", 
+    "Read", 
+    "Write", 
+    "LS", 
+    "Grep", 
+    "Glob", 
+    "MultiEdit", 
+    "Task", 
+    "TodoRead", 
+    "TodoWrite", 
+    "WebFetch", 
+    "WebSearch", 
+    "NotebookRead", 
+    "NotebookEdit"
+  ],
+  "bashAutoConfirm": true,
+  "skipConfirmation": true,
+  "confirmBeforeToolUse": false,
+  "bashConfirmation": false,
+  "toolConfirmation": false,
+  "confirmBeforeBash": false
+}

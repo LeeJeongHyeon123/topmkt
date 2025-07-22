@@ -362,6 +362,9 @@
 }
 </style>
 
+<!-- 공통 업로드 설정 (validateFileSize 함수 사용 전에 로드) -->
+<?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
+
 <div class="corp-apply-container">
     <!-- 헤더 -->
     <div class="corp-apply-header">
@@ -497,7 +500,7 @@
                     <div class="file-upload-area" onclick="document.getElementById('business_registration_file').click()">
                         <div class="file-upload-icon">📄</div>
                         <div class="file-upload-text">클릭하거나 파일을 드래그하여 업로드</div>
-                        <div class="file-upload-hint">JPG, PNG, WebP, PDF 파일 (최대 10MB)</div>
+                        <div class="file-upload-hint">JPG, PNG, WebP, PDF 파일 (최대 30MB)</div>
                     </div>
                     
                     <input type="file" 
@@ -610,9 +613,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const file = fileInput.files[0];
         if (!file) return;
 
-        // 파일 크기 검증 (10MB)
-        if (file.size > 10 * 1024 * 1024) {
-            alert('파일 크기는 10MB를 초과할 수 없습니다.');
+        // 파일 크기 검증 (공통 설정 사용: 30MB)
+        if (!window.validateFileSize || !window.validateFileSize(file.size)) {
+            alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             fileInput.value = '';
             return;
         }
@@ -699,4 +702,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
 

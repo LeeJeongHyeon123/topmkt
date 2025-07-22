@@ -420,7 +420,7 @@ foreach ($extensions as $ext) {
 <?php
 try {
     echo "연결 시도 중...\n";
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
     
     if ($mysqli->connect_error) {
         echo "<span class='error'>❌ 연결 실패: {$mysqli->connect_error}</span>\n";

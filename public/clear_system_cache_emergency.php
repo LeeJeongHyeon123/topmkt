@@ -108,13 +108,13 @@ echo "\n";
 // 6. 데이터베이스 연결 테스트
 echo "<span class='info'>6. 데이터베이스 연결 테스트</span>\n";
 try {
-    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'topmkt');
+    $mysqli = new mysqli('localhost', 'root', 'Dnlszkem1!', 'TOPMKT');
     
     if ($mysqli->connect_error) {
         echo "<span class='error'>❌ 데이터베이스 연결 실패: " . $mysqli->connect_error . "</span>\n";
         
         // 대안 연결 시도
-        $mysqli = new mysqli('127.0.0.1', 'root', 'Dnlszkem1!', 'topmkt', 3306);
+        $mysqli = new mysqli('127.0.0.1', 'root', 'Dnlszkem1!', 'TOPMKT', 3306);
         if ($mysqli->connect_error) {
             echo "<span class='error'>❌ 대안 연결도 실패</span>\n";
         } else {

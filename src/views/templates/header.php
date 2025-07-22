@@ -8,10 +8,10 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="<?= $og_type ?? 'website' ?>">
-    <meta property="og:url" content="<?= 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?>">
+    <meta property="og:url" content="<?= 'https://' . ($_SERVER['HTTP_HOST'] ?? 'www.topmktx.com') . ($_SERVER['REQUEST_URI'] ?? '/') ?>">
     <meta property="og:title" content="<?= $og_title ?? ($page_title ? $page_title . ' - 탑마케팅' : '탑마케팅 - 마케팅 전문가들의 지식 공유 플랫폼') ?>">
     <meta property="og:description" content="<?= $og_description ?? ($page_description ?? '마케팅 전문가들이 모여 지식을 공유하고 함께 성장하는 플랫폼입니다. 세미나, 워크샵, 커뮤니티를 통해 최신 마케팅 트렌드를 만나보세요.') ?>">
-    <meta property="og:image" content="<?= $og_image ?? 'https://' . $_SERVER['HTTP_HOST'] . '/assets/images/topmkt-og-image.png?v=' . date('Ymd') ?>">
+    <meta property="og:image" content="<?= $og_image ?? 'https://' . ($_SERVER['HTTP_HOST'] ?? 'www.topmktx.com') . '/assets/images/topmkt-og-image.png?v=' . date('Ymd') ?>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="탑마케팅">
@@ -19,10 +19,10 @@
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="<?= 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?>">
+    <meta property="twitter:url" content="<?= 'https://' . ($_SERVER['HTTP_HOST'] ?? 'www.topmktx.com') . ($_SERVER['REQUEST_URI'] ?? '/') ?>">
     <meta property="twitter:title" content="<?= $og_title ?? ($page_title ? $page_title . ' - 탑마케팅' : '탑마케팅 - 마케팅 전문가들의 지식 공유 플랫폼') ?>">
     <meta property="twitter:description" content="<?= $og_description ?? ($page_description ?? '마케팅 전문가들이 모여 지식을 공유하고 함께 성장하는 플랫폼입니다. 세미나, 워크샵, 커뮤니티를 통해 최신 마케팅 트렌드를 만나보세요.') ?>">
-    <meta property="twitter:image" content="<?= $og_image ?? 'https://' . $_SERVER['HTTP_HOST'] . '/assets/images/topmkt-og-image.png?v=' . date('Ymd') ?>">
+    <meta property="twitter:image" content="<?= $og_image ?? 'https://' . ($_SERVER['HTTP_HOST'] ?? 'www.topmktx.com') . '/assets/images/topmkt-og-image.png?v=' . date('Ymd') ?>">
     
     <!-- 추가 메타 태그 -->
     <meta name="keywords" content="<?= $keywords ?? '마케팅, 네트워크 마케팅, 세미나, 워크샵, 커뮤니티, 마케팅 교육, 온라인 강의, 탑마케팅, TopMKT, 비즈니스 매칭, 마케팅 플랫폼' ?>">
@@ -45,14 +45,16 @@
     require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
     try {
         $currentUserId = AuthMiddleware::getCurrentUserId();
+        $currentUserRole = AuthMiddleware::getUserRole();
         if ($currentUserId): ?>
     <meta name="user-id" content="<?= $currentUserId ?>">
+    <meta name="user-role" content="<?= $currentUserRole ?>">
     <?php endif;
     } catch (Exception $e) {
         // 로그인하지 않은 사용자의 경우 무시
         $currentUserId = null;
     } ?>
-    <link rel="canonical" href="<?= 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?>">
+    <link rel="canonical" href="<?= 'https://' . ($_SERVER['HTTP_HOST'] ?? 'www.topmktx.com') . ($_SERVER['REQUEST_URI'] ?? '/') ?>">
     
     <!-- 파비콘 - 모든 페이지 통일 -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20250609">
@@ -63,7 +65,31 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/loading.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome 6.4.0 with fallback for connection issues -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <style>
+    /* Font Awesome fallback - 연결 오류시 대체 스타일 */
+    .fa-solid::before, .fas::before { 
+        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", sans-serif !important; 
+        font-weight: 900 !important;
+    }
+    .fa-regular::before, .far::before { 
+        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", sans-serif !important; 
+        font-weight: 400 !important;
+    }
+    /* CDN 연결 실패시 대체 텍스트 */
+    .fa-user::before { content: "👤"; }
+    .fa-home::before { content: "🏠"; }
+    .fa-search::before { content: "🔍"; }
+    .fa-bell::before { content: "🔔"; }
+    .fa-envelope::before { content: "✉️"; }
+    .fa-cog::before { content: "⚙️"; }
+    .fa-plus::before { content: "+"; }
+    .fa-edit::before { content: "✏️"; }
+    .fa-trash::before { content: "🗑️"; }
+    .fa-check::before { content: "✓"; }
+    </style>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -85,6 +111,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="/assets/js/chat-notifications.js"></script>
+    <?php endif; ?>
+    
+    <!-- 신청 대기 알림 시스템 (기업 유저용) -->
+    <?php if (isset($currentUserId) && $currentUserId): ?>
+    <script src="/assets/js/registration-notifications.js"></script>
     <?php endif; ?>
     
     <!-- 구조화 데이터 (JSON-LD) -->
@@ -129,7 +160,7 @@
                             <div class="logo-icon">
                                 <i class="fas fa-rocket header-rocket"></i>
                             </div>
-                            <span class="logo-text"><?= 탑마케팅 ?? '탑마케팅' ?></span>
+                            <span class="logo-text">탑마케팅</span>
                         </a>
                     </h1>
                 </div>

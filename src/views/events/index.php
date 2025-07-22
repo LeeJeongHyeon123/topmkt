@@ -418,7 +418,7 @@ $monthNames = [
         <?php if ($isLoggedIn): ?>
             <?php 
             // 기업회원 권한 확인
-            require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+            require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
             $permission = CorporateMiddleware::checkLectureEventPermission();
             
             if ($permission['hasPermission']): ?>
@@ -434,7 +434,7 @@ $monthNames = [
                 </a>
             <?php endif; ?>
         <?php else: ?>
-            <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="create-event-btn">
+            <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI'] ?? '/events') ?>" class="create-event-btn">
                 <i class="fas fa-sign-in-alt"></i>
                 로그인 후 등록
             </a>

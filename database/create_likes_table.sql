@@ -1,7 +1,7 @@
 -- 좋아요 테이블 생성
 -- 실행 방법: MariaDB 콘솔에서 다음 명령어 실행
 -- mysql -u root -p
--- USE topmkt;
+-- USE TOPMKT;
 -- SOURCE /var/www/html/topmkt/database/create_likes_table.sql;
 
 CREATE TABLE IF NOT EXISTS post_likes (

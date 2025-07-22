@@ -1,7 +1,7 @@
 -- 커뮤니티 게시판 성능 최적화 SQL
 -- 실행: mysql -u root -pDnlszkem1! topmkt < optimize_community_performance.sql
 
-USE topmkt;
+USE TOPMKT;
 
 -- 현재 상태 확인
 SELECT '=== 최적화 전 인덱스 상태 ===' as info;
@@ -11,7 +11,7 @@ SELECT
     COLUMN_NAME,
     CARDINALITY
 FROM information_schema.STATISTICS 
-WHERE TABLE_SCHEMA = 'topmkt' 
+WHERE TABLE_SCHEMA = 'TOPMKT' 
   AND TABLE_NAME IN ('posts', 'users')
   AND INDEX_NAME != 'PRIMARY'
 ORDER BY TABLE_NAME, INDEX_NAME;
@@ -54,7 +54,7 @@ SELECT
     CARDINALITY,
     INDEX_TYPE
 FROM information_schema.STATISTICS 
-WHERE TABLE_SCHEMA = 'topmkt'
+WHERE TABLE_SCHEMA = 'TOPMKT'
   AND TABLE_NAME IN ('posts', 'users', 'comments')
   AND INDEX_NAME LIKE 'idx_%'
 ORDER BY TABLE_NAME, INDEX_NAME;

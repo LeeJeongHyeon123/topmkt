@@ -41,7 +41,7 @@ try {
             REFERENCED_TABLE_NAME,
             REFERENCED_COLUMN_NAME
         FROM information_schema.KEY_COLUMN_USAGE 
-        WHERE REFERENCED_TABLE_SCHEMA = 'topmkt' 
+        WHERE REFERENCED_TABLE_SCHEMA = 'TOPMKT' 
         AND TABLE_NAME IN ('users', 'comments', 'posts')
         ORDER BY TABLE_NAME, COLUMN_NAME
     ");

@@ -80,6 +80,7 @@ class Router {
             
             // 미디어 업로드 라우트
             'POST:/api/media/upload-image' => ['MediaController', 'uploadImage'],
+            'POST:/api/upload-event-image' => ['EventController', 'uploadEventImage'],
             
             // 사용자 프로필 이미지 API
             'GET:/api/users/{id}/profile-image' => ['UserController', 'getProfileImage'],
@@ -122,11 +123,14 @@ class Router {
             'POST:/events/{id}/delete' => ['EventController', 'delete'],
             'GET:/events/{id}/ical' => ['EventController', 'generateICal'],
             
-            // 행사 신청 관리 API 라우트
-            'GET:/api/events/{id}/registration-status' => ['EventController', 'getRegistrationStatus'],
-            'POST:/api/events/{id}/registration' => ['EventController', 'register'],
-            'DELETE:/api/events/{id}/registration' => ['EventController', 'cancelRegistration'],
+            // 행사 신청 관리 API 라우트 (새로운 event_registrations 테이블 사용)
+            'GET:/api/events/{id}/registration-status' => ['EventController', 'registrationStatus'],
+            'POST:/api/events/{id}/registration' => ['EventController', 'registerEvent'],
+            'DELETE:/api/events/{id}/registration' => ['EventController', 'cancelEventRegistration'],
             'GET:/api/events/{id}/previous-registration' => ['EventController', 'getPreviousRegistration'],
+            
+            // 신청 대기 알림 API
+            'GET:/api/registrations/pending-count' => ['RegistrationNotificationController', 'getPendingCount'],
             
             // 채팅 라우트
             'GET:/chat' => ['ChatController', 'index'],
@@ -280,9 +284,12 @@ class Router {
         file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller: $controllerName\n", FILE_APPEND);
         file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Action: $action\n", FILE_APPEND);
         file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Path: $controllerPath\n", FILE_APPEND);
+        file_put_contents('./logs/topmkt_errors.log', "현재 작업 디렉토리: " . getcwd() . "\n", FILE_APPEND);
+        file_put_contents('./logs/topmkt_errors.log', "routes.php 파일 위치: " . __FILE__ . "\n", FILE_APPEND);
         
         if (file_exists($controllerPath)) {
             file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller file exists\n", FILE_APPEND);
+            file_put_contents('./logs/topmkt_errors.log', "실제 require 파일: $controllerPath\n", FILE_APPEND);
             require_once $controllerPath;
             if (class_exists($controllerName)) {
                 file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller class exists\n", FILE_APPEND);
