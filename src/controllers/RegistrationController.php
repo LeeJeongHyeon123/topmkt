@@ -7,6 +7,7 @@ require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
+require_once SRC_PATH . '/helpers/FirebaseHelper.php';
 require_once SRC_PATH . '/services/EmailService.php';
 
 class RegistrationController extends BaseController
@@ -378,6 +379,14 @@ class RegistrationController extends BaseController
                 $this->db->commit();
                 error_log("✅ 트랜잭션 커밋 완료");
                 
+                // 강의 주최자에게 Firebase 실시간 알림 발송
+                try {
+                    $this->updateOrganizerNotification($lectureId);
+                } catch (Exception $e) {
+                    error_log("Firebase 실시간 알림 업데이트 오류: " . $e->getMessage());
+                    // Firebase 실패는 전체 프로세스를 중단하지 않음
+                }
+                
                 // 신청 확인 SMS 발송
                 try {
                     require_once SRC_PATH . '/helpers/SmsHelper.php';
@@ -652,6 +661,50 @@ class RegistrationController extends BaseController
             return false;
         }
         return hash_equals($_SESSION['csrf_token'], $token);
+    }
+    
+    /**
+     * 강의 주최자의 Firebase 실시간 알림 업데이트
+     * 
+     * @param int $lectureId 강의 ID
+     */
+    private function updateOrganizerNotification($lectureId)
+    {
+        try {
+            // 강의 주최자 ID 조회
+            $organizerQuery = "SELECT user_id FROM lectures WHERE id = ?";
+            $stmt = $this->db->prepare($organizerQuery);
+            $stmt->bind_param("i", $lectureId);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            
+            if (!$result) {
+                error_log("Firebase 알림: 강의를 찾을 수 없음 (ID: {$lectureId})");
+                return;
+            }
+            
+            $organizerId = $result['user_id'];
+            
+            // 주최자의 현재 대기 신청 수 계산
+            $pendingData = FirebaseHelper::calculatePendingCount($organizerId);
+            
+            // Firebase 실시간 알림 업데이트
+            $updateResult = FirebaseHelper::updatePendingNotification(
+                $organizerId,
+                $pendingData['count'],
+                $pendingData['details']
+            );
+            
+            if ($updateResult) {
+                error_log("Firebase 실시간 알림 업데이트 성공 - 주최자: {$organizerId}, 대기수: {$pendingData['count']}");
+            } else {
+                error_log("Firebase 실시간 알림 업데이트 실패 - 주최자: {$organizerId}");
+            }
+            
+        } catch (Exception $e) {
+            error_log("Firebase 알림 업데이트 중 오류: " . $e->getMessage());
+            throw $e;
+        }
     }
 }
 ?>

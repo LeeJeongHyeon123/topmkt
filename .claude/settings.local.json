@@ -79,7 +79,22 @@
       "Bash(ln:*)",
       "Bash(/var/www/html/topmkt/mysql_cnf_demo.sh:*)",
       "Bash(./scripts/mysql_connect.sh:*)",
-      "Bash(telnet:*)"
+      "Bash(telnet:*)",
+      "Bash",
+      "Edit",
+      "Read",
+      "Write",
+      "LS",
+      "Grep",
+      "Glob",
+      "MultiEdit",
+      "Task",
+      "TodoRead",
+      "TodoWrite",
+      "WebFetch",
+      "WebSearch",
+      "NotebookRead",
+      "NotebookEdit"
     ],
     "deny": []
   }

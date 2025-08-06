@@ -6,6 +6,7 @@
 require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
+require_once SRC_PATH . '/helpers/FirebaseHelper.php';
 require_once SRC_PATH . '/services/EmailService.php';
 
 class RegistrationDashboardController extends BaseController
@@ -340,6 +341,14 @@ class RegistrationDashboardController extends BaseController
             $result = $this->db->execute($updateQuery, [$newStatus, $adminNotes, $userId, $registrationId]);
             
             if ($result) {
+                // 강의 주최자에게 Firebase 실시간 알림 발송
+                try {
+                    $this->updateOrganizerFirebaseNotification($registration['lecture_organizer']);
+                } catch (Exception $e) {
+                    error_log("Firebase 실시간 알림 업데이트 오류: " . $e->getMessage());
+                    // Firebase 실패는 전체 프로세스를 중단하지 않음
+                }
+                
                 // SMS 알림 발송 (이메일 대신)
                 try {
                     require_once SRC_PATH . '/helpers/SmsHelper.php';
@@ -710,6 +719,36 @@ class RegistrationDashboardController extends BaseController
             return false;
         }
         return hash_equals($_SESSION['csrf_token'], $token);
+    }
+    
+    /**
+     * 강의 주최자의 Firebase 실시간 알림 업데이트
+     * 
+     * @param int $organizerId 주최자 ID
+     */
+    private function updateOrganizerFirebaseNotification($organizerId)
+    {
+        try {
+            // 주최자의 현재 대기 신청 수 계산
+            $pendingData = FirebaseHelper::calculatePendingCount($organizerId);
+            
+            // Firebase 실시간 알림 업데이트
+            $updateResult = FirebaseHelper::updatePendingNotification(
+                $organizerId,
+                $pendingData['count'],
+                $pendingData['details']
+            );
+            
+            if ($updateResult) {
+                error_log("Firebase 실시간 알림 업데이트 성공 - 주최자: {$organizerId}, 대기수: {$pendingData['count']}");
+            } else {
+                error_log("Firebase 실시간 알림 업데이트 실패 - 주최자: {$organizerId}");
+            }
+            
+        } catch (Exception $e) {
+            error_log("Firebase 알림 업데이트 중 오류: " . $e->getMessage());
+            throw $e;
+        }
     }
 }
 ?>

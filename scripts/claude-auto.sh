@@ -25,8 +25,9 @@ echo "   CLAUDE_CONFIRM_TOOLS=$CLAUDE_CONFIRM_TOOLS"
 echo "   CLAUDE_CONFIRM_BEFORE_TOOL_USE=$CLAUDE_CONFIRM_BEFORE_TOOL_USE"
 echo ""
 
-# Claude Code CLI 시작
-claude --continue --project /var/www/html/topmkt
+# Claude Code CLI 시작 (이전 대화 자동 복원)
+echo "🔄 이전 대화 자동 복원 중..."
+claude --continue
 
 echo ""
 echo "🏁 Claude Code CLI 세션이 종료되었습니다."

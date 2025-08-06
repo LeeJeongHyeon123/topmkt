@@ -113,9 +113,9 @@
     <script src="/assets/js/chat-notifications.js"></script>
     <?php endif; ?>
     
-    <!-- 신청 대기 알림 시스템 (기업 유저용) -->
+    <!-- Firebase 실시간 신청 대기 알림 시스템 (기업 유저용) -->
     <?php if (isset($currentUserId) && $currentUserId): ?>
-    <script src="/assets/js/registration-notifications.js"></script>
+    <script src="/assets/js/registration-notifications-realtime.js"></script>
     <?php endif; ?>
     
     <!-- 구조화 데이터 (JSON-LD) -->

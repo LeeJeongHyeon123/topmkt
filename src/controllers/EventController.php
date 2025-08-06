@@ -12,6 +12,7 @@ require_once SRC_PATH . '/helpers/WebLogger.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/controllers/LectureController.php';
 require_once SRC_PATH . '/config/upload.php';
+require_once SRC_PATH . '/helpers/FirebaseHelper.php';
 
 class EventController extends LectureController {
     private $db;
@@ -1143,6 +1144,13 @@ class EventController extends LectureController {
                 
                 // 커밋
                 $this->db->commit();
+                
+                // 행사 주최자에게 Firebase 실시간 알림 발송
+                try {
+                    $this->updateEventOrganizerNotification($eventId);
+                } catch (Exception $e) {
+                    error_log("Firebase 실시간 알림 업데이트 오류: " . $e->getMessage());
+                }
                 
                 // 행사 신청 확인 SMS 발송
                 try {
@@ -2568,6 +2576,13 @@ class EventController extends LectureController {
             
             $registrationId = $this->db->lastInsertId();
             
+            // 행사 주최자에게 Firebase 실시간 알림 발송
+            try {
+                $this->updateEventOrganizerNotification($eventId);
+            } catch (Exception $e) {
+                error_log("Firebase 실시간 알림 업데이트 오류: " . $e->getMessage());
+            }
+            
             // 행사 신청 확인 SMS 발송
             try {
                 require_once SRC_PATH . '/helpers/SmsHelper.php';
@@ -2693,6 +2708,53 @@ class EventController extends LectureController {
         if ($nextWaiting) {
             $updateQuery = "UPDATE event_registrations SET status = 'approved', is_waiting_list = 0, waiting_order = NULL WHERE id = ?";
             $this->db->execute($updateQuery, [$nextWaiting['id']]);
+        }
+    }
+    
+    /**
+     * 행사 주최자에게 Firebase 실시간 알림 업데이트
+     */
+    private function updateEventOrganizerNotification($eventId) {
+        try {
+            // 행사 주최자 정보 조회
+            $lectureQuery = "SELECT user_id FROM lectures WHERE id = ? AND content_type = 'event'";
+            $lecture = $this->db->fetch($lectureQuery, [$eventId]);
+            
+            if (!$lecture) {
+                error_log("행사 정보를 찾을 수 없음: Event ID {$eventId}");
+                return;
+            }
+            
+            $organizerId = $lecture['user_id'];
+            
+            // 주최자가 기업 회원인지 확인
+            $userQuery = "SELECT role FROM users WHERE id = ?";
+            $user = $this->db->fetch($userQuery, [$organizerId]);
+            
+            if (!$user || $user['role'] !== 'ROLE_CORP') {
+                // 기업 회원이 아니면 알림 불필요
+                return;
+            }
+            
+            // 주최자의 현재 대기 신청 수 계산
+            $pendingData = FirebaseHelper::calculatePendingCount($organizerId);
+            
+            // Firebase 실시간 알림 업데이트
+            $result = FirebaseHelper::updatePendingNotification(
+                $organizerId,
+                $pendingData['count'],
+                $pendingData['details']
+            );
+            
+            if ($result) {
+                error_log("Firebase 실시간 알림 업데이트 성공 - 행사 주최자: {$organizerId}, 대기 건수: {$pendingData['count']}");
+            } else {
+                error_log("Firebase 실시간 알림 업데이트 실패 - 행사 주최자: {$organizerId}");
+            }
+            
+        } catch (Exception $e) {
+            error_log("행사 주최자 Firebase 알림 업데이트 오류: " . $e->getMessage());
+            throw $e;
         }
     }
 }
