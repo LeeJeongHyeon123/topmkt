@@ -139,6 +139,21 @@ class Router {
             'GET:/chat/search-users' => ['ChatController', 'searchUsers'],
             'GET:/chat/firebase-token' => ['ChatController', 'getFirebaseToken'],
             
+            // 공지사항 라우트
+            'GET:/notices' => ['NoticeController', 'index'],
+            'GET:/notices/write' => ['NoticeController', 'showWrite'],
+            'GET:/notices/{id}' => ['NoticeController', 'show'],
+            'GET:/notices/{id}/edit' => ['NoticeController', 'showEdit'],
+            'POST:/api/notices' => ['NoticeController', 'create'],
+            'PUT:/api/notices/{id}' => ['NoticeController', 'update'],
+            'DELETE:/api/notices/{id}' => ['NoticeController', 'delete'],
+            
+            // 공지사항 댓글 라우트
+            'POST:/api/notice-comments' => ['NoticeCommentController', 'store'],
+            'PUT:/api/notice-comments/{id}' => ['NoticeCommentController', 'update'],
+            'DELETE:/api/notice-comments/{id}' => ['NoticeCommentController', 'delete'],
+            'GET:/api/notice-comments' => ['NoticeCommentController', 'list'],
+            
             // 기업회원 라우트
             'GET:/corp/info' => ['CorporateController', 'info'],
             'GET:/corp/apply' => ['CorporateController', 'apply'],

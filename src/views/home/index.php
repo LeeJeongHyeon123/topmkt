@@ -98,6 +98,20 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <div class="icon-bg orange">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                </div>
+                <h3>공지사항</h3>
+                <p>플랫폼의 최신 소식과 중요한 공지사항을 확인하고 소통하세요</p>
+                <a href="/notices" class="feature-link">
+                    <span>확인하기</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </div>
 </section>

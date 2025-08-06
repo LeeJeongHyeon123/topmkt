@@ -134,6 +134,12 @@ class TopMarketingLoader {
     }
     
     show() {
+        // 🚫 외부 프로토콜 클릭 직후에는 로딩 UI 표시 안 함
+        if (window.lastExternalProtocolClick && (Date.now() - window.lastExternalProtocolClick < 1000)) {
+            console.log('🚫 최근 외부 프로토콜 클릭으로 인한 로딩 UI 표시 무시');
+            return;
+        }
+        
         this.isLoading = true;
         this.loadingStartTime = Date.now();
         
@@ -300,21 +306,95 @@ let topMarketingLoader;
     topMarketingLoader = new TopMarketingLoader();
 })();
 
-// DOM 로드 완료 시 추가 설정
+// DOM 로드 완료 시 추가 설정 - 개선된 버전
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Loading.js 초기화 시작');
     
-    // 모든 링크에 클릭 이벤트 추가
+    // 이미 처리된 링크 추적
+    const processedLinks = new Set();
+    
+    // tel:, mailto: 링크에 직접 이벤트 리스너 추가하여 이벤트 버블링 차단
+    function blockExternalProtocolLinks() {
+        const externalLinks = document.querySelectorAll('a[href^="tel:"], a[href^="mailto:"], a[href^="sms:"]');
+        let newLinksCount = 0;
+        
+        externalLinks.forEach(link => {
+            if (!processedLinks.has(link)) {
+                processedLinks.add(link);
+                newLinksCount++;
+                
+                link.addEventListener('click', function(e) {
+                    console.log('🚫 외부 프로토콜 링크 클릭 - 로딩 UI 완전 차단:', this.href);
+                    
+                    // 전역 타임스탬프 기록 (다른 이벤트 리스너들이 참조할 수 있도록)
+                    window.lastExternalProtocolClick = Date.now();
+                    
+                    e.stopPropagation(); 
+                    e.stopImmediatePropagation(); 
+                    
+                    // 추가 안전장치: 로딩이 이미 표시되어 있다면 숨김
+                    if (topMarketingLoader && topMarketingLoader.isLoading) {
+                        console.log('🔄 기존 로딩 UI 강제 종료');
+                        topMarketingLoader.hide();
+                    }
+                    
+                    // 잠시 후 로딩 UI가 뜨려고 하는 것도 방지
+                    setTimeout(() => {
+                        if (topMarketingLoader && topMarketingLoader.isLoading) {
+                            console.log('🔄 지연된 로딩 UI도 강제 종료');
+                            topMarketingLoader.hide();
+                        }
+                    }, 100);
+                    
+                }, true); // 캡처링 단계에서 최우선 처리
+            }
+        });
+        
+        if (newLinksCount > 0) {
+            console.log('🔗 새로운 외부 프로토콜 링크 보호:', newLinksCount + '개');
+        }
+    }
+    
+    // 페이지 로드 시 한번 실행
+    blockExternalProtocolLinks();
+    
+    // 내부 링크용 이벤트 리스너 - 더 엄격한 조건 체크
     document.addEventListener('click', function(e) {
+        // 먼저 외부 프로토콜인지 다시 한번 체크
+        const clickedElement = e.target;
+        if (clickedElement.tagName === 'A') {
+            const href = clickedElement.getAttribute('href') || clickedElement.href || '';
+            if (href.match(/^(tel|mailto|sms|skype|whatsapp):/i)) {
+                console.log('🚫 클릭 이벤트에서 외부 프로토콜 감지 - 로딩 UI 스킵:', href);
+                return;
+            }
+        }
+        
         const link = e.target.closest('a');
-        if (link && link.href && !link.target && !link.href.startsWith('#') && !link.href.startsWith('javascript:')) {
-            // 같은 도메인 내의 일반 링크 클릭 시
-            const currentDomain = window.location.hostname;
-            const linkDomain = new URL(link.href).hostname;
-            
-            if (currentDomain === linkDomain) {
+        if (!link) return;
+        
+        const linkHref = link.getAttribute('href') || link.href || '';
+        if (linkHref.match(/^(tel|mailto|sms|skype|whatsapp):/i)) {
+            console.log('🚫 closest 검색에서 외부 프로토콜 감지 - 로딩 UI 스킵:', linkHref);
+            return;
+        }
+        
+        // 기타 제외 조건들
+        if (!link.href || link.target || 
+            link.href.startsWith('#') || 
+            link.href.startsWith('javascript:')) {
+            return;
+        }
+        
+        try {
+            const linkUrl = new URL(link.href);
+            if (linkUrl.hostname === window.location.hostname) {
+                console.log('✅ 내부 링크 확인됨 - 로딩 UI 표시:', link.href);
                 topMarketingLoader.show();
                 topMarketingLoader.setMessage('페이지를 이동하는 중...');
             }
+        } catch (error) {
+            console.log('❌ URL 파싱 오류:', error);
         }
     });
     
@@ -325,6 +405,8 @@ document.addEventListener('DOMContentLoaded', function() {
             topMarketingLoader.setMessage('처리 중...');
         }
     });
+    
+    console.log('🎯 Loading.js 초기화 완료 - 외부 프로토콜 링크 보호 활성화');
 });
 
 // 페이지 로드 이벤트 처리

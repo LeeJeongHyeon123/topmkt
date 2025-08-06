@@ -102,7 +102,7 @@
     ?>
     
     <!-- JavaScript -->
-    <script src="/assets/js/loading.js"></script>
+    <script src="/assets/js/loading.js?v=<?= time() ?>"></script>
     <script src="/assets/js/jwt-auth.js" defer></script>
     <script src="/assets/js/main.js" defer></script>
     
@@ -172,6 +172,7 @@
                         <li><a href="/community" class="<?= ($pageSection ?? '') === 'community' ? 'active' : '' ?>">커뮤니티</a></li>
                         <li><a href="/lectures" class="<?= ($pageSection ?? '') === 'lectures' ? 'active' : '' ?>">강의 일정</a></li>
                         <li><a href="/events" class="<?= ($pageSection ?? '') === 'events' ? 'active' : '' ?>">행사 일정</a></li>
+                        <li><a href="/notices" class="<?= ($pageSection ?? '') === 'notices' ? 'active' : '' ?>">공지사항</a></li>
                     </ul>
                 </nav>
 
@@ -239,8 +240,8 @@
                                     $userRole = AuthMiddleware::getUserRole();
                                     if ($userRole === 'ROLE_ADMIN'): ?>
                                 <a href="/admin" class="dropdown-item">
-                                    <i class="fas fa-cog"></i>
-                                    <span>⚙️ 관리자</span>
+                                    <span>⚙️</span>
+                                    <span>관리자</span>
                                 </a>
                                 <?php endif;
                                 } catch (Exception $e) {
@@ -948,10 +949,21 @@
     // 관리자 권한 확인을 위한 JavaScript 변수 설정
     require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
     $isAdmin = AuthMiddleware::isAdmin();
+    $currentRole = AuthMiddleware::getCurrentUserRole();
+    $currentUserId = AuthMiddleware::getCurrentUserId();
+    
+    // PHP 디버깅 정보를 JavaScript 콘솔에 출력
     ?>
     
     // 관리자 여부를 JavaScript 변수로 전달
     const isAdmin = <?= $isAdmin ? 'true' : 'false' ?>;
+    
+    // PHP에서 전달된 관리자 정보 디버깅
+    console.log('🔍 PHP 관리자 권한 체크 결과:', {
+        php_isAdmin: <?= $isAdmin ? 'true' : 'false' ?>,
+        php_currentRole: '<?= $currentRole ?? 'null' ?>',
+        php_currentUserId: <?= $currentUserId ?? 'null' ?>
+    });
     
     document.addEventListener('DOMContentLoaded', function() {
         // 사용자 메뉴 드롭다운 토글
@@ -981,12 +993,24 @@
                     const badgeHtml = unreadCount > 0 ? `<span class="notification-badge dropdown-chat-badge" style="background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto; font-weight: bold; min-width: 16px; text-align: center;">${unreadCount}</span>` : '';
                     
                     // 관리자 메뉴 HTML 생성
+                    console.log('관리자 드롭다운 메뉴 체크:', {
+                        isAdmin: isAdmin,
+                        typeof_isAdmin: typeof isAdmin,
+                        will_show_admin_menu: !!isAdmin
+                    });
+                    
                     const adminMenuHtml = isAdmin ? `
                         <a href="/admin" class="dropdown-item admin-item">
-                            <i class="fas fa-cog"></i>
+                            <span>⚙️</span>
                             <span>관리자 페이지</span>
                         </a>
                         <div class="dropdown-divider"></div>` : '';
+                    
+                    if (isAdmin) {
+                        console.log('✅ 관리자 메뉴가 드롭다운에 추가됩니다.');
+                    } else {
+                        console.log('❌ 관리자 권한이 없어서 관리자 메뉴가 표시되지 않습니다.');
+                    }
                     
                     const floatingDropdown = document.createElement('div');
                     floatingDropdown.id = 'floating-user-dropdown';
@@ -1065,10 +1089,12 @@
                         el.addEventListener('mouseenter', () => el.style.backgroundColor = '#f3f0ff');
                         el.addEventListener('mouseleave', () => el.style.backgroundColor = 'transparent');
                         
-                        // 관리자 아이콘 스타일
-                        const icon = el.querySelector('i');
-                        if (icon) {
-                            icon.style.color = '#7c3aed';
+                        // 이모지 아이콘 스타일 (첫 번째 span)
+                        const emojiIcon = el.querySelector('span:first-child');
+                        if (emojiIcon) {
+                            emojiIcon.style.fontSize = '16px';
+                            emojiIcon.style.width = '16px';
+                            emojiIcon.style.textAlign = 'center';
                         }
                     });
                     floatingDropdown.querySelectorAll('.notification-badge').forEach(el => {

@@ -528,7 +528,7 @@ $profile = $applicationStatus['profile'];
     <div style="text-align: center; color: #718096; font-size: 0.9rem; margin-top: 40px; padding: 20px; background: #f8fafc; border-radius: 12px;">
         <p>
             <strong>📞 문의사항이 있으시면</strong><br>
-            전화: <strong>070-4138-8899</strong> | 이메일: <strong>jh@wincard.kr</strong>
+            전화: <strong>1577-9794</strong> | 이메일: <strong>jh@wincard.kr</strong>
         </p>
     </div>
 </div>

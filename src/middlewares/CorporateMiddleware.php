@@ -35,6 +35,12 @@ class CorporateMiddleware {
         }
         
         try {
+            // 관리자는 모든 권한 허용 (기업 기능 포함)
+            require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+            if (AuthMiddleware::isAdmin()) {
+                return true;
+            }
+            
             require_once SRC_PATH . '/config/database.php';
             $db = Database::getInstance();
             

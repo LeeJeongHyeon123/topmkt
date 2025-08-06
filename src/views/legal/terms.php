@@ -192,7 +192,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                         <p><strong>대표자:</strong> 이정현</p>
                         <p><strong>사업자등록번호:</strong> 133-88-02437</p>
                         <p><strong>이메일:</strong> jh@wincard.kr</p>
-                        <p><strong>고객센터:</strong> 070-4138-8899 (평일 09:00-18:00)</p>
+                        <p><strong>고객센터:</strong> 1577-9794 (평일 09:00-18:00)</p>
                         <p><strong>주소:</strong> 서울시 금천구 가산디지털1로 204, 반도 아이비밸리 6층</p>
                     </div>
                 </section>

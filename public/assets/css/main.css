@@ -1586,6 +1586,7 @@ ul, ol {
     --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     --accent-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --orange-gradient: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%);
     
     --text-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --shadow-light: 0 2px 20px rgba(0,0,0,0.1);
@@ -2007,7 +2008,7 @@ body {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 32px;
 }
 
@@ -2054,6 +2055,10 @@ body {
 
 .icon-bg.green {
     background: var(--accent-gradient);
+}
+
+.icon-bg.orange {
+    background: var(--orange-gradient);
 }
 
 .feature-card h3 {
@@ -3197,7 +3202,7 @@ body {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 32px;
 }
 
@@ -3244,6 +3249,10 @@ body {
 
 .icon-bg.green {
     background: var(--accent-gradient);
+}
+
+.icon-bg.orange {
+    background: var(--orange-gradient);
 }
 
 .feature-card h3 {

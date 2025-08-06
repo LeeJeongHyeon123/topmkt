@@ -458,7 +458,7 @@
     <!-- 추가 안내 -->
     <div style="text-align: center; color: #718096; font-size: 0.9rem; margin-top: 40px;">
         <p>
-            📞 문의사항이 있으시면 <strong>070-4138-8899</strong>로 연락주세요.<br>
+            📞 문의사항이 있으시면 <strong>1577-9794</strong>로 연락주세요.<br>
             📧 이메일: <strong>jh@wincard.kr</strong>
         </p>
     </div>
