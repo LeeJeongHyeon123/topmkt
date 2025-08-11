@@ -87,6 +87,9 @@ class Post {
                     p.status,
                     p.created_at,
                     u.nickname as author_name,
+                    u.profile_image_original,
+                    u.profile_image_profile,
+                    u.profile_image_thumb,
                     COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
@@ -162,6 +165,9 @@ class Post {
                     p.status,
                     p.created_at,
                     u.nickname as author_name,
+                    u.profile_image_original,
+                    u.profile_image_profile,
+                    u.profile_image_thumb,
                     COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
                     CASE 
                         WHEN p.title LIKE ? THEN 3
@@ -195,7 +201,9 @@ class Post {
             $totalSearchTime = (microtime(true) - $searchStartTime) * 1000;
             WebLogger::info("🔍 [SEARCH] 전체 검색 완료: " . round($totalSearchTime, 2) . "ms");
         } else {
-            // 일반 목록 조회
+            // 일반 목록 조회 - 서브쿼리 최적화 버전
+            WebLogger::info("🚀 [OPTIMIZED] 서브쿼리 기반 최적화 쿼리 실행");
+            
             $sql = "
                 SELECT 
                     p.id,
@@ -208,13 +216,19 @@ class Post {
                     p.status,
                     p.created_at,
                     u.nickname as author_name,
+                    u.profile_image_original,
+                    u.profile_image_profile,
+                    u.profile_image_thumb,
                     COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
-                FROM posts p
-                FORCE INDEX (idx_posts_list_performance)
+                FROM (
+                    SELECT id, user_id, title, content, view_count, like_count, 
+                           comment_count, status, created_at
+                    FROM posts 
+                    WHERE status = 'published'
+                    ORDER BY created_at DESC 
+                    LIMIT ? OFFSET ?
+                ) p
                 JOIN users u ON p.user_id = u.id
-                WHERE p.status = 'published'
-                ORDER BY p.created_at DESC 
-                LIMIT ? OFFSET ?
             ";
             
             $result = PerformanceDebugger::executeQuery($this->db, $sql, [$pageSize, $offset]);
@@ -307,6 +321,9 @@ class Post {
         $sql = "
             SELECT p.*, 
                    u.nickname as author_name,
+                   u.profile_image_original,
+                   u.profile_image_profile,
+                   u.profile_image_thumb,
                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
             FROM posts p
             JOIN users u ON p.user_id = u.id

@@ -24,6 +24,9 @@ if (!empty($search)) {
 
 // 페이지 로드 시간 계산 (뷰 끝에서 사용)
 $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
+
+// ProfileImageHelper 로드
+require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 ?>
 
 <!-- 성능 최적화 리소스 힌트 -->
@@ -31,6 +34,9 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
 <link rel="dns-prefetch" href="//www.topmktx.com">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#2563eb">
+
+<!-- 프로필 이미지 모달 통합 리소스 -->
+<?php include SRC_PATH . '/views/components/profile-modal-resources.php'; ?>
 
 <style>
 /* 공지사항 게시판 스타일 - 커뮤니티와 구분되는 고유한 테마 */
@@ -112,17 +118,24 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
 }
 
 .btn {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.3s ease;
+    line-height: 1.3;
+    white-space: nowrap;
+    min-height: 36px;
+}
+
+.btn i {
+    font-size: 12px !important;
 }
 
 .btn-primary {
@@ -145,16 +158,62 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     background: #4a5568;
 }
 
-.btn-write {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    color: white;
-    font-weight: 700;
+/* 공지사항 전용 작성 버튼 - 다른 버튼과 조화 */
+a.btn-write {
+    background: #059669 !important;
+    color: white !important;
+    font-weight: 500 !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    border-radius: 6px !important;
+    border: none !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.3s ease !important;
+    line-height: 1.3 !important;
+    white-space: nowrap !important;
+    box-shadow: none !important;
+    height: auto !important;
+    min-height: 36px !important;
+    vertical-align: top !important;
+    margin: 0 !important;
+    overflow: hidden !important;
 }
 
-.btn-write:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
-    text-decoration: none;
+/* Font Awesome 아이콘 - 다른 버튼과 일치 */
+a.btn-write i {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    text-align: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+a.btn-write i::before {
+    line-height: 1.3 !important;
+    vertical-align: baseline !important;
+}
+
+a.btn-write span {
+    line-height: 1.3 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
+a.btn-write:hover {
+    background: #047857 !important;
+    transform: translateY(-1px) !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2) !important;
+}
+
+a.btn-write:active {
+    transform: translateY(0) !important;
 }
 
 .board-stats {
@@ -456,6 +515,9 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     }
 }
 
+/* 기존 프로필 이미지 모달 스타일 제거됨 - 통합 CSS 사용 */
+
+
 /* 화이트 배경 일관성 유지 */
 body {
     background-color: white !important;
@@ -561,8 +623,9 @@ body {
         
         <!-- 글쓰기 버튼 (기업 사용자만) -->
         <?php if ($isLoggedIn && $canWrite): ?>
-            <a href="/notices/write" class="btn btn-write">
-                <i class="fas fa-pen"></i> 공지 작성
+            <a href="/notices/write" class="btn-write">
+                <i class="fas fa-edit"></i>
+                <span>공지 작성</span>
             </a>
         <?php elseif ($isLoggedIn): ?>
             <span class="btn" style="background: #e2e8f0; color: #718096; cursor: not-allowed;">
@@ -631,26 +694,24 @@ body {
                 <div class="notice-item <?= $notice['is_featured'] ? 'featured' : '' ?>" 
                      onclick="location.href='/notices/<?= $notice['id'] ?>'">
                     
-                    <!-- 기업 아바타 -->
-                    <div class="company-avatar" title="<?= htmlspecialchars($notice['company_name']) ?>">
+                    <!-- 기업 아바타 (통합 컴포넌트 사용) -->
+                    <div class="company-avatar">
                         <?php 
-                        $companyLogo = $notice['company_logo'] ?? null;
-                        $companyName = $notice['company_name'] ?? '기업';
-                        
-                        if ($companyLogo): ?>
-                            <img src="<?= htmlspecialchars($companyLogo) ?>" 
-                                 alt="<?= htmlspecialchars($companyName) ?>" 
-                                 loading="lazy"
-                                 width="50" 
-                                 height="50"
-                                 style="object-fit: cover; border-radius: 50%;"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div style="display: none; width: 50px; height: 50px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border-radius: 50%; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem;">
-                                <?= mb_substr($companyName, 0, 1) ?>
-                            </div>
-                        <?php else: ?>
-                            <?= mb_substr($companyName, 0, 1) ?>
-                        <?php endif; ?>
+                            // 사용자 정보만 추출 (공지사항 ID와 구분)
+                            $user = [
+                                'id' => $notice['user_id'], // 실제 사용자 ID 사용
+                                'user_id' => $notice['user_id'],
+                                'nickname' => $notice['nickname'] ?? $notice['author_name'] ?? '알 수 없음',
+                                'author_name' => $notice['nickname'] ?? $notice['author_name'] ?? '알 수 없음',
+                                'profile_image_original' => $notice['profile_image_original'] ?? null,
+                                'profile_image_profile' => $notice['profile_image_profile'] ?? null,
+                                'profile_image_thumb' => $notice['profile_image_thumb'] ?? null,
+                                'profile_image' => $notice['profile_image'] ?? null
+                            ];
+                            $mode = 'api';
+                            $extraClasses = [];
+                            include SRC_PATH . '/views/components/profile-image.php';
+                        ?>
                     </div>
                     
                     <!-- 공지사항 내용 -->
@@ -790,14 +851,17 @@ body {
                     <?php endif; ?>
                 </p>
                 <?php if ($isLoggedIn && $canWrite): ?>
-                    <a href="/notices/write" class="btn btn-primary">
-                        <i class="fas fa-pen"></i> 공지 작성
+                    <a href="/notices/write" class="btn-write">
+                        <i class="fas fa-edit"></i>
+                        <span>공지 작성</span>
                     </a>
                 <?php endif; ?>
             </div>
         </div>
     <?php endif; ?>
 </div>
+
+<!-- 프로필 이미지 모달은 profile-modal.js에서 동적 생성됨 -->
 
 <script>
 // 공지사항 목록 페이지 JavaScript
@@ -937,6 +1001,8 @@ document.addEventListener('DOMContentLoaded', function() {
             hasPrevPage: <?= isset($hasPrevPage) ? ($hasPrevPage ? 'true' : 'false') : 'false' ?>
         };
     }
+    
+    // 프로필 이미지 클릭 이벤트는 통합 컴포넌트에서 자동 처리됨
 });
 
 // 하이라이트 애니메이션 CSS 추가
@@ -969,4 +1035,6 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 </script>

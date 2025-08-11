@@ -6,6 +6,7 @@
 // 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
+require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -20,6 +21,9 @@ if ($isLoggedIn && isset($event)) {
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+// 프로필 이미지 모달 리소스 로드
+include SRC_PATH . '/views/components/profile-modal-resources.php';
 ?>
 
 <!-- 한국어 인코딩 설정 -->
@@ -1906,35 +1910,14 @@ if (!isset($_SESSION['csrf_token'])) {
                     <h3><i class="fas fa-user-edit"></i> 작성자</h3>
                     <div class="author-info-compact">
                         <?php 
-                        // 원본 이미지 우선, 없으면 썸네일, 둘 다 없으면 null
-                        $authorImage = $event['profile_image_original'] ?? $event['profile_image'] ?? null;
+                        $user = $event; 
+                        $size = ProfileImageHelper::SIZE_THUMB;
+                        $mode = 'direct';
+                        $extraClasses = ['author-avatar-small'];
+                        include SRC_PATH . '/views/components/profile-image.php';
+                        
                         $authorName = $event['author_name'] ?? $event['nickname'] ?? '작성자';
                         ?>
-                        
-                        <div class="author-avatar-small" 
-                             <?php if ($authorImage): ?>
-                             onclick="showProfileImageModal('<?= addslashes(htmlspecialchars($authorImage)) ?>', '<?= addslashes(htmlspecialchars($authorName)) ?>')" 
-                             style="cursor: pointer;" 
-                             title="프로필 이미지 크게 보기"
-                             <?php else: ?>
-                             style="cursor: default;"
-                             title="프로필 이미지 없음"
-                             <?php endif; ?>>
-                            
-                            <?php if ($authorImage): ?>
-                                <img src="<?= htmlspecialchars($authorImage) ?>" 
-                                     alt="<?= htmlspecialchars($authorName) ?>" 
-                                     style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%); border-radius: 50%; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
-                                    <?= mb_substr($authorName, 0, 1) ?>
-                                </div>
-                            <?php else: ?>
-                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
-                                    <?= mb_substr($authorName, 0, 1) ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
                         <div class="author-details-compact">
                             <div class="author-name-compact"><?= htmlspecialchars($authorName) ?></div>
                             <div class="author-meta-compact">
@@ -2904,92 +2887,7 @@ function copyToClipboard(text) {
     }
 }
 
-// 프로필 이미지 모달 함수
-function showProfileImageModal(imageSrc, userName) {
-    if (!imageSrc || imageSrc.trim() === '') {
-        alert('원본 프로필 이미지를 찾을 수 없습니다.');
-        return; // 이미지가 없으면 모달을 열지 않음
-    }
-    
-    // 프로필 이미지 모달이 없으면 생성
-    let modal = document.getElementById('profileImageModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'profileImageModal';
-        modal.style.cssText = `
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-        `;
-        
-        modal.innerHTML = `
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 16px; min-width: 300px; max-width: 90vw; max-height: 90vh; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden;">
-                <div style="padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
-                    <h3 id="modalUserName" style="margin: 0; color: #2d3748; font-size: 1.2rem; font-weight: 600;"></h3>
-                    <button onclick="closeProfileImageModal()" style="background: none; border: none; font-size: 28px; color: #718096; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s ease;">&times;</button>
-                </div>
-                <div style="padding: 24px; text-align: center; background: white;">
-                    <img id="modalProfileImage" src="" alt="프로필 이미지" style="min-width: 200px; min-height: 200px; max-width: 500px; max-height: 500px; width: auto; height: auto; border-radius: 8px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);">
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        // 모달 배경 클릭 시 닫기
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeProfileImageModal();
-            }
-        });
-    }
-    
-    const modalImage = modal.querySelector('#modalProfileImage');
-    const modalUserName = modal.querySelector('#modalUserName');
-    
-    // 이미지 로딩 상태 표시
-    modalImage.style.display = 'none';
-    modalUserName.textContent = userName + '의 프로필';
-    modal.style.display = 'block';
-    
-    // 새 이미지 객체로 로딩 확인
-    const img = new Image();
-    img.onload = function() {
-        modalImage.src = imageSrc;
-        modalImage.style.display = 'block';
-    };
-    img.onerror = function() {
-        modalImage.style.display = 'none';
-        alert('이미지를 로딩할 수 없습니다.');
-        closeProfileImageModal();
-    };
-    img.src = imageSrc;
-    
-    // ESC 키로 모달 닫기
-    document.addEventListener('keydown', handleProfileModalEscKey);
-}
-
-function closeProfileImageModal() {
-    const modal = document.getElementById('profileImageModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-    
-    // ESC 키 이벤트 제거
-    document.removeEventListener('keydown', handleProfileModalEscKey);
-}
-
-function handleProfileModalEscKey(event) {
-    if (event.key === 'Escape') {
-        closeProfileImageModal();
-    }
-}
+// 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 
 // 작성자와 채팅 시작
 function startChatWithAuthor(authorId, authorName) {

@@ -3,6 +3,10 @@
  * 채팅 메인 페이지
  * Firebase Realtime Database 기반 실시간 채팅
  */
+require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
+
+// 프로필 이미지 모달 리소스 로드
+include SRC_PATH . '/views/components/profile-modal-resources.php';
 ?>
 
 <!-- 브라우저 확장 프로그램 에러 억제 -->
@@ -740,148 +744,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 프로필 이미지 모달 */
-.profile-image-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    z-index: 10000;
-    opacity: 0;
-    animation: modalFadeIn 0.3s ease forwards;
-}
-
-.profile-image-modal.show {
-    opacity: 1;
-}
-
-.profile-image-modal .modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 90vw;
-    max-height: 95vh;
-    overflow: hidden;
-    animation: modalSlideIn 0.3s ease forwards;
-    display: flex;
-    flex-direction: column;
-    width: auto;
-    height: auto;
-}
-
-.profile-image-modal .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f8fafc;
-    flex-shrink: 0;
-}
-
-.profile-image-modal .modal-header h3 {
-    margin: 0;
-    color: #2d3748;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.profile-image-modal .modal-close {
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #718096;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-.profile-image-modal .modal-close:hover {
-    background: #e2e8f0;
-    color: #2d3748;
-}
-
-.profile-image-modal .modal-body {
-    padding: 24px;
-    text-align: center;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    min-height: 200px;
-}
-
-.profile-image-modal .modal-body img {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    max-width: 90vw;
-    max-height: 80vh;
-    width: auto;
-    height: auto;
-    border-radius: 12px;
-    object-fit: contain;
-    transition: all 0.3s ease;
-    display: block;
-    margin: 0 auto;
-}
-
-@keyframes modalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes modalSlideIn {
-    from { 
-        transform: translate(-50%, -50%) scale(0.9);
-        opacity: 0;
-    }
-    to { 
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-}
-
-/* 모바일에서 더 큰 이미지 표시 */
-@media (max-width: 768px) {
-    .profile-image-modal .modal-content {
-        min-width: 300px;
-        max-width: 98vw;
-        max-height: 98vh;
-        margin: 10px;
-    }
-    
-    .profile-image-modal .modal-body {
-        padding: 16px;
-        max-height: calc(98vh - 60px);
-    }
-    
-    .profile-image-modal .modal-body img {
-        max-width: calc(98vw - 50px);
-        max-height: calc(98vh - 120px);
-    }
-    
-    .profile-image-modal .modal-header {
-        padding: 15px 20px;
-    }
-    
-    .profile-image-modal .modal-header h3 {
-        font-size: 1.1rem;
-    }
-}
+/* 기존 프로필 이미지 모달 CSS 제거됨 - profile-modal.css 통합 시스템 사용 */
 </style>
 
 <div class="chat-container">
@@ -1001,18 +864,7 @@
     </div>
 </div>
 
-<!-- 프로필 이미지 모달 -->
-<div id="profileImageModal" class="profile-image-modal" onclick="closeProfileImageModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <h3 id="modalUserName">사용자 프로필</h3>
-            <button class="modal-close" onclick="closeProfileImageModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <img id="modalProfileImage" src="" alt="프로필 이미지">
-        </div>
-    </div>
-</div>
+<!-- 기존 프로필 이미지 모달 HTML 제거됨 - profile-modal.js 통합 시스템 사용 -->
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1101,6 +953,25 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeChat();
     setupEventListeners();
     
+    // 프로필 이미지 클릭 이벤트 위임 (동적으로 생성된 요소용)
+    document.addEventListener('click', function(e) {
+        const profileImage = e.target.closest('.profile-image-clickable');
+        if (profileImage) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const userId = profileImage.getAttribute('data-user-id');
+            const userName = profileImage.getAttribute('data-user-name');
+            
+            if (userId && userName && typeof window.profileModal !== 'undefined') {
+                console.log('🖼️ 채팅 페이지 프로필 이미지 클릭:', { userId, userName });
+                window.profileModal.show(userId, userName, false);
+            } else {
+                console.warn('⚠️ 프로필 이미지 클릭 실패:', { userId, userName, profileModal: typeof window.profileModal });
+            }
+        }
+    });
+    
     // 페이지 언로드 시 리스너 정리
     window.addEventListener('beforeunload', cleanupChatListeners);
     window.addEventListener('pagehide', cleanupChatListeners);
@@ -1187,28 +1058,14 @@ function setupEventListeners() {
         }
     });
     
-    // ESC 키로 모달 닫기
+    // ESC 키로 모달 닫기 (프로필 이미지 모달은 profile-modal.js에서 자동 처리)
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeNewChatModal();
-            closeProfileImageModal();
         }
     });
     
-    // 프로필 이미지 클릭 이벤트 위임
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('profile-image-clickable')) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const userId = e.target.getAttribute('data-user-id');
-            const userName = e.target.getAttribute('data-user-name');
-            
-            if (userId && userName) {
-                fetchProfileImage(userId, userName);
-            }
-        }
-    });
+    // 프로필 이미지 클릭 이벤트는 profile-modal.js의 통합 시스템에서 자동 처리됨
 }
 
 /**
@@ -2500,10 +2357,11 @@ async function loadUserInfo(userId) {
         const data = response_data.data || response_data;
         
         if (data.user_id) {
+            const imageData = data.data || data;
             users[userId] = {
-                id: data.user_id,
-                nickname: data.nickname,
-                profile_image: data.original_image
+                id: imageData.user_id,
+                nickname: imageData.nickname,
+                profile_image: imageData.original_image
             };
             
             console.log('✅ 사용자 정보 로드됨:', users[userId]);
@@ -2578,10 +2436,11 @@ function handleUrlHash() {
                             .then(response => response.json())
                             .then(data => {
                                 if (data.user_id) {
+                                    const imageData = data.data || data;
                                     const user = {
-                                        id: data.user_id,
-                                        nickname: data.nickname || '사용자',
-                                        profile_image: data.original_image
+                                        id: imageData.user_id,
+                                        nickname: imageData.nickname || '사용자',
+                                        profile_image: imageData.original_image
                                     };
                                     users[userId] = user;
                                     console.log(`🔗 API로 사용자 정보 로드 완료, 채팅방 생성 중:`, user);
@@ -2621,150 +2480,5 @@ function handleUrlHash() {
     }
 }
 
-// 프로필 이미지 모달 관련 함수들
-
-/**
- * 프로필 이미지 가져오기 및 모달 표시
- */
-function fetchProfileImage(userId, userName) {
-    if (!userId || !userName) {
-        console.error('사용자 ID 또는 이름이 없습니다.');
-        return;
-    }
-    
-    console.log(`프로필 이미지 로딩 시작: 사용자 ID ${userId}, 이름 ${userName}`);
-    
-    // 모달 열기 및 로딩 상태 표시
-    const modal = document.getElementById('profileImageModal');
-    const modalImage = document.getElementById('modalProfileImage');
-    const modalUserName = document.getElementById('modalUserName');
-    
-    if (!modal || !modalImage || !modalUserName) {
-        console.error('프로필 모달 요소를 찾을 수 없습니다.');
-        return;
-    }
-    
-    modalUserName.textContent = userName + '님의 프로필';
-    modalImage.style.display = 'none';
-    modalImage.src = '';
-    modal.style.display = 'block';
-    
-    // 로딩 스피너 표시
-    const modalBody = modal.querySelector('.modal-body');
-    const spinner = document.createElement('div');
-    spinner.id = 'imageLoadingSpinner';
-    spinner.style.cssText = `
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px;
-        color: #718096;
-    `;
-    spinner.innerHTML = `
-        <div style="width: 24px; height: 24px; border: 2px solid #e2e8f0; border-top: 2px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 12px;"></div>
-        이미지를 불러오는 중...
-    `;
-    modalBody.appendChild(spinner);
-    
-    // API 호출하여 원본 프로필 이미지 정보 가져오기
-    chatFetch(`/api/users/${userId}/profile-image`)
-        .then(response => response.json())
-        .then(data => {
-            // 로딩 스피너 제거
-            const spinner = document.getElementById('imageLoadingSpinner');
-            if (spinner) {
-                spinner.remove();
-            }
-            
-            if (data.original_image) {
-                showProfileImageModal(data.original_image, userName);
-            } else {
-                alert('원본 프로필 이미지를 찾을 수 없습니다.');
-                closeProfileImageModal();
-            }
-        })
-        .catch(error => {
-            console.error('프로필 이미지 로딩 오류:', error);
-            
-            // 로딩 스피너 제거
-            const spinner = document.getElementById('imageLoadingSpinner');
-            if (spinner) {
-                spinner.remove();
-            }
-            
-            // 채팅에서는 이미 있는 이미지 사용 (캐시된 이미지)
-            const existingImg = document.querySelector(`[data-user-id="${userId}"] img`);
-            if (existingImg && existingImg.src) {
-                showProfileImageModal(existingImg.src, userName);
-            } else {
-                alert('이미지를 불러오는 중 오류가 발생했습니다.');
-                closeProfileImageModal();
-            }
-        });
-}
-
-/**
- * 프로필 이미지 모달 표시
- */
-function showProfileImageModal(imageSrc, userName) {
-    if (!imageSrc || imageSrc.trim() === '') {
-        alert('원본 프로필 이미지를 찾을 수 없습니다.');
-        return;
-    }
-    
-    const modal = document.getElementById('profileImageModal');
-    const modalImage = document.getElementById('modalProfileImage');
-    const modalUserName = document.getElementById('modalUserName');
-    
-    if (!modal || !modalImage || !modalUserName) {
-        console.error('프로필 모달 요소를 찾을 수 없습니다.');
-        return;
-    }
-    
-    modalUserName.textContent = userName + '님의 프로필';
-    
-    // 이미지 미리 로딩 후 표시
-    const img = new Image();
-    img.onload = function() {
-        modalImage.src = imageSrc;
-        modalImage.style.display = 'block';
-    };
-    img.onerror = function() {
-        modalImage.style.display = 'none';
-        alert('이미지를 로딩할 수 없습니다.');
-        closeProfileImageModal();
-    };
-    img.src = imageSrc;
-    
-    // ESC 키 이벤트 추가
-    document.addEventListener('keydown', handleModalEscKey);
-}
-
-/**
- * 프로필 이미지 모달 닫기
- */
-function closeProfileImageModal() {
-    const modal = document.getElementById('profileImageModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-    
-    // 로딩 스피너 제거
-    const spinner = document.getElementById('imageLoadingSpinner');
-    if (spinner) {
-        spinner.remove();
-    }
-    
-    // ESC 키 이벤트 제거
-    document.removeEventListener('keydown', handleModalEscKey);
-}
-
-/**
- * ESC 키 핸들러
- */
-function handleModalEscKey(event) {
-    if (event.key === 'Escape') {
-        closeProfileImageModal();
-    }
-}
+// 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 </script>

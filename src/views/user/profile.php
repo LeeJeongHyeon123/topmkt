@@ -12,6 +12,10 @@ $recentComments = $recentComments ?? [];
 
 // HTML 새니타이저 포함
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
+require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
+
+// 프로필 이미지 모달 리소스 로드
+include SRC_PATH . '/views/components/profile-modal-resources.php';
 
 // 프로필 이미지 경로 설정
 $profileImageUrl = '/assets/images/default-avatar.png';
@@ -788,16 +792,13 @@ if (!empty($user['last_login'])) {
     <div class="profile-header-section">
         <div class="profile-main-info">
             <div class="profile-image-container">
-                <?php if (!empty($user['profile_image_profile'])): ?>
-                    <img src="<?= htmlspecialchars($profileImageUrl) ?>" 
-                         alt="<?= htmlspecialchars($user['nickname']) ?>님의 프로필 이미지" 
-                         class="profile-image"
-                         onclick="showImageModal('<?= htmlspecialchars($user['profile_image_original'] ?? $profileImageUrl) ?>')">
-                <?php else: ?>
-                    <div class="profile-image-fallback">
-                        <?= mb_substr($user['nickname'] ?? '?', 0, 1) ?>
-                    </div>
-                <?php endif; ?>
+                <?php 
+                // $user는 이미 정의되어 있으므로 그대로 사용
+                $size = ProfileImageHelper::SIZE_PROFILE;
+                $mode = 'direct';
+                $extraClasses = ['profile-image'];
+                include SRC_PATH . '/views/components/profile-image.php';
+                ?>
             </div>
             
             <div class="profile-details">
@@ -1089,30 +1090,10 @@ if (!empty($user['last_login'])) {
     </div>
 </div>
 
-<!-- 이미지 확대 모달 -->
-<div id="imageModal" class="image-modal" onclick="hideImageModal()">
-    <span class="modal-close" onclick="hideImageModal()">&times;</span>
-    <div class="image-modal-content">
-        <img id="modalImage" src="" alt="프로필 이미지">
-    </div>
-</div>
+<!-- 기존 이미지 모달 HTML 제거됨 - profile-modal.js 통합 시스템 사용 -->
 
 <script>
-// 이미지 모달 관련 함수
-function showImageModal(imageSrc) {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    
-    modal.style.display = 'block';
-    modalImg.src = imageSrc;
-    document.body.style.overflow = 'hidden';
-}
-
-function hideImageModal() {
-    const modal = document.getElementById('imageModal');
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-}
+// 기존 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 
 // 공유하기 기능 (강의 페이지와 동일)
 function shareContent() {
@@ -1236,11 +1217,7 @@ function copyToClipboard(text) {
 }
 
 // ESC 키로 모달 닫기
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        hideImageModal();
-    }
-});
+// ESC 키 이벤트는 profile-modal.js의 통합 시스템에서 자동 처리됨
 
 // 프로필 페이지 성능 측정 및 로깅
 (function() {

@@ -6,6 +6,7 @@
 // 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
+require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -48,6 +49,9 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
 <meta property="article:modified_time" content="<?= date('c', strtotime($notice['updated_at'])) ?>">
 <meta property="article:author" content="<?= htmlspecialchars($notice['company_name']) ?>">
 <meta property="article:section" content="공지사항">
+
+<!-- 프로필 이미지 모달 통합 리소스 -->
+<?php include SRC_PATH . '/views/components/profile-modal-resources.php'; ?>
 
 <style>
 /* 공지사항 상세보기 페이지 스타일 */
@@ -539,162 +543,27 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
     min-width: 80px;
 }
 
-/* 공유 모달 스타일 */
-.share-modal {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(3px);
-}
-
-.share-modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    min-width: 320px;
-    max-width: 95vw;
-    max-height: 95vh;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    overflow: auto;
-}
-
-.share-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.share-modal-header h3 {
-    margin: 0;
-    color: #2d3748;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.share-modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #718096;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-.share-modal-close:hover {
-    background: #f1f5f9;
-    color: #2d3748;
-}
-
-.share-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.share-option {
-    display: flex;
-    flex-direction: column;
+/* 공유 버튼 스타일 (행사/강의 페이지와 일관성 유지) */
+.btn-share {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: #4a5568;
-}
-
-.share-option:hover {
-    border-color: #2563eb;
-    background: #f0f9ff;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
-}
-
-.share-option-icon {
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 12px 20px;
+    background: #6366f1;
     color: white;
-}
-
-.share-option-text {
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-}
-
-.share-option.facebook .share-option-icon {
-    background: #1877f2;
-}
-
-.share-option.twitter .share-option-icon {
-    background: #1da1f2;
-}
-
-.share-option.kakao .share-option-icon {
-    background: #fee500;
-    color: #3c1e1e;
-}
-
-.share-option.link .share-option-icon {
-    background: #6b7280;
-}
-
-.share-url-section {
-    border-top: 1px solid #e2e8f0;
-    padding-top: 20px;
-}
-
-.share-url-section h4 {
-    margin: 0 0 10px 0;
-    color: #374151;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.share-url-input {
-    display: flex;
-    gap: 8px;
-}
-
-.share-url-input input {
-    flex: 1;
-    padding: 10px 12px;
-    border: 2px solid #e2e8f0;
+    border: none;
     border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
     font-size: 14px;
-    background: #f9fafb;
 }
 
-.share-url-input input:focus {
-    outline: none;
-    border-color: #2563eb;
-    background: white;
+.btn-share:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
 }
 
 /* 모바일 반응형 */
@@ -752,16 +621,10 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
         padding: 15px 20px;
     }
     
-    .share-modal-content {
-        margin: 20px;
-        min-width: auto;
-        max-width: calc(100vw - 40px);
-    }
-    
-    .share-options {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
+
+/* 기존 프로필 이미지 모달 스타일 제거됨 - 통합 CSS 사용 */
+
 
 /* 화이트 배경 일관성 유지 */
 body {
@@ -825,16 +688,21 @@ body {
                 <div class="meta-item company-meta-with-avatar">
                     <div class="company-avatar-small">
                         <?php 
-                        $companyLogo = $notice['company_logo'] ?? null;
-                        $companyName = $notice['company_name'] ?? '기업';
-                        
-                        if ($companyLogo): ?>
-                            <img src="<?= htmlspecialchars($companyLogo) ?>" 
-                                 alt="<?= htmlspecialchars($companyName) ?>" 
-                                 loading="lazy">
-                        <?php else: ?>
-                            <?= mb_substr($companyName, 0, 1) ?>
-                        <?php endif; ?>
+                            // 사용자 정보만 추출 (공지사항 ID와 구분)
+                            $user = [
+                                'id' => $notice['user_id'], // 실제 사용자 ID 사용
+                                'user_id' => $notice['user_id'],
+                                'nickname' => $notice['nickname'] ?? $notice['author_name'] ?? $companyName ?? '알 수 없음',
+                                'author_name' => $notice['nickname'] ?? $notice['author_name'] ?? $companyName ?? '알 수 없음',
+                                'profile_image_original' => $notice['profile_image_original'] ?? null,
+                                'profile_image_profile' => $notice['profile_image_profile'] ?? null,
+                                'profile_image_thumb' => $notice['profile_image_thumb'] ?? null,
+                                'profile_image' => $notice['profile_image'] ?? null
+                            ];
+                            $mode = 'api';
+                            $extraClasses = [];
+                            include SRC_PATH . '/views/components/profile-image.php';
+                        ?>
                     </div>
                     <div>
                         <strong><?= htmlspecialchars($companyName) ?></strong>
@@ -875,8 +743,8 @@ body {
             
             <div class="notice-actions">
                 <!-- 공유 버튼 -->
-                <button type="button" class="btn btn-primary" onclick="openShareModal()">
-                    <i class="fas fa-share-alt"></i> 공유하기
+                <button class="btn btn-secondary" onclick="shareContent()">
+                    🔗 공유하기
                 </button>
                 
                 <!-- 목록으로 버튼 -->
@@ -943,60 +811,6 @@ body {
     </div>
 </div>
 
-<!-- 공유 모달 -->
-<div id="shareModal" class="share-modal" onclick="closeShareModal()">
-    <div class="share-modal-content" onclick="event.stopPropagation()">
-        <div class="share-modal-header">
-            <h3>공지사항 공유</h3>
-            <button class="share-modal-close" onclick="closeShareModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <div class="share-options">
-            <a href="#" class="share-option facebook" onclick="shareToFacebook()">
-                <div class="share-option-icon">
-                    <i class="fab fa-facebook-f"></i>
-                </div>
-                <div class="share-option-text">페이스북</div>
-            </a>
-            
-            <a href="#" class="share-option twitter" onclick="shareToTwitter()">
-                <div class="share-option-icon">
-                    <i class="fab fa-twitter"></i>
-                </div>
-                <div class="share-option-text">트위터</div>
-            </a>
-            
-            <a href="#" class="share-option kakao" onclick="shareToKakao()">
-                <div class="share-option-icon">
-                    <i class="fas fa-comment"></i>
-                </div>
-                <div class="share-option-text">카카오톡</div>
-            </a>
-            
-            <a href="#" class="share-option link" onclick="copyShareUrl()">
-                <div class="share-option-icon">
-                    <i class="fas fa-link"></i>
-                </div>
-                <div class="share-option-text">링크 복사</div>
-            </a>
-        </div>
-        
-        <div class="share-url-section">
-            <h4>공지사항 주소</h4>
-            <div class="share-url-input">
-                <input type="text" 
-                       id="shareUrl" 
-                       value="<?= $pageUrl ?>" 
-                       readonly>
-                <button type="button" class="btn btn-primary" onclick="copyShareUrl()">
-                    <i class="fas fa-copy"></i> 복사
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <?php
 // 댓글 렌더링 함수
@@ -1089,12 +903,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 페이지 조회수 증가 (비동기)
     updateViewCount();
     
-    // ESC 키로 모달 닫기
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeShareModal();
-        }
-    });
 });
 
 // 조회수 업데이트
@@ -1332,90 +1140,117 @@ function deleteNotice(noticeId) {
     });
 }
 
-// 공유 모달 열기
-function openShareModal() {
-    document.getElementById('shareModal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-// 공유 모달 닫기
-function closeShareModal() {
-    document.getElementById('shareModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-// 페이스북 공유
-function shareToFacebook() {
-    const url = encodeURIComponent('<?= $pageUrl ?>');
-    const title = encodeURIComponent('<?= addslashes($notice['title']) ?>');
-    
-    window.open(
-        `https://www.facebook.com/sharer/sharer.php?u=${url}&t=${title}`,
-        'facebook-share',
-        'width=600,height=400,scrollbars=yes'
-    );
-}
-
-// 트위터 공유
-function shareToTwitter() {
-    const url = encodeURIComponent('<?= $pageUrl ?>');
-    const text = encodeURIComponent('<?= addslashes($notice['title']) . ' - 탑마케팅 공지사항' ?>');
-    
-    window.open(
-        `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
-        'twitter-share',
-        'width=600,height=400,scrollbars=yes'
-    );
-}
-
-// 카카오톡 공유 (카카오 SDK 필요)
-function shareToKakao() {
-    // 카카오 SDK가 로드되지 않은 경우 URL 복사로 대체
-    if (typeof Kakao === 'undefined') {
-        copyShareUrl();
-        alert('카카오톡 공유는 현재 지원하지 않습니다. URL이 복사되었습니다.');
-        return;
-    }
-    
-    Kakao.Link.sendDefault({
-        objectType: 'feed',
-        content: {
-            title: '<?= addslashes($notice['title']) ?>',
-            description: '<?= addslashes($pageDescription) ?>',
-            imageUrl: '<?= $pageImage ?>',
-            link: {
-                webUrl: '<?= $pageUrl ?>',
-                mobileWebUrl: '<?= $pageUrl ?>'
-            }
-        }
-    });
-}
-
-// URL 복사
-function copyShareUrl() {
-    const urlInput = document.getElementById('shareUrl');
-    urlInput.select();
-    urlInput.setSelectionRange(0, 99999);
+/**
+ * 공지사항 공유하기 기능 
+ * 행사/강의 페이지와 동일한 Web Share API 사용
+ */
+function shareContent() {
+    const title = '<?= addslashes($notice['title']) ?> - 탑마케팅 공지사항';
+    const url = '<?= $pageUrl ?>';
     
     try {
-        document.execCommand('copy');
-        alert('URL이 클립보드에 복사되었습니다.');
-    } catch (err) {
-        console.error('URL 복사 실패:', err);
-        alert('URL 복사에 실패했습니다. 수동으로 복사해주세요.');
+        // Web Share API 사용 (모바일에서 네이티브 공유)
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                url: url
+            }).then(() => {
+                console.log('공유 성공');
+            }).catch((error) => {
+                if (error.name !== 'AbortError') {
+                    console.log('공유 실패:', error);
+                    // 공유 실패 시 폴백 사용
+                    fallbackShare(title, url);
+                }
+            });
+        } else {
+            // 폴백: 클립보드 복사 또는 공유 옵션 표시
+            fallbackShare(title, url);
+        }
+    } catch (error) {
+        console.error('공유 기능 오류:', error);
+        alert('공유 기능에 오류가 발생했습니다.');
     }
 }
 
-// Web Share API 사용 (지원하는 브라우저에서)
-if (navigator.share) {
-    function nativeShare() {
-        navigator.share({
-            title: '<?= addslashes($notice['title']) ?>',
-            text: '<?= addslashes($pageDescription) ?>',
-            url: '<?= $pageUrl ?>'
-        }).catch(err => {
-            console.log('공유 취소됨:', err);
+/**
+ * 폴백 공유 기능 (클립보드 복사)
+ */
+function fallbackShare(title, url) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+            alert('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
+        }).catch(() => {
+            showShareModal(title, url);
         });
+    } else {
+        showShareModal(title, url);
     }
 }
+
+/**
+ * 공유 모달 표시
+ */
+function showShareModal(title, url) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);">
+            <h3 style="margin-bottom: 20px; color: #2d3748;">🔗 공지사항 공유하기</h3>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px;">
+                    Facebook
+                </a>
+                
+                <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}" target="_blank" style="padding: 10px 20px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px;">
+                    Twitter
+                </a>
+                
+                <a href="https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}" target="_blank" style="padding: 10px 20px; background: #0088CC; color: white; text-decoration: none; border-radius: 6px;">
+                    Telegram
+                </a>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <input type="text" value="${url}" readonly style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="navigator.clipboard.writeText('${url}').then(() => alert('복사되었습니다!'))" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    링크 복사
+                </button>
+                <button onclick="this.closest('[style*=\\"position: fixed\\"]').remove()" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    닫기
+                </button>
+            </div>
+        </div>
+    `;
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+    
+    document.body.appendChild(modal);
+}
+</script>
+
+<!-- 프로필 이미지 모달은 profile-modal.js에서 동적 생성됨 -->
+
+<script>
+// 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 </script>

@@ -6,6 +6,7 @@
 // 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
+require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -20,6 +21,9 @@ if ($isLoggedIn && isset($lecture)) {
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+// 프로필 이미지 모달 리소스 로드
+include SRC_PATH . '/views/components/profile-modal-resources.php';
 ?>
 
 <!-- CSRF 토큰 메타 태그 -->
@@ -1209,79 +1213,7 @@ if (!isset($_SESSION['csrf_token'])) {
     transition: box-shadow 0.3s ease;
 }
 
-/* 프로필 이미지 모달 스타일 */
-.profile-image-modal {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-}
-
-.profile-image-modal .modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 16px;
-    min-width: 300px;
-    max-width: 90vw;
-    max-height: 90vh;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-}
-
-.profile-image-modal .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f8fafc;
-}
-
-.profile-image-modal .modal-header h3 {
-    margin: 0;
-    color: #2d3748;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.profile-image-modal .modal-close {
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #718096;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-.profile-image-modal .modal-close:hover {
-    background: #e2e8f0;
-    color: #2d3748;
-}
-
-.profile-image-modal .modal-body {
-    padding: 24px;
-    text-align: center;
-    background: white;
-}
-
-.profile-image-modal .modal-body img {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
+/* 기존 프로필 이미지 모달 CSS 제거됨 - profile-modal.css 통합 시스템 사용 */
 
 /* 작성자 정보 카드 (컴팩트) */
 .author-info-card {
@@ -1478,19 +1410,6 @@ body {
         color: #333 !important;
     }
     
-    .profile-image-modal .modal-content {
-        background: white !important;
-        color: #333 !important;
-    }
-    
-    .profile-image-modal .modal-header {
-        background: #f8fafc !important;
-        border-color: #e2e8f0 !important;
-    }
-    
-    .profile-image-modal .modal-header h3 {
-        color: #2d3748 !important;
-    }
     
     /* 텍스트 색상도 라이트 모드로 유지 */
     .lecture-title, .lecture-subtitle, .lecture-description,
@@ -2290,25 +2209,15 @@ body {
                 <div class="sidebar-card author-info-card">
                     <h3 class="sidebar-title">✍️ 작성자</h3>
                     <div class="author-info-compact">
-                        <div class="author-avatar-small" onclick="showProfileImageModal('<?= addslashes(htmlspecialchars($lecture['profile_image_original'] ?? $lecture['profile_image_profile'] ?? '')) ?>', '<?= addslashes(htmlspecialchars($lecture['author_name'] ?? $lecture['nickname'] ?? '작성자')) ?>')" style="cursor: pointer;" title="프로필 이미지 크게 보기">
-                            <?php 
-                            $authorImage = $lecture['profile_image'] ?? null;
-                            $authorName = $lecture['author_name'] ?? $lecture['nickname'] ?? '작성자';
-                            
-                            if ($authorImage): ?>
-                                <img src="<?= htmlspecialchars($authorImage) ?>" 
-                                     alt="<?= htmlspecialchars($authorName) ?>" 
-                                     style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
-                                    <?= mb_substr($authorName, 0, 1) ?>
-                                </div>
-                            <?php else: ?>
-                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
-                                    <?= mb_substr($authorName, 0, 1) ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                        <?php 
+                        $user = $lecture; 
+                        $size = ProfileImageHelper::SIZE_THUMB;
+                        $mode = 'direct';
+                        $extraClasses = ['author-avatar-small'];
+                        include SRC_PATH . '/views/components/profile-image.php';
+                        
+                        $authorName = $lecture['author_name'] ?? $lecture['nickname'] ?? '작성자';
+                        ?>
                         <div class="author-details-compact">
                             <div class="author-name-compact"><?= htmlspecialchars($authorName) ?></div>
                             <div class="author-meta-compact">
@@ -2346,18 +2255,7 @@ body {
     <div class="modal-image-counter" id="imageCounter">    </div>
 </div>
 
-<!-- 프로필 이미지 확대 모달 -->
-<div id="profileImageModal" class="profile-image-modal" onclick="closeProfileImageModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <h3 id="modalUserName">사용자 프로필</h3>
-            <button class="modal-close" onclick="closeProfileImageModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <img id="modalProfileImage" src="" alt="프로필 이미지" style="min-width: 200px; min-height: 200px; max-width: 500px; max-height: 500px; width: auto; height: auto; border-radius: 8px;">
-        </div>
-    </div>
-</div>
+<!-- 기존 프로필 이미지 모달 HTML 제거됨 - profile-modal.js 통합 시스템 사용 -->
 
 <script>
 // 전역 오류 핸들러 추가
@@ -2859,57 +2757,7 @@ function openInstructorImageModal(imageSrc, imageAlt) {
     }
 }
 
-// 프로필 이미지 모달 함수
-function showProfileImageModal(imageSrc, userName) {
-    if (!imageSrc || imageSrc.trim() === '') {
-        alert('원본 프로필 이미지를 찾을 수 없습니다.');
-        return; // 이미지가 없으면 모달을 열지 않음
-    }
-    
-    const modal = document.getElementById('profileImageModal');
-    const modalImage = document.getElementById('modalProfileImage');
-    const modalUserName = document.getElementById('modalUserName');
-    
-    if (!modal || !modalImage || !modalUserName) {
-        console.error('프로필 모달 요소를 찾을 수 없습니다.');
-        return;
-    }
-    
-    // 이미지 로딩 상태 표시
-    modalImage.style.display = 'none';
-    modalUserName.textContent = userName + '의 프로필';
-    modal.style.display = 'block';
-    
-    // 새 이미지 객체로 로딩 확인
-    const img = new Image();
-    img.onload = function() {
-        modalImage.src = imageSrc;
-        modalImage.style.display = 'block';
-    };
-    img.onerror = function() {
-        modalImage.style.display = 'none';
-        alert('이미지를 로딩할 수 없습니다.');
-        closeProfileImageModal();
-    };
-    img.src = imageSrc;
-    
-    // ESC 키로 모달 닫기
-    document.addEventListener('keydown', handleProfileModalEscKey);
-}
-
-function closeProfileImageModal() {
-    const modal = document.getElementById('profileImageModal');
-    modal.style.display = 'none';
-    
-    // ESC 키 이벤트 제거
-    document.removeEventListener('keydown', handleProfileModalEscKey);
-}
-
-function handleProfileModalEscKey(event) {
-    if (event.key === 'Escape') {
-        closeProfileImageModal();
-    }
-}
+// 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 
 /**
  * 강의 신청 시스템
