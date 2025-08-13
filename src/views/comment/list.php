@@ -84,10 +84,43 @@
     margin-bottom: 20px;
 }
 
+/* 답글 스타일 대폭 개선 - 공지사항 스타일 적용 */
 .comment-item.reply {
-    margin-left: 40px;
-    border-left: 3px solid #e2e8f0;
+    margin-left: 50px;
+    margin-top: 15px;
+    border-left: 4px solid #3b82f6;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 0 12px 12px 0;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     padding-left: 20px;
+}
+
+/* 답글 연결선 */
+.comment-item.reply::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -25px;
+    width: 25px;
+    height: 30px;
+    border-left: 3px solid #3b82f6;
+    border-bottom: 3px solid #3b82f6;
+    border-bottom-left-radius: 12px;
+    opacity: 0.7;
+}
+
+/* 답글 배지 */
+.reply-to-info {
+    background: rgba(59, 130, 246, 0.1);
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    margin: -20px -20px 10px -20px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    font-size: 13px;
+    color: #1e40af;
+    font-weight: 500;
 }
 
 .comment-card {
@@ -95,6 +128,21 @@
     border-radius: 8px;
     padding: 20px;
     transition: background-color 0.3s ease;
+}
+
+/* 일반 댓글과 답글 구분을 위한 호버 효과 */
+.comment-item {
+    transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.comment-item.reply:hover {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
 }
 
 .comment-card:hover {
@@ -285,8 +333,20 @@
     }
     
     .comment-item.reply {
-        margin-left: 20px;
+        margin-left: 30px;
         padding-left: 15px;
+    }
+    
+    .comment-item.reply::before {
+        left: -20px;
+        width: 20px;
+        height: 25px;
+    }
+    
+    .reply-to-info {
+        margin: -20px -15px 10px -15px;
+        font-size: 12px;
+        padding: 5px 10px;
     }
     
     .comment-header {
@@ -307,12 +367,17 @@
  */
 
 // 댓글 렌더링 함수
-function renderComment($comment, $currentUserId = null, $depth = 0) {
+function renderComment($comment, $currentUserId = null, $depth = 0, $parentAuthor = null) {
     $isOwner = $currentUserId && $comment['user_id'] == $currentUserId;
     $isReply = $depth > 0;
     ?>
     <div class="comment-item <?= $isReply ? 'reply' : '' ?>" id="comment-<?= $comment['id'] ?>" data-comment-id="<?= $comment['id'] ?>" data-depth="<?= $depth ?>">
         <div class="comment-card">
+            <?php if ($isReply && $parentAuthor): ?>
+                <div class="reply-to-info">
+                    📌 <?= htmlspecialchars($parentAuthor) ?>님에게 답글
+                </div>
+            <?php endif; ?>
             <div class="comment-header">
                 <div class="comment-author">
                     <div class="comment-avatar">
@@ -488,7 +553,7 @@ $commentCount = count($comments);
             <!-- 대댓글 렌더링 -->
             <?php if (!empty($comment['replies'])): ?>
                 <?php foreach ($comment['replies'] as $reply): ?>
-                    <?php renderComment($reply, $currentUserId, 1); ?>
+                    <?php renderComment($reply, $currentUserId, 1, $comment['author_name']); ?>
                 <?php endforeach; ?>
             <?php endif; ?>
         <?php endforeach; ?>
@@ -656,13 +721,29 @@ function submitComment(event) {
             content: content
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        return response.json();
+    })
     .then(data => {
-        if (data.success) {
+        console.log('Response data:', data);
+        
+        // 다양한 성공 응답 형태 처리
+        const isSuccess = data.success === true || 
+                         (data.status === 'success' && data.data && data.data.success === true) ||
+                         (data.data && data.data.success === true);
+        
+        if (isSuccess) {
             // 페이지 새로고침으로 댓글 목록 업데이트
+            console.log('댓글 작성 성공, 페이지 새로고침');
             location.reload();
         } else {
-            alert(data.message || '댓글 작성에 실패했습니다.');
+            const errorMessage = data.message || 
+                               (data.data && data.data.message) || 
+                               '댓글 작성에 실패했습니다.';
+            console.error('댓글 작성 실패:', errorMessage);
+            alert(errorMessage);
         }
     })
     .catch(error => {
@@ -717,12 +798,27 @@ function submitReply(parentId) {
             content: content
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Reply response status:', response.status);
+        return response.json();
+    })
     .then(data => {
-        if (data.success) {
+        console.log('Reply response data:', data);
+        
+        // 다양한 성공 응답 형태 처리
+        const isSuccess = data.success === true || 
+                         (data.status === 'success' && data.data && data.data.success === true) ||
+                         (data.data && data.data.success === true);
+        
+        if (isSuccess) {
+            console.log('답글 작성 성공, 페이지 새로고침');
             location.reload();
         } else {
-            alert(data.message || '답글 작성에 실패했습니다.');
+            const errorMessage = data.message || 
+                               (data.data && data.data.message) || 
+                               '답글 작성에 실패했습니다.';
+            console.error('답글 작성 실패:', errorMessage);
+            alert(errorMessage);
         }
     })
     .catch(error => {
@@ -742,24 +838,112 @@ function cancelReply(commentId) {
     form.querySelector('.reply-textarea').value = '';
 }
 
-// 댓글 수정
+// 댓글 수정 모드 (공지사항과 동일한 인라인 편집)
 function editComment(commentId) {
-    // 간단히 prompt로 구현 (향후 인라인 편집으로 개선 가능)
-    const currentContent = document.getElementById('comment-content-' + commentId).textContent.trim();
-    const rawNewContent = prompt('댓글을 수정하세요:', currentContent);
+    const contentDiv = document.getElementById('comment-content-' + commentId);
+    const editForm = document.getElementById('edit-form-' + commentId);
     
-    if (rawNewContent === null) {
+    if (!contentDiv || !editForm) {
+        // 수정 폼이 없는 경우 동적으로 생성
+        showInlineEditForm(commentId);
         return;
     }
     
-    const newContent = normalizeText(rawNewContent);
-    if (newContent === currentContent) {
+    // 기존 내용을 편집 폼에 설정
+    const currentContent = contentDiv.textContent.trim();
+    const textarea = editForm.querySelector('textarea');
+    textarea.value = currentContent;
+    
+    // 내용 숨기고 편집 폼 표시
+    contentDiv.style.display = 'none';
+    editForm.style.display = 'block';
+    textarea.focus();
+}
+
+// 인라인 편집 폼 동적 생성
+function showInlineEditForm(commentId) {
+    const commentItem = document.querySelector(`[data-comment-id="${commentId}"]`);
+    const contentDiv = document.getElementById('comment-content-' + commentId);
+    
+    if (!commentItem || !contentDiv) {
+        alert('댓글을 찾을 수 없습니다.');
         return;
     }
     
-    if (!newContent) {
+    const currentContent = contentDiv.textContent.trim();
+    
+    // 편집 폼 HTML 생성 (공지사항과 동일한 구조)
+    const editFormHTML = `
+        <div class="comment-edit-form" id="edit-form-${commentId}" style="margin-top: 10px;">
+            <textarea id="edit-content-${commentId}" style="width: 100%; min-height: 80px; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical; transition: border-color 0.3s ease; box-sizing: border-box;">${currentContent}</textarea>
+            <div class="comment-edit-actions" style="display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end;">
+                <button type="button" onclick="cancelEditComment(${commentId})" style="font-size: 12px; padding: 6px 12px; min-width: 80px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; color: #4a5568;">취소</button>
+                <button type="button" onclick="updateComment(${commentId})" style="font-size: 12px; padding: 6px 12px; min-width: 80px; background: #2563eb; color: white; border: 1px solid #2563eb; border-radius: 4px; cursor: pointer;">저장</button>
+            </div>
+        </div>
+    `;
+    
+    // 댓글 내용 다음에 편집 폼 삽입
+    contentDiv.insertAdjacentHTML('afterend', editFormHTML);
+    
+    // 내용 숨기고 편집 폼 표시
+    contentDiv.style.display = 'none';
+    
+    const textarea = document.getElementById(`edit-content-${commentId}`);
+    textarea.focus();
+    
+    // textarea 포커스 시 테두리 색상 변경
+    textarea.addEventListener('focus', function() {
+        this.style.borderColor = '#2563eb';
+        this.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+    });
+    
+    textarea.addEventListener('blur', function() {
+        this.style.borderColor = '#e2e8f0';
+        this.style.boxShadow = 'none';
+    });
+}
+
+// 댓글 수정 취소
+function cancelEditComment(commentId) {
+    const contentDiv = document.getElementById('comment-content-' + commentId);
+    const editForm = document.getElementById('edit-form-' + commentId);
+    
+    if (contentDiv) {
+        contentDiv.style.display = 'block';
+    }
+    
+    if (editForm) {
+        editForm.remove(); // 동적으로 생성된 폼 제거
+    }
+}
+
+// 댓글 수정 저장
+function updateComment(commentId) {
+    const textarea = document.getElementById(`edit-content-${commentId}`);
+    
+    if (!textarea) {
+        alert('편집 폼을 찾을 수 없습니다.');
+        return;
+    }
+    
+    const content = normalizeText(textarea.value);
+    
+    if (!content) {
         alert('댓글 내용을 입력해주세요.');
         return;
+    }
+    
+    if (content.length < 2) {
+        alert('댓글은 2자 이상 입력해주세요.');
+        return;
+    }
+    
+    // 저장 버튼 비활성화
+    const saveBtn = textarea.parentElement.querySelector('button[onclick*="updateComment"]');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '저장 중...';
     }
     
     fetch('/api/comments/' + commentId, {
@@ -769,20 +953,42 @@ function editComment(commentId) {
             'X-CSRF-Token': getCsrfToken()
         },
         body: JSON.stringify({
-            content: newContent
+            content: content
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Edit response status:', response.status);
+        return response.json();
+    })
     .then(data => {
-        if (data.success) {
+        console.log('Edit response data:', data);
+        
+        // 다양한 성공 응답 형태 처리
+        const isSuccess = data.success === true || 
+                         (data.status === 'success' && data.data && data.data.success === true) ||
+                         (data.data && data.data.success === true);
+        
+        if (isSuccess) {
+            console.log('댓글 수정 성공, 페이지 새로고침');
             location.reload();
         } else {
-            alert(data.message || '댓글 수정에 실패했습니다.');
+            const errorMessage = data.message || 
+                               (data.data && data.data.message) || 
+                               '댓글 수정에 실패했습니다.';
+            console.error('댓글 수정 실패:', errorMessage);
+            alert(errorMessage);
         }
     })
     .catch(error => {
         console.error('Error:', error);
         alert('댓글 수정 중 오류가 발생했습니다.');
+    })
+    .finally(() => {
+        // 버튼 상태 복원
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = '저장';
+        }
     });
 }
 
