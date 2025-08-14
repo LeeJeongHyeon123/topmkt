@@ -89,7 +89,7 @@ class Notice {
                     cp.company_name,
                     cp.representative_name
                 FROM notices n
-                JOIN users u ON n.user_id = u.id
+                LEFT JOIN users u ON n.user_id = u.id
                 JOIN company_profiles cp ON n.company_id = cp.id
                 WHERE n.status = 'published'
                 AND n.created_at <= :start_time
@@ -181,7 +181,7 @@ class Notice {
                     ORDER BY created_at DESC 
                     LIMIT 500
                 ) n
-                JOIN users u ON n.user_id = u.id
+                LEFT JOIN users u ON n.user_id = u.id
                 JOIN company_profiles cp ON n.company_id = cp.id
                 WHERE $whereCondition
             ";
@@ -225,7 +225,7 @@ class Notice {
                     cp.representative_name
                 FROM notices n
                 FORCE INDEX (idx_notices_list_performance)
-                JOIN users u ON n.user_id = u.id
+                LEFT JOIN users u ON n.user_id = u.id
                 JOIN company_profiles cp ON n.company_id = cp.id
                 WHERE n.status = 'published'
             ";

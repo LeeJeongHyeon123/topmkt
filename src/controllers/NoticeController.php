@@ -179,11 +179,83 @@ class NoticeController {
             $ogUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/notices/' . $noticeId;
             $ogImage = $notice['image_path'] ? 'https://' . $_SERVER['HTTP_HOST'] . $notice['image_path'] : 'https://' . $_SERVER['HTTP_HOST'] . '/assets/images/og-default.png';
             
-            error_log("✅ 공지사항 상세 조회 완료: {$notice['title']} (작성자: {$notice['company_name']})");
+            // 댓글 데이터 조회
+            require_once SRC_PATH . '/models/NoticeComment.php';
+            $commentModel = new NoticeComment();
+            $comments = $commentModel->getAllByNoticeId($noticeId);
+            
+            // 이미지 데이터 처리 - 뷰에서 images 배열을 기대하므로 변환
+            if (!empty($notice['image_path'])) {
+                // 현재는 단일 이미지만 저장되므로 배열로 변환
+                $notice['images'] = [
+                    [
+                        'id' => 1, // 임시 ID
+                        'file_path' => $notice['image_path'],
+                        'filename' => basename($notice['image_path'])
+                    ]
+                ];
+                
+                // 같은 시간대에 업로드된 다른 이미지들도 찾아서 추가
+                $uploadTime = '';
+                if (preg_match('/(\d{14})_[a-f0-9]+\.jpg$/', $notice['image_path'], $matches)) {
+                    $uploadTime = $matches[1];
+                    $uploadDir = dirname($_SERVER['DOCUMENT_ROOT'] . $notice['image_path']);
+                    
+                    // 같은 시간대 이미지 파일들 검색 (±1초 범위로 확장)
+                    if (is_dir($uploadDir)) {
+                        $timeBase = substr($uploadTime, 0, 12); // 분까지만 (YYYYMMDDHHMM)
+                        $files = glob($uploadDir . '/' . $timeBase . '*_*.jpg');
+                        $imageId = 2;
+                        
+                        foreach ($files as $file) {
+                            $fileName = basename($file);
+                            $filePath = str_replace($_SERVER['DOCUMENT_ROOT'], '', $file);
+                            
+                            // 이미 추가된 이미지는 제외
+                            if ($filePath !== $notice['image_path']) {
+                                $notice['images'][] = [
+                                    'id' => $imageId++,
+                                    'file_path' => $filePath,
+                                    'filename' => $fileName
+                                ];
+                            }
+                        }
+                    }
+                }
+            } else {
+                $notice['images'] = [];
+            }
+            
+            // 본문 내용의 빈 img 태그들을 실제 이미지로 교체
+            if (!empty($notice['images'])) {
+                $content = $notice['content'];
+                
+                // 빈 img 태그들을 찾아서 실제 이미지로 교체
+                $imageIndex = 0;
+                $content = preg_replace_callback('/<img[^>]*>/i', function($matches) use ($notice, &$imageIndex) {
+                    if ($imageIndex < count($notice['images'])) {
+                        $image = $notice['images'][$imageIndex];
+                        $imageIndex++;
+                        return '<img src="' . htmlspecialchars($image['file_path']) . '" alt="' . htmlspecialchars($image['filename']) . '" class="content-image" loading="lazy">';
+                    }
+                    return $matches[0]; // 원본 유지
+                }, $content);
+                
+                $notice['content'] = $content;
+            }
+            
+            error_log("✅ 공지사항 상세 조회 완료: {$notice['title']} (작성자: {$notice['company_name']}) - 댓글 " . count($comments) . "개, 이미지 " . count($notice['images']) . "개");
+            
+            // 편집 권한 확인
+            $canEdit = $isLoggedIn && $this->noticeModel->isOwner($noticeId, $currentUserId);
+            
+            // 회사 이름 추출 (뷰에서 필요)
+            $companyName = $notice['company_name'] ?? '알 수 없음';
             
             // 뷰 변수 설정
             $data = [
                 'notice' => $notice,
+                'comments' => $comments,
                 'user' => [
                     'isLoggedIn' => $isLoggedIn,
                     'currentUserId' => $currentUserId,
@@ -200,7 +272,7 @@ class NoticeController {
             // 헤더와 뷰 렌더링
             $page_title = $notice['title'] . ' - 공지사항';
             require_once SRC_PATH . '/views/templates/header.php';
-            require_once SRC_PATH . '/views/notices/show.php';
+            require_once SRC_PATH . '/views/notices/detail.php';
             require_once SRC_PATH . '/views/templates/footer.php';
             
         } catch (Exception $e) {
@@ -254,8 +326,13 @@ class NoticeController {
                 'user' => [
                     'currentUserId' => $currentUserId,
                     'userCompanyId' => $userCompanyId
-                ]
+                ],
+                'canWrite' => true
             ];
+            
+            // 뷰 변수 추출
+            extract($data);
+            extract($data['user']);
             
             // 헤더와 뷰 렌더링
             $page_title = '공지사항 작성';
@@ -344,7 +421,10 @@ class NoticeController {
         try {
             // 로그인 확인
             if (!AuthMiddleware::isLoggedIn()) {
-                ResponseHelper::json(['success' => false, 'message' => '로그인이 필요합니다.'], 401);
+                http_response_code(401);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
@@ -352,38 +432,69 @@ class NoticeController {
             
             // 기업 사용자 권한 확인
             if (!$this->noticeModel->isCompanyUser($currentUserId)) {
-                ResponseHelper::json(['success' => false, 'message' => '공지사항 작성 권한이 없습니다.'], 403);
+                http_response_code(403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '공지사항 작성 권한이 없습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
             // CSRF 토큰 검증
             $csrfToken = $_POST['csrf_token'] ?? $_REQUEST['csrf_token'] ?? '';
             if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrfToken)) {
-                ResponseHelper::json(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], 403);
+                http_response_code(403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
-            // JSON 입력 데이터 읽기
-            $input = json_decode(file_get_contents('php://input'), true);
+            // 입력 데이터 읽기 (JSON 또는 FormData 지원)
+            $input = null;
+            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+            
+            if (strpos($contentType, 'application/json') !== false) {
+                // JSON 형식
+                $input = json_decode(file_get_contents('php://input'), true);
+            } else {
+                // FormData 형식 (multipart/form-data)
+                $input = $_POST;
+            }
+            
             if (!$input) {
-                ResponseHelper::json(['success' => false, 'message' => '잘못된 요청 형식입니다.'], 400);
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '잘못된 요청 형식입니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
             // 입력 데이터 검증
             $title = trim($input['title'] ?? '');
             $content = trim($input['content'] ?? '');
-            $imagePath = $input['image_path'] ?? null;
+            $imagePaths = $input['image_paths'] ?? [];
             $isFeatured = isset($input['is_featured']) ? (bool)$input['is_featured'] : false;
             
+            // 이미지 경로 배열을 처리 (현재는 첫 번째 이미지만 사용, 추후 다중 이미지 지원 가능)
+            $imagePath = null;
+            if (!empty($imagePaths) && is_array($imagePaths)) {
+                $imagePath = $imagePaths[0] ?? null;
+            }
+            
             if (empty($title) || empty($content)) {
-                ResponseHelper::json(['success' => false, 'message' => '제목과 내용을 모두 입력해주세요.'], 400);
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '제목과 내용을 모두 입력해주세요.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
             // 제목 길이 검증
             if (mb_strlen($title) > 200) {
-                ResponseHelper::json(['success' => false, 'message' => '제목은 200자를 초과할 수 없습니다.'], 400);
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '제목은 200자를 초과할 수 없습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
@@ -393,7 +504,10 @@ class NoticeController {
             // 사용자의 기업 ID 조회
             $userCompanyId = $this->noticeModel->getUserCompanyId($currentUserId);
             if (!$userCompanyId) {
-                ResponseHelper::json(['success' => false, 'message' => '기업 정보를 찾을 수 없습니다.'], 400);
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '기업 정보를 찾을 수 없습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
@@ -411,19 +525,27 @@ class NoticeController {
             
             if ($noticeId) {
                 WebLogger::info("✅ 공지사항 생성 성공: ID $noticeId, 제목: '$title'");
-                ResponseHelper::json([
+                http_response_code(200);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
                     'success' => true,
                     'message' => '공지사항이 성공적으로 작성되었습니다.',
-                    'notice_id' => $noticeId,
-                    'redirect' => '/notices/' . $noticeId
-                ]);
+                    'data' => [
+                        'id' => $noticeId,
+                        'redirect' => '/notices/' . $noticeId
+                    ]
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
             } else {
                 throw new Exception('공지사항 생성에 실패했습니다.');
             }
             
         } catch (Exception $e) {
             error_log("❌ 공지사항 생성 중 오류: " . $e->getMessage());
-            ResponseHelper::json(['success' => false, 'message' => '공지사항 작성 중 오류가 발생했습니다.'], 500);
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['success' => false, 'message' => '공지사항 작성 중 오류가 발생했습니다.'], JSON_UNESCAPED_UNICODE);
+            exit;
         }
     }
     
@@ -434,7 +556,10 @@ class NoticeController {
         try {
             // 로그인 확인
             if (!AuthMiddleware::isLoggedIn()) {
-                ResponseHelper::json(['success' => false, 'message' => '로그인이 필요합니다.'], 401);
+                http_response_code(401);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
@@ -450,31 +575,49 @@ class NoticeController {
             // CSRF 토큰 검증
             $csrfToken = $_POST['csrf_token'] ?? $_REQUEST['csrf_token'] ?? '';
             if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrfToken)) {
-                ResponseHelper::json(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], 403);
+                http_response_code(403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
             // JSON 입력 데이터 읽기
             $input = json_decode(file_get_contents('php://input'), true);
             if (!$input) {
-                ResponseHelper::json(['success' => false, 'message' => '잘못된 요청 형식입니다.'], 400);
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '잘못된 요청 형식입니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
             // 입력 데이터 검증
             $title = trim($input['title'] ?? '');
             $content = trim($input['content'] ?? '');
-            $imagePath = $input['image_path'] ?? null;
+            $imagePaths = $input['image_paths'] ?? [];
             $isFeatured = isset($input['is_featured']) ? (bool)$input['is_featured'] : false;
             
+            // 이미지 경로 배열을 처리 (현재는 첫 번째 이미지만 사용, 추후 다중 이미지 지원 가능)
+            $imagePath = null;
+            if (!empty($imagePaths) && is_array($imagePaths)) {
+                $imagePath = $imagePaths[0] ?? null;
+            }
+            
             if (empty($title) || empty($content)) {
-                ResponseHelper::json(['success' => false, 'message' => '제목과 내용을 모두 입력해주세요.'], 400);
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '제목과 내용을 모두 입력해주세요.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
             // 제목 길이 검증
             if (mb_strlen($title) > 200) {
-                ResponseHelper::json(['success' => false, 'message' => '제목은 200자를 초과할 수 없습니다.'], 400);
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '제목은 200자를 초과할 수 없습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
@@ -515,7 +658,10 @@ class NoticeController {
         try {
             // 로그인 확인
             if (!AuthMiddleware::isLoggedIn()) {
-                ResponseHelper::json(['success' => false, 'message' => '로그인이 필요합니다.'], 401);
+                http_response_code(401);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
@@ -532,7 +678,10 @@ class NoticeController {
             $input = json_decode(file_get_contents('php://input'), true);
             $csrfToken = $input['csrf_token'] ?? '';
             if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrfToken)) {
-                ResponseHelper::json(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], 403);
+                http_response_code(403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
                 return;
             }
             
@@ -559,6 +708,46 @@ class NoticeController {
         } catch (Exception $e) {
             error_log("❌ 공지사항 삭제 중 오류: " . $e->getMessage());
             ResponseHelper::json(['success' => false, 'message' => '공지사항 삭제 중 오류가 발생했습니다.'], 500);
+        }
+    }
+    
+    /**
+     * 공지사항 조회수 증가 (AJAX API)
+     */
+    public function incrementView($id) {
+        try {
+            $noticeId = intval($id);
+            
+            if (!$noticeId) {
+                ResponseHelper::json(['success' => false, 'message' => '잘못된 공지사항 ID입니다.'], 400);
+                return;
+            }
+            
+            // 공지사항 존재 확인
+            $notice = $this->noticeModel->getById($noticeId);
+            if (!$notice) {
+                ResponseHelper::json(['success' => false, 'message' => '공지사항을 찾을 수 없습니다.'], 404);
+                return;
+            }
+            
+            // 조회수 증가
+            $success = $this->noticeModel->incrementViewCount($noticeId);
+            
+            if ($success) {
+                ResponseHelper::json([
+                    'success' => true,
+                    'message' => '조회수가 증가되었습니다.',
+                    'data' => [
+                        'view_count' => $notice['view_count'] + 1
+                    ]
+                ]);
+            } else {
+                ResponseHelper::json(['success' => false, 'message' => '조회수 증가에 실패했습니다.'], 500);
+            }
+            
+        } catch (Exception $e) {
+            error_log("❌ 공지사항 조회수 증가 중 오류: " . $e->getMessage());
+            ResponseHelper::json(['success' => false, 'message' => '조회수 처리 중 오류가 발생했습니다.'], 500);
         }
     }
 } 

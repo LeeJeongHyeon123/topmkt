@@ -3,15 +3,19 @@
  * 공지사항 상세보기 페이지
  */
 
-// 로그인 상태 확인
+// 데이터 추출 및 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
-$isLoggedIn = AuthMiddleware::isLoggedIn();
-$currentUserId = AuthMiddleware::getCurrentUserId();
+
+// 컨트롤러에서 전달받은 데이터 추출
+$notice = $data['notice'] ?? null;
+$isLoggedIn = $data['user']['isLoggedIn'] ?? false;
+$currentUserId = $data['user']['currentUserId'] ?? null;
+$isOwner = $data['user']['isOwner'] ?? false;
 
 // 공지사항 정보가 없으면 404 처리
-if (!isset($notice) || !$notice) {
+if (!$notice) {
     header('HTTP/1.1 404 Not Found');
     include SRC_PATH . '/views/templates/404.php';
     return;
@@ -381,10 +385,57 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
     border-bottom: none;
 }
 
+/* 답글 스타일 대폭 개선 */
 .comment-item.reply {
-    margin-left: 30px;
-    border-left: 3px solid #e2e8f0;
-    background: #f8fafc;
+    margin-left: 50px;
+    margin-top: 15px;
+    border-left: 4px solid #3b82f6;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 0 12px 12px 0;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* 답글 연결선 */
+.comment-item.reply::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -25px;
+    width: 25px;
+    height: 30px;
+    border-left: 3px solid #3b82f6;
+    border-bottom: 3px solid #3b82f6;
+    border-bottom-left-radius: 12px;
+    opacity: 0.7;
+}
+
+/* 답글 배지 */
+.reply-to-info {
+    background: rgba(59, 130, 246, 0.1);
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    margin: -20px -30px 10px -30px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    font-size: 13px;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+/* 일반 댓글과 답글 구분을 위한 추가 스타일 */
+.comment-item {
+    transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.comment-item.reply:hover {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
 }
 
 .comment-header {
@@ -613,7 +664,19 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
     }
     
     .comment-item.reply {
-        margin-left: 15px;
+        margin-left: 25px;
+    }
+    
+    .comment-item.reply::before {
+        left: -15px;
+        width: 15px;
+        height: 25px;
+    }
+    
+    .reply-to-info {
+        margin: -15px -20px 8px -20px;
+        padding: 4px 8px;
+        font-size: 12px;
     }
     
     .comment-form,
@@ -621,6 +684,153 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
         padding: 15px 20px;
     }
     
+}
+
+/* 첨부 이미지 섹션 스타일 */
+.notice-attachments {
+    margin-top: 30px;
+    padding: 25px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.attachments-header {
+    color: #2d3748;
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.attachments-header i {
+    color: #2563eb;
+    font-size: 1.2rem;
+}
+
+.attachment-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.attachment-item {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.attachment-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #2563eb;
+}
+
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.attachment-item:hover .image-container img {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(37, 99, 235, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    font-weight: 600;
+}
+
+.attachment-item:hover .image-overlay {
+    opacity: 1;
+}
+
+.image-overlay i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.image-overlay span {
+    font-size: 0.9rem;
+}
+
+.image-info {
+    padding: 12px 15px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.image-number {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+}
+
+.image-name {
+    color: #4b5563;
+    font-size: 0.8rem;
+    font-weight: 500;
+    flex: 1;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .notice-attachments {
+        padding: 20px 15px;
+        margin-top: 20px;
+    }
+    
+    .attachment-images {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .image-container {
+        height: 150px;
+    }
+    
+    .attachments-header {
+        font-size: 1rem;
+    }
 }
 
 /* 기존 프로필 이미지 모달 스타일 제거됨 - 통합 CSS 사용 */
@@ -726,6 +936,35 @@ body {
             <div class="content-body">
                 <?= $notice['content'] ?>
             </div>
+            
+            <!-- 첨부 이미지 섹션 -->
+            <?php if (!empty($notice['images'])): ?>
+            <div class="notice-attachments">
+                <h4 class="attachments-header">
+                    <i class="fas fa-images"></i> 
+                    첨부 이미지 (<?= count($notice['images']) ?>개)
+                </h4>
+                <div class="attachment-images">
+                    <?php foreach ($notice['images'] as $index => $image): ?>
+                    <div class="attachment-item" onclick="openImageModal('<?= htmlspecialchars($image['file_path']) ?>')">
+                        <div class="image-container">
+                            <img src="<?= htmlspecialchars($image['file_path']) ?>" 
+                                 alt="<?= htmlspecialchars($image['filename']) ?>" 
+                                 loading="lazy">
+                            <div class="image-overlay">
+                                <i class="fas fa-search-plus"></i>
+                                <span>확대보기</span>
+                            </div>
+                        </div>
+                        <div class="image-info">
+                            <span class="image-number">#<?= $index + 1 ?></span>
+                            <span class="image-name"><?= htmlspecialchars(mb_substr(basename($image['filename'], '.jpg'), 15)) ?></span>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
         
         <!-- 푸터 -->
@@ -769,7 +1008,7 @@ body {
     <div class="comments-section">
         <h3>
             <i class="fas fa-comments"></i>
-            댓글 <span id="commentCount"><?= number_format($notice['comment_count'] ?? 0) ?></span>개
+            댓글 <span id="commentCount"><?= number_format($data['notice']['comment_count'] ?? 0) ?></span>개
         </h3>
         
         <!-- 댓글 작성 폼 -->
@@ -797,9 +1036,34 @@ body {
         
         <!-- 댓글 목록 -->
         <div class="comments-list" id="commentsList">
+            <?php 
+            $comments = $data['comments'] ?? [];
+            $currentUserId = $data['user']['currentUserId'] ?? null;
+            
+            // 댓글을 계층 구조로 정리
+            $commentMap = [];
+            $parentComments = [];
+            $replyComments = [];
+            
+            // 댓글을 부모/답글로 분류
+            foreach ($comments as $comment) {
+                $commentMap[$comment['id']] = $comment;
+                if (empty($comment['parent_id'])) {
+                    $parentComments[] = $comment;
+                } else {
+                    $replyComments[$comment['parent_id']][] = $comment;
+                }
+            }
+            ?>
             <?php if (!empty($comments)): ?>
-                <?php foreach ($comments as $comment): ?>
-                    <?= renderComment($comment, $currentUserId, 0) ?>
+                <?php foreach ($parentComments as $parentComment): ?>
+                    <?= renderComment($parentComment, $currentUserId, 0) ?>
+                    
+                    <?php if (isset($replyComments[$parentComment['id']])): ?>
+                        <?php foreach ($replyComments[$parentComment['id']] as $reply): ?>
+                            <?= renderComment($reply, $currentUserId, 1, $parentComment) ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             <?php else: ?>
                 <div style="text-align: center; padding: 40px; color: #718096;">
@@ -814,11 +1078,19 @@ body {
 
 <?php
 // 댓글 렌더링 함수
-function renderComment($comment, $currentUserId, $depth = 0) {
+function renderComment($comment, $currentUserId, $depth = 0, $parentComment = null) {
     $isReply = $depth > 0;
     $canEditComment = $currentUserId && ($currentUserId == $comment['user_id']);
     
-    $html = '<div class="comment-item' . ($isReply ? ' reply' : '') . '" data-comment-id="' . $comment['id'] . '">';
+    $html = '<div class="comment-item' . ($isReply ? ' reply' : '') . '" data-comment-id="' . $comment['id'] . '" data-parent-id="' . ($comment['parent_id'] ?? '') . '">';
+    
+    // 답글인 경우 부모 댓글 정보 표시
+    if ($isReply && $parentComment) {
+        $html .= '<div class="reply-to-info">';
+        $html .= '<i class="fas fa-reply" style="color: #3b82f6; margin-right: 6px;"></i>';
+        $html .= '<span style="color: #1e40af;">@' . htmlspecialchars($parentComment['nickname'] ?? '익명') . '님에게 답글</span>';
+        $html .= '</div>';
+    }
     
     // 댓글 헤더
     $html .= '<div class="comment-header">';
@@ -924,7 +1196,16 @@ function updateViewCount() {
 
 // 댓글 작성
 function submitComment() {
-    const content = document.getElementById('commentContent').value.trim();
+    const commentElement = document.getElementById('commentContent');
+    
+    // 비로그인 상태에서는 댓글 작성 폼이 존재하지 않음
+    if (!commentElement) {
+        alert('댓글을 작성하려면 로그인이 필요합니다.');
+        window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+    }
+    
+    const content = commentElement.value.trim();
     
     if (content.length < 2) {
         alert('댓글은 2자 이상 입력해주세요.');
@@ -951,11 +1232,11 @@ function submitComment() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.data && data.data.success) {
             // 댓글 목록 새로고침
             location.reload();
         } else {
-            throw new Error(data.message || '댓글 작성 중 오류가 발생했습니다.');
+            throw new Error((data.data && data.data.message) || data.message || '댓글 작성 중 오류가 발생했습니다.');
         }
     })
     .catch(error => {
@@ -966,7 +1247,10 @@ function submitComment() {
 
 // 댓글 내용 지우기
 function clearComment() {
-    document.getElementById('commentContent').value = '';
+    const commentElement = document.getElementById('commentContent');
+    if (commentElement) {
+        commentElement.value = '';
+    }
 }
 
 // 답글 폼 표시
@@ -1016,11 +1300,11 @@ function submitReply(parentId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.data && data.data.success) {
             // 댓글 목록 새로고침
             location.reload();
         } else {
-            throw new Error(data.message || '답글 작성 중 오류가 발생했습니다.');
+            throw new Error((data.data && data.data.message) || data.message || '답글 작성 중 오류가 발생했습니다.');
         }
     })
     .catch(error => {
@@ -1069,10 +1353,10 @@ function updateComment(commentId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.data && data.data.success) {
             location.reload();
         } else {
-            throw new Error(data.message || '댓글 수정 중 오류가 발생했습니다.');
+            throw new Error((data.data && data.data.message) || data.message || '댓글 수정 중 오류가 발생했습니다.');
         }
     })
     .catch(error => {
@@ -1098,10 +1382,10 @@ function deleteComment(commentId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.data && data.data.success) {
             location.reload();
         } else {
-            throw new Error(data.message || '댓글 삭제 중 오류가 발생했습니다.');
+            throw new Error((data.data && data.data.message) || data.message || '댓글 삭제 중 오류가 발생했습니다.');
         }
     })
     .catch(error => {
@@ -1127,11 +1411,11 @@ function deleteNotice(noticeId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.data && data.data.success) {
             alert('공지사항이 삭제되었습니다.');
             window.location.href = '/notices';
         } else {
-            throw new Error(data.message || '삭제 중 오류가 발생했습니다.');
+            throw new Error((data.data && data.data.message) || data.message || '삭제 중 오류가 발생했습니다.');
         }
     })
     .catch(error => {
@@ -1145,8 +1429,8 @@ function deleteNotice(noticeId) {
  * 행사/강의 페이지와 동일한 Web Share API 사용
  */
 function shareContent() {
-    const title = '<?= addslashes($notice['title']) ?> - 탑마케팅 공지사항';
-    const url = '<?= $pageUrl ?>';
+    const title = <?= json_encode($notice['title'] . ' - 탑마케팅 공지사항', JSON_UNESCAPED_UNICODE) ?>;
+    const url = <?= json_encode($pageUrl ?? 'https://www.topmktx.com/notices/' . $notice['id'], JSON_UNESCAPED_UNICODE) ?>;
     
     try {
         // Web Share API 사용 (모바일에서 네이티브 공유)
@@ -1185,6 +1469,176 @@ function fallbackShare(title, url) {
         });
     } else {
         showShareModal(title, url);
+    }
+}
+
+// 전역 이벤트 핸들러 저장
+let modalEventHandlers = {
+    escape: null,
+    resize: null
+};
+
+/**
+ * 이미지 모달 열기
+ */
+function openImageModal(imagePath) {
+    // 기존 모달이 있다면 제거
+    const existingModal = document.querySelector('.image-modal');
+    if (existingModal) {
+        closeImageModal();
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        cursor: zoom-out;
+        animation: fadeIn 0.2s ease-out;
+    `;
+    
+    // CSS 애니메이션 추가
+    if (!document.querySelector('#image-modal-styles')) {
+        const style = document.createElement('style');
+        style.id = 'image-modal-styles';
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+            .image-modal-closing {
+                animation: fadeOut 0.15s ease-in !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // 화면 크기 계산
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const padding = 40; // 좌우 여백
+    const maxWidth = screenWidth - padding;
+    const maxHeight = screenHeight - padding;
+    
+    modal.innerHTML = `
+        <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: default; padding: 20px; box-sizing: border-box;">
+            <img id="modal-image" src="${imagePath}" alt="이미지 확대보기" 
+                 style="max-width: ${maxWidth}px; max-height: ${maxHeight}px; width: auto; height: auto; object-fit: contain; border-radius: 12px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5); cursor: zoom-out; display: block;"
+                 onclick="closeImageModal()">
+            <button onclick="closeImageModal()" 
+                    style="position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95); color: #333; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); transition: all 0.2s ease; z-index: 10001; backdrop-filter: blur(10px);"
+                    onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='scale(1.15)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.transform='scale(1)'">
+                ✕
+            </button>
+        </div>
+    `;
+    
+    // 이미지 로드 후 크기 재조정
+    const modalImage = modal.querySelector('#modal-image');
+    modalImage.onload = function() {
+        const img = this;
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+        
+        // 비율 계산
+        const widthRatio = maxWidth / naturalWidth;
+        const heightRatio = maxHeight / naturalHeight;
+        const ratio = Math.min(widthRatio, heightRatio, 1); // 1을 넘지 않도록
+        
+        // 최적 크기 설정
+        const finalWidth = naturalWidth * ratio;
+        const finalHeight = naturalHeight * ratio;
+        
+        img.style.width = finalWidth + 'px';
+        img.style.height = finalHeight + 'px';
+        img.style.maxWidth = 'none';
+        img.style.maxHeight = 'none';
+        
+        console.log(`이미지 크기 조정: ${naturalWidth}x${naturalHeight} → ${finalWidth}x${finalHeight} (비율: ${ratio.toFixed(2)})`);
+    };
+    
+    // 모달 배경 클릭시 닫기
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeImageModal();
+        }
+    });
+    
+    // ESC 키로 닫기
+    modalEventHandlers.escape = (e) => {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    };
+    document.addEventListener('keydown', modalEventHandlers.escape);
+    
+    // 윈도우 리사이즈 처리
+    modalEventHandlers.resize = () => {
+        const modalImage = document.querySelector('#modal-image');
+        if (modalImage && modalImage.naturalWidth) {
+            const newScreenWidth = window.innerWidth;
+            const newScreenHeight = window.innerHeight;
+            const newMaxWidth = newScreenWidth - padding;
+            const newMaxHeight = newScreenHeight - padding;
+            
+            const naturalWidth = modalImage.naturalWidth;
+            const naturalHeight = modalImage.naturalHeight;
+            
+            const widthRatio = newMaxWidth / naturalWidth;
+            const heightRatio = newMaxHeight / naturalHeight;
+            const ratio = Math.min(widthRatio, heightRatio, 1);
+            
+            const finalWidth = naturalWidth * ratio;
+            const finalHeight = naturalHeight * ratio;
+            
+            modalImage.style.width = finalWidth + 'px';
+            modalImage.style.height = finalHeight + 'px';
+            
+            console.log(`리사이즈 시 이미지 크기 재조정: ${finalWidth}x${finalHeight}`);
+        }
+    };
+    window.addEventListener('resize', modalEventHandlers.resize);
+    
+    // body 스크롤 방지
+    document.body.style.overflow = 'hidden';
+    
+    document.body.appendChild(modal);
+}
+
+/**
+ * 이미지 모달 닫기
+ */
+function closeImageModal() {
+    const modal = document.querySelector('.image-modal');
+    if (modal) {
+        // 이벤트 리스너 정리
+        if (modalEventHandlers.escape) {
+            document.removeEventListener('keydown', modalEventHandlers.escape);
+            modalEventHandlers.escape = null;
+        }
+        if (modalEventHandlers.resize) {
+            window.removeEventListener('resize', modalEventHandlers.resize);
+            modalEventHandlers.resize = null;
+        }
+        
+        modal.classList.add('image-modal-closing');
+        setTimeout(() => {
+            modal.remove();
+            document.body.style.overflow = ''; // 스크롤 복원
+        }, 150);
     }
 }
 
