@@ -18,7 +18,16 @@
     "WebFetch", 
     "WebSearch", 
     "NotebookRead", 
-    "NotebookEdit"
+    "NotebookEdit",
+    "mcp__launch_browser",
+    "mcp__navigate",
+    "mcp__screenshot",
+    "mcp__click",
+    "mcp__type",
+    "mcp__wait_for_selector",
+    "mcp__evaluate",
+    "mcp__get_page_content",
+    "mcp__close_browser"
   ],
   "bashAutoConfirm": true,
   "skipConfirmation": true,

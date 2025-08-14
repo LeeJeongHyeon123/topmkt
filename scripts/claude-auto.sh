@@ -13,6 +13,11 @@ export CLAUDE_TOOL_CONFIRMATION=false
 export CLAUDE_INTERACTIVE_MODE=false
 export ANTHROPIC_CONFIRM_TOOLS=false
 
+# MCP 관련 환경 변수 설정
+export MCP_ENABLED=true
+export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=false
+export DISPLAY=:99
+
 # 작업 디렉토리를 탑마케팅 프로젝트로 설정
 cd /var/www/html/topmkt
 
@@ -23,6 +28,9 @@ echo "🔧 환경 변수:"
 echo "   CLAUDE_AUTO_EXECUTE=$CLAUDE_AUTO_EXECUTE"
 echo "   CLAUDE_CONFIRM_TOOLS=$CLAUDE_CONFIRM_TOOLS"
 echo "   CLAUDE_CONFIRM_BEFORE_TOOL_USE=$CLAUDE_CONFIRM_BEFORE_TOOL_USE"
+echo "   MCP_ENABLED=$MCP_ENABLED"
+echo "   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=$PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"
+echo "🎭 Playwright MCP 지원: 활성화"
 echo ""
 
 # Claude Code CLI 시작 (이전 대화 자동 복원)

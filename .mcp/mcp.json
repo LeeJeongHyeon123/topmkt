@@ -8,6 +8,16 @@
       "env": {
         "FIGMA_CHANNEL": "al1wsaom"
       }
+    },
+    "playwright": {
+      "command": "node",
+      "args": [
+        "/var/www/html/topmkt/playwright-mcp-server.js"
+      ],
+      "env": {
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "false",
+        "DISPLAY": ":99"
+      }
     }
   }
 }
