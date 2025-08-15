@@ -204,11 +204,11 @@ class User {
      */
     public function updateProfile($userId, $profileData) {
         $fields = [];
-        $params = [$userId];
+        $params = [':user_id' => $userId];  // 명명된 파라미터로 통일
         
         $allowedFields = [
-            'nickname', 'email', 'bio', 'birth_date', 'gender', 
-            'website_url', 'social_links',
+            'nickname', 'email', 'phone', 'bio', 'birth_date', 'gender', 
+            'website_url', 'social_links', 'role', 'status',
             'profile_image_original', 'profile_image_profile', 'profile_image_thumb'
         ];
         
@@ -228,7 +228,7 @@ class User {
             return false;
         }
         
-        $sql = "UPDATE users SET " . implode(', ', $fields) . ", updated_at = NOW() WHERE id = ?";
+        $sql = "UPDATE users SET " . implode(', ', $fields) . ", updated_at = NOW() WHERE id = :user_id";
         
         $result = $this->db->execute($sql, $params);
         
@@ -583,5 +583,286 @@ class User {
             error_log("User::searchUsers 오류: " . $e->getMessage());
             return [];
         }
+    }
+    
+    /**
+     * 관리자용 사용자 목록 조회 (필터링 및 페이지네이션 지원)
+     */
+    public function getFilteredUsers($filters = [], $page = 1, $limit = 20) {
+        $whereClauses = [];
+        $params = [];
+        $joins = [];
+        
+        // 기본 WHERE 조건 (삭제된 사용자 제외)
+        $whereClauses[] = "u.status != 'deleted'";
+        
+        // 상태 필터
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $whereClauses[] = "u.status = ?";
+            $params[] = $filters['status'];
+        }
+        
+        // 권한 필터
+        if (!empty($filters['role']) && $filters['role'] !== 'all') {
+            $whereClauses[] = "u.role = ?";
+            $params[] = $filters['role'];
+        }
+        
+        // 기업 상태 필터
+        if (!empty($filters['corp_status']) && $filters['corp_status'] !== 'all') {
+            $whereClauses[] = "u.corp_status = ?";
+            $params[] = $filters['corp_status'];
+        }
+        
+        // 휴대폰 인증 상태 필터
+        if (!empty($filters['verified_status']) && $filters['verified_status'] !== 'all') {
+            switch ($filters['verified_status']) {
+                case 'phone_verified':
+                    $whereClauses[] = "u.phone_verified = 1";
+                    break;
+                case 'phone_unverified':
+                    $whereClauses[] = "u.phone_verified = 0";
+                    break;
+            }
+        }
+        
+        // 날짜 범위 필터
+        if (!empty($filters['date_from'])) {
+            $whereClauses[] = "DATE(u.created_at) >= ?";
+            $params[] = $filters['date_from'];
+        }
+        
+        if (!empty($filters['date_to'])) {
+            $whereClauses[] = "DATE(u.created_at) <= ?";
+            $params[] = $filters['date_to'];
+        }
+        
+        // 로그인 활동 필터
+        if (!empty($filters['login_activity']) && $filters['login_activity'] !== 'all') {
+            switch ($filters['login_activity']) {
+                case 'recent_7days':
+                    $whereClauses[] = "u.last_login >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+                    break;
+                case 'recent_30days':
+                    $whereClauses[] = "u.last_login >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                    break;
+                case 'inactive_30days':
+                    $whereClauses[] = "(u.last_login IS NULL OR u.last_login < DATE_SUB(NOW(), INTERVAL 30 DAY))";
+                    break;
+            }
+        }
+        
+        // 검색 (닉네임, 이메일, 전화번호)
+        if (!empty($filters['search'])) {
+            $searchTerm = '%' . $filters['search'] . '%';
+            $whereClauses[] = "(u.nickname LIKE ? OR u.email LIKE ? OR u.phone LIKE ?)";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+        
+        // WHERE 절 구성
+        $whereClause = !empty($whereClauses) ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
+        
+        // 정렬
+        $orderBy = "ORDER BY u.created_at DESC";
+        if (!empty($filters['sort'])) {
+            switch ($filters['sort']) {
+                case 'nickname':
+                    $orderBy = "ORDER BY u.nickname ASC";
+                    break;
+                case 'email':
+                    $orderBy = "ORDER BY u.email ASC";
+                    break;
+                case 'last_login':
+                    $orderBy = "ORDER BY u.last_login DESC";
+                    break;
+                case 'status':
+                    $orderBy = "ORDER BY u.status ASC, u.created_at DESC";
+                    break;
+            }
+        }
+        
+        // 페이지네이션
+        $offset = ($page - 1) * $limit;
+        
+        // 메인 쿼리
+        $sql = "SELECT 
+                    u.id,
+                    u.nickname,
+                    u.email,
+                    u.phone,
+                    u.role,
+                    u.status,
+                    u.corp_status,
+                    u.phone_verified,
+                    u.login_attempts,
+                    u.last_login,
+                    u.created_at,
+                    u.profile_image_thumb,
+                    (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND status = 'published') as post_count,
+                    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND status = 'active') as comment_count
+                FROM users u 
+                {$whereClause} 
+                {$orderBy}
+                LIMIT {$limit} OFFSET {$offset}";
+        
+        $users = $this->db->fetchAll($sql, $params);
+        
+        // 총 개수 조회
+        $countSql = "SELECT COUNT(*) as total FROM users u {$whereClause}";
+        $totalResult = $this->db->fetch($countSql, $params);
+        $total = $totalResult['total'];
+        
+        return [
+            'users' => $users,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+            'total_pages' => ceil($total / $limit)
+        ];
+    }
+    
+    /**
+     * 사용자 상태 업데이트 (관리자용)
+     */
+    public function updateUserStatus($userId, $status, $adminId, $reason = '') {
+        try {
+            $this->db->beginTransaction();
+            
+            // 사용자 상태 업데이트
+            $sql = "UPDATE users SET status = ?, updated_at = NOW() WHERE id = ?";
+            $result = $this->db->execute($sql, [$status, $userId]);
+            
+            if ($result) {
+                // 관리자 활동 로그 기록
+                $this->logUserActivity($adminId, 'USER_STATUS_UPDATE', "사용자 ID {$userId}의 상태를 {$status}로 변경", [
+                    'target_user_id' => $userId,
+                    'new_status' => $status,
+                    'reason' => $reason
+                ]);
+                
+                $this->db->commit();
+                return true;
+            }
+            
+            $this->db->rollback();
+            return false;
+            
+        } catch (Exception $e) {
+            $this->db->rollback();
+            error_log('사용자 상태 업데이트 실패: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * 사용자 권한 업데이트 (관리자용)
+     */
+    public function updateUserRole($userId, $role, $adminId, $reason = '') {
+        try {
+            $this->db->beginTransaction();
+            
+            // 기존 권한 조회
+            $oldRole = $this->db->fetch("SELECT role FROM users WHERE id = ?", [$userId]);
+            
+            // 사용자 권한 업데이트
+            $sql = "UPDATE users SET role = ?, updated_at = NOW() WHERE id = ?";
+            $result = $this->db->execute($sql, [$role, $userId]);
+            
+            if ($result) {
+                // 관리자 활동 로그 기록
+                $this->logUserActivity($adminId, 'USER_ROLE_UPDATE', "사용자 ID {$userId}의 권한을 {$oldRole['role']}에서 {$role}로 변경", [
+                    'target_user_id' => $userId,
+                    'old_role' => $oldRole['role'],
+                    'new_role' => $role,
+                    'reason' => $reason
+                ]);
+                
+                $this->db->commit();
+                return true;
+            }
+            
+            $this->db->rollback();
+            return false;
+            
+        } catch (Exception $e) {
+            $this->db->rollback();
+            error_log('사용자 권한 업데이트 실패: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * 관리자용 사용자 상세 정보 조회
+     */
+    public function getAdminUserDetail($userId) {
+        $sql = "SELECT 
+                    u.*,
+                    (SELECT COUNT(*) FROM posts WHERE user_id = u.id AND status = 'published') as post_count,
+                    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND status = 'active') as comment_count,
+                    (SELECT COALESCE(SUM(p.like_count), 0) FROM posts p WHERE p.user_id = u.id AND p.status = 'published') as total_likes,
+                    DATEDIFF(NOW(), u.created_at) as join_days
+                FROM users u 
+                WHERE u.id = ?";
+        
+        $user = $this->db->fetch($sql, [$userId]);
+        
+        if ($user && $user['social_links']) {
+            $user['social_links'] = json_decode($user['social_links'], true);
+        }
+        
+        // 최근 활동 이력 조회
+        if ($user) {
+            $user['recent_activity'] = $this->getUserRecentActivity($userId);
+        }
+        
+        return $user;
+    }
+    
+    /**
+     * 사용자 최근 활동 이력 조회
+     */
+    public function getUserRecentActivity($userId, $limit = 10) {
+        $sql = "SELECT action, description, created_at 
+                FROM user_logs 
+                WHERE user_id = ? 
+                ORDER BY created_at DESC 
+                LIMIT ?";
+        
+        return $this->db->fetchAll($sql, [$userId, $limit]);
+    }
+    
+    /**
+     * 사용자 통계 조회 (관리자 대시보드용)
+     */
+    public function getUserStatistics() {
+        $stats = [];
+        
+        // 전체 사용자 수
+        $result = $this->db->fetch("SELECT COUNT(*) as total FROM users WHERE status != 'deleted'");
+        $stats['total_users'] = $result['total'];
+        
+        // 오늘 신규 가입자
+        $result = $this->db->fetch("SELECT COUNT(*) as today FROM users WHERE DATE(created_at) = CURDATE() AND status != 'deleted'");
+        $stats['today_signups'] = $result['today'];
+        
+        // 활성 사용자 (최근 30일 로그인)
+        $result = $this->db->fetch("SELECT COUNT(*) as active FROM users WHERE last_login >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND status = 'active'");
+        $stats['active_users'] = $result['active'];
+        
+        // 상태별 통계
+        $statusStats = $this->db->fetchAll("SELECT status, COUNT(*) as count FROM users WHERE status != 'deleted' GROUP BY status");
+        $stats['by_status'] = array_column($statusStats, 'count', 'status');
+        
+        // 권한별 통계
+        $roleStats = $this->db->fetchAll("SELECT role, COUNT(*) as count FROM users WHERE status != 'deleted' GROUP BY role");
+        $stats['by_role'] = array_column($roleStats, 'count', 'role');
+        
+        // 기업 상태별 통계
+        $corpStats = $this->db->fetchAll("SELECT corp_status, COUNT(*) as count FROM users WHERE status != 'deleted' GROUP BY corp_status");
+        $stats['by_corp_status'] = array_column($corpStats, 'count', 'corp_status');
+        
+        return $stats;
     }
 } 
