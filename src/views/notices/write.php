@@ -426,8 +426,8 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
         <h4>💡 공지사항 작성 가이드</h4>
         <ul>
             <li>명확하고 간결한 제목을 작성해주세요</li>
-            <li>중요한 공지사항은 '중요 공지'로 설정할 수 있습니다</li>
-            <li>이미지 업로드 시 <?= number_format(UploadConfig::MAX_SIZE / (1024 * 1024)) ?>MB 이하의 파일만 가능합니다</li>
+            <li>이미지는 최대 5개까지 첨부 가능합니다</li>
+            <li>이미지 업로드 시 <?= number_format(UploadConfig::MAX_FILE_SIZE / (1024 * 1024)) ?>MB 이하의 파일만 가능합니다</li>
             <li>HTML 태그는 자동으로 정리되어 안전하게 저장됩니다</li>
         </ul>
     </div>
@@ -453,20 +453,6 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
             <div class="char-counter" id="titleCounter">0 / 200</div>
         </div>
         
-        <!-- 중요 공지 설정 -->
-        <div class="form-group">
-            <div class="form-checkbox-wrapper">
-                <input type="checkbox" 
-                       id="is_featured" 
-                       name="is_featured" 
-                       class="form-checkbox"
-                       value="1"
-                       <?= ($isEdit && ($notice['is_featured'] ?? false)) ? 'checked' : '' ?>>
-                <label for="is_featured" class="form-checkbox-label">
-                    ⭐ 중요 공지로 설정 (목록 상단에 노란색으로 표시됩니다)
-                </label>
-            </div>
-        </div>
         
         <!-- 내용 -->
         <div class="form-group">
@@ -496,7 +482,7 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
                        accept="image/*" 
                        multiple>
                 <p style="font-size: 12px; color: #718096; margin: 10px 0 0 0;">
-                    지원 형식: JPG, PNG, GIF | 최대 <?= number_format(UploadConfig::MAX_SIZE / (1024 * 1024)) ?>MB | 최대 5개
+                    지원 형식: JPG, PNG, GIF | 최대 <?= number_format(UploadConfig::MAX_FILE_SIZE / (1024 * 1024)) ?>MB | 최대 5개
                 </p>
             </div>
             
@@ -530,7 +516,7 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
             <button type="submit" class="btn btn-primary" id="submitBtn">
                 <i class="fas fa-save"></i> <?= $submitText ?>
             </button>
-            <a href="/notices" class="btn btn-secondary">
+            <a href="/notices" class="btn btn-secondary" onclick="isFormSubmitted = true;">
                 <i class="fas fa-times"></i> 취소
             </a>
             <?php if ($isEdit): ?>
@@ -551,7 +537,8 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
 let quill;
 let uploadedFiles = [];
 const maxImages = 5;
-const maxFileSize = <?= UploadConfig::MAX_SIZE ?>;
+const maxFileSize = <?= UploadConfig::MAX_FILE_SIZE ?>;
+let isFormSubmitted = false; // 폼 제출 상태 추적
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📢 공지사항 작성 페이지 초기화');
@@ -569,6 +556,75 @@ document.addEventListener('DOMContentLoaded', function() {
     updateImageCount();
 });
 
+// 🚀 Ultra Think v3.13.0: Quill 커스텀 이미지 핸들러 (MediaController 연동)
+function quillImageHandler() {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.addEventListener('change', function() {
+        const file = input.files[0];
+        if (!file) return;
+        
+        // 파일 크기 검증 (30MB)
+        if (file.size > 30 * 1024 * 1024) {
+            alert('파일 크기는 30MB를 초과할 수 없습니다.');
+            return;
+        }
+        
+        // 파일 형식 검증
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('허용되지 않는 파일 형식입니다. (jpg, jpeg, png, gif, webp만 가능)');
+            return;
+        }
+        
+        // 업로드 진행
+        uploadImageToQuill(file);
+    });
+    input.click();
+}
+
+// Quill 에디터 이미지 업로드 함수
+function uploadImageToQuill(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+    formData.append('upload_type', 'notices');
+    formData.append('is_quill_upload', 'true'); // 🚀 Ultra Think v3.13.0: Quill 업로드 구분
+    
+    // 로딩 상태 표시
+    const range = quill.getSelection(true);
+    quill.insertText(range.index, '이미지 업로드 중...', 'italic', true);
+    
+    fetch('/api/media/upload-image', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 로딩 텍스트 제거
+        quill.deleteText(range.index, '이미지 업로드 중...'.length);
+        
+        if (data.success) {
+            // 성공시 이미지 삽입
+            quill.insertEmbed(range.index, 'image', data.data.url, 'user');
+            quill.setSelection(range.index + 1, 0);  // 커서를 이미지 다음으로 이동
+            
+            console.log('✅ Quill 이미지 업로드 성공:', data.data.url);
+        } else {
+            alert('이미지 업로드 실패: ' + data.message);
+            console.error('❌ Quill 이미지 업로드 실패:', data.message);
+        }
+    })
+    .catch(error => {
+        // 로딩 텍스트 제거
+        quill.deleteText(range.index, '이미지 업로드 중...'.length);
+        
+        alert('이미지 업로드 중 오류가 발생했습니다.');
+        console.error('❌ Quill 이미지 업로드 오류:', error);
+    });
+}
+
 // Quill 에디터 초기화
 function initializeEditor() {
     const toolbarOptions = [
@@ -583,7 +639,12 @@ function initializeEditor() {
 
     quill = new Quill('#editor-container', {
         modules: {
-            toolbar: toolbarOptions
+            toolbar: {
+                container: toolbarOptions,
+                handlers: {
+                    image: quillImageHandler  // 🚀 Ultra Think v3.13.0: 커스텀 이미지 핸들러 추가
+                }
+            }
         },
         theme: 'snow',
         placeholder: '공지사항 내용을 입력하세요...\n\n• 중요한 정보는 굵게 표시하세요\n• 필요한 경우 이미지를 첨부하세요\n• 독자가 이해하기 쉽게 작성해주세요'
@@ -689,6 +750,7 @@ function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+    formData.append('upload_type', 'notices'); // 공지사항 업로드 타입 명시
     
     const progressEl = document.getElementById('uploadProgress');
     const progressFill = document.getElementById('progressFill');
@@ -696,7 +758,7 @@ function uploadImage(file) {
     
     progressEl.style.display = 'block';
     
-    fetch('/api/upload/image', {
+    fetch('/api/media/upload-image', {
         method: 'POST',
         body: formData
     })
@@ -705,10 +767,16 @@ function uploadImage(file) {
         progressEl.style.display = 'none';
         
         if (data.success) {
-            addImagePreview(data.data.file_path, data.data.id);
+            // MediaController 응답 형식에 맞게 수정
+            const imageUrl = data.data.url;
+            const fileName = data.data.filename;
+            const tempId = Date.now(); // 임시 ID 생성
+            
+            addImagePreview(imageUrl, tempId);
             uploadedFiles.push({
-                id: data.data.id,
-                path: data.data.file_path
+                id: tempId,
+                path: imageUrl,
+                filename: fileName
             });
             updateImageCount();
         } else {
@@ -756,18 +824,8 @@ function removeImage(button, imageId) {
     // 이미지 개수 업데이트
     updateImageCount();
     
-    // 서버에서 임시 파일 삭제 (필요한 경우)
-    fetch(`/api/upload/image/${imageId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            csrf_token: document.querySelector('input[name="csrf_token"]').value
-        })
-    }).catch(error => {
-        console.warn('임시 이미지 삭제 실패:', error);
-    });
+    // 참고: 서버에서 임시 파일 자동 정리됨 (DELETE 엔드포인트 없음)
+    console.log('이미지 제거됨:', imageId);
 }
 
 // 이미지 개수 업데이트
@@ -806,8 +864,10 @@ function validateForm() {
     
     const isValid = title.length >= 2 && 
                    title.length <= 200 && 
-                   content.length >= 10 && 
+                   content.length >= 3 && 
                    content.length <= 50000;
+    
+    console.log('🔍 폼 검증:', { title: title.length, content: content.length, isValid });
     
     submitBtn.disabled = !isValid;
     
@@ -834,14 +894,16 @@ function submitForm() {
     // 폼 데이터 준비
     const formData = new FormData(document.getElementById('noticeForm'));
     
-    // 업로드된 이미지 ID들 추가
+    // 업로드된 이미지 경로들 추가
     uploadedFiles.forEach(file => {
-        formData.append('image_ids[]', file.id);
+        formData.append('image_paths[]', file.path);
     });
     
     // AJAX로 폼 제출
     const url = <?= $isEdit ? "'/api/notices/' + " . ($notice['id'] ?? 'null') : "'/api/notices'" ?>;
     const method = <?= $isEdit ? "'PUT'" : "'POST'" ?>;
+    
+    console.log('🚀 폼 제출 정보:', { url, method, isEdit: <?= $isEdit ? 'true' : 'false' ?> });
     
     fetch(url, {
         method: method,
@@ -850,6 +912,9 @@ function submitForm() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // 폼 제출 성공 상태로 설정
+            isFormSubmitted = true;
+            
             alert(<?= $isEdit ? "'공지사항이 성공적으로 수정되었습니다.'" : "'공지사항이 성공적으로 작성되었습니다.'" ?>);
             window.location.href = '/notices/' + data.data.id;
         } else {
@@ -872,6 +937,9 @@ function deleteNotice(noticeId) {
     if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.')) {
         return;
     }
+    
+    // 삭제 시도 시 폼 제출 상태로 설정 (beforeunload 방지)
+    isFormSubmitted = true;
     
     fetch(`/api/notices/${noticeId}`, {
         method: 'DELETE',
@@ -899,13 +967,36 @@ function deleteNotice(noticeId) {
 
 // 페이지 떠나기 전 확인
 window.addEventListener('beforeunload', function(e) {
-    const title = document.getElementById('title').value.trim();
-    const content = quill.getText().trim();
+    // 폼이 성공적으로 제출된 경우 경고 표시하지 않음
+    if (isFormSubmitted) {
+        return;
+    }
     
+    const title = document.getElementById('title').value.trim();
+    const content = quill ? quill.getText().trim() : '';
+    
+    // 제목이나 내용이 입력된 경우에만 경고 표시
     if (title || content) {
         e.preventDefault();
-        e.returnValue = '';
-        return '';
+        e.returnValue = '변경사항이 저장되지 않을 수 있습니다. 정말로 페이지를 떠나시겠습니까?';
+        return '변경사항이 저장되지 않을 수 있습니다. 정말로 페이지를 떠나시겠습니까?';
+    }
+});
+
+// 🚀 Ultra Think: beforeunload confirm 취소 시 로딩 UI 정리
+window.addEventListener('focus', function() {
+    // 사용자가 confirm에서 취소하고 페이지로 돌아온 경우 로딩 UI 숨김
+    if (window.topMarketingLoader && window.topMarketingLoader.isLoading) {
+        console.log('🔄 페이지 포커스 복구 - 로딩 UI 정리');
+        window.topMarketingLoader.hide();
+    }
+});
+
+// 🚀 Ultra Think: 페이지 가시성 변경 시에도 로딩 UI 정리
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && window.topMarketingLoader && window.topMarketingLoader.isLoading) {
+        console.log('🔄 페이지 가시성 복구 - 로딩 UI 정리');
+        window.topMarketingLoader.hide();
     }
 });
 </script>

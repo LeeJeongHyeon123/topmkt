@@ -349,7 +349,136 @@ class Notice {
             WHERE n.id = ? AND n.status != 'deleted'
         ";
         
-        return $this->db->fetch($sql, [$id]);
+        $notice = $this->db->fetch($sql, [$id]);
+        
+        if ($notice) {
+            // 🚀 Ultra Think v3.10.0 호환: 타임스탬프 기반 다중 이미지 자동 검색
+            $notice['images'] = $this->getNoticeImages($id, $notice);
+        }
+        
+        return $notice;
+    }
+    
+    /**
+     * 🚀 Ultra Think v3.11.0: 공지사항 이미지 포괄적 검색 시스템
+     * 공지사항 업데이트 시간 기준으로 관련된 모든 이미지를 발견
+     */
+    private function getNoticeImages($noticeId, $notice) {
+        $images = [];
+        
+        // 🚀 Ultra Think: image_path가 없어도 해당 시간대 이미지 검색
+        // 기본 업로드 경로 설정 (공지사항 생성 날짜 기준)
+        $createdTime = new DateTime($notice['created_at']);
+        $updatedTime = new DateTime($notice['updated_at']);
+        $dateDir = $createdTime->format('Y/m');
+        
+        if (!empty($notice['image_path'])) {
+            // image_path가 있는 경우: 해당 디렉토리에서 검색
+            $uploadPath = '/var/www/html/topmkt/public' . dirname($notice['image_path']);
+        } else {
+            // image_path가 없는 경우: 기본 날짜 디렉토리에서 검색
+            $uploadPath = '/var/www/html/topmkt/public/assets/uploads/notices/' . $dateDir;
+        }
+            
+        if (is_dir($uploadPath)) {
+            $files = scandir($uploadPath);
+            $relatedImages = [];
+            
+            // 🚀 Ultra Think v3.13.0: Quill 업로드 디렉토리도 확인하여 중복 제외
+            $quillUploadPath = '/var/www/html/topmkt/public/assets/uploads/notices-content/' . $dateDir;
+            $quillFiles = [];
+            if (is_dir($quillUploadPath)) {
+                $quillFiles = array_map(function($file) {
+                    return basename($file); // 파일명만 추출하여 비교용
+                }, scandir($quillUploadPath));
+            }
+            
+            // 생성 시간부터 마지막 수정 시간까지의 모든 이미지 포함 (Quill 업로드 제외)
+            foreach ($files as $file) {
+                if (in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                    // 🚀 Ultra Think v3.13.0: Quill 업로드 이미지는 첨부 이미지에서 제외
+                    if (in_array($file, $quillFiles)) {
+                        continue; // Quill 업로드 이미지는 건너뛰기
+                    }
+                    
+                    // 파일명에서 타임스탬프 추출
+                    if (preg_match('/^(\d{14})_/', $file, $matches)) {
+                        $fileTimestamp = $matches[1];
+                        
+                        try {
+                            $fileTime = new DateTime($fileTimestamp);
+                            
+                            // 🚀 Ultra Think v3.13.0: CRITICAL FIX - 매우 좁은 시간 범위로 충돌 방지
+                            // 문제: 기존 ±5분/+30분 범위가 너무 넓어서 다른 공지사항 이미지까지 포함
+                            // 해결: 공지사항 생성~수정 시간대로만 제한 (±1분 버퍼)
+                            $minTime = clone $createdTime;
+                            $minTime->modify('-1 minutes'); // 생성 전 1분만 허용
+                            
+                            $maxTime = clone $updatedTime;
+                            $maxTime->modify('+1 minutes'); // 수정 후 1분만 허용
+                            
+                            // 추가 검증: 다른 공지사항과의 충돌 방지
+                            $isValidTimeRange = ($fileTime >= $minTime && $fileTime <= $maxTime);
+                            
+                            if ($isValidTimeRange) {
+                                // 🚀 Ultra Think: 더 정밀한 검증 - 다른 공지사항의 이미지인지 확인
+                                $isConflictingImage = false;
+                                
+                                // 이 이미지가 다른 공지사항의 명시적인 image_path인지 확인
+                                $conflictCheck = $this->db->fetch("
+                                    SELECT id, title FROM notices 
+                                    WHERE id != ? AND image_path LIKE ? AND status != 'deleted'
+                                ", [$noticeId, '%' . $file]);
+                                
+                                if ($conflictCheck) {
+                                    $isConflictingImage = true;
+                                    error_log("⚠️ 이미지 충돌 감지: $file는 공지사항 {$conflictCheck['id']}의 이미지입니다");
+                                }
+                                
+                                if (!$isConflictingImage) {
+                                    $relatedImages[] = [
+                                        'file' => $file,
+                                        'timestamp' => $fileTimestamp,
+                                        'time_obj' => $fileTime
+                                    ];
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("⚠️ 타임스탬프 파싱 오류: $fileTimestamp in $file");
+                        }
+                    }
+                }
+            }
+            
+            // 시간순으로 정렬
+            usort($relatedImages, function($a, $b) {
+                return $a['time_obj'] <=> $b['time_obj'];
+            });
+            
+            // 이미지 배열 생성
+            foreach ($relatedImages as $index => $imgData) {
+                // 🚀 Ultra Think: image_path가 없는 경우 날짜 디렉토리 기준 경로 생성
+                if (!empty($notice['image_path'])) {
+                    $filePath = dirname($notice['image_path']) . '/' . $imgData['file'];
+                } else {
+                    $filePath = '/assets/uploads/notices/' . $dateDir . '/' . $imgData['file'];
+                }
+                
+                $images[] = [
+                    'id' => $index + 1,
+                    'filename' => $imgData['file'],
+                    'file_path' => $filePath,
+                    'upload_time' => $imgData['time_obj']->format('Y-m-d H:i:s')
+                ];
+            }
+            
+            error_log("🔍 공지사항 {$noticeId}번 이미지 검색 범위: " . 
+                     $minTime->format('Y-m-d H:i:s') . " ~ " . $maxTime->format('Y-m-d H:i:s'));
+        }
+        
+        error_log("✅ 공지사항 {$noticeId}번 포괄적 이미지 검색 완료: " . count($images) . "개 발견");
+        
+        return $images;
     }
     
     /**
@@ -367,7 +496,7 @@ class Notice {
             $data['title'],
             $data['content'],
             $data['image_path'] ?? null,
-            ($data['is_featured'] ?? false) ? 1 : 0
+            0
         ]);
         
         // 새 공지사항 추가 시 관련 캐시 무효화
@@ -390,7 +519,7 @@ class Notice {
             $data['title'],
             $data['content'],
             $data['image_path'] ?? null,
-            ($data['is_featured'] ?? false) ? 1 : 0,
+            0,
             $id
         ]);
         
@@ -471,7 +600,7 @@ class Notice {
             FROM notices n
             JOIN users u ON n.user_id = u.id
             JOIN company_profiles cp ON n.company_id = cp.id
-            WHERE n.status = 'published' AND n.is_featured = true
+            WHERE n.status = 'published' AND n.is_featured = false
             ORDER BY n.created_at DESC
             LIMIT ?
         ";
@@ -563,5 +692,72 @@ class Notice {
         ";
         $result = $this->db->fetch($sql, [$userId]);
         return $result ? $result['id'] : null;
+    }
+    
+    /**
+     * 공지사항 이미지 제거 (파일 시스템 기반)
+     */
+    public function removeImages($noticeId, $imageIds) {
+        if (empty($imageIds) || !is_array($imageIds)) {
+            return true;
+        }
+        
+        try {
+            // 공지사항 정보 조회
+            $notice = $this->getById($noticeId);
+            if (!$notice || empty($notice['images'])) {
+                error_log("⚠️ 공지사항 $noticeId 에 이미지가 없습니다.");
+                return true;
+            }
+            
+            $removedCount = 0;
+            
+            // 제거할 이미지들을 ID로 찾아서 삭제
+            foreach ($notice['images'] as $image) {
+                if (in_array($image['id'], $imageIds)) {
+                    $filePath = ROOT_PATH . '/public' . $image['file_path'];
+                    if (file_exists($filePath)) {
+                        if (unlink($filePath)) {
+                            error_log("🗑️ 이미지 파일 삭제: " . $filePath);
+                            $removedCount++;
+                        } else {
+                            error_log("❌ 이미지 파일 삭제 실패: " . $filePath);
+                        }
+                    } else {
+                        error_log("⚠️ 이미지 파일이 존재하지 않음: " . $filePath);
+                    }
+                }
+            }
+            
+            // 첫 번째 이미지가 제거된 경우 image_path 업데이트
+            $firstImageRemoved = in_array(1, $imageIds);
+            if ($firstImageRemoved && count($notice['images']) > 1) {
+                // 남은 이미지 중 첫 번째를 새로운 대표 이미지로 설정
+                $remainingImages = array_filter($notice['images'], function($img) use ($imageIds) {
+                    return !in_array($img['id'], $imageIds);
+                });
+                
+                if (!empty($remainingImages)) {
+                    $firstRemainingImage = reset($remainingImages);
+                    $updateSql = "UPDATE notices SET image_path = ? WHERE id = ?";
+                    $this->db->execute($updateSql, [$firstRemainingImage['file_path'], $noticeId]);
+                } else {
+                    // 모든 이미지가 제거된 경우
+                    $updateSql = "UPDATE notices SET image_path = NULL WHERE id = ?";
+                    $this->db->execute($updateSql, [$noticeId]);
+                }
+            } elseif (count($imageIds) >= count($notice['images'])) {
+                // 모든 이미지가 제거된 경우
+                $updateSql = "UPDATE notices SET image_path = NULL WHERE id = ?";
+                $this->db->execute($updateSql, [$noticeId]);
+            }
+            
+            error_log("✅ 공지사항 $noticeId 이미지 제거 완료: $removedCount 개");
+            return true;
+            
+        } catch (Exception $e) {
+            error_log("❌ 이미지 제거 중 오류: " . $e->getMessage());
+            return false;
+        }
     }
 } 
