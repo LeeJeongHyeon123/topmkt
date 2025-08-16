@@ -62,25 +62,6 @@
 
     <!-- 스크립트 -->
     <script>
-        // 모바일 메뉴 토글
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileToggle = document.getElementById('mobile-menu-toggle');
-            const mobileNav = document.getElementById('main-nav');
-            const overlay = document.getElementById('mobile-menu-overlay');
-
-            if (mobileToggle && mobileNav && overlay) {
-                mobileToggle.addEventListener('click', function() {
-                    mobileNav.classList.toggle('active');
-                    overlay.classList.toggle('active');
-                    document.body.classList.toggle('mobile-menu-open');
-                });
-
-                overlay.addEventListener('click', function() {
-                    mobileNav.classList.remove('active');
-                    overlay.classList.remove('active');
-                    document.body.classList.remove('mobile-menu-open');
-                });
-            }
 
             // 드롭다운 메뉴
             const dropdowns = document.querySelectorAll('.dropdown');
@@ -113,7 +94,6 @@
                     }, 300);
                 }, 5000);
             });
-        });
     </script>
     
     <!-- 레이지 로딩 스크립트 -->

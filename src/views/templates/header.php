@@ -150,8 +150,62 @@
     <?php endif; ?>
 </head>
 <body>
-    <header class="main-header modern-header">
-        <div class="container">
+    <header class="main-header modern-header" style="overflow: visible;">
+        <!-- 🎯 심플하고 깔끔한 모바일 햄버거 메뉴 (로고와 세로 중앙정렬) -->
+        <button class="mobile-hamburger" id="mobile-hamburger" style="
+            position: fixed !important;
+            top: 14px !important;
+            right: 20px !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px !important;
+            height: 44px !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            border-radius: 8px !important;
+            cursor: pointer;
+            padding: 0;
+            gap: 4px;
+            z-index: 999999 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            transition: all 0.2s ease !important;
+            backdrop-filter: blur(20px) !important;
+        ">
+            <span style="
+                display: block !important; 
+                width: 18px !important; 
+                height: 2px !important; 
+                background: #374151 !important; 
+                border-radius: 1px; 
+                transition: all 0.2s ease !important;
+                transform-origin: center;
+                pointer-events: none !important;
+            "></span>
+            <span style="
+                display: block !important; 
+                width: 18px !important; 
+                height: 2px !important; 
+                background: #374151 !important; 
+                border-radius: 1px; 
+                transition: all 0.2s ease !important;
+                transform-origin: center;
+                pointer-events: none !important;
+            "></span>
+            <span style="
+                display: block !important; 
+                width: 18px !important; 
+                height: 2px !important; 
+                background: #374151 !important; 
+                border-radius: 1px; 
+                transition: all 0.2s ease !important;
+                transform-origin: center;
+                pointer-events: none !important;
+            "></span>
+        </button>
+        
+        <div class="container" style="overflow: visible !important; position: relative;">
             <div class="header-content">
                 <!-- 로고 -->
                 <div class="header-left">
@@ -209,51 +263,6 @@
                             <span class="user-name"><?= htmlspecialchars($currentUser['nickname'] ?? '사용자') ?></span>
                             <i class="fas fa-chevron-down"></i>
                             
-                            <div class="user-dropdown">
-                                <div class="dropdown-header">
-                                    <div class="user-info">
-                                        <span class="user-display-name"><?= htmlspecialchars($currentUser['nickname'] ?? '사용자') ?></span>
-                                    </div>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <a href="/profile" class="dropdown-item">
-                                    <i class="fas fa-user"></i>
-                                    <span>프로필</span>
-                                </a>
-                                <a href="/chat" class="dropdown-item">
-                                    <i class="fas fa-envelope"></i>
-                                    <span>채팅</span>
-                                </a>
-                                
-                                <?php 
-                                // 모든 로그인된 사용자에게 신청 관리 메뉴 표시
-                                try {
-                                    $isLoggedIn = AuthMiddleware::isLoggedIn();
-                                    if ($isLoggedIn): ?>
-                                <a href="/registrations" class="dropdown-item">
-                                    <i class="fas fa-clipboard-list"></i>
-                                    <span>신청 관리</span>
-                                </a>
-                                <?php endif;
-                                    
-                                    // 관리자를 위한 관리자 대시보드 메뉴
-                                    $userRole = AuthMiddleware::getUserRole();
-                                    if ($userRole === 'ROLE_ADMIN'): ?>
-                                <a href="/admin" class="dropdown-item">
-                                    <span>⚙️</span>
-                                    <span>관리자</span>
-                                </a>
-                                <?php endif;
-                                } catch (Exception $e) {
-                                    // 권한 확인 실패 시 무시
-                                } ?>
-                                
-                                <div class="dropdown-divider"></div>
-                                <a href="/auth/logout" class="dropdown-item logout-item" onclick="return confirmLogout()">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <span>로그아웃</span>
-                                </a>
-                            </div>
                         </div>
                     <?php else: ?>
                         <!-- 비로그인 사용자 메뉴 -->
@@ -268,18 +277,273 @@
                     <?php endif; ?>
                 </div>
 
-                <!-- 모바일 메뉴 토글 -->
-                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                </button>
+                <!-- 중복 햄버거 버튼 제거됨 - mobile-hamburger만 사용 -->
+                
+                <style>
+                /* 🎯 심플하고 깔끔한 모바일 햄버거 메뉴 스타일 */
+                .mobile-hamburger {
+                    background: rgba(255, 255, 255, 0.95);
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    cursor: pointer;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 44px;
+                    height: 44px;
+                    gap: 4px;
+                    border-radius: 8px;
+                    transition: all 0.2s ease;
+                    backdrop-filter: blur(20px);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                }
+                
+                .mobile-hamburger span {
+                    display: block;
+                    width: 18px;
+                    height: 2px;
+                    background: #374151;
+                    border-radius: 1px;
+                    transition: all 0.2s ease;
+                    transform-origin: center;
+                    pointer-events: none;
+                }
+                
+                /* 호버 효과 */
+                .mobile-hamburger:hover {
+                    background: rgba(255, 255, 255, 1);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    border-color: rgba(0, 0, 0, 0.2);
+                }
+                
+                .mobile-hamburger:hover span {
+                    background: #1f2937;
+                }
+                
+                /* 클릭 효과 */
+                .mobile-hamburger:active {
+                    transform: scale(0.95);
+                    transition: transform 0.1s ease;
+                }
+                
+                /* 메뉴 열렸을 때 X자 변환 애니메이션 */
+                .mobile-hamburger.active span:nth-child(1) {
+                    transform: rotate(45deg) translate(5px, 5px);
+                }
+                
+                .mobile-hamburger.active span:nth-child(2) {
+                    opacity: 0;
+                    transform: scale(0);
+                }
+                
+                .mobile-hamburger.active span:nth-child(3) {
+                    transform: rotate(-45deg) translate(5px, -5px);
+                }
+                
+                /* 기본 상태에서 햄버거 숨김 */
+                .mobile-hamburger {
+                    display: none !important;
+                }
+                
+                @media (max-width: 768px) {
+                    /* 모바일에서 햄버거 표시 - fixed 위치로 최상위 표시 (로고와 중앙정렬) */
+                    .mobile-hamburger {
+                        display: flex !important;
+                        position: fixed !important;
+                        top: 14px !important;
+                        right: 20px !important;
+                        z-index: 999999 !important;
+                    }
+                    
+                    /* 사용자 메뉴 완전 숨김 */
+                    .user-menu {
+                        display: none !important;
+                        visibility: hidden !important;
+                        opacity: 0 !important;
+                        position: absolute !important;
+                        left: -9999px !important;
+                    }
+                    
+                    /* nav-auth 영역도 숨김 */
+                    .nav-auth {
+                        display: none !important;
+                        visibility: hidden !important;
+                        opacity: 0 !important;
+                        width: 0 !important;
+                        height: 0 !important;
+                        overflow: hidden !important;
+                    }
+                    
+                    /* 헤더 레이아웃 조정 */
+                    .header-content {
+                        display: flex !important;
+                        justify-content: space-between !important;
+                        align-items: center !important;
+                    }
+                    
+                    .header-left {
+                        order: 1;
+                    }
+                }
+                
+                /* PC에서 모바일 요소들 완전 숨김 */
+                @media (min-width: 769px) {
+                    .mobile-hamburger {
+                        display: none !important;
+                        visibility: hidden !important;
+                        opacity: 0 !important;
+                        pointer-events: none !important;
+                        position: absolute !important;
+                        left: -99999px !important;
+                        top: -99999px !important;
+                        right: auto !important;
+                        width: 0 !important;
+                        height: 0 !important;
+                        overflow: hidden !important;
+                        z-index: -1 !important;
+                    }
+                    
+                    .mobile-menu-modal {
+                        display: none !important;
+                        visibility: hidden !important;
+                        opacity: 0 !important;
+                        pointer-events: none !important;
+                    }
+                }
+                </style>
+
             </div>
         </div>
 
         <!-- 모바일 메뉴 오버레이 -->
         <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
     </header>
+
+    <!-- 모바일/태블릿 전용 햄버거 메뉴 모달 -->
+    <div class="mobile-menu-modal" id="mobileMenuModal">
+        <div class="mobile-modal-overlay">
+            <!-- 모바일 닫기 버튼 -->
+            <button class="mobile-dropdown-close" id="mobileDropdownClose">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- 모달 콘텐츠 -->
+            <div class="mobile-modal-content">
+                <?php if ($isLoggedIn): ?>
+                <!-- 로그인된 사용자 프로필 헤더 -->
+                <div class="mobile-profile-header">
+                    <div class="profile-image-large">
+                        <?php 
+                        $profileImage = AuthMiddleware::getCurrentUserProfileImage();
+                        $defaultImage = '/assets/images/default-avatar.png';
+                        $imageUrl = $profileImage ? $profileImage : $defaultImage;
+                        ?>
+                        <img src="<?= htmlspecialchars($imageUrl) ?>" alt="프로필" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="avatar-fallback-large">
+                            👤
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="user-display-name"><?= htmlspecialchars($currentUser['nickname'] ?? '사용자') ?></div>
+                        <div class="user-role">
+                            <?php 
+                            $userRole = AuthMiddleware::getCurrentUserRole();
+                            if ($userRole === 'ROLE_ADMIN') {
+                                echo '시스템 관리자';
+                            } elseif ($userRole === 'ROLE_CORPORATE') {
+                                echo '기업 회원';
+                            } else {
+                                echo '일반 회원';
+                            }
+                            ?>
+                        </div>
+                        <div class="user-welcome">안녕하세요! 👋</div>
+                    </div>
+                </div>
+                <?php else: ?>
+                <!-- 비로그인 사용자 헤더 -->
+                <div class="mobile-guest-header">
+                    <div class="guest-icon">👋</div>
+                    <div class="guest-message">탑마케팅에 오신 것을 환영합니다!</div>
+                    <div class="auth-buttons">
+                        <a href="/auth/login" class="mobile-login-btn">로그인</a>
+                        <a href="/auth/signup" class="mobile-signup-btn">회원가입</a>
+                    </div>
+                </div>
+                <?php endif; ?>
+                
+                <!-- 메인 네비게이션 섹션 -->
+                <div class="menu-section">
+                    <div class="section-title">메인 메뉴</div>
+                    <a href="/" class="dropdown-item <?= ($pageSection ?? '') === 'home' ? 'active' : '' ?>">
+                        <i class="fas fa-home"></i>
+                        <span>홈</span>
+                    </a>
+                    <a href="/community" class="dropdown-item <?= ($pageSection ?? '') === 'community' ? 'active' : '' ?>">
+                        <i class="fas fa-comments"></i>
+                        <span>커뮤니티</span>
+                    </a>
+                    <a href="/lectures" class="dropdown-item <?= ($pageSection ?? '') === 'lectures' ? 'active' : '' ?>">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>강의 일정</span>
+                    </a>
+                    <a href="/events" class="dropdown-item <?= ($pageSection ?? '') === 'events' ? 'active' : '' ?>">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>행사 일정</span>
+                    </a>
+                    <a href="/notices" class="dropdown-item <?= ($pageSection ?? '') === 'notices' ? 'active' : '' ?>">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>공지사항</span>
+                    </a>
+                </div>
+                
+                <?php if ($isLoggedIn): ?>
+                <div class="dropdown-divider"></div>
+                
+                <!-- 개인 메뉴 섹션 (로그인 사용자만) -->
+                <div class="menu-section">
+                    <div class="section-title">개인 메뉴</div>
+                    <a href="/profile" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>프로필</span>
+                    </a>
+                    <a href="/chat" class="dropdown-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>채팅</span>
+                    </a>
+                    <a href="/registrations" class="dropdown-item">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>신청 관리</span>
+                    </a>
+                    
+                    <?php 
+                    // 관리자를 위한 관리자 대시보드 메뉴
+                    try {
+                        $userRole = AuthMiddleware::getUserRole();
+                        if ($userRole === 'ROLE_ADMIN'): ?>
+                    <a href="/admin" class="dropdown-item admin-item">
+                        <i class="fas fa-cog"></i>
+                        <span>관리자 대시보드</span>
+                    </a>
+                    <?php endif;
+                    } catch (Exception $e) {
+                        // 권한 확인 실패 시 무시
+                    } ?>
+                </div>
+                
+                <div class="dropdown-divider"></div>
+                
+                <!-- 시스템 메뉴 -->
+                <a href="/auth/logout" class="dropdown-item logout-item" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>로그아웃</span>
+                </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
     
     <main class="main-content">
         <!-- 알림 메시지 -->
@@ -318,14 +582,32 @@
     <!-- 사용자 메뉴 스타일 -->
     <style>
     
-    /* 🚀 헤더 로켓 애니메이션 */
+    /* 🌊 로켓 파동 애니메이션 짤림 완전 방지 */
+    html, body {
+        overflow-x: visible !important;
+    }
+    
+    * {
+        box-sizing: border-box;
+    }
+    
+    .main-header, .container, .header-content, .header-left, .logo, .logo-link, .logo-icon {
+        overflow: visible !important;
+    }
+    
+    /* 🚀 헤더 로켓 애니메이션 - 완전 짤림 방지 */
     .header-rocket {
         display: inline-block;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: center bottom;
+        transform-origin: center center;
         position: relative;
         color: #3b82f6;
         font-size: 1.8rem;
+        padding: 10px; /* 패딩을 크게 늘려서 안전 영역 확보 */
+        margin: -8px; /* 네거티브 마진으로 시각적 위치는 유지 */
+        z-index: 9999 !important;
+        overflow: visible !important;
+        contain: none !important; /* CSS containment 비활성화 */
     }
     
     /* 페이지 로딩 시 로켓 착륙 애니메이션 */
@@ -393,11 +675,12 @@
         }
     }
     
-    /* 로고 링크 호버 시 로켓 특수 효과 */
+    /* 로고 링크 호버 시 로켓 특수 효과 - z-index 최상위 설정 */
     .logo-link {
         position: relative;
         text-decoration: none;
         transition: all 0.3s ease;
+        z-index: 9996 !important; /* 로고 링크에 높은 z-index 적용 */
     }
     
     /* 반짝이는 라인선 제거됨 */
@@ -414,6 +697,7 @@
         transform: translateX(-50%);
         opacity: 0;
         transition: all 0.3s ease;
+        z-index: 9995 !important; /* 파동 애니메이션 z-index 추가 */
     }
     
     .logo-icon::after {
@@ -425,6 +709,7 @@
         opacity: 0;
         font-size: 0.8rem;
         animation: landingSmoke 2.5s ease-out;
+        z-index: 9994 !important; /* 연기 애니메이션 z-index 추가 */
     }
     
     /* 착륙 추진 효과 애니메이션 */
@@ -524,10 +809,10 @@
         animation: landingShockwave 1s ease-out 2.3s;
     }
     
-    /* 호버 시 로켓 엔진 점화! */
+    /* 호버 시 로켓 엔진 점화! - 안전한 범위로 제한 */
     .logo-link:hover .header-rocket {
         animation: headerRocketIgnition 0.8s ease-in-out;
-        transform: translateY(-3px) rotate(-8deg) scale(1.1);
+        transform: translateY(-3px) rotate(-5deg) scale(1.05); /* 회전과 크기를 줄여서 안전하게 */
         color: #1d4ed8;
         filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
     }
@@ -549,24 +834,24 @@
     
     /* 호버 시 반짝이는 효과 제거됨 */
     
-    /* 클릭 시 로켓 발사! */
+    /* 클릭 시 로켓 발사! - 안전한 범위로 제한 */
     .logo-link:active .header-rocket {
         animation: headerRocketLaunch 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        transform: translateY(-8px) rotate(-20deg) scale(1.15);
+        transform: translateY(-5px) rotate(-10deg) scale(1.08); /* 변환 범위를 줄여서 안전하게 */
     }
     
     @keyframes headerRocketLaunch {
         0% {
-            transform: translateY(-3px) rotate(-8deg) scale(1.1);
+            transform: translateY(-3px) rotate(-5deg) scale(1.05);
         }
         40% {
-            transform: translateY(-5px) rotate(-15deg) scale(1.12);
+            transform: translateY(-4px) rotate(-8deg) scale(1.06);
         }
         70% {
-            transform: translateY(-10px) rotate(-18deg) scale(1.18);
+            transform: translateY(-6px) rotate(-10deg) scale(1.08);
         }
         100% {
-            transform: translateY(-8px) rotate(-20deg) scale(1.15);
+            transform: translateY(-5px) rotate(-10deg) scale(1.08);
         }
     }
     
@@ -608,7 +893,7 @@
         text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
     }
     
-    /* 로고 아이콘 컨테이너 */
+    /* 로고 아이콘 컨테이너 - z-index로 로켓 애니메이션 짤림 방지 */
     .logo-icon {
         display: flex;
         align-items: center;
@@ -619,11 +904,14 @@
         background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.05));
         transition: all 0.3s ease;
         margin-right: 12px;
+        margin-left: 0px; /* 로고를 좌측으로 더 붙이기 위해 마진 제거 */
         position: relative;
         overflow: visible;
+        z-index: 9998 !important; /* 로켓보다 약간 낮은 z-index로 설정 */
         opacity: 0;
         animation: logoIconAppear 2.6s ease-out forwards,
                    landingShockwave 1s ease-out 2.3s;
+        contain: none !important; /* CSS containment 비활성화로 애니메이션 짤림 방지 */
     }
     
     @keyframes logoIconAppear {
@@ -664,6 +952,7 @@
             width: 35px;
             height: 35px;
             margin-right: 8px;
+            margin-left: 10px; /* 모바일에서도 좌측 여백 유지 */
         }
         
         .logo-link::after {
@@ -672,17 +961,20 @@
         }
     }
     
-    /* 헤더 레이아웃 개선 */
+    /* 헤더 레이아웃 개선 - 로켓 애니메이션 짤림 방지 */
     .header-content {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 15px 0;
+        padding: 15px 20px 15px 20px; /* 좌측 패딩을 20px로 조정하여 로고를 좌측으로 */
+        overflow: visible; /* 애니메이션이 컨테이너를 벗어나도 표시되도록 */
     }
     
     .header-left {
         flex: 0 0 auto;
+        position: relative;
+        z-index: 9997 !important; /* 로고 영역 전체에 높은 z-index 적용 */
     }
     
     .main-nav {
@@ -804,32 +1096,34 @@
         transform: rotate(180deg);
     }
     
-    /* 드롭다운 메뉴 */
-    .user-dropdown {
-        position: absolute !important;
-        top: calc(100% + 10px) !important;
-        right: 0 !important;
-        min-width: 200px !important;
-        background: white !important;
-        border-radius: 8px !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        transform: translateY(-10px) !important;
-        transition: all 0.3s ease !important;
-        z-index: 1000 !important;
-        border: 1px solid #e5e7eb !important;
-        display: block !important;
-        pointer-events: none !important;
-    }
-    
-    .user-menu.active .user-dropdown {
-        opacity: 0 !important;
-        visibility: hidden !important;
-        transform: translateY(-10px) !important;
-        display: none !important;
-        z-index: 1000 !important;
-        pointer-events: none !important;
+    /* 드롭다운 메뉴 - 데스크톱에서만 적용 */
+    @media (min-width: 769px) {
+        .user-dropdown {
+            position: absolute !important;
+            top: calc(100% + 10px) !important;
+            right: 0 !important;
+            min-width: 200px !important;
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: translateY(-10px) !important;
+            transition: all 0.3s ease !important;
+            z-index: 1000 !important;
+            border: 1px solid #e5e7eb !important;
+            display: block !important;
+            pointer-events: none !important;
+        }
+        
+        .user-menu.active .user-dropdown {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: translateY(-10px) !important;
+            display: none !important;
+            z-index: 1000 !important;
+            pointer-events: none !important;
+        }
     }
     
     .dropdown-header {
@@ -900,21 +1194,24 @@
         flex-shrink: 0;
     }
     
-    /* 반응형 */
+    /* 반응형 - 모바일 헤더 한 줄 유지 */
     @media (max-width: 768px) {
         .header-content {
-            flex-direction: column;
-            gap: 15px;
-            padding: 10px 0;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 12px 0 !important;
+            gap: 0 !important;
         }
         
         .main-nav {
-            margin: 0;
-            order: 2;
+            display: none !important;
         }
         
         .nav-auth {
-            order: 3;
+            flex: 0 0 auto !important;
+            margin-left: auto !important;
         }
         
         .user-name {
@@ -961,173 +1258,244 @@
     // PHP에서 전달된 관리자 정보 디버깅
     console.log('🔍 PHP 관리자 권한 체크 결과:', {
         php_isAdmin: <?= $isAdmin ? 'true' : 'false' ?>,
-        php_currentRole: '<?= $currentRole ?? 'null' ?>',
-        php_currentUserId: <?= $currentUserId ?? 'null' ?>
+        php_currentRole: '<?= $currentRole ?? 'UNKNOWN' ?>',
+        php_currentUserId: <?= $currentUserId ?? 0 ?>
     });
     
     document.addEventListener('DOMContentLoaded', function() {
-        // 사용자 메뉴 드롭다운 토글
-        const userMenu = document.querySelector('.user-menu');
+        // 🚀 New Mobile Hamburger Menu v4.0.0 (단일 버튼)
+        const mobileHamburger = document.getElementById('mobile-hamburger');
+        const mobileMenuModal = document.getElementById('mobileMenuModal');
+        const mobileDropdownClose = document.getElementById('mobileDropdownClose');
         
+        // 화면 크기 감지 함수
+        const isMobile = () => window.innerWidth <= 768;
+        
+        // 햄버거 메뉴 버튼 클릭 이벤트 (애니메이션 포함)
+        function toggleMobileMenu(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (mobileMenuModal && mobileHamburger) {
+                const isActive = mobileMenuModal.classList.contains('active');
+                
+                // 메뉴 모달 토글
+                mobileMenuModal.classList.toggle('active');
+                
+                // 햄버거 아이콘 X자 변환 애니메이션
+                mobileHamburger.classList.toggle('active');
+                
+                // 스크롤 방지
+                if (!isActive) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+        
+        if (mobileHamburger) {
+            mobileHamburger.addEventListener('click', toggleMobileMenu);
+        }
+        
+        // 모바일 닫기 버튼 이벤트
+        if (mobileDropdownClose) {
+            mobileDropdownClose.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMobileMenu();
+            });
+        }
+        
+        // 모바일 오버레이 배경 클릭으로 닫기
+        if (mobileMenuModal) {
+            const overlay = mobileMenuModal.querySelector('.mobile-modal-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+        }
+        
+        // 데스크톱에서는 기존 드롭다운 방식 유지
+        const userMenu = document.querySelector('.user-menu');
         if (userMenu) {
-            // 클릭으로 드롭다운 토글
             userMenu.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // 기존 드롭다운 확인
-                let existingDropdown = document.getElementById('floating-user-dropdown');
-                
-                if (existingDropdown) {
-                    // 드롭다운이 이미 있으면 제거
-                    existingDropdown.remove();
-                    this.classList.remove('active');
-                } else {
-                    // 새 드롭다운 생성
-                    this.classList.add('active');
-                    const rect = this.getBoundingClientRect();
-                    
-                    // 현재 읽지 않은 메시지 수 가져오기
-                    const currentBadge = document.getElementById('chatNotificationBadge');
-                    const unreadCount = currentBadge ? parseInt(currentBadge.textContent) || 0 : 0;
-                    const badgeHtml = unreadCount > 0 ? `<span class="notification-badge dropdown-chat-badge" style="background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto; font-weight: bold; min-width: 16px; text-align: center;">${unreadCount}</span>` : '';
-                    
-                    // 관리자 메뉴 HTML 생성
-                    console.log('관리자 드롭다운 메뉴 체크:', {
-                        isAdmin: isAdmin,
-                        typeof_isAdmin: typeof isAdmin,
-                        will_show_admin_menu: !!isAdmin
-                    });
-                    
-                    const adminMenuHtml = isAdmin ? `
-                        <a href="/admin" class="dropdown-item admin-item">
-                            <span>⚙️</span>
-                            <span>관리자 페이지</span>
-                        </a>
-                        <div class="dropdown-divider"></div>` : '';
-                    
-                    if (isAdmin) {
-                        console.log('✅ 관리자 메뉴가 드롭다운에 추가됩니다.');
-                    } else {
-                        console.log('❌ 관리자 권한이 없어서 관리자 메뉴가 표시되지 않습니다.');
-                    }
-                    
-                    const floatingDropdown = document.createElement('div');
-                    floatingDropdown.id = 'floating-user-dropdown';
-                    floatingDropdown.innerHTML = `
-                        <div class="dropdown-header">
-                            <div class="user-info">
-                                <span class="user-display-name"><?= htmlspecialchars($_SESSION['username'] ?? '사용자') ?></span>
-                            </div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="/profile" class="dropdown-item">
-                            <i class="fas fa-user"></i>
-                            <span>프로필</span>
-                        </a>
-                        <a href="/chat" class="dropdown-item">
-                            <i class="fas fa-envelope"></i>
-                            <span>채팅</span>
-                            ${badgeHtml}
-                        </a>
-                        <a href="/registrations" class="dropdown-item">
-                            <i class="fas fa-clipboard-list"></i>
-                            <span>신청 관리</span>
-                        </a>
-                        ${adminMenuHtml}
-                        <div class="dropdown-divider"></div>
-                        <a href="/auth/logout" class="dropdown-item logout-item" onclick="return confirmLogout()">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>로그아웃</span>
-                        </a>
-                    `;
-                    
-                    floatingDropdown.style.cssText = `
-                        position: fixed !important;
-                        top: ${rect.bottom + 10}px !important;
-                        right: ${window.innerWidth - rect.right}px !important;
-                        width: 200px !important;
-                        background: white !important;
-                        border-radius: 8px !important;
-                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
-                        z-index: 999999 !important;
-                        border: 1px solid #e5e7eb !important;
-                        display: block !important;
-                        opacity: 1 !important;
-                        visibility: visible !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                        font-family: 'Noto Sans KR', sans-serif !important;
-                        color: #374151 !important;
-                    `;
-                    
-                    // 드롭다운 내부 요소들에 대한 스타일 적용
-                    floatingDropdown.querySelectorAll('.dropdown-header').forEach(el => {
-                        el.style.cssText = 'padding: 15px; border-bottom: 1px solid #f3f4f6;';
-                    });
-                    floatingDropdown.querySelectorAll('.user-display-name').forEach(el => {
-                        el.style.cssText = 'display: block; font-weight: 600; color: #1f2937; font-size: 14px;';
-                    });
-
-                    floatingDropdown.querySelectorAll('.dropdown-divider').forEach(el => {
-                        el.style.cssText = 'height: 1px; background: #f3f4f6; margin: 0;';
-                    });
-                    floatingDropdown.querySelectorAll('.dropdown-item').forEach(el => {
-                        el.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: #374151; text-decoration: none; font-size: 14px; transition: background-color 0.2s ease;';
-                        el.addEventListener('mouseenter', () => el.style.backgroundColor = '#f9fafb');
-                        el.addEventListener('mouseleave', () => el.style.backgroundColor = 'transparent');
-                    });
-                    floatingDropdown.querySelectorAll('.logout-item').forEach(el => {
-                        el.style.color = '#dc2626';
-                        el.addEventListener('mouseenter', () => el.style.backgroundColor = '#fef2f2');
-                        el.addEventListener('mouseleave', () => el.style.backgroundColor = 'transparent');
-                    });
-                    
-                    // 관리자 메뉴 아이템 스타일
-                    floatingDropdown.querySelectorAll('.admin-item').forEach(el => {
-                        el.style.color = '#7c3aed';
-                        el.addEventListener('mouseenter', () => el.style.backgroundColor = '#f3f0ff');
-                        el.addEventListener('mouseleave', () => el.style.backgroundColor = 'transparent');
-                        
-                        // 이모지 아이콘 스타일 (첫 번째 span)
-                        const emojiIcon = el.querySelector('span:first-child');
-                        if (emojiIcon) {
-                            emojiIcon.style.fontSize = '16px';
-                            emojiIcon.style.width = '16px';
-                            emojiIcon.style.textAlign = 'center';
-                        }
-                    });
-                    floatingDropdown.querySelectorAll('.notification-badge').forEach(el => {
-                        el.style.cssText = 'background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto; font-weight: bold; min-width: 16px; text-align: center;';
-                    });
-                    
-                    document.body.appendChild(floatingDropdown);
-                }
-                
-            });
-            
-            // 호버 이벤트 제거 - 클릭만 사용
-            
-            // 외부 클릭 시 드롭다운 닫기
-            document.addEventListener('click', function(e) {
-                const existingDropdown = document.getElementById('floating-user-dropdown');
-                if (existingDropdown && !userMenu.contains(e.target) && !existingDropdown.contains(e.target)) {
-                    existingDropdown.remove();
-                    userMenu.classList.remove('active');
+                if (!isMobile()) {
+                    // 데스크톱: 기존 작은 드롭다운 방식 유지
+                    createDesktopDropdown();
                 }
             });
             
             // ESC 키로 드롭다운 닫기
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    const existingDropdown = document.getElementById('floating-user-dropdown');
-                    if (existingDropdown) {
-                        existingDropdown.remove();
-                        userMenu.classList.remove('active');
+                    if (isMobile()) {
+                        closeMobileMenu();
+                    } else {
+                        closeDesktopDropdown();
                     }
                 }
             });
-        } else {
+            
+            // 외부 클릭으로 데스크톱 드롭다운 닫기
+            document.addEventListener('click', function(e) {
+                if (!isMobile()) {
+                    closeDesktopDropdown(e);
+                }
+            });
+            
+            // 화면 크기 변경 시 드롭다운 정리
+            window.addEventListener('resize', function() {
+                if (isMobile()) {
+                    closeDesktopDropdown();
+                } else {
+                    closeMobileMenu();
+                }
+            });
+        }
+        
+        // 모바일 메뉴 닫기 함수
+        function closeMobileMenu() {
+            if (mobileMenuModal) {
+                mobileMenuModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            // 햄버거 아이콘 애니메이션 원복
+            if (mobileHamburger) {
+                mobileHamburger.classList.remove('active');
+            }
+        }
+        
+        // 데스크톱 드롭다운 생성 함수
+        function createDesktopDropdown() {
+            // 기존 드롭다운 확인
+            let existingDropdown = document.getElementById('floating-user-dropdown');
+            
+            if (existingDropdown) {
+                existingDropdown.remove();
+                userMenu.classList.remove('active');
+                return;
+            }
+            
+            userMenu.classList.add('active');
+            const rect = userMenu.getBoundingClientRect();
+            
+            // 현재 읽지 않은 메시지 수 가져오기
+            const currentBadge = document.getElementById('chatNotificationBadge');
+            const unreadCount = currentBadge ? parseInt(currentBadge.textContent) || 0 : 0;
+            const badgeHtml = unreadCount > 0 ? `<span class="notification-badge dropdown-chat-badge">${unreadCount}</span>` : '';
+            
+            // 관리자 메뉴 HTML 생성
+            const adminMenuHtml = isAdmin ? `
+                <a href="/admin" class="dropdown-item admin-item">
+                    <span>⚙️</span>
+                    <span>관리자 페이지</span>
+                </a>
+                <div class="dropdown-divider"></div>` : '';
+            
+            const floatingDropdown = document.createElement('div');
+            floatingDropdown.id = 'floating-user-dropdown';
+            const userNickname = '<?= htmlspecialchars($currentUser['nickname'] ?? '사용자') ?>';
+            floatingDropdown.innerHTML = `
+                <div class="dropdown-header">
+                    <div class="user-info">
+                        <span class="user-display-name">${userNickname}</span>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="/profile" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    <span>프로필</span>
+                </a>
+                <a href="/chat" class="dropdown-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>채팅</span>
+                    ${badgeHtml}
+                </a>
+                <a href="/registrations" class="dropdown-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>신청 관리</span>
+                </a>
+                ${adminMenuHtml}
+                <div class="dropdown-divider"></div>
+                <a href="/auth/logout" class="dropdown-item logout-item" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>로그아웃</span>
+                </a>
+            `;
+            
+            // 데스크톱 드롭다운 스타일
+            floatingDropdown.style.cssText = `
+                position: fixed !important;
+                top: ${rect.bottom + 10}px !important;
+                right: ${window.innerWidth - rect.right}px !important;
+                width: 200px !important;
+                background: white !important;
+                border-radius: 8px !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+                z-index: 999999 !important;
+                border: 1px solid #e5e7eb !important;
+                display: block !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-family: 'Noto Sans KR', sans-serif !important;
+                color: #374151 !important;
+            `;
+            
+            // 데스크톱 드롭다운 스타일 적용
+            applyDesktopDropdownStyles(floatingDropdown);
+            document.body.appendChild(floatingDropdown);
+        }
+        
+        // 데스크톱 드롭다운 닫기 함수
+        function closeDesktopDropdown(e) {
+            const existingDropdown = document.getElementById('floating-user-dropdown');
+            if (existingDropdown) {
+                if (!e || (!userMenu.contains(e.target) && !existingDropdown.contains(e.target))) {
+                    existingDropdown.remove();
+                    userMenu.classList.remove('active');
+                }
+            }
+        }
+        
+        // 데스크톱 드롭다운 스타일 적용 함수
+        function applyDesktopDropdownStyles(dropdown) {
+            dropdown.querySelectorAll('.dropdown-header').forEach(el => {
+                el.style.cssText = 'padding: 15px; border-bottom: 1px solid #f3f4f6;';
+            });
+            dropdown.querySelectorAll('.user-display-name').forEach(el => {
+                el.style.cssText = 'display: block; font-weight: 600; color: #1f2937; font-size: 14px;';
+            });
+            dropdown.querySelectorAll('.dropdown-divider').forEach(el => {
+                el.style.cssText = 'height: 1px; background: #f3f4f6; margin: 0;';
+            });
+            dropdown.querySelectorAll('.dropdown-item').forEach(el => {
+                el.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: #374151; text-decoration: none; font-size: 14px; transition: background-color 0.2s ease;';
+                el.addEventListener('mouseenter', () => el.style.backgroundColor = '#f9fafb');
+                el.addEventListener('mouseleave', () => el.style.backgroundColor = 'transparent');
+            });
+            dropdown.querySelectorAll('.logout-item').forEach(el => {
+                el.style.color = '#dc2626';
+                el.addEventListener('mouseenter', () => el.style.backgroundColor = '#fef2f2');
+                el.addEventListener('mouseleave', () => el.style.backgroundColor = 'transparent');
+            });
+            dropdown.querySelectorAll('.admin-item').forEach(el => {
+                el.style.color = '#7c3aed';
+                el.addEventListener('mouseenter', () => el.style.backgroundColor = '#f3f0ff');
+                el.addEventListener('mouseleave', () => el.style.backgroundColor = 'transparent');
+            });
+            dropdown.querySelectorAll('.notification-badge').forEach(el => {
+                el.style.cssText = 'background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto; font-weight: bold; min-width: 16px; text-align: center;';
+            });
         }
         
         // 로그아웃 확인
