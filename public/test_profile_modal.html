@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필 모달 테스트</title>
+    
+    <style>
+        .profile-image-clickable {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .profile-image-clickable:hover {
+            opacity: 0.8;
+        }
+
+        .profile-image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+        }
+
+        .profile-image-modal .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .profile-image-modal .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .profile-image-modal .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .profile-image-modal .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-image-modal .modal-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .profile-image-modal .modal-body img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-container {
+            padding: 50px;
+            text-align: center;
+        }
+
+        .test-user {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>프로필 이미지 모달 테스트</h1>
+        
+        <div class="test-user">
+            <h3>테스트 사용자 1</h3>
+            <img src="/assets/uploads/default-avatar.png" 
+                 alt="프로필 이미지" 
+                 class="profile-image-clickable"
+                 title="클릭하면 큰 이미지로 볼 수 있습니다"
+                 onclick="profileModal.show('/assets/uploads/default-avatar.png', '테스트 사용자', true)">
+            <p>이미지를 클릭해보세요!</p>
+        </div>
+
+        <div class="test-user">
+            <h3>테스트 사용자 2</h3>
+            <img src="/assets/uploads/default-avatar.png" 
+                 alt="프로필 이미지" 
+                 class="profile-image-clickable"
+                 title="클릭하면 큰 이미지로 볼 수 있습니다"
+                 onclick="profileModal.show('/assets/uploads/default-avatar.png', '테스트 사용자 2', true)">
+            <p>이미지를 클릭해보세요!</p>
+        </div>
+
+        <button onclick="testProfileModal()">프로필 모달 테스트</button>
+        
+        <div id="test-results" style="margin-top: 20px; padding: 20px; background: #f8fafc; border-radius: 8px;">
+            <h3>테스트 결과</h3>
+            <ul id="results-list"></ul>
+        </div>
+    </div>
+
+    <!-- 프로필 이미지 모달 JavaScript -->
+    <script src="/assets/js/profile-modal.js"></script>
+
+    <script>
+        function addResult(message, success = true) {
+            const list = document.getElementById('results-list');
+            const li = document.createElement('li');
+            li.textContent = message;
+            li.style.color = success ? 'green' : 'red';
+            list.appendChild(li);
+        }
+
+        function testProfileModal() {
+            const list = document.getElementById('results-list');
+            list.innerHTML = '';
+            
+            // 1. window.profileModal 존재 확인
+            if (typeof window.profileModal !== 'undefined') {
+                addResult('✅ window.profileModal 존재');
+            } else {
+                addResult('❌ window.profileModal 존재하지 않음', false);
+                return;
+            }
+
+            // 2. show 함수 존재 확인
+            if (typeof window.profileModal.show === 'function') {
+                addResult('✅ profileModal.show 함수 존재');
+            } else {
+                addResult('❌ profileModal.show 함수 존재하지 않음', false);
+                return;
+            }
+
+            // 3. close 함수 존재 확인
+            if (typeof window.profileModal.close === 'function') {
+                addResult('✅ profileModal.close 함수 존재');
+            } else {
+                addResult('❌ profileModal.close 함수 존재하지 않음', false);
+                return;
+            }
+
+            // 4. 모달 HTML 확인
+            const modal = document.getElementById('profileImageModal');
+            if (modal) {
+                addResult('✅ profileImageModal HTML 존재');
+            } else {
+                addResult('❌ profileImageModal HTML 존재하지 않음', false);
+                return;
+            }
+
+            // 5. 모달 기능 테스트
+            try {
+                window.profileModal.show('/assets/uploads/default-avatar.png', '기능 테스트', true);
+                
+                setTimeout(() => {
+                    const isVisible = modal.style.display !== 'none';
+                    if (isVisible) {
+                        addResult('✅ 모달 표시 기능 정상');
+                        
+                        // 모달 닫기 테스트
+                        window.profileModal.close();
+                        setTimeout(() => {
+                            const isClosed = modal.style.display === 'none';
+                            if (isClosed) {
+                                addResult('✅ 모달 닫기 기능 정상');
+                                addResult('🎉 모든 테스트 통과!');
+                            } else {
+                                addResult('❌ 모달 닫기 기능 오류', false);
+                            }
+                        }, 100);
+                    } else {
+                        addResult('❌ 모달 표시 기능 오류', false);
+                    }
+                }, 100);
+            } catch (error) {
+                addResult('❌ 모달 기능 테스트 오류: ' + error.message, false);
+            }
+        }
+
+        // 페이지 로드 완료 시 자동 테스트
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('페이지 로드 완료');
+            setTimeout(testProfileModal, 1000);
+        });
+    </script>
+</body>
+</html>

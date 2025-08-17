@@ -11,6 +11,12 @@
     <title><?= $page_title ?? '관리자 대시보드' ?> - 탑마케팅 관리자</title>
     <meta name="robots" content="noindex, nofollow">
     
+    <!-- 파비콘 - 유저 페이지와 동일 -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20250609">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg?v=20250609">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png?v=20250609">
+    <link rel="shortcut icon" href="/favicon.ico?v=20250609">
+    
     <!-- 기본 CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

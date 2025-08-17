@@ -29,9 +29,12 @@ class Comment {
         $comments = $this->db->fetchAll("
             SELECT c.*, 
                    u.nickname as author_name, 
-                   COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
+                   COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
+                   p_u.nickname as parent_author_name
             FROM comments c
             JOIN users u ON c.user_id = u.id
+            LEFT JOIN comments p_c ON c.parent_id = p_c.id
+            LEFT JOIN users p_u ON p_c.user_id = p_u.id
             WHERE c.post_id = ? AND c.status = 'active'
             ORDER BY c.created_at DESC
             LIMIT ? OFFSET ?
@@ -56,9 +59,12 @@ class Comment {
         $sql = "
             SELECT c.*, 
                    u.nickname as author_name, 
-                   COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
+                   COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
+                   p_u.nickname as parent_author_name
             FROM comments c
             JOIN users u ON c.user_id = u.id
+            LEFT JOIN comments p_c ON c.parent_id = p_c.id
+            LEFT JOIN users p_u ON p_c.user_id = p_u.id
             WHERE c.post_id = ? AND c.status = 'active'
             ORDER BY c.created_at DESC
         ";

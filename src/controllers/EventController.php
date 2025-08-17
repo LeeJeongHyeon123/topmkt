@@ -50,7 +50,10 @@ class EventController extends LectureController {
             // 현재 월/년도 파라미터 처리
             $year = $_GET['year'] ?? date('Y');
             $month = $_GET['month'] ?? date('m');
-            $view = $_GET['view'] ?? 'calendar'; // calendar, list
+            
+            // 디바이스 감지 및 기본 뷰 설정 (공통 시스템 사용)
+            require_once SRC_PATH . '/helpers/DeviceHelper.php';
+            $view = DeviceHelper::getDefaultView($_GET['view'] ?? null);
             
             // 유효성 검사
             $year = intval($year);
@@ -2757,4 +2760,5 @@ class EventController extends LectureController {
             throw $e;
         }
     }
+    
 }

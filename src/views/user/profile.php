@@ -587,38 +587,43 @@ if (!empty($user['last_login'])) {
     box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
-/* 반응형 */
+/* 📱 모바일 반응형 최적화 (v3.11.7) */
+/* 세련된 접근성: 44px 터치 타겟 + 현대적 UI */
 @media (max-width: 768px) {
     .connection-item {
-        padding: 12px;
+        padding: 14px; /* 개선: 12px -> 14px (터치 영역 확대) */
         gap: 12px;
+        min-height: 44px; /* 개선: 터치 타겟 보장 */
+        box-sizing: border-box;
     }
     
     .connection-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
+        width: 44px; /* 개선: 40px -> 44px (터치 타겟) */
+        height: 44px; /* 개선: 40px -> 44px */
+        font-size: 16px; /* 개선: 18px -> 16px (세련된 아이콘) */
     }
     
     .social-connection-item {
-        padding: 12px;
+        padding: 14px; /* 개선: 터치 영역 확대 */
         gap: 12px;
+        min-height: 44px; /* 개선: 터치 타겟 보장 */
+        box-sizing: border-box;
     }
     
     .social-connection-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
+        width: 44px; /* 개선: 40px -> 44px (터치 타겟) */
+        height: 44px; /* 개선: 40px -> 44px */
+        font-size: 16px; /* 개선: 18px -> 16px (세련된 아이콘) */
     }
     
     .empty-social-content {
-        padding: 30px 15px;
+        padding: 25px 15px; /* 개선: 30px -> 25px (컴팩트) */
     }
     
     .empty-social-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
+        width: 56px; /* 개선: 60px -> 56px (세련되게) */
+        height: 56px; /* 개선: 60px -> 56px */
+        font-size: 22px; /* 개선: 24px -> 22px */
     }
 }
 
@@ -713,35 +718,37 @@ if (!empty($user['last_login'])) {
     opacity: 0.7;
 }
 
-/* 반응형 디자인 */
+/* 📱 모바일 반응형 메인 서비스 */
 @media (max-width: 768px) {
     .profile-container {
-        padding: 15px;
+        padding: 12px; /* 개선: 15px -> 12px (컴팩트) */
     }
     
     .profile-header-section {
-        padding: 25px 20px;
-        margin-bottom: 20px;
+        padding: 20px 16px; /* 개선: 25px 20px -> 20px 16px */
+        margin-bottom: 18px; /* 개선: 20px -> 18px */
     }
     
     .profile-main-info {
         flex-direction: column;
         text-align: center;
-        gap: 20px;
+        gap: 18px; /* 개선: 20px -> 18px */
     }
     
     .profile-name {
-        font-size: 2rem;
+        font-size: 1.8rem; /* 개선: 2rem -> 1.8rem (세련된 헤더)
     }
     
     .profile-meta {
         justify-content: center;
         flex-wrap: wrap;
+        font-size: 14px; /* 개선: 메타 정보 세련되게 */
+        gap: 8px; /* 개선: 요소 간 간격 */
     }
     
     .profile-content {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 16px; /* 개선: 20px -> 16px */
     }
     
     .profile-sidebar {
@@ -754,35 +761,123 @@ if (!empty($user['last_login'])) {
     }
     
     .stat-item {
-        padding: 8px 4px;
+        padding: 12px 8px; /* 개선: 8px 4px -> 12px 8px (터치 영역) */
+        min-height: 44px; /* 개선: 터치 타겟 보장 */
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .stat-value {
-        font-size: 1.2rem;
+        font-size: 1.1rem; /* 개선: 1.2rem -> 1.1rem (세련되게) */
+    }
+    
+    .stat-label {
+        font-size: 14px; /* 개선: 12.8px -> 14px (접근성) */
     }
     
     .social-links {
         justify-content: center;
+        gap: 8px; /* 개선: 소셜 링크 간격 */
+    }
+    
+    /* 버튼 텍스트 줄바꿈 방지 */
+    .btn {
+        white-space: nowrap; /* 개선: 버튼 텍스트 줄바꿈 방지 */
+        min-height: 44px; /* 개선: 터치 타겟 보장 */
+        padding: 10px 16px; /* 개선: 적절한 패딩 */
+        box-sizing: border-box;
+        font-size: 14px; /* 개선: 세련된 버튼 크기 */
+    }
+    
+    /* 프로필 액션 버튼들 */
+    .profile-actions {
+        display: flex;
+        gap: 8px; /* 개선: 버튼 간 간격 */
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .profile-actions .btn {
+        font-size: 13px; /* 개선: 모바일에서 컴팩트 */
+        padding: 10px 14px;
     }
 }
 
+/* 소형 모바일 최적화 (480px 이하) */
 @media (max-width: 480px) {
+    .profile-container {
+        padding: 8px; /* 개선: 소형 화면 컴팩트 */
+    }
+    
+    .profile-header-section {
+        padding: 16px 12px; /* 개선: 컴팩트 헤더 */
+        margin-bottom: 15px;
+    }
+    
+    .profile-name {
+        font-size: 1.6rem; /* 개선: 1.8rem -> 1.6rem */
+    }
+    
     .profile-image,
     .profile-image-fallback {
-        width: 100px;
-        height: 100px;
+        width: 96px; /* 개선: 100px -> 96px (세련되게) */
+        height: 96px; /* 개선: 100px -> 96px */
     }
     
     .profile-image-fallback {
-        font-size: 2.5rem;
+        font-size: 2.2rem; /* 개선: 2.5rem -> 2.2rem */
+    }
+    
+    .profile-meta {
+        font-size: 13px; /* 개선: 소형 화면 메타 정보 */
+        gap: 6px;
     }
     
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 6px; /* 개선: 8px -> 6px */
+    }
+    
+    .stat-item {
+        padding: 10px 6px; /* 개선: 소형 화면 컴팩트 */
+        min-height: 44px;
+    }
+    
+    .stat-value {
+        font-size: 1rem; /* 개선: 1.1rem -> 1rem */
+    }
+    
+    .stat-label {
+        font-size: 13px; /* 개선: 소형 화면 최적화 */
     }
     
     .profile-card {
-        padding: 20px 15px;
+        padding: 16px 12px; /* 개선: 20px 15px -> 16px 12px */
+    }
+    
+    .profile-actions {
+        gap: 6px; /* 개선: 소형 화면 간격 */
+    }
+    
+    .profile-actions .btn {
+        font-size: 12px; /* 개선: 소형 화면 버튼 */
+        padding: 8px 12px;
+        min-height: 44px; /* 터치 타겟 유지 */
+    }
+    
+    /* 소셜 링크 최적화 */
+    .social-connection-icon {
+        width: 40px; /* 개선: 소형 화면에서 컴팩트 */
+        height: 40px;
+        font-size: 14px;
+    }
+    
+    .connection-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
     }
 }
 </style>

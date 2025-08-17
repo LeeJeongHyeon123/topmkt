@@ -184,53 +184,15 @@ class NoticeController {
             $commentModel = new NoticeComment();
             $comments = $commentModel->getAllByNoticeId($noticeId);
             
-            // 이미지 데이터 처리 - 뷰에서 images 배열을 기대하므로 변환
-            if (!empty($notice['image_path'])) {
-                // 현재는 단일 이미지만 저장되므로 배열로 변환
-                $notice['images'] = [
-                    [
-                        'id' => 1, // 임시 ID
-                        'file_path' => $notice['image_path'],
-                        'filename' => basename($notice['image_path'])
-                    ]
-                ];
-                
-                // 같은 시간대에 업로드된 다른 이미지들도 찾아서 추가
-                $uploadTime = '';
-                if (preg_match('/(\d{14})_[a-f0-9]+\.jpg$/', $notice['image_path'], $matches)) {
-                    $uploadTime = $matches[1];
-                    $uploadDir = dirname($_SERVER['DOCUMENT_ROOT'] . $notice['image_path']);
-                    
-                    // 같은 시간대 이미지 파일들 검색 (±1초 범위로 확장)
-                    if (is_dir($uploadDir)) {
-                        $timeBase = substr($uploadTime, 0, 12); // 분까지만 (YYYYMMDDHHMM)
-                        $files = glob($uploadDir . '/' . $timeBase . '*_*.jpg');
-                        $imageId = 2;
-                        
-                        foreach ($files as $file) {
-                            $fileName = basename($file);
-                            $filePath = str_replace($_SERVER['DOCUMENT_ROOT'], '', $file);
-                            
-                            // 이미 추가된 이미지는 제외
-                            if ($filePath !== $notice['image_path']) {
-                                $notice['images'][] = [
-                                    'id' => $imageId++,
-                                    'file_path' => $filePath,
-                                    'filename' => $fileName
-                                ];
-                            }
-                        }
-                    }
-                }
-            } else {
-                $notice['images'] = [];
-            }
+            // 🚀 Ultra Think v3.10.0: Notice 모델의 getNoticeImages 결과 사용
+            // Notice 모델에서 이미 포괄적인 이미지 검색을 완료했으므로 별도 처리 불필요
+            // images 배열은 Notice::getById()에서 이미 설정됨
             
-            // 본문 내용의 빈 img 태그들을 실제 이미지로 교체
+            // 🚀 Ultra Think v3.13.0: 본문 내용의 빈 img 태그 처리 개선
+            $content = $notice['content'];
+            
             if (!empty($notice['images'])) {
-                $content = $notice['content'];
-                
-                // 빈 img 태그들을 찾아서 실제 이미지로 교체
+                // 이미지가 있는 경우: 빈 img 태그들을 실제 이미지로 교체
                 $imageIndex = 0;
                 $content = preg_replace_callback('/<img[^>]*>/i', function($matches) use ($notice, &$imageIndex) {
                     if ($imageIndex < count($notice['images'])) {
@@ -240,9 +202,23 @@ class NoticeController {
                     }
                     return $matches[0]; // 원본 유지
                 }, $content);
-                
-                $notice['content'] = $content;
+            } else {
+                // 이미지가 없는 경우: 빈 img 태그를 적절한 메시지로 교체
+                $content = preg_replace_callback('/<img[^>]*>/i', function($matches) {
+                    // src 속성이 있는 이미지는 그대로 유지
+                    if (preg_match('/src\s*=\s*["\'][^"\']+["\']/', $matches[0])) {
+                        return $matches[0];
+                    }
+                    
+                    // 빈 img 태그는 업로드 실패 안내로 교체
+                    return '<div class="missing-image-notice" style="padding: 15px; margin: 10px 0; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; text-align: center; color: #92400e;">' .
+                           '<i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>' .
+                           '이미지 업로드 중 오류가 발생했습니다. 다시 시도해 주세요.' .
+                           '</div>';
+                }, $content);
             }
+            
+            $notice['content'] = $content;
             
             error_log("✅ 공지사항 상세 조회 완료: {$notice['title']} (작성자: {$notice['company_name']}) - 댓글 " . count($comments) . "개, 이미지 " . count($notice['images']) . "개");
             
@@ -330,6 +306,10 @@ class NoticeController {
                 'canWrite' => true
             ];
             
+            // 🚀 Ultra Think: write.php에서 필요한 변수들 설정
+            $action = 'write'; // 작성 모드
+            $notice = null; // 새 공지사항이므로 기존 데이터 없음
+            
             // 뷰 변수 추출
             extract($data);
             extract($data['user']);
@@ -389,12 +369,28 @@ class NoticeController {
             
             error_log("✅ 공지사항 수정 권한 확인 완료: {$notice['title']}");
             
-            // 뷰 변수 설정
-            $data = [
-                'notice' => $notice,
-                'user' => [
-                    'currentUserId' => $currentUserId
-                ]
+            // 🚀 Ultra Think: 본문 내용의 빈 img 태그들을 실제 이미지로 교체 (편집용)
+            if (!empty($notice['images'])) {
+                $content = $notice['content'];
+                
+                // 빈 img 태그들을 찾아서 실제 이미지로 교체
+                $imageIndex = 0;
+                $content = preg_replace_callback('/<img[^>]*>/i', function($matches) use ($notice, &$imageIndex) {
+                    if ($imageIndex < count($notice['images'])) {
+                        $image = $notice['images'][$imageIndex];
+                        $imageIndex++;
+                        return '<img src="' . htmlspecialchars($image['file_path']) . '" alt="' . htmlspecialchars($image['filename']) . '" class="content-image" loading="lazy">';
+                    }
+                    return $matches[0]; // 원본 유지
+                }, $content);
+                
+                $notice['content'] = $content;
+                error_log("📝 공지사항 수정 페이지: 본문 이미지 교체 완료 (" . count($notice['images']) . "개)");
+            }
+            
+            // 뷰에서 사용할 변수 직접 설정
+            $user = [
+                'currentUserId' => $currentUserId
             ];
             
             // 헤더와 뷰 렌더링
@@ -473,7 +469,7 @@ class NoticeController {
             $title = trim($input['title'] ?? '');
             $content = trim($input['content'] ?? '');
             $imagePaths = $input['image_paths'] ?? [];
-            $isFeatured = isset($input['is_featured']) ? (bool)$input['is_featured'] : false;
+            $isFeatured = false;
             
             // 이미지 경로 배열을 처리 (현재는 첫 번째 이미지만 사용, 추후 다중 이미지 지원 가능)
             $imagePath = null;
@@ -553,61 +549,101 @@ class NoticeController {
      * 공지사항 수정 처리 (API)
      */
     public function update($id) {
+        error_log("✏️ NoticeController::update({$id}) 호출");
+        
         try {
+            file_put_contents('/tmp/notice_debug.log', "🚀 NoticeController::update($id) 시작\n", FILE_APPEND);
+            
             // 로그인 확인
-            if (!AuthMiddleware::isLoggedIn()) {
+            $isLoggedIn = AuthMiddleware::isLoggedIn();
+            file_put_contents('/tmp/notice_debug.log', "로그인 상태: " . ($isLoggedIn ? 'OK' : 'NO') . "\n", FILE_APPEND);
+            
+            if (!$isLoggedIn) {
+                file_put_contents('/tmp/notice_debug.log', "❌ 로그인 안됨으로 종료\n", FILE_APPEND);
                 http_response_code(401);
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.'], JSON_UNESCAPED_UNICODE);
-                exit;
                 return;
             }
             
             $currentUserId = AuthMiddleware::getCurrentUserId();
             $noticeId = intval($id);
+            file_put_contents('/tmp/notice_debug.log', "사용자 ID: $currentUserId, 공지사항 ID: $noticeId\n", FILE_APPEND);
             
             // 소유자 권한 확인
-            if (!$this->noticeModel->isOwner($noticeId, $currentUserId)) {
-                ResponseHelper::json(['success' => false, 'message' => '수정 권한이 없습니다.'], 403);
-                return;
-            }
+            $isOwner = $this->noticeModel->isOwner($noticeId, $currentUserId);
+            file_put_contents('/tmp/notice_debug.log', "권한 확인: 공지사항 ID $noticeId, 사용자 ID $currentUserId, 권한: " . ($isOwner ? 'OK' : 'NO') . "\n", FILE_APPEND);
             
-            // CSRF 토큰 검증
-            $csrfToken = $_POST['csrf_token'] ?? $_REQUEST['csrf_token'] ?? '';
-            if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrfToken)) {
+            if (!$isOwner) {
+                file_put_contents('/tmp/notice_debug.log', "❌ 권한 없음으로 종료\n", FILE_APPEND);
                 http_response_code(403);
                 header('Content-Type: application/json; charset=utf-8');
-                echo json_encode(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], JSON_UNESCAPED_UNICODE);
+                echo json_encode(['success' => false, 'message' => '수정 권한이 없습니다.'], JSON_UNESCAPED_UNICODE);
                 exit;
                 return;
             }
             
-            // JSON 입력 데이터 읽기
-            $input = json_decode(file_get_contents('php://input'), true);
-            if (!$input) {
-                http_response_code(400);
-                header('Content-Type: application/json; charset=utf-8');
-                echo json_encode(['success' => false, 'message' => '잘못된 요청 형식입니다.'], JSON_UNESCAPED_UNICODE);
-                exit;
-                return;
+            // 메서드 오버라이드 지원 (_method 필드 확인)
+            $actualMethod = $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
+            file_put_contents('/tmp/notice_debug.log', "실제 메서드: $actualMethod (원본: {$_SERVER['REQUEST_METHOD']})\n", FILE_APPEND);
+            
+            // FormData와 JSON 모두 지원
+            $isFormData = !empty($_POST) || !empty($_FILES);
+            
+            if ($isFormData) {
+                // FormData 처리 (편집 페이지에서 파일 업로드 포함)
+                $title = trim($_POST['title'] ?? '');
+                $content = trim($_POST['content'] ?? '');
+                $removedImages = json_decode($_POST['removed_images'] ?? '[]', true);
+                $isFeatured = false;
+                
+                error_log("📝 FormData 수정 요청 상세:");
+                error_log("   - 제목: '$title' (길이: " . mb_strlen($title) . ")");
+                error_log("   - 내용: '" . substr($content, 0, 100) . "...' (길이: " . mb_strlen($content) . ")");
+                error_log("   - 상태: 일반 공지");
+                error_log("   - 제거된 이미지: " . count($removedImages) . "개");
+                
+            } else {
+                // JSON 처리 (기존 API 호환)
+                $input = json_decode(file_get_contents('php://input'), true);
+                if (!$input) {
+                    http_response_code(400);
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(['success' => false, 'message' => '잘못된 요청 형식입니다.'], JSON_UNESCAPED_UNICODE);
+                    return;
+                }
+                
+                $title = trim($input['title'] ?? '');
+                $content = trim($input['content'] ?? '');
+                $imagePaths = $input['image_paths'] ?? [];
+                $removedImages = [];
+                $isFeatured = false;
+                
+                error_log("📝 JSON 수정 요청: 제목='$title'");
             }
             
-            // 입력 데이터 검증
-            $title = trim($input['title'] ?? '');
-            $content = trim($input['content'] ?? '');
-            $imagePaths = $input['image_paths'] ?? [];
-            $isFeatured = isset($input['is_featured']) ? (bool)$input['is_featured'] : false;
+            // HTML 태그 제거한 순수 텍스트 내용으로 검증
+            $contentText = strip_tags($content);
+            $contentText = trim(preg_replace('/\s+/', ' ', $contentText)); // 공백 정리
             
-            // 이미지 경로 배열을 처리 (현재는 첫 번째 이미지만 사용, 추후 다중 이미지 지원 가능)
-            $imagePath = null;
-            if (!empty($imagePaths) && is_array($imagePaths)) {
-                $imagePath = $imagePaths[0] ?? null;
-            }
+            // 디버깅용 로그 파일에 직접 작성
+            $logData = [
+                'time' => date('Y-m-d H:i:s'),
+                'title' => $title,
+                'title_length' => mb_strlen($title),
+                'content_original' => substr($content, 0, 200),
+                'content_text' => substr($contentText, 0, 100),
+                'content_text_length' => mb_strlen($contentText),
+                'is_featured' => 'false'
+            ];
+            file_put_contents('/tmp/notice_debug.log', json_encode($logData, JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND);
             
-            if (empty($title) || empty($content)) {
+            if (empty($title) || empty($contentText)) {
+                $errorMsg = empty($title) ? '제목을 입력해주세요.' : '내용을 입력해주세요.';
+                file_put_contents('/tmp/notice_debug.log', "❌ 검증 실패: $errorMsg\n", FILE_APPEND);
                 http_response_code(400);
                 header('Content-Type: application/json; charset=utf-8');
-                echo json_encode(['success' => false, 'message' => '제목과 내용을 모두 입력해주세요.'], JSON_UNESCAPED_UNICODE);
+                echo json_encode(['success' => false, 'message' => $errorMsg], JSON_UNESCAPED_UNICODE);
                 exit;
                 return;
             }
@@ -624,6 +660,60 @@ class NoticeController {
             // 내용 정리 (HTML 정리)
             $content = HtmlSanitizerHelper::sanitizeRichText($content);
             
+            // 이미지 처리
+            $imagePath = null;
+            $uploadedImages = [];
+            
+            if ($isFormData) {
+                // 기존 공지사항 조회하여 현재 이미지 확인
+                $currentNotice = $this->noticeModel->getById($noticeId);
+                $imagePath = $currentNotice['image_path'] ?? null;
+                
+                // 새 이미지 파일 업로드 처리 (공통 타임스탬프 사용)
+                if (!empty($_FILES['new_images']['name'][0])) {
+                    error_log("📤 새 이미지 업로드 시작: " . count($_FILES['new_images']['name']) . "개");
+                    
+                    // 모든 새 이미지에 사용할 공통 타임스탬프 생성
+                    $commonTimestamp = date('YmdHis');
+                    error_log("🕒 새 이미지용 공통 타임스탬프: {$commonTimestamp}");
+                    
+                    for ($i = 0; $i < count($_FILES['new_images']['name']); $i++) {
+                        if ($_FILES['new_images']['error'][$i] === UPLOAD_ERR_OK) {
+                            $uploadedFile = $this->handleImageUpload([
+                                'name' => $_FILES['new_images']['name'][$i],
+                                'type' => $_FILES['new_images']['type'][$i],
+                                'tmp_name' => $_FILES['new_images']['tmp_name'][$i],
+                                'error' => $_FILES['new_images']['error'][$i],
+                                'size' => $_FILES['new_images']['size'][$i]
+                            ], $commonTimestamp, $currentNotice);
+                            
+                            if ($uploadedFile) {
+                                $uploadedImages[] = $uploadedFile;
+                                // 첫 번째 업로드된 이미지를 메인 이미지로 설정
+                                if (!$imagePath) {
+                                    $imagePath = $uploadedFile;
+                                }
+                                error_log("✅ 새 이미지 업로드 완료: {$uploadedFile}");
+                            }
+                        }
+                    }
+                    
+                    error_log("📋 전체 업로드 완료: " . count($uploadedImages) . "개 이미지, 메인 이미지: " . ($imagePath ?: '없음'));
+                }
+                
+                // 기존 이미지 제거 처리 (실제 파일 및 DB 삭제)
+                if (!empty($removedImages)) {
+                    error_log("🗑️ 기존 이미지 제거 시작: " . implode(', ', $removedImages));
+                    $this->noticeModel->removeImages($noticeId, $removedImages);
+                }
+                
+            } else {
+                // JSON 처리 (기존 방식)
+                if (!empty($imagePaths) && is_array($imagePaths)) {
+                    $imagePath = $imagePaths[0] ?? null;
+                }
+            }
+            
             // 공지사항 수정
             $noticeData = [
                 'title' => $title,
@@ -635,12 +725,18 @@ class NoticeController {
             $success = $this->noticeModel->update($noticeId, $noticeData);
             
             if ($success) {
-                WebLogger::info("✅ 공지사항 수정 성공: ID $noticeId, 제목: '$title'");
-                ResponseHelper::json([
+                error_log("✅ 공지사항 수정 성공: ID $noticeId, 제목: '$title', 이미지: " . ($imagePath ?: '없음'));
+                
+                // JavaScript와 호환되는 직접 JSON 응답
+                http_response_code(200);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
                     'success' => true,
                     'message' => '공지사항이 성공적으로 수정되었습니다.',
+                    'notice_id' => $noticeId,
                     'redirect' => '/notices/' . $noticeId
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
             } else {
                 throw new Exception('공지사항 수정에 실패했습니다.');
             }
@@ -748,6 +844,81 @@ class NoticeController {
         } catch (Exception $e) {
             error_log("❌ 공지사항 조회수 증가 중 오류: " . $e->getMessage());
             ResponseHelper::json(['success' => false, 'message' => '조회수 처리 중 오류가 발생했습니다.'], 500);
+        }
+    }
+    
+    /**
+     * 단일 이미지 파일 업로드 처리 (기존 이미지와 동일한 디렉토리 구조 사용)
+     */
+    private function handleImageUpload($file, $baseTimestamp = null, $existingNotice = null) {
+        require_once SRC_PATH . '/config/upload.php';
+        
+        try {
+            // 파일 검증
+            if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+                error_log("❌ 파일 업로드 오류: " . ($file['error'] ?? 'UNKNOWN'));
+                return null;
+            }
+            
+            // 파일 크기 검증
+            $validation = UploadConfig::validateImageFile($file);
+            if (!$validation['success']) {
+                error_log("❌ 파일 검증 실패: " . $validation['message']);
+                return null;
+            }
+            
+            // 기존 공지사항의 이미지 경로에서 디렉토리 구조 추출
+            $yearMonthPath = '';
+            if ($existingNotice && !empty($existingNotice['image_path'])) {
+                // 기존 이미지 경로에서 연도/월 추출 (예: /assets/uploads/notices/2025/08/filename.jpg)
+                $pathInfo = pathinfo($existingNotice['image_path']);
+                $dirPath = $pathInfo['dirname'];
+                if (preg_match('/notices\/(\d{4}\/\d{2})$/', $dirPath, $matches)) {
+                    $yearMonthPath = $matches[1] . '/';
+                }
+            }
+            
+            // 연도/월 경로가 없으면 현재 날짜로 생성
+            if (empty($yearMonthPath)) {
+                $yearMonthPath = date('Y/m') . '/';
+            }
+            
+            // 업로드 디렉토리 설정 (연도/월 서브디렉토리 포함)
+            $uploadDir = '/var/www/html/topmkt/public/assets/uploads/notices/' . $yearMonthPath;
+            $webPath = '/assets/uploads/notices/' . $yearMonthPath;
+            
+            // 업로드 디렉토리 생성
+            if (!is_dir($uploadDir)) {
+                if (!mkdir($uploadDir, 0755, true)) {
+                    error_log("❌ 업로드 디렉토리 생성 실패: $uploadDir");
+                    return null;
+                }
+            }
+            
+            // 파일명 생성 (공통 타임스탬프 사용 + 랜덤해시)
+            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $timestamp = $baseTimestamp ?: date('YmdHis');
+            $randomHash = bin2hex(random_bytes(8));
+            $filename = $timestamp . '_' . $randomHash . '.' . $extension;
+            
+            $uploadPath = $uploadDir . $filename;
+            $webFilePath = $webPath . $filename;
+            
+            // 파일 이동
+            if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+                // 파일 권한 설정
+                chmod($uploadPath, 0644);
+                
+                error_log("✅ 이미지 업로드 성공: " . $webFilePath);
+                return $webFilePath;
+            } else {
+                error_log("❌ 파일 이동 실패: " . $uploadPath);
+                return null;
+            }
+            
+        } catch (Exception $e) {
+            error_log("❌ 이미지 업로드 중 오류: " . $e->getMessage());
+            return null;
         }
     }
 } 

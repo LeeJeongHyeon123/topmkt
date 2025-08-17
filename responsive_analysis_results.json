@@ -1,0 +1,1128 @@
+{
+  "timestamp": "2025-08-17T06:53:10.021Z",
+  "summary": {
+    "totalPages": 13,
+    "totalTests": 26,
+    "criticalIssues": 7,
+    "warningIssues": 1,
+    "goodPages": 12
+  },
+  "results": [
+    {
+      "page": "홈페이지",
+      "url": "/",
+      "viewport": "모바일",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/?analysis_test=1755413573591",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "17개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "13개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 3478
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "홈페이지",
+      "url": "/",
+      "viewport": "태블릿",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/?analysis_test=1755413573516",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 3290
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "커뮤니티",
+      "url": "/community",
+      "viewport": "모바일",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/community?analysis_test=1755413573527",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "103개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "16개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 5511
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "커뮤니티",
+      "url": "/community",
+      "viewport": "태블릿",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/community?analysis_test=1755413573557",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 4894
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "강의일정",
+      "url": "/lectures",
+      "viewport": "모바일",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/lectures?analysis_test=1755413576436&view=list",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "29개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "14개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 1336
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "강의일정",
+      "url": "/lectures",
+      "viewport": "태블릿",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/lectures?analysis_test=1755413573562",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [
+          {
+            "type": "element_overflow",
+            "severity": "medium",
+            "message": "35개 요소가 화면 밖으로 벗어남"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 2064
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 1,
+      "severity": "warning"
+    },
+    {
+      "page": "행사일정",
+      "url": "/events",
+      "viewport": "모바일",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/events?analysis_test=1755413573982&view=list",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "20개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "13개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 1180
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "행사일정",
+      "url": "/events",
+      "viewport": "태블릿",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/events?analysis_test=1755413573603",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 1384
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "공지사항",
+      "url": "/notices",
+      "viewport": "모바일",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/notices?analysis_test=1755413576311",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "element_overflow",
+            "severity": "medium",
+            "message": "25개 요소가 화면 밖으로 벗어남"
+          },
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "56개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "11개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 4030
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 3,
+      "severity": "critical"
+    },
+    {
+      "page": "공지사항",
+      "url": "/notices",
+      "viewport": "태블릿",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/notices?analysis_test=1755413575239",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 3876
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "채팅",
+      "url": "/chat",
+      "viewport": "모바일",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/chat?analysis_test=1755413573591",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "25개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "9개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 1129
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/___모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "채팅",
+      "url": "/chat",
+      "viewport": "태블릿",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/chat?analysis_test=1755413573563",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 1293
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/___태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "내프로필",
+      "url": "/profile",
+      "viewport": "모바일",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/profile?analysis_test=1755413573553",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "70개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "19개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 4017
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "내프로필",
+      "url": "/profile",
+      "viewport": "태블릿",
+      "critical": true,
+      "analysis": {
+        "url": "https://www.topmktx.com/profile?analysis_test=1755413576408",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 3774
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "프로필편집",
+      "url": "/profile/edit",
+      "viewport": "모바일",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/profile/edit?analysis_test=1755413574292",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "22개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "18개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 3669
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/______모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "프로필편집",
+      "url": "/profile/edit",
+      "viewport": "태블릿",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/profile/edit?analysis_test=1755413575235",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 3396
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/______태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "기업회원정보",
+      "url": "/corp/info",
+      "viewport": "모바일",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/corp/info?analysis_test=1755413577466",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "15개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "9개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 3820
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_______모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "기업회원정보",
+      "url": "/corp/info",
+      "viewport": "태블릿",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/corp/info?analysis_test=1755413577464",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 3387
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_______태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "로그인",
+      "url": "/auth/login",
+      "viewport": "모바일",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/auth/login?analysis_test=1755413577420",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "17개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "12개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 1872
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "로그인",
+      "url": "/auth/login",
+      "viewport": "태블릿",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/auth/login?analysis_test=1755413576359",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 1753
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "회원가입",
+      "url": "/auth/signup",
+      "viewport": "모바일",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/auth/signup?analysis_test=1755413577457",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "24개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "16개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 2561
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "회원가입",
+      "url": "/auth/signup",
+      "viewport": "태블릿",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/auth/signup?analysis_test=1755413577468",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 2365
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "이용약관",
+      "url": "/terms",
+      "viewport": "모바일",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/terms?analysis_test=1755413577467",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "17개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "9개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 9625
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "이용약관",
+      "url": "/terms",
+      "viewport": "태블릿",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/terms?analysis_test=1755413577469",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 6369
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_____태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    },
+    {
+      "page": "개인정보처리방침",
+      "url": "/privacy",
+      "viewport": "모바일",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/privacy?analysis_test=1755413578793",
+        "viewport": {
+          "name": "모바일",
+          "width": 375,
+          "height": 812,
+          "type": "mobile"
+        },
+        "issues": [
+          {
+            "type": "small_text",
+            "severity": "medium",
+            "message": "17개 요소의 폰트가 너무 작음 (14px 미만)"
+          },
+          {
+            "type": "small_touch_targets",
+            "severity": "high",
+            "message": "9개 터치 요소가 너무 작음 (44px 미만)"
+          }
+        ],
+        "metrics": {
+          "windowWidth": 375,
+          "windowHeight": 812,
+          "documentWidth": 375,
+          "documentHeight": 13802
+        },
+        "elements": {
+          "header": {
+            "width": 375,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 375,
+            "height": 276.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_________모바일.png",
+      "issueCount": 2,
+      "severity": "critical"
+    },
+    {
+      "page": "개인정보처리방침",
+      "url": "/privacy",
+      "viewport": "태블릿",
+      "critical": false,
+      "analysis": {
+        "url": "https://www.topmktx.com/privacy?analysis_test=1755413577464",
+        "viewport": {
+          "name": "태블릿",
+          "width": 768,
+          "height": 1024,
+          "type": "tablet"
+        },
+        "issues": [],
+        "metrics": {
+          "windowWidth": 768,
+          "windowHeight": 1024,
+          "documentWidth": 768,
+          "documentHeight": 9560
+        },
+        "elements": {
+          "header": {
+            "width": 768,
+            "height": 71,
+            "overflowing": false
+          },
+          "footer": {
+            "width": 768,
+            "height": 228.5625,
+            "overflowing": false
+          }
+        }
+      },
+      "screenshotPath": "/var/www/html/topmkt/screenshots/responsive_analysis/_________태블릿.png",
+      "issueCount": 0,
+      "severity": "good"
+    }
+  ]
+}

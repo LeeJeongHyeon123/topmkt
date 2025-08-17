@@ -145,8 +145,10 @@ class Router {
             'GET:/notices/{id}' => ['NoticeController', 'show'],
             'GET:/notices/{id}/edit' => ['NoticeController', 'showEdit'],
             'POST:/api/notices' => ['NoticeController', 'create'],
+            'POST:/api/notices/{id}' => ['NoticeController', 'update'], // FormData 호환성을 위한 POST 추가
             'PUT:/api/notices/{id}' => ['NoticeController', 'update'],
             'DELETE:/api/notices/{id}' => ['NoticeController', 'delete'],
+            'POST:/api/notices/{id}/view' => ['NoticeController', 'incrementView'],
             
             // 공지사항 댓글 라우트
             'POST:/api/notice-comments' => ['NoticeCommentController', 'store'],
@@ -170,6 +172,19 @@ class Router {
             'POST:/admin/corporate/detail' => ['AdminController', 'corporateApplicationDetail'],
             'GET:/admin/document/view' => ['AdminController', 'viewDocument'],
             'POST:/admin/corporate/manage' => ['AdminController', 'manageCorporateMember'],
+            
+            // 사용자 관리 라우트
+            'GET:/admin/users' => ['AdminController', 'userList'],
+            'GET:/admin/users/data' => ['AdminController', 'getUsersData'],
+            'GET:/admin/users/{id}/detail' => ['AdminController', 'getUserDetail'],
+            'POST:/admin/users/{id}/status' => ['AdminController', 'updateUserStatus'],
+            'POST:/admin/users/{id}/role' => ['AdminController', 'updateUserRole'],
+            'POST:/admin/users/{id}/edit' => ['AdminController', 'editUser'],
+            'POST:/admin/users/bulk-action' => ['AdminController', 'bulkUserAction'],
+            'POST:/admin/users/{id}/notify' => ['AdminController', 'notifyUser'],
+            'GET:/admin/users/export' => ['AdminController', 'exportUsers'],
+            'GET:/admin/users/stats' => ['AdminController', 'getUserStats'],
+            'GET:/admin/getUserStats' => ['AdminController', 'getUserStats'],
             
             // 요가 랜딩페이지 테스트 라우트
             'GET:/yoga-landing' => ['YogaController', 'landing'],

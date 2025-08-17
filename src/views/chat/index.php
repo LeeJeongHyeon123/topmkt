@@ -86,10 +86,16 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     color: white;
     border: none;
     border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
+    padding: 10px 16px; /* 개선: 터치 타겟 확대 */
+    font-size: 14px; /* 개선: 0.8rem -> 14px (세련된 버튼) */
     cursor: pointer;
     transition: all 0.2s ease;
+    min-height: 44px; /* 개선: 터치 타겟 최소 높이 */
+    min-width: 44px;  /* 개선: 터치 타겟 최소 너비 */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .new-chat-btn:hover {
@@ -104,15 +110,19 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .chat-room-item {
-    padding: 12px;
+    padding: 14px; /* 개선: 12px -> 14px (터치 영역 확대) */
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 4px;
     position: relative;
-    z-index: 10; /* 디버깅: 클릭 우선순위 높임 */
-    pointer-events: auto; /* 디버깅: 클릭 가능 명시 */
-    background: #fff; /* 디버깅: 배경색 명시 */
+    z-index: 10;
+    pointer-events: auto;
+    background: #fff;
+    min-height: 44px; /* 개선: 터치 타겟 최소 높이 */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 }
 
 /* 채팅방 아이템 내부 요소들이 클릭을 차단하지 않도록 */
@@ -140,8 +150,8 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .room-avatar {
-    width: 40px;
-    height: 40px;
+    width: 44px; /* 개선: 40px -> 44px (터치 타겟 최소 크기) */
+    height: 44px; /* 개선: 40px -> 44px */
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
@@ -149,7 +159,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     justify-content: center;
     color: white;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 14px; /* 개선: 0.9rem -> 14px */
     flex-shrink: 0;
 }
 
@@ -161,7 +171,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 .room-name {
     font-weight: 600;
     color: #2d3748;
-    font-size: 0.9rem;
+    font-size: 15px; /* 개선: 0.9rem -> 15px (적절한 방 이름 크기) */
     margin-bottom: 2px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -169,7 +179,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .room-last-message {
-    font-size: 0.8rem;
+    font-size: 13px; /* 개선: 0.8rem -> 13px (마지막 메시지 적절한 크기) */
     color: #718096;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -185,7 +195,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .room-time {
-    font-size: 0.7rem;
+    font-size: 11px; /* 개선: 0.7rem -> 11px (시간 정보 적절한 크기) */
     color: #a0aec0;
 }
 
@@ -193,11 +203,16 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     background: #e53e3e;
     color: white;
     border-radius: 10px;
-    padding: 2px 6px;
-    font-size: 0.7rem;
+    padding: 4px 8px; /* 개선: 2px 6px -> 4px 8px (터치 영역 확대) */
+    font-size: 11px; /* 개선: 0.7rem -> 11px */
     font-weight: 600;
-    min-width: 18px;
+    min-width: 20px; /* 개선: 18px -> 20px */
+    min-height: 20px; /* 개선: 최소 높이 추가 */
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 /* 메인 채팅 영역 */
@@ -656,21 +671,26 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     color: currentColor;
 }
 
-/* 모바일 반응형 */
+/* 📱 모바일 반응형 최적화 (v3.11.7) */
+/* 터치 타겟 44px+ 유지하되 세련된 UI */
 @media (max-width: 768px) {
     .chat-container {
-        padding: 10px;
+        padding: 8px; /* 개선: 10px -> 8px (컴팩트) */
         height: calc(100vh - 80px);
     }
     
     .chat-header {
-        padding: 30px 20px;
-        margin-top: 20px;
-        margin-bottom: 20px;
+        padding: 25px 15px; /* 개선: 30px 20px -> 25px 15px */
+        margin-top: 15px; /* 개선: 20px -> 15px */
+        margin-bottom: 15px; /* 개선: 20px -> 15px */
     }
     
     .chat-header h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem; /* 개선: 1.5rem -> 1.4rem (세련된 헤더) */
+    }
+    
+    .chat-header p {
+        font-size: 14px; /* 개선: 명시적 크기 */
     }
     
     .chat-layout {
@@ -694,13 +714,147 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         border-radius: 0;
     }
     
+    .sidebar-header {
+        padding: 15px; /* 개선: 20px -> 15px */
+    }
+    
+    .sidebar-title {
+        font-size: 16px; /* 개선: 1.1rem -> 16px */
+    }
+    
+    .new-chat-btn {
+        padding: 10px 14px; /* 개선: 모바일 컴팩트 */
+        font-size: 13px; /* 개선: 모바일 최적화 */
+        min-height: 44px;
+    }
+    
+    .chat-room-item {
+        padding: 12px; /* 개선: 모바일에서 적절한 패딩 */
+        min-height: 44px;
+    }
+    
+    .room-avatar {
+        width: 40px; /* 개선: 모바일에서 컴팩트 */
+        height: 40px;
+        font-size: 13px;
+    }
+    
+    .room-name {
+        font-size: 14px; /* 개선: 15px -> 14px (모바일 최적화) */
+    }
+    
+    .room-last-message {
+        font-size: 12px; /* 개선: 13px -> 12px */
+    }
+    
+    .room-time {
+        font-size: 10px; /* 개선: 11px -> 10px */
+    }
+    
     .message-bubble {
         max-width: 85%;
+        font-size: 15px; /* 개선: 메시지 가독성 */
+    }
+    
+    .chat-input {
+        font-size: 16px; /* 개선: iOS 줌 방지 */
+        min-height: 44px; /* 개선: 터치 타겟 */
+        padding: 12px 16px; /* 개선: 충분한 패딩 */
+        box-sizing: border-box;
+    }
+    
+    .chat-send-btn {
+        min-height: 44px; /* 개선: 터치 타겟 */
+        min-width: 44px;
+        font-size: 14px; /* 개선: 전송 버튼 크기 */
     }
     
     .modal-content {
         width: 95%;
-        margin: 20px;
+        margin: 15px; /* 개선: 20px -> 15px */
+        padding: 20px; /* 개선: 모달 패딩 명시 */
+    }
+}
+
+/* 소형 모바일 최적화 (480px 이하) */
+@media (max-width: 480px) {
+    .chat-container {
+        padding: 5px;
+        height: calc(100vh - 70px);
+    }
+    
+    .chat-header {
+        padding: 20px 12px;
+        margin-top: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .chat-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .chat-header p {
+        font-size: 13px;
+    }
+    
+    .sidebar-header {
+        padding: 12px;
+    }
+    
+    .sidebar-title {
+        font-size: 15px;
+    }
+    
+    .new-chat-btn {
+        padding: 10px 12px;
+        font-size: 12px;
+        min-height: 44px;
+    }
+    
+    .chat-room-item {
+        padding: 10px;
+        min-height: 44px;
+    }
+    
+    .room-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+    }
+    
+    .room-name {
+        font-size: 13px;
+    }
+    
+    .room-last-message {
+        font-size: 11px;
+    }
+    
+    .room-time {
+        font-size: 9px;
+    }
+    
+    .message-bubble {
+        max-width: 90%;
+        font-size: 14px;
+    }
+    
+    .chat-input {
+        font-size: 16px; /* iOS 줌 방지 유지 */
+        min-height: 44px;
+        padding: 10px 14px;
+    }
+    
+    .chat-send-btn {
+        min-height: 44px;
+        min-width: 44px;
+        font-size: 13px;
+    }
+    
+    .modal-content {
+        width: 96%;
+        margin: 10px;
+        padding: 16px;
     }
 }
 

@@ -1,0 +1,122 @@
+{
+  "timestamp": "2025-08-15T15:44:50.385Z",
+  "totalTime": 10543,
+  "stabilityRate": 100,
+  "networkRate": 100,
+  "overallScore": 100,
+  "finalStatus": "✅ 우수 (병렬 테스트 환경 완벽)",
+  "recommendation": "420개 E2E 테스트 실행 권장",
+  "details": {
+    "stability": {
+      "passed": 3,
+      "failed": 0,
+      "details": []
+    },
+    "performance": {
+      "memoryUsage": [
+        {
+          "browser": "A",
+          "used": "9.54",
+          "total": "9.54",
+          "timestamp": 1755272690054
+        },
+        {
+          "browser": "B",
+          "used": "9.54",
+          "total": "9.54",
+          "timestamp": 1755272690062
+        },
+        {
+          "browser": "C",
+          "used": "9.54",
+          "total": "9.54",
+          "timestamp": 1755272690066
+        }
+      ],
+      "loadTimes": [
+        {
+          "browser": "B",
+          "url": "/",
+          "time": 413
+        },
+        {
+          "browser": "A",
+          "url": "/",
+          "time": 425
+        },
+        {
+          "browser": "C",
+          "url": "/",
+          "time": 471
+        },
+        {
+          "browser": "A",
+          "url": "/community",
+          "time": 145
+        },
+        {
+          "browser": "C",
+          "url": "/community",
+          "time": 154
+        },
+        {
+          "browser": "B",
+          "url": "/community",
+          "time": 232
+        },
+        {
+          "browser": "B",
+          "url": "/lectures",
+          "time": 166
+        },
+        {
+          "browser": "C",
+          "url": "/lectures",
+          "time": 166
+        },
+        {
+          "browser": "A",
+          "url": "/lectures",
+          "time": 171
+        },
+        {
+          "browser": "A",
+          "url": "/notices",
+          "time": 63
+        },
+        {
+          "browser": "B",
+          "url": "/notices",
+          "time": 68
+        },
+        {
+          "browser": "C",
+          "url": "/notices",
+          "time": 69
+        },
+        {
+          "browser": "B",
+          "url": "/admin",
+          "time": 49
+        },
+        {
+          "browser": "C",
+          "url": "/admin",
+          "time": 52
+        },
+        {
+          "browser": "A",
+          "url": "/admin",
+          "time": 62
+        }
+      ],
+      "cpuUsage": []
+    },
+    "network": {
+      "connectSuccess": 15,
+      "connectFailed": 0,
+      "errors": []
+    },
+    "errors": []
+  }
+}

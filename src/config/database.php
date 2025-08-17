@@ -91,14 +91,25 @@ class Database {
                 $convertedSql = $sql;
                 $convertedParams = [];
                 
-                foreach ($params as $key => $value) {
-                    if (strpos($key, ':') === 0) {
-                        // :param 형태의 파라미터를 ?로 변환
-                        $convertedSql = str_replace($key, '?', $convertedSql);
-                        $convertedParams[] = $value;
-                    } else {
-                        $convertedParams[] = $value;
+                // SQL에서 나타나는 순서대로 파라미터를 변환
+                if (isset($params[0]) || array_key_exists(0, $params)) {
+                    // 인덱스 배열인 경우 그대로 사용
+                    $convertedParams = $params;
+                } else {
+                    // 명명된 파라미터인 경우 SQL 순서에 맞게 변환
+                    $namedParams = [];
+                    
+                    // SQL에서 :param 형태의 파라미터를 찾아서 순서대로 처리
+                    preg_match_all('/:([a-zA-Z_][a-zA-Z0-9_]*)/', $sql, $matches);
+                    
+                    foreach ($matches[0] as $placeholder) {
+                        if (isset($params[$placeholder])) {
+                            $namedParams[] = $params[$placeholder];
+                            $convertedSql = preg_replace('/' . preg_quote($placeholder, '/') . '/', '?', $convertedSql, 1);
+                        }
                     }
+                    
+                    $convertedParams = $namedParams;
                 }
                 
                 $stmt = $this->connection->prepare($convertedSql);

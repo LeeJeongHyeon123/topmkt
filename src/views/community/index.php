@@ -82,12 +82,14 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
 }
 
 .search-input {
-    padding: 10px 15px;
+    padding: 12px 16px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
     width: 250px;
     transition: border-color 0.3s ease;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -97,10 +99,10 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
 }
 
 .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
@@ -108,6 +110,8 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 /* 기존 프로필 이미지 모달 스타일 제거됨 - 통합 CSS 사용 */
@@ -435,14 +439,20 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     transform: translateY(-50%);
     background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
     border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
+    border-radius: 8px;
+    padding: 12px 16px;
     color: #ffffff;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
+    min-height: 44px;
+    min-width: 44px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-btn:hover {
@@ -509,52 +519,132 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     }
 }
 
+/* 모바일 반응형 최적화 - UltraThink */
 @media (max-width: 768px) {
     .community-container {
-        padding: 15px;
+        padding: 16px;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
     }
     
     .community-header {
-        padding: 30px 20px;
+        padding: 24px 16px;
+        margin-top: 20px;
+        margin-left: -16px;
+        margin-right: -16px;
+        border-radius: 0;
     }
     
     .community-header h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
+        line-height: 1.3;
+    }
+    
+    .community-header p {
+        font-size: 1rem;
     }
     
     .board-controls {
         flex-direction: column;
         align-items: stretch;
+        gap: 16px;
+        margin-bottom: 24px;
     }
     
     .search-form {
-        justify-content: center;
-        margin-bottom: 15px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
     }
     
     .search-input {
         width: 100%;
-        max-width: 300px;
+        max-width: none;
+        font-size: 16px;
+        padding: 14px 16px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+        font-size: 16px;
+        padding: 14px 20px;
+        min-height: 48px;
+    }
+    
+    .btn-write {
+        width: 100% !important;
+        justify-content: center !important;
+        font-size: 16px !important;
+        padding: 14px 20px !important;
+        min-height: 48px !important;
     }
     
     .search-performance,
     .search-summary {
-        font-size: 0.8rem;
-        padding: 8px 12px;
+        font-size: 14px;
+        padding: 12px 16px;
+        margin: 16px 0;
+        border-radius: 8px;
     }
     
     .post-item {
-        padding: 15px;
+        padding: 20px 16px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+    }
+    
+    .post-title {
+        font-size: 16px;
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+    
+    .post-content {
+        font-size: 14px;
+        line-height: 1.5;
     }
     
     .post-meta {
         flex-direction: column;
         align-items: flex-start;
-        gap: 5px;
+        gap: 6px;
+        font-size: 14px;
     }
     
     .pagination {
         flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .pagination a,
+    .pagination span {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 12px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* 프로필 이미지 최적화 */
+    .profile-image {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+    }
+    
+    /* 로딩 및 빈 상태 최적화 */
+    .loading, .empty-state {
+        padding: 40px 16px;
+        text-align: center;
+        font-size: 16px;
     }
 }
 
@@ -636,6 +726,68 @@ body {
 }
 
 /* 다크모드 감지되어도 화이트 배경 강제 유지 */
+/* 소형 모바일 최적화 */
+@media (max-width: 480px) {
+    .community-container {
+        padding: 12px;
+    }
+    
+    .community-header {
+        padding: 20px 12px;
+        margin-left: -12px;
+        margin-right: -12px;
+    }
+    
+    .community-header h1 {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .community-header p {
+        font-size: 0.9rem;
+    }
+    
+    .search-input {
+        font-size: 16px; /* iOS 줌 방지 */
+        padding: 16px;
+        min-height: 52px;
+    }
+    
+    .btn, .btn-write {
+        font-size: 16px !important;
+        padding: 16px 20px !important;
+        min-height: 52px !important;
+    }
+    
+    .post-item {
+        padding: 16px 12px;
+        gap: 10px;
+    }
+    
+    .post-title {
+        font-size: 15px;
+    }
+    
+    .post-content,
+    .post-meta {
+        font-size: 13px;
+    }
+    
+    .pagination a,
+    .pagination span {
+        min-width: 48px;
+        min-height: 48px;
+        font-size: 15px;
+    }
+    
+    .profile-image {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
 @media (prefers-color-scheme: dark) {
     body {
         background-color: white !important;

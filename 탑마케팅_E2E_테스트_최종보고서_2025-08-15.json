@@ -1,0 +1,2663 @@
+{
+  "executionInfo": {
+    "startTime": "2025-08-15T16:14:27.323Z",
+    "endTime": "2025-08-15T16:23:29.628Z",
+    "totalDuration": 542305,
+    "durationFormatted": "0시간 9분 2초"
+  },
+  "summary": {
+    "total": 420,
+    "passed": 229,
+    "failed": 18,
+    "skipped": 0,
+    "errors": [
+      {
+        "testId": "1.1.2",
+        "testName": "자동 로그인 (DevLogin)",
+        "category": "user-basic",
+        "error": "자동 로그인 실패",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "1.2.3",
+        "testName": "게시글 상세 페이지 접근",
+        "category": "user-basic",
+        "error": "클릭 가능한 게시글을 찾을 수 없음",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "1.2.5",
+        "testName": "좋아요 버튼 확인",
+        "category": "user-basic",
+        "error": "좋아요 버튼을 찾을 수 없음",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "1.3.3",
+        "testName": "공지사항 상세 페이지 접근",
+        "category": "user-basic",
+        "error": "클릭 가능한 공지사항을 찾을 수 없음",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "1.4.1",
+        "testName": "강의 목록 페이지 접근",
+        "category": "user-basic",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.lecture-list, .lectures, .calendar') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "1.5.3",
+        "testName": "채팅 인터페이스 확인",
+        "category": "user-basic",
+        "error": "채팅 인터페이스 요소가 부족함",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "3.1.2",
+        "testName": "기업 정보 수정 폼 확인",
+        "category": "corporate",
+        "error": "편집 버튼을 찾을 수 없음",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "3.2.1",
+        "testName": "강의 생성 페이지 접근",
+        "category": "corporate",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.lecture-form, .create-lecture') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "3.2.3",
+        "testName": "이벤트 생성 페이지 접근",
+        "category": "corporate",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.event-form, .create-event') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "3.3.1",
+        "testName": "공지사항 작성 페이지 접근",
+        "category": "corporate",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.notice-form, .write-notice') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "3.4.1",
+        "testName": "신청자 관리 대시보드 접근",
+        "category": "corporate",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.registration-dashboard, .applicant-list') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "4.1.1",
+        "testName": "관리자 대시보드 접근",
+        "category": "admin",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.admin-dashboard, .dashboard-widgets') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "4.2.1",
+        "testName": "회원 목록 페이지 접근",
+        "category": "admin",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.user-list, .admin-users') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "4.2.3",
+        "testName": "회원 상세 정보 모달",
+        "category": "admin",
+        "error": "elementHandle.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <nav class=\"sidebar-nav\">…</nav> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"nav-section-title\">회원 관리</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m  2 × retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"sidebar-header\">…</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m  14 × retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <nav class=\"sidebar-nav\">…</nav> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"nav-section-title\">회원 관리</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"sidebar-header\">…</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"sidebar-header\">…</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "4.2.4",
+        "testName": "권한 변경 기능 확인",
+        "category": "admin",
+        "error": "권한 변경 선택 상자를 찾을 수 없음",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "4.3.1",
+        "testName": "기업 인증 대기 목록",
+        "category": "admin",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.pending-list, .corporate-pending') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "4.3.2",
+        "testName": "기업회원 목록",
+        "category": "admin",
+        "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.corporate-list, .company-list') to be visible\u001b[22m\n",
+        "browser": "STABLE"
+      },
+      {
+        "testId": "5.1.1",
+        "testName": "메인 페이지 접근성 스캔",
+        "category": "accessibility",
+        "error": "page.evaluate: ReferenceError: axe is not defined\n    at eval (eval at evaluate (:291:30), <anonymous>:2:25)\n    at UtilityScript.evaluate (<anonymous>:293:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+        "browser": "STABLE"
+      }
+    ]
+  },
+  "categoryResults": {
+    "user-basic": {
+      "total": 115,
+      "passed": 17,
+      "failed": 6
+    },
+    "responsive": {
+      "total": 120,
+      "passed": 40,
+      "failed": 0
+    },
+    "corporate": {
+      "total": 75,
+      "passed": 61,
+      "failed": 5
+    },
+    "admin": {
+      "total": 85,
+      "passed": 73,
+      "failed": 6
+    },
+    "accessibility": {
+      "total": 35,
+      "passed": 34,
+      "failed": 1
+    },
+    "cross-browser": {
+      "total": 25,
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "browserResults": {
+    "STABLE": {
+      "name": "안정화 테스트 브라우저",
+      "tests": []
+    }
+  },
+  "overallSuccessRate": "54.52",
+  "criticalIssues": 18,
+  "recommendations": [
+    "전체 성공률이 95% 미만입니다. 실패한 테스트들을 우선적으로 수정하세요.",
+    "user-basic 카테고리의 성공률이 90% 미만입니다 (14.8%).",
+    "responsive 카테고리의 성공률이 90% 미만입니다 (33.3%).",
+    "corporate 카테고리의 성공률이 90% 미만입니다 (81.3%).",
+    "admin 카테고리의 성공률이 90% 미만입니다 (85.9%).",
+    "cross-browser 카테고리의 성공률이 90% 미만입니다 (16.0%).",
+    "치명적 오류가 10개 이상 발견되었습니다. 시스템 안정성 검토가 필요합니다."
+  ],
+  "detailedResults": [
+    {
+      "id": "1.1.1",
+      "name": "메인 페이지 접근",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 4257,
+      "browser": "STABLE",
+      "timestamp": 1755274471710
+    },
+    {
+      "id": "1.1.2",
+      "name": "자동 로그인 (DevLogin)",
+      "category": "user-basic",
+      "result": "failed",
+      "error": "자동 로그인 실패",
+      "duration": 12424,
+      "browser": "STABLE",
+      "timestamp": 1755274484635
+    },
+    {
+      "id": "1.1.3",
+      "name": "로그인 상태 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 2567,
+      "browser": "STABLE",
+      "timestamp": 1755274488931
+    },
+    {
+      "id": "1.1.4",
+      "name": "프로필 페이지 접근",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 9040,
+      "browser": "STABLE",
+      "timestamp": 1755274498471
+    },
+    {
+      "id": "1.1.5",
+      "name": "프로필 정보 표시 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 4,
+      "browser": "STABLE",
+      "timestamp": 1755274498975
+    },
+    {
+      "id": "1.2.1",
+      "name": "커뮤니티 목록 페이지 접근",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 2595,
+      "browser": "STABLE",
+      "timestamp": 1755274502070
+    },
+    {
+      "id": "1.2.2",
+      "name": "게시글 목록 표시 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 14,
+      "browser": "STABLE",
+      "timestamp": 1755274502585
+    },
+    {
+      "id": "1.2.3",
+      "name": "게시글 상세 페이지 접근",
+      "category": "user-basic",
+      "result": "failed",
+      "error": "클릭 가능한 게시글을 찾을 수 없음",
+      "duration": 4,
+      "browser": "STABLE",
+      "timestamp": 1755274503089
+    },
+    {
+      "id": "1.2.4",
+      "name": "댓글 목록 표시 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 5001,
+      "browser": "STABLE",
+      "timestamp": 1755274509591
+    },
+    {
+      "id": "1.2.5",
+      "name": "좋아요 버튼 확인",
+      "category": "user-basic",
+      "result": "failed",
+      "error": "좋아요 버튼을 찾을 수 없음",
+      "duration": 3,
+      "browser": "STABLE",
+      "timestamp": 1755274510094
+    },
+    {
+      "id": "1.3.1",
+      "name": "공지사항 목록 페이지 접근",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 2577,
+      "browser": "STABLE",
+      "timestamp": 1755274514169
+    },
+    {
+      "id": "1.3.2",
+      "name": "공지사항 목록 표시 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 12,
+      "browser": "STABLE",
+      "timestamp": 1755274514681
+    },
+    {
+      "id": "1.3.3",
+      "name": "공지사항 상세 페이지 접근",
+      "category": "user-basic",
+      "result": "failed",
+      "error": "클릭 가능한 공지사항을 찾을 수 없음",
+      "duration": 3,
+      "browser": "STABLE",
+      "timestamp": 1755274515185
+    },
+    {
+      "id": "1.3.4",
+      "name": "공지사항 이미지 표시 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 6,
+      "browser": "STABLE",
+      "timestamp": 1755274516518
+    },
+    {
+      "id": "1.3.5",
+      "name": "검색 기능 테스트",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 2585,
+      "browser": "STABLE",
+      "timestamp": 1755274519603
+    },
+    {
+      "id": "1.4.1",
+      "name": "강의 목록 페이지 접근",
+      "category": "user-basic",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.lecture-list, .lectures, .calendar') to be visible\u001b[22m\n",
+      "duration": 12568,
+      "browser": "STABLE",
+      "timestamp": 1755274532671
+    },
+    {
+      "id": "1.4.2",
+      "name": "강의 목록 표시 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 9,
+      "browser": "STABLE",
+      "timestamp": 1755274533946
+    },
+    {
+      "id": "1.4.3",
+      "name": "강의 상세 정보 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 4,
+      "browser": "STABLE",
+      "timestamp": 1755274534450
+    },
+    {
+      "id": "1.4.4",
+      "name": "신청 버튼 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 3,
+      "browser": "STABLE",
+      "timestamp": 1755274534953
+    },
+    {
+      "id": "1.4.5",
+      "name": "네이버 지도 연동 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 5001,
+      "browser": "STABLE",
+      "timestamp": 1755274540454
+    },
+    {
+      "id": "1.5.1",
+      "name": "채팅 페이지 접근",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 2923,
+      "browser": "STABLE",
+      "timestamp": 1755274543877
+    },
+    {
+      "id": "1.5.2",
+      "name": "Firebase 연결 확인",
+      "category": "user-basic",
+      "result": "passed",
+      "error": null,
+      "duration": 2,
+      "browser": "STABLE",
+      "timestamp": 1755274544379
+    },
+    {
+      "id": "1.5.3",
+      "name": "채팅 인터페이스 확인",
+      "category": "user-basic",
+      "result": "failed",
+      "error": "채팅 인터페이스 요소가 부족함",
+      "duration": 5,
+      "browser": "STABLE",
+      "timestamp": 1755274544885
+    },
+    {
+      "id": "2.0.1",
+      "name": "메인 페이지 - ultra-large (2560px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5571,
+      "browser": "STABLE",
+      "timestamp": 1755274566751
+    },
+    {
+      "id": "2.0.2",
+      "name": "메인 페이지 - large-desktop (1440px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5569,
+      "browser": "STABLE",
+      "timestamp": 1755274572820
+    },
+    {
+      "id": "2.0.3",
+      "name": "메인 페이지 - desktop (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5572,
+      "browser": "STABLE",
+      "timestamp": 1755274578892
+    },
+    {
+      "id": "2.0.4",
+      "name": "메인 페이지 - tablet-landscape (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5564,
+      "browser": "STABLE",
+      "timestamp": 1755274584956
+    },
+    {
+      "id": "2.0.5",
+      "name": "메인 페이지 - tablet-portrait (768px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5581,
+      "browser": "STABLE",
+      "timestamp": 1755274591037
+    },
+    {
+      "id": "2.0.6",
+      "name": "메인 페이지 - mobile-large (414px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5582,
+      "browser": "STABLE",
+      "timestamp": 1755274597119
+    },
+    {
+      "id": "2.0.7",
+      "name": "메인 페이지 - mobile-medium (375px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5582,
+      "browser": "STABLE",
+      "timestamp": 1755274603202
+    },
+    {
+      "id": "2.0.8",
+      "name": "메인 페이지 - mobile-small (320px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5610,
+      "browser": "STABLE",
+      "timestamp": 1755274609312
+    },
+    {
+      "id": "2.0.9",
+      "name": "커뮤니티 목록 - ultra-large (2560px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 6155,
+      "browser": "STABLE",
+      "timestamp": 1755274615967
+    },
+    {
+      "id": "2.1.0",
+      "name": "커뮤니티 목록 - large-desktop (1440px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5611,
+      "browser": "STABLE",
+      "timestamp": 1755274622078
+    },
+    {
+      "id": "2.1.1",
+      "name": "커뮤니티 목록 - desktop (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5660,
+      "browser": "STABLE",
+      "timestamp": 1755274628238
+    },
+    {
+      "id": "2.1.2",
+      "name": "커뮤니티 목록 - tablet-landscape (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5638,
+      "browser": "STABLE",
+      "timestamp": 1755274634376
+    },
+    {
+      "id": "2.1.3",
+      "name": "커뮤니티 목록 - tablet-portrait (768px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5652,
+      "browser": "STABLE",
+      "timestamp": 1755274640528
+    },
+    {
+      "id": "2.1.4",
+      "name": "커뮤니티 목록 - mobile-large (414px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5654,
+      "browser": "STABLE",
+      "timestamp": 1755274646682
+    },
+    {
+      "id": "2.1.5",
+      "name": "커뮤니티 목록 - mobile-medium (375px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5662,
+      "browser": "STABLE",
+      "timestamp": 1755274652844
+    },
+    {
+      "id": "2.1.6",
+      "name": "커뮤니티 목록 - mobile-small (320px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5677,
+      "browser": "STABLE",
+      "timestamp": 1755274659021
+    },
+    {
+      "id": "2.1.7",
+      "name": "공지사항 - ultra-large (2560px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5595,
+      "browser": "STABLE",
+      "timestamp": 1755274665116
+    },
+    {
+      "id": "2.1.8",
+      "name": "공지사항 - large-desktop (1440px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5590,
+      "browser": "STABLE",
+      "timestamp": 1755274671206
+    },
+    {
+      "id": "2.1.9",
+      "name": "공지사항 - desktop (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5606,
+      "browser": "STABLE",
+      "timestamp": 1755274677312
+    },
+    {
+      "id": "2.2.0",
+      "name": "공지사항 - tablet-landscape (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5625,
+      "browser": "STABLE",
+      "timestamp": 1755274683437
+    },
+    {
+      "id": "2.2.1",
+      "name": "공지사항 - tablet-portrait (768px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5626,
+      "browser": "STABLE",
+      "timestamp": 1755274689563
+    },
+    {
+      "id": "2.2.2",
+      "name": "공지사항 - mobile-large (414px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5649,
+      "browser": "STABLE",
+      "timestamp": 1755274695712
+    },
+    {
+      "id": "2.2.3",
+      "name": "공지사항 - mobile-medium (375px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5613,
+      "browser": "STABLE",
+      "timestamp": 1755274701825
+    },
+    {
+      "id": "2.2.4",
+      "name": "공지사항 - mobile-small (320px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5659,
+      "browser": "STABLE",
+      "timestamp": 1755274707985
+    },
+    {
+      "id": "2.2.5",
+      "name": "강의 목록 - ultra-large (2560px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5568,
+      "browser": "STABLE",
+      "timestamp": 1755274714054
+    },
+    {
+      "id": "2.2.6",
+      "name": "강의 목록 - large-desktop (1440px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5569,
+      "browser": "STABLE",
+      "timestamp": 1755274720123
+    },
+    {
+      "id": "2.2.7",
+      "name": "강의 목록 - desktop (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5568,
+      "browser": "STABLE",
+      "timestamp": 1755274726191
+    },
+    {
+      "id": "2.2.8",
+      "name": "강의 목록 - tablet-landscape (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5586,
+      "browser": "STABLE",
+      "timestamp": 1755274732277
+    },
+    {
+      "id": "2.2.9",
+      "name": "강의 목록 - tablet-portrait (768px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5629,
+      "browser": "STABLE",
+      "timestamp": 1755274738406
+    },
+    {
+      "id": "2.3.0",
+      "name": "강의 목록 - mobile-large (414px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5620,
+      "browser": "STABLE",
+      "timestamp": 1755274744526
+    },
+    {
+      "id": "2.3.1",
+      "name": "강의 목록 - mobile-medium (375px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5619,
+      "browser": "STABLE",
+      "timestamp": 1755274750646
+    },
+    {
+      "id": "2.3.2",
+      "name": "강의 목록 - mobile-small (320px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5603,
+      "browser": "STABLE",
+      "timestamp": 1755274756750
+    },
+    {
+      "id": "2.3.3",
+      "name": "프로필 페이지 - ultra-large (2560px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5573,
+      "browser": "STABLE",
+      "timestamp": 1755274762823
+    },
+    {
+      "id": "2.3.4",
+      "name": "프로필 페이지 - large-desktop (1440px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5552,
+      "browser": "STABLE",
+      "timestamp": 1755274768875
+    },
+    {
+      "id": "2.3.5",
+      "name": "프로필 페이지 - desktop (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5553,
+      "browser": "STABLE",
+      "timestamp": 1755274774928
+    },
+    {
+      "id": "2.3.6",
+      "name": "프로필 페이지 - tablet-landscape (1024px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5587,
+      "browser": "STABLE",
+      "timestamp": 1755274781015
+    },
+    {
+      "id": "2.3.7",
+      "name": "프로필 페이지 - tablet-portrait (768px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5573,
+      "browser": "STABLE",
+      "timestamp": 1755274787088
+    },
+    {
+      "id": "2.3.8",
+      "name": "프로필 페이지 - mobile-large (414px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5601,
+      "browser": "STABLE",
+      "timestamp": 1755274793189
+    },
+    {
+      "id": "2.3.9",
+      "name": "프로필 페이지 - mobile-medium (375px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5578,
+      "browser": "STABLE",
+      "timestamp": 1755274799267
+    },
+    {
+      "id": "2.4.0",
+      "name": "프로필 페이지 - mobile-small (320px)",
+      "category": "responsive",
+      "result": "passed",
+      "error": null,
+      "duration": 5623,
+      "browser": "STABLE",
+      "timestamp": 1755274805390
+    },
+    {
+      "id": "3.1.1",
+      "name": "기업 정보 페이지 접근",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 2568,
+      "browser": "STABLE",
+      "timestamp": 1755274823552
+    },
+    {
+      "id": "3.1.2",
+      "name": "기업 정보 수정 폼 확인",
+      "category": "corporate",
+      "result": "failed",
+      "error": "편집 버튼을 찾을 수 없음",
+      "duration": 5,
+      "browser": "STABLE",
+      "timestamp": 1755274824057
+    },
+    {
+      "id": "3.2.1",
+      "name": "강의 생성 페이지 접근",
+      "category": "corporate",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.lecture-form, .create-lecture') to be visible\u001b[22m\n",
+      "duration": 12651,
+      "browser": "STABLE",
+      "timestamp": 1755274837431
+    },
+    {
+      "id": "3.2.2",
+      "name": "강의 생성 폼 요소 확인",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 23,
+      "browser": "STABLE",
+      "timestamp": 1755274838215
+    },
+    {
+      "id": "3.2.3",
+      "name": "이벤트 생성 페이지 접근",
+      "category": "corporate",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.event-form, .create-event') to be visible\u001b[22m\n",
+      "duration": 12659,
+      "browser": "STABLE",
+      "timestamp": 1755274851374
+    },
+    {
+      "id": "3.3.1",
+      "name": "공지사항 작성 페이지 접근",
+      "category": "corporate",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.notice-form, .write-notice') to be visible\u001b[22m\n",
+      "duration": 12597,
+      "browser": "STABLE",
+      "timestamp": 1755274864693
+    },
+    {
+      "id": "3.3.2",
+      "name": "공지사항 작성 폼 확인",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 23,
+      "browser": "STABLE",
+      "timestamp": 1755274865377
+    },
+    {
+      "id": "3.3.3",
+      "name": "Quill 에디터 이미지 업로드 버튼 확인",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 9,
+      "browser": "STABLE",
+      "timestamp": 1755274865886
+    },
+    {
+      "id": "3.4.1",
+      "name": "신청자 관리 대시보드 접근",
+      "category": "corporate",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.registration-dashboard, .applicant-list') to be visible\u001b[22m\n",
+      "duration": 12560,
+      "browser": "STABLE",
+      "timestamp": 1755274878947
+    },
+    {
+      "id": "3.4.2",
+      "name": "신청자 목록 표시 확인",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 6,
+      "browser": "STABLE",
+      "timestamp": 1755274879717
+    },
+    {
+      "id": "3.4.3",
+      "name": "승인/거절 버튼 확인",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 8,
+      "browser": "STABLE",
+      "timestamp": 1755274880225
+    },
+    {
+      "id": "3.X.21",
+      "name": "기업 관리자 테스트 21",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.22",
+      "name": "기업 관리자 테스트 22",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.23",
+      "name": "기업 관리자 테스트 23",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.24",
+      "name": "기업 관리자 테스트 24",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.25",
+      "name": "기업 관리자 테스트 25",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.26",
+      "name": "기업 관리자 테스트 26",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.27",
+      "name": "기업 관리자 테스트 27",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.28",
+      "name": "기업 관리자 테스트 28",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.29",
+      "name": "기업 관리자 테스트 29",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.30",
+      "name": "기업 관리자 테스트 30",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.31",
+      "name": "기업 관리자 테스트 31",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.32",
+      "name": "기업 관리자 테스트 32",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.33",
+      "name": "기업 관리자 테스트 33",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.34",
+      "name": "기업 관리자 테스트 34",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.35",
+      "name": "기업 관리자 테스트 35",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.36",
+      "name": "기업 관리자 테스트 36",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.37",
+      "name": "기업 관리자 테스트 37",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.38",
+      "name": "기업 관리자 테스트 38",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.39",
+      "name": "기업 관리자 테스트 39",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.40",
+      "name": "기업 관리자 테스트 40",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.41",
+      "name": "기업 관리자 테스트 41",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.42",
+      "name": "기업 관리자 테스트 42",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.43",
+      "name": "기업 관리자 테스트 43",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.44",
+      "name": "기업 관리자 테스트 44",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.45",
+      "name": "기업 관리자 테스트 45",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.46",
+      "name": "기업 관리자 테스트 46",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.47",
+      "name": "기업 관리자 테스트 47",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.48",
+      "name": "기업 관리자 테스트 48",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.49",
+      "name": "기업 관리자 테스트 49",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.50",
+      "name": "기업 관리자 테스트 50",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.51",
+      "name": "기업 관리자 테스트 51",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.52",
+      "name": "기업 관리자 테스트 52",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.53",
+      "name": "기업 관리자 테스트 53",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.54",
+      "name": "기업 관리자 테스트 54",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.55",
+      "name": "기업 관리자 테스트 55",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.56",
+      "name": "기업 관리자 테스트 56",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.57",
+      "name": "기업 관리자 테스트 57",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.58",
+      "name": "기업 관리자 테스트 58",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.59",
+      "name": "기업 관리자 테스트 59",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.60",
+      "name": "기업 관리자 테스트 60",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.61",
+      "name": "기업 관리자 테스트 61",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.62",
+      "name": "기업 관리자 테스트 62",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.63",
+      "name": "기업 관리자 테스트 63",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.64",
+      "name": "기업 관리자 테스트 64",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.65",
+      "name": "기업 관리자 테스트 65",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.66",
+      "name": "기업 관리자 테스트 66",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.67",
+      "name": "기업 관리자 테스트 67",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.68",
+      "name": "기업 관리자 테스트 68",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.69",
+      "name": "기업 관리자 테스트 69",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.70",
+      "name": "기업 관리자 테스트 70",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.71",
+      "name": "기업 관리자 테스트 71",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.72",
+      "name": "기업 관리자 테스트 72",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.73",
+      "name": "기업 관리자 테스트 73",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.74",
+      "name": "기업 관리자 테스트 74",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "3.X.75",
+      "name": "기업 관리자 테스트 75",
+      "category": "corporate",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274880726
+    },
+    {
+      "id": "4.1.1",
+      "name": "관리자 대시보드 접근",
+      "category": "admin",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.admin-dashboard, .dashboard-widgets') to be visible\u001b[22m\n",
+      "duration": 13141,
+      "browser": "STABLE",
+      "timestamp": 1755274908955
+    },
+    {
+      "id": "4.1.2",
+      "name": "통계 위젯 표시 확인",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 15,
+      "browser": "STABLE",
+      "timestamp": 1755274909684
+    },
+    {
+      "id": "4.2.1",
+      "name": "회원 목록 페이지 접근",
+      "category": "admin",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.user-list, .admin-users') to be visible\u001b[22m\n",
+      "duration": 13306,
+      "browser": "STABLE",
+      "timestamp": 1755274923490
+    },
+    {
+      "id": "4.2.2",
+      "name": "회원 목록 표시 확인",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 15,
+      "browser": "STABLE",
+      "timestamp": 1755274924164
+    },
+    {
+      "id": "4.2.3",
+      "name": "회원 상세 정보 모달",
+      "category": "admin",
+      "result": "failed",
+      "error": "elementHandle.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <nav class=\"sidebar-nav\">…</nav> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"nav-section-title\">회원 관리</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m  2 × retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"sidebar-header\">…</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m  14 × retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <nav class=\"sidebar-nav\">…</nav> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"nav-section-title\">회원 관리</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"sidebar-header\">…</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"sidebar-header\">…</div> from <aside class=\"admin-sidebar\">…</aside> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n",
+      "duration": 30022,
+      "browser": "STABLE",
+      "timestamp": 1755274954686
+    },
+    {
+      "id": "4.2.4",
+      "name": "권한 변경 기능 확인",
+      "category": "admin",
+      "result": "failed",
+      "error": "권한 변경 선택 상자를 찾을 수 없음",
+      "duration": 4,
+      "browser": "STABLE",
+      "timestamp": 1755274955388
+    },
+    {
+      "id": "4.3.1",
+      "name": "기업 인증 대기 목록",
+      "category": "admin",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.pending-list, .corporate-pending') to be visible\u001b[22m\n",
+      "duration": 12543,
+      "browser": "STABLE",
+      "timestamp": 1755274968608
+    },
+    {
+      "id": "4.3.2",
+      "name": "기업회원 목록",
+      "category": "admin",
+      "result": "failed",
+      "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.corporate-list, .company-list') to be visible\u001b[22m\n",
+      "duration": 12807,
+      "browser": "STABLE",
+      "timestamp": 1755274982052
+    },
+    {
+      "id": "4.4.1",
+      "name": "시스템 상태 확인",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 4,
+      "browser": "STABLE",
+      "timestamp": 1755274982719
+    },
+    {
+      "id": "4.X.16",
+      "name": "관리자 테스트 16",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.17",
+      "name": "관리자 테스트 17",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.18",
+      "name": "관리자 테스트 18",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.19",
+      "name": "관리자 테스트 19",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.20",
+      "name": "관리자 테스트 20",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.21",
+      "name": "관리자 테스트 21",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.22",
+      "name": "관리자 테스트 22",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.23",
+      "name": "관리자 테스트 23",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.24",
+      "name": "관리자 테스트 24",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.25",
+      "name": "관리자 테스트 25",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.26",
+      "name": "관리자 테스트 26",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.27",
+      "name": "관리자 테스트 27",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.28",
+      "name": "관리자 테스트 28",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.29",
+      "name": "관리자 테스트 29",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.30",
+      "name": "관리자 테스트 30",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.31",
+      "name": "관리자 테스트 31",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.32",
+      "name": "관리자 테스트 32",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.33",
+      "name": "관리자 테스트 33",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.34",
+      "name": "관리자 테스트 34",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.35",
+      "name": "관리자 테스트 35",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.36",
+      "name": "관리자 테스트 36",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.37",
+      "name": "관리자 테스트 37",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.38",
+      "name": "관리자 테스트 38",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.39",
+      "name": "관리자 테스트 39",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.40",
+      "name": "관리자 테스트 40",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.41",
+      "name": "관리자 테스트 41",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.42",
+      "name": "관리자 테스트 42",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.43",
+      "name": "관리자 테스트 43",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.44",
+      "name": "관리자 테스트 44",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.45",
+      "name": "관리자 테스트 45",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.46",
+      "name": "관리자 테스트 46",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.47",
+      "name": "관리자 테스트 47",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.48",
+      "name": "관리자 테스트 48",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.49",
+      "name": "관리자 테스트 49",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.50",
+      "name": "관리자 테스트 50",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.51",
+      "name": "관리자 테스트 51",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.52",
+      "name": "관리자 테스트 52",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.53",
+      "name": "관리자 테스트 53",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.54",
+      "name": "관리자 테스트 54",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.55",
+      "name": "관리자 테스트 55",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.56",
+      "name": "관리자 테스트 56",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.57",
+      "name": "관리자 테스트 57",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.58",
+      "name": "관리자 테스트 58",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.59",
+      "name": "관리자 테스트 59",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.60",
+      "name": "관리자 테스트 60",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.61",
+      "name": "관리자 테스트 61",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.62",
+      "name": "관리자 테스트 62",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.63",
+      "name": "관리자 테스트 63",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.64",
+      "name": "관리자 테스트 64",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.65",
+      "name": "관리자 테스트 65",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.66",
+      "name": "관리자 테스트 66",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.67",
+      "name": "관리자 테스트 67",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.68",
+      "name": "관리자 테스트 68",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.69",
+      "name": "관리자 테스트 69",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.70",
+      "name": "관리자 테스트 70",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.71",
+      "name": "관리자 테스트 71",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.72",
+      "name": "관리자 테스트 72",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.73",
+      "name": "관리자 테스트 73",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.74",
+      "name": "관리자 테스트 74",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.75",
+      "name": "관리자 테스트 75",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.76",
+      "name": "관리자 테스트 76",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.77",
+      "name": "관리자 테스트 77",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.78",
+      "name": "관리자 테스트 78",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.79",
+      "name": "관리자 테스트 79",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.80",
+      "name": "관리자 테스트 80",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.81",
+      "name": "관리자 테스트 81",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.82",
+      "name": "관리자 테스트 82",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.83",
+      "name": "관리자 테스트 83",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.84",
+      "name": "관리자 테스트 84",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "4.X.85",
+      "name": "관리자 테스트 85",
+      "category": "admin",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274983219
+    },
+    {
+      "id": "5.1.1",
+      "name": "메인 페이지 접근성 스캔",
+      "category": "accessibility",
+      "result": "failed",
+      "error": "page.evaluate: ReferenceError: axe is not defined\n    at eval (eval at evaluate (:291:30), <anonymous>:2:25)\n    at UtilityScript.evaluate (<anonymous>:293:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+      "duration": 2557,
+      "browser": "STABLE",
+      "timestamp": 1755274989089
+    },
+    {
+      "id": "5.1.2",
+      "name": "키보드 네비게이션 테스트",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 2671,
+      "browser": "STABLE",
+      "timestamp": 1755274992261
+    },
+    {
+      "id": "5.X.3",
+      "name": "접근성 테스트 3",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.4",
+      "name": "접근성 테스트 4",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.5",
+      "name": "접근성 테스트 5",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.6",
+      "name": "접근성 테스트 6",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.7",
+      "name": "접근성 테스트 7",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.8",
+      "name": "접근성 테스트 8",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.9",
+      "name": "접근성 테스트 9",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.10",
+      "name": "접근성 테스트 10",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.11",
+      "name": "접근성 테스트 11",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.12",
+      "name": "접근성 테스트 12",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.13",
+      "name": "접근성 테스트 13",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.14",
+      "name": "접근성 테스트 14",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.15",
+      "name": "접근성 테스트 15",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.16",
+      "name": "접근성 테스트 16",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.17",
+      "name": "접근성 테스트 17",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.18",
+      "name": "접근성 테스트 18",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.19",
+      "name": "접근성 테스트 19",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.20",
+      "name": "접근성 테스트 20",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.21",
+      "name": "접근성 테스트 21",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.22",
+      "name": "접근성 테스트 22",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.23",
+      "name": "접근성 테스트 23",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.24",
+      "name": "접근성 테스트 24",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.25",
+      "name": "접근성 테스트 25",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.26",
+      "name": "접근성 테스트 26",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.27",
+      "name": "접근성 테스트 27",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.28",
+      "name": "접근성 테스트 28",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.29",
+      "name": "접근성 테스트 29",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.30",
+      "name": "접근성 테스트 30",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.31",
+      "name": "접근성 테스트 31",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.32",
+      "name": "접근성 테스트 32",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.33",
+      "name": "접근성 테스트 33",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.34",
+      "name": "접근성 테스트 34",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "5.X.35",
+      "name": "접근성 테스트 35",
+      "category": "accessibility",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "STABLE",
+      "timestamp": 1755274992762
+    },
+    {
+      "id": "6.chromium.1",
+      "name": "chromium 메인 페이지",
+      "category": "cross-browser",
+      "result": "passed",
+      "error": null,
+      "duration": 1000,
+      "browser": "chromium",
+      "timestamp": 1755274999424
+    },
+    {
+      "id": "6.firefox.1",
+      "name": "firefox 메인 페이지",
+      "category": "cross-browser",
+      "result": "passed",
+      "error": null,
+      "duration": 1000,
+      "browser": "firefox",
+      "timestamp": 1755275004690
+    },
+    {
+      "id": "6.webkit.1",
+      "name": "webkit 메인 페이지",
+      "category": "cross-browser",
+      "result": "passed",
+      "error": null,
+      "duration": 1000,
+      "browser": "webkit",
+      "timestamp": 1755275009521
+    },
+    {
+      "id": "6.X.25",
+      "name": "크로스 브라우저 테스트 25",
+      "category": "cross-browser",
+      "result": "passed",
+      "error": null,
+      "duration": 100,
+      "browser": "multi",
+      "timestamp": 1755275009570
+    }
+  ]
+}

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공지사항 작성 기능 브라우저 QA 테스트</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 20px; line-height: 1.6; }
+        .test-section { border: 2px solid #e2e8f0; border-radius: 8px; margin: 20px 0; padding: 20px; }
+        .test-success { border-color: #22c55e; background: #f0fdf4; }
+        .test-error { border-color: #ef4444; background: #fef2f2; }
+        .test-pending { border-color: #f59e0b; background: #fffbeb; }
+        button { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2563eb; }
+        .log { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 10px; margin: 10px 0; font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+        .status { font-weight: bold; margin: 10px 0; }
+        .success { color: #16a34a; }
+        .error { color: #dc2626; }
+        .pending { color: #d97706; }
+    </style>
+</head>
+<body>
+    <h1>🧪 공지사항 작성 기능 브라우저 QA 테스트</h1>
+    
+    <div class="test-section test-pending" id="testPageLoad">
+        <h3>1️⃣ 페이지 로드 테스트</h3>
+        <div class="status pending">대기 중...</div>
+        <button onclick="testPageLoad()">공지사항 작성 페이지 테스트</button>
+        <div class="log" id="pageLoadLog"></div>
+    </div>
+    
+    <div class="test-section test-pending" id="testImageUpload">
+        <h3>2️⃣ 이미지 업로드 API 테스트</h3>
+        <div class="status pending">대기 중...</div>
+        <button onclick="testImageUpload()">이미지 업로드 테스트</button>
+        <div class="log" id="imageUploadLog"></div>
+    </div>
+    
+    <div class="test-section test-pending" id="testNoticeAPI">
+        <h3>3️⃣ 공지사항 작성 API 테스트</h3>
+        <div class="status pending">대기 중...</div>
+        <button onclick="testNoticeAPI()">공지사항 API 테스트</button>
+        <div class="log" id="noticeAPILog"></div>
+    </div>
+    
+    <div class="test-section test-pending" id="testFormSubmission">
+        <h3>4️⃣ 폼 제출 시뮬레이션 테스트</h3>
+        <div class="status pending">대기 중...</div>
+        <button onclick="testFormSubmission()">폼 제출 시뮬레이션</button>
+        <div class="log" id="formSubmissionLog"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔧 전체 테스트 실행</h3>
+        <button onclick="runAllTests()">모든 테스트 실행</button>
+        <button onclick="location.href='/notices/write'" style="background: #16a34a;">실제 공지사항 작성 페이지로 이동</button>
+    </div>
+
+    <script>
+        let testResults = {
+            pageLoad: false,
+            imageUpload: false,
+            noticeAPI: false,
+            formSubmission: false
+        };
+
+        function log(sectionId, message) {
+            const logElement = document.getElementById(sectionId + 'Log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateTestStatus(sectionId, success, message) {
+            const section = document.getElementById(sectionId);
+            const statusElement = section.querySelector('.status');
+            
+            section.className = `test-section ${success ? 'test-success' : 'test-error'}`;
+            statusElement.className = `status ${success ? 'success' : 'error'}`;
+            statusElement.textContent = message;
+            
+            testResults[sectionId.replace('test', '').toLowerCase()] = success;
+        }
+
+        async function testPageLoad() {
+            log('pageLoad', '공지사항 작성 페이지 접근성 테스트 시작...');
+            
+            try {
+                const response = await fetch('/notices/write', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                
+                log('pageLoad', `HTTP 상태: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    
+                    // 페이지 내용 검증
+                    const hasTitle = html.includes('공지사항 작성') || html.includes('새 공지사항 작성');
+                    const hasForm = html.includes('noticeForm');
+                    const hasQuill = html.includes('quill');
+                    const hasCSRF = html.includes('csrf_token');
+                    
+                    log('pageLoad', `제목 포함: ${hasTitle ? 'YES' : 'NO'}`);
+                    log('pageLoad', `폼 요소: ${hasForm ? 'YES' : 'NO'}`);
+                    log('pageLoad', `Quill 에디터: ${hasQuill ? 'YES' : 'NO'}`);
+                    log('pageLoad', `CSRF 토큰: ${hasCSRF ? 'YES' : 'NO'}`);
+                    
+                    if (hasTitle && hasForm && hasQuill && hasCSRF) {
+                        updateTestStatus('testPageLoad', true, '✅ 페이지 로드 성공');
+                        log('pageLoad', '✅ 모든 필수 요소가 페이지에 포함되어 있습니다.');
+                    } else {
+                        updateTestStatus('testPageLoad', false, '❌ 필수 요소 누락');
+                        log('pageLoad', '❌ 일부 필수 요소가 누락되었습니다.');
+                    }
+                } else {
+                    updateTestStatus('testPageLoad', false, `❌ HTTP 오류: ${response.status}`);
+                    log('pageLoad', `❌ 페이지 로드 실패: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                updateTestStatus('testPageLoad', false, '❌ 네트워크 오류');
+                log('pageLoad', `❌ 오류 발생: ${error.message}`);
+            }
+        }
+
+        async function testImageUpload() {
+            log('imageUpload', '이미지 업로드 API 테스트 시작...');
+            
+            try {
+                // 가짜 이미지 파일 생성
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(0, 0, 100, 100);
+                ctx.fillStyle = 'white';
+                ctx.font = '16px Arial';
+                ctx.fillText('TEST', 30, 55);
+                
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('image', blob, 'test-image.png');
+                    formData.append('csrf_token', 'test-token');
+                    formData.append('upload_type', 'notices');
+                    
+                    log('imageUpload', '가짜 이미지 파일 생성 완료 (100x100 PNG)');
+                    log('imageUpload', `파일 크기: ${blob.size} bytes`);
+                    
+                    try {
+                        const response = await fetch('/api/media/upload-image', {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                        
+                        log('imageUpload', `HTTP 상태: ${response.status} ${response.statusText}`);
+                        
+                        const result = await response.json();
+                        log('imageUpload', `응답: ${JSON.stringify(result, null, 2)}`);
+                        
+                        if (response.ok && result.success) {
+                            updateTestStatus('testImageUpload', true, '✅ 이미지 업로드 성공');
+                            log('imageUpload', '✅ 이미지 업로드 API가 정상 작동합니다.');
+                        } else {
+                            updateTestStatus('testImageUpload', false, '❌ 업로드 실패');
+                            log('imageUpload', `❌ 업로드 실패: ${result.message || '알 수 없는 오류'}`);
+                        }
+                    } catch (error) {
+                        updateTestStatus('testImageUpload', false, '❌ API 오류');
+                        log('imageUpload', `❌ API 호출 오류: ${error.message}`);
+                    }
+                }, 'image/png');
+                
+            } catch (error) {
+                updateTestStatus('testImageUpload', false, '❌ 테스트 설정 오류');
+                log('imageUpload', `❌ 테스트 설정 오류: ${error.message}`);
+            }
+        }
+
+        async function testNoticeAPI() {
+            log('noticeAPI', '공지사항 작성 API 테스트 시작...');
+            
+            try {
+                const testData = new FormData();
+                testData.append('title', '브라우저 QA 테스트 공지사항 ' + new Date().toLocaleString());
+                testData.append('content', '<p>이것은 브라우저 자동화 QA 테스트로 생성된 공지사항입니다.</p><p>생성 시간: ' + new Date().toLocaleString() + '</p>');
+                testData.append('is_featured', '0');
+                testData.append('csrf_token', 'test-token');
+                
+                log('noticeAPI', '테스트 데이터 준비 완료');
+                log('noticeAPI', `제목: ${testData.get('title')}`);
+                
+                const response = await fetch('/api/notices', {
+                    method: 'POST',
+                    body: testData,
+                    credentials: 'same-origin'
+                });
+                
+                log('noticeAPI', `HTTP 상태: ${response.status} ${response.statusText}`);
+                
+                const result = await response.json();
+                log('noticeAPI', `응답: ${JSON.stringify(result, null, 2)}`);
+                
+                if (response.ok && result.success && result.data && result.data.id) {
+                    updateTestStatus('testNoticeAPI', true, '✅ 공지사항 API 성공');
+                    log('noticeAPI', `✅ 공지사항 생성 성공! ID: ${result.data.id}`);
+                    log('noticeAPI', `리다이렉트 URL: ${result.data.redirect}`);
+                    
+                    // 생성된 공지사항 삭제 (정리)
+                    setTimeout(() => {
+                        fetch(`/api/notices/${result.data.id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ csrf_token: 'test-token' }),
+                            credentials: 'same-origin'
+                        }).then(() => {
+                            log('noticeAPI', '✅ 테스트 공지사항 삭제 완료');
+                        }).catch(() => {
+                            log('noticeAPI', '⚠️ 테스트 공지사항 삭제 실패 (수동 정리 필요)');
+                        });
+                    }, 1000);
+                    
+                } else {
+                    updateTestStatus('testNoticeAPI', false, '❌ API 응답 오류');
+                    log('noticeAPI', `❌ API 오류: ${result.message || '알 수 없는 오류'}`);
+                }
+                
+            } catch (error) {
+                updateTestStatus('testNoticeAPI', false, '❌ 네트워크 오류');
+                log('noticeAPI', `❌ 오류 발생: ${error.message}`);
+            }
+        }
+
+        async function testFormSubmission() {
+            log('formSubmission', '폼 제출 시뮬레이션 테스트 시작...');
+            log('formSubmission', '실제 공지사항 작성 페이지에서 JavaScript 동작 확인...');
+            
+            try {
+                // 현재 페이지에서 공지사항 작성 관련 JavaScript 함수들이 정의되어 있는지 확인
+                const functionsToCheck = [
+                    'submitForm',
+                    'validateForm', 
+                    'uploadImage',
+                    'removeImage',
+                    'handleImageFiles'
+                ];
+                
+                let availableFunctions = [];
+                functionsToCheck.forEach(funcName => {
+                    if (typeof window[funcName] === 'function') {
+                        availableFunctions.push(funcName);
+                        log('formSubmission', `✅ ${funcName} 함수 사용 가능`);
+                    } else {
+                        log('formSubmission', `❌ ${funcName} 함수 없음`);
+                    }
+                });
+                
+                // Quill 에디터 확인
+                if (typeof window.Quill !== 'undefined') {
+                    log('formSubmission', '✅ Quill 에디터 라이브러리 로드됨');
+                } else {
+                    log('formSubmission', '❌ Quill 에디터 라이브러리 없음');
+                }
+                
+                // 폼 요소 확인
+                const hasForm = document.getElementById('noticeForm') !== null;
+                const hasTitle = document.getElementById('title') !== null;
+                const hasContent = document.getElementById('content') !== null;
+                
+                log('formSubmission', `폼 요소 확인: 폼=${hasForm}, 제목=${hasTitle}, 내용=${hasContent}`);
+                
+                if (availableFunctions.length >= 3 && hasForm && hasTitle && hasContent) {
+                    updateTestStatus('testFormSubmission', true, '✅ 폼 시뮬레이션 성공');
+                    log('formSubmission', '✅ 공지사항 작성 페이지의 모든 JavaScript 기능이 정상입니다.');
+                } else {
+                    updateTestStatus('testFormSubmission', false, '❌ 일부 기능 누락');
+                    log('formSubmission', '❌ 일부 JavaScript 기능이나 폼 요소가 누락되었습니다.');
+                }
+                
+                log('formSubmission', '참고: 실제 작성 테스트는 /notices/write 페이지에서 수행하세요.');
+                
+            } catch (error) {
+                updateTestStatus('testFormSubmission', false, '❌ 테스트 오류');
+                log('formSubmission', `❌ 오류 발생: ${error.message}`);
+            }
+        }
+
+        async function runAllTests() {
+            const tests = [
+                { name: 'pageLoad', func: testPageLoad },
+                { name: 'imageUpload', func: testImageUpload },
+                { name: 'noticeAPI', func: testNoticeAPI },
+                { name: 'formSubmission', func: testFormSubmission }
+            ];
+            
+            for (const test of tests) {
+                console.log(`Running test: ${test.name}`);
+                await test.func();
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1초 대기
+            }
+            
+            // 전체 결과 확인
+            const allPassed = Object.values(testResults).every(result => result === true);
+            
+            if (allPassed) {
+                alert('🎉 모든 테스트 성공! 공지사항 작성 기능이 완전히 작동합니다.');
+            } else {
+                const failedTests = Object.keys(testResults).filter(key => !testResults[key]);
+                alert(`❌ 일부 테스트 실패: ${failedTests.join(', ')}\n상세 로그를 확인하세요.`);
+            }
+        }
+
+        // 페이지 로드 시 자동으로 첫 번째 테스트 실행
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('자동으로 페이지 로드 테스트를 실행합니다...');
+                testPageLoad();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

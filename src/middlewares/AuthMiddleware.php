@@ -167,8 +167,8 @@ class AuthMiddleware {
      * @return array|false 사용자 정보 또는 false
      */
     private static function authenticateWithJWT() {
-        // 액세스 토큰 확인
-        $accessToken = $_COOKIE['access_token'] ?? null;
+        // 액세스 토큰 확인 (여러 쿠키명 지원)
+        $accessToken = $_COOKIE['access_token'] ?? $_COOKIE['auth_token'] ?? $_COOKIE['jwt_token'] ?? null;
         
         if ($accessToken) {
             $userData = JWTHelper::getUserFromToken($accessToken);
@@ -214,12 +214,34 @@ class AuthMiddleware {
     
     /**
      * 데이터베이스에서 사용자 정보 조회
+     * 무한 루프 방지 로직 포함 (v3.8.1)
      * 
      * @param int $userId 사용자 ID
      * @return array|false 사용자 정보 또는 false
      */
     private static function getUserFromDatabase($userId) {
+        // 무한 루프 방지: 호출 스택 깊이 추적
+        static $callStack = [];
+        static $callCount = 0;
+        
+        // 같은 사용자 ID로 이미 호출 중인지 확인
+        if (isset($callStack[$userId])) {
+            error_log("⚠️ 무한 루프 방지: 사용자 ID $userId 중복 호출 차단");
+            return false;
+        }
+        
+        // 호출 깊이 제한 (최대 5회)
+        $callCount++;
+        if ($callCount > 5) {
+            error_log("🚨 무한 루프 방지: 최대 호출 깊이 초과 ($callCount)");
+            $callCount = 0; // 카운터 리셋
+            return false;
+        }
+        
         try {
+            // 호출 스택에 추가
+            $callStack[$userId] = true;
+            
             require_once SRC_PATH . '/config/database.php';
             $db = Database::getInstance();
             
@@ -231,11 +253,14 @@ class AuthMiddleware {
             ", [$userId]);
             
             if (!$user) {
+                // 호출 스택에서 제거
+                unset($callStack[$userId]);
+                $callCount--;
                 return false;
             }
             
             // JWT에서 사용하는 형태로 변환
-            return [
+            $result = [
                 'id' => $user['id'],
                 'user_id' => $user['id'], // 호환성
                 'nickname' => $user['nickname'],
@@ -249,8 +274,19 @@ class AuthMiddleware {
                 'updated_at' => $user['updated_at']
             ];
             
+            // 성공적으로 완료, 호출 스택에서 제거
+            unset($callStack[$userId]);
+            $callCount--;
+            
+            return $result;
+            
         } catch (Exception $e) {
             error_log('사용자 정보 조회 오류: ' . $e->getMessage());
+            
+            // 호출 스택에서 제거
+            unset($callStack[$userId]);
+            $callCount--;
+            
             return false;
         }
     }

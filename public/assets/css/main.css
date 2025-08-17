@@ -9,7 +9,7 @@ input, textarea, [contenteditable] {
 
 /* 클릭 가능한 요소만 포인터 커서 */
 a, button, [role="button"], .btn, [onclick], 
-.user-menu, .dropdown-toggle, .mobile-menu-toggle,
+.user-menu, .dropdown-toggle,
 .nav-menu a, .feature-link, .rocket-launch-btn {
     cursor: pointer !important;
 }
@@ -389,14 +389,6 @@ ul, ol {
     color: #fff;
 }
 
-.mobile-menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-}
 
 /* 모바일 반응형 */
 @media (max-width: 992px) {
@@ -409,9 +401,6 @@ ul, ol {
         justify-content: space-between;
     }
     
-    .mobile-menu-toggle {
-        display: block;
-    }
     
     .main-nav {
         position: fixed;
@@ -4475,24 +4464,6 @@ body {
     width: 100%;
 }
 
-/* 모바일 메뉴 */
-.mobile-menu-toggle {
-    display: none;
-    flex-direction: column;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    gap: 4px;
-}
-
-.hamburger-line {
-    width: 24px;
-    height: 2px;
-    background: #64748b;
-    border-radius: 1px;
-    transition: var(--transition-medium);
-}
 
 .mobile-menu-overlay {
     position: fixed;
@@ -4931,4 +4902,527 @@ body {
 
 .alert.chat-notification .alert-close {
     color: white;
+}
+
+/* ==========================================================================
+   🚀 Ultra Think Mobile Header Optimization (v3.14.0)
+   ========================================================================== */
+
+/* 모바일 헤더 레이아웃 개선 - 프로필 이미지 잘림 문제 완전 해결 (v3.15.2) */
+@media (max-width: 768px) {
+    /* 모바일 헤더 컨테이너 최적화 */
+    .main-header .container {
+        padding-left: 16px !important;
+        padding-right: 60px !important; /* 햄버거 메뉴(40px) + 여유 공간(20px) 확보 */
+        box-sizing: border-box !important;
+    }
+    
+    .header-content {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 12px 0 !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: calc(100vw - 76px) !important; /* 뷰포트 너비에서 좌우 패딩(16px+60px) 제외 */
+        overflow: hidden !important; /* 넘치는 요소 숨김 */
+    }
+    
+    .header-left {
+        flex: 0 0 auto !important;
+        order: 1;
+    }
+    
+    .main-nav {
+        display: none !important; /* 모바일에서 완전 숨김 */
+    }
+    
+    .nav-auth {
+        flex: 0 0 auto !important;
+        order: 3;
+        display: flex !important;
+        align-items: center !important;
+        position: absolute !important;
+        right: 0 !important; /* 절대 위치로 오른쪽 끝에 고정 */
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin-right: 0 !important;
+    }
+    
+    /* 사용자 메뉴 최적화 - 프로필 이미지 중심 */
+    .user-menu {
+        width: 50px !important;
+        height: 50px !important;
+        padding: 8px !important;
+        border-radius: 25px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(0, 0, 0, 0.05) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* 사용자 아바타 크기 고정 */
+    .user-avatar {
+        width: 32px !important;
+        height: 32px !important;
+        margin: 0 !important;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+    }
+    
+    /* 모바일에서 사용자 이름과 화살표 완전 숨김 */
+    .user-menu .user-name {
+        display: none !important;
+    }
+    
+    .user-menu i.fa-chevron-down {
+        display: none !important;
+    }
+    
+}
+
+/* 모바일/태블릿 햄버거 메뉴 */
+@media (max-width: 768px) {
+    /* 기존 사용자 메뉴 숨김 */
+    .user-menu {
+        display: none !important;
+    }
+    
+    /* 햄버거 메뉴 버튼 표시 */
+    .mobile-menu-toggle {
+        display: flex !important;
+        flex-direction: column;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        gap: 4px;
+        order: 3;
+        margin-left: auto;
+    }
+    
+    .hamburger-line {
+        width: 24px !important;
+        height: 3px !important;
+        background: #333 !important;
+        background-color: #333 !important;
+        border-radius: 1px;
+        transition: all 0.3s ease;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    /* 모바일 메뉴 모달 기본 스타일 */
+    .mobile-menu-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .mobile-menu-modal.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+    }
+    
+    .mobile-modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .mobile-modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 0;
+        width: 100%;
+        max-width: 420px;
+        max-height: 90vh;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform: translateY(30px) scale(0.9);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .mobile-menu-modal.active .mobile-modal-content {
+        transform: translateY(0) scale(1);
+    }
+    
+    /* 프로필 헤더 스타일 */
+    .mobile-profile-header {
+        padding: 24px 20px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .profile-image-large {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .profile-image-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .avatar-fallback-large {
+        width: 100%;
+        height: 100%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        font-size: 28px;
+    }
+    
+    .profile-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .profile-info .user-display-name {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: white;
+    }
+    
+    .profile-info .user-role {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-bottom: 4px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .profile-info .user-welcome {
+        font-size: 13px;
+        opacity: 0.8;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* 비로그인 사용자 헤더 */
+    .mobile-guest-header {
+        padding: 24px 20px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        text-align: center;
+    }
+    
+    .guest-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+    
+    .guest-message {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 16px;
+        color: white;
+    }
+    
+    .auth-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .mobile-login-btn, .mobile-signup-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .mobile-login-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .mobile-signup-btn {
+        background: white;
+        color: #667eea;
+    }
+    
+    .mobile-login-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .mobile-signup-btn:hover {
+        background: #f8fafc;
+    }
+    
+    /* 헤더 스타일 개선 */
+    .dropdown-header {
+        padding: 24px 20px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        text-align: center;
+    }
+    
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .user-display-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .user-welcome {
+        font-size: 14px;
+        opacity: 0.9;
+        color: white;
+    }
+    
+    /* 메뉴 섹션 스타일 */
+    .menu-section {
+        padding: 16px 0 8px;
+    }
+    
+    .section-title {
+        padding: 8px 20px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #f9fafb;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    /* 드롭다운 아이템 개선 */
+    
+    .dropdown-header .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .dropdown-header .user-display-name {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .dropdown-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        padding: 18px 20px !important;
+        color: #374151 !important;
+        text-decoration: none !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        border-bottom: 1px solid #f9fafb;
+        transition: all 0.2s ease !important;
+        min-height: 60px;
+        box-sizing: border-box;
+        position: relative;
+    }
+    
+    .dropdown-item:hover {
+        background: #f8fafc !important;
+        color: #667eea !important;
+    }
+    
+    .dropdown-item.active {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)) !important;
+        color: #667eea !important;
+        font-weight: 600 !important;
+        border-left: 4px solid #667eea;
+        padding-left: 16px !important;
+    }
+    
+    .dropdown-item.active::after {
+        content: '✓';
+        position: absolute;
+        right: 20px;
+        color: #667eea;
+        font-weight: bold;
+    }
+    
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+    
+    .dropdown-item i {
+        width: 20px !important;
+        text-align: center !important;
+        font-size: 16px !important;
+        color: #9ca3af;
+        flex-shrink: 0;
+    }
+    
+    .dropdown-item:hover i,
+    .dropdown-item.active i {
+        color: #667eea;
+    }
+    
+    .dropdown-divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 0;
+    }
+    
+    /* 관리자 메뉴 스타일 */
+    .admin-item {
+        background: #f3f0ff !important;
+        color: #7c3aed !important;
+    }
+    
+    .admin-item:hover {
+        background: #ede9fe !important;
+        color: #6d28d9 !important;
+    }
+    
+    .admin-item i {
+        color: #7c3aed !important;
+    }
+    
+    /* 로그아웃 메뉴 스타일 */
+    .logout-item {
+        color: #dc2626 !important;
+        background: #fef2f2 !important;
+        margin-top: 8px;
+        border-radius: 0 0 16px 16px;
+    }
+    
+    .logout-item:hover {
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+    }
+    
+    .logout-item i {
+        color: #dc2626 !important;
+    }
+    
+    /* 모바일 메뉴 닫기 버튼 */
+    .mobile-dropdown-close {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        z-index: 10000;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+    
+    .mobile-dropdown-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* 태블릿 최적화 (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .user-dropdown {
+        min-width: 240px !important;
+        max-width: 300px;
+    }
+    
+    .dropdown-item {
+        padding: 14px 16px !important;
+        font-size: 15px !important;
+    }
+    
+    .dropdown-header {
+        padding: 20px 16px;
+    }
+}
+
+/* 기본 상태에서 햄버거 메뉴 숨김 */
+.mobile-menu-toggle {
+    display: none !important;
+}
+
+/* 사용자 메뉴 클릭 이벤트 개선 */
+@media (max-width: 768px) {
+    .user-menu {
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        display: none !important; /* 모바일에서 사용자 메뉴 숨김 */
+    }
+    
+    .user-avatar img {
+        transition: transform 0.2s ease;
+    }
+    
+    .user-menu:active .user-avatar img {
+        transform: scale(0.95);
+    }
+    
+    /* 햄버거 메뉴 버튼 다시 표시 */
+    .mobile-menu-toggle {
+        display: flex !important;
+        flex-direction: column;
+        background: rgba(0, 0, 0, 0.1) !important; /* 약간의 배경색 추가 */
+        border: 1px solid rgba(0, 0, 0, 0.2) !important; /* 테두리 추가 */
+        border-radius: 4px !important;
+        cursor: pointer;
+        padding: 8px;
+        gap: 4px;
+        order: 3;
+        margin-left: auto;
+        z-index: 100; /* 다른 요소들보다 위에 표시 */
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+    
+    .hamburger-line {
+        width: 24px !important;
+        height: 3px !important;
+        background: #333 !important;
+        background-color: #333 !important;
+        border-radius: 1px;
+        transition: all 0.3s ease;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
 }

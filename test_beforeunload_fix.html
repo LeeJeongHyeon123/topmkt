@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beforeunload 수정 테스트</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 20px; line-height: 1.6; }
+        .test-box { border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .success { border-color: #22c55e; background: #f0fdf4; }
+        button { background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2563eb; }
+        .test-complete { background: #16a34a; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Beforeunload 이벤트 수정 테스트</h1>
+    
+    <div class="test-box success">
+        <h3>✅ 수정 완료된 내용</h3>
+        <ul>
+            <li><strong>전역 변수 추가</strong>: <code>isFormSubmitted = false</code></li>
+            <li><strong>성공 시 설정</strong>: 폼 제출 성공 시 <code>isFormSubmitted = true</code></li>
+            <li><strong>취소 버튼</strong>: 클릭 시 <code>isFormSubmitted = true</code> 설정</li>
+            <li><strong>삭제 기능</strong>: 삭제 시작 시 <code>isFormSubmitted = true</code> 설정</li>
+            <li><strong>beforeunload 개선</strong>: <code>isFormSubmitted</code> 체크 추가</li>
+        </ul>
+    </div>
+    
+    <div class="test-box">
+        <h3>🧪 테스트 방법</h3>
+        <ol>
+            <li><strong>공지사항 작성 페이지</strong>로 이동</li>
+            <li><strong>제목과 내용</strong>을 입력</li>
+            <li><strong>작성하기 버튼</strong> 클릭</li>
+            <li><strong>성공 알림</strong> 후 상세 페이지로 이동</li>
+            <li><strong>예상 결과</strong>: "변경사항이 저장되지 않을 수 있습니다" 경고가 더 이상 표시되지 않음</li>
+        </ol>
+    </div>
+    
+    <div class="test-box">
+        <h3>🔗 테스트 링크</h3>
+        <div style="margin: 20px 0;">
+            <button onclick="location.href='/notices/write'">📝 공지사항 작성 페이지</button>
+            <button onclick="location.href='/notices'" style="background: #6b7280;">📋 공지사항 목록</button>
+        </div>
+    </div>
+    
+    <div class="test-box">
+        <h3>📋 체크리스트</h3>
+        <label><input type="checkbox"> 작성 후 성공 메시지 표시됨</label><br>
+        <label><input type="checkbox"> 상세 페이지로 정상 리다이렉트됨</label><br>
+        <label><input type="checkbox"> beforeunload 경고가 표시되지 않음</label><br>
+        <label><input type="checkbox"> 취소 버튼 클릭 시 경고 없이 목록으로 이동</label><br>
+        <br>
+        <button onclick="confirmFix()" class="test-complete">✅ 문제 해결 확인</button>
+    </div>
+
+    <script>
+        function confirmFix() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            if (checkedCount === checkboxes.length) {
+                alert('🎉 완벽합니다! beforeunload 문제가 완전히 해결되었습니다.\n\n✅ 모든 테스트 항목 통과\n✅ 사용자 경험 개선 완료\n\n이제 공지사항 작성이 매끄럽게 작동합니다!');
+            } else {
+                alert(`⚠️ ${checkboxes.length - checkedCount}개 항목이 아직 확인되지 않았습니다.\n\n모든 테스트를 완료한 후 다시 확인해주세요.`);
+            }
+        }
+        
+        // 페이지 로드 시 설명 표시
+        window.addEventListener('load', () => {
+            console.log('🔧 Beforeunload 이벤트 수정 완료');
+            console.log('📝 테스트 페이지: /notices/write');
+        });
+    </script>
+</body>
+</html>

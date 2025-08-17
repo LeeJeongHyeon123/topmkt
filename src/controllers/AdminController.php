@@ -192,7 +192,6 @@ class AdminController {
         
         return [
             'pendingCorps' => $pendingCorps,
-            'reports' => [], // TODO: 신고 시스템 구현 시 추가
             'systemAlerts' => []
         ];
     }

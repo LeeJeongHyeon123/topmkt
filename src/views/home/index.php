@@ -146,6 +146,221 @@ require_once SRC_PATH . '/views/templates/header.php';
 
 <!-- 🚀 로켓 애니메이션 CSS -->
 <style>
+/* 기본 레이아웃 및 반응형 스타일 */
+* {
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 히어로 섹션 */
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    text-align: center;
+    z-index: 2;
+    position: relative;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 50px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: white;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 버튼 스타일 */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 32px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    min-height: 56px;
+    box-sizing: border-box;
+}
+
+.btn-primary-gradient {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-ghost {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* 기능 섹션 */
+.features-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.section-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    margin-bottom: 24px;
+}
+
+.icon-bg {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    font-size: 24px;
+}
+
+.icon-bg.green {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.icon-bg.purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+
+.feature-card p {
+    font-size: 16px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 12px 0;
+    min-height: 44px;
+    transition: all 0.3s ease;
+}
+
+.feature-link:hover {
+    color: #1d4ed8;
+    transform: translateX(4px);
+}
+
 /* 로켓 애니메이션 효과 */
 .rocket-icon {
     display: inline-block;
@@ -331,6 +546,178 @@ require_once SRC_PATH . '/views/templates/header.php';
 @media (hover: none) {
     .rocket-launch-btn:active {
         transform: translateY(-1px) scale(0.98);
+    }
+}
+
+/* 모바일 반응형 최적화 - UltraThink */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+    
+    .hero-section {
+        min-height: 90vh;
+        padding: 60px 0 40px;
+    }
+    
+    .hero-badge {
+        font-size: 13px;
+        padding: 6px 12px;
+        margin-bottom: 20px;
+    }
+    
+    .hero-title {
+        font-size: 2.25rem;
+        line-height: 1.1;
+        margin-bottom: 20px;
+    }
+    
+    .hero-description {
+        font-size: 1.125rem;
+        margin-bottom: 28px;
+        padding: 0 10px;
+    }
+    
+    .hero-description br {
+        display: none;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 280px;
+        padding: 18px 24px;
+        font-size: 16px;
+        min-height: 56px;
+        justify-content: center;
+    }
+    
+    .features-section {
+        padding: 60px 0;
+    }
+    
+    .section-header {
+        margin-bottom: 40px;
+    }
+    
+    .section-badge {
+        font-size: 13px;
+        padding: 6px 16px;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 12px;
+    }
+    
+    .section-subtitle {
+        font-size: 1.125rem;
+        padding: 0 10px;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 0 4px;
+    }
+    
+    .feature-card {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+    
+    .icon-bg {
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+    }
+    
+    .feature-card p {
+        font-size: 15px;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+    
+    .feature-link {
+        font-size: 15px;
+        padding: 14px 0;
+        min-height: 48px;
+    }
+}
+
+/* 소형 모바일 최적화 */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 12px;
+    }
+    
+    .hero-section {
+        min-height: 85vh;
+        padding: 40px 0 30px;
+    }
+    
+    .hero-title {
+        font-size: 1.875rem;
+        margin-bottom: 16px;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+        margin-bottom: 24px;
+    }
+    
+    .btn {
+        max-width: 100%;
+        padding: 20px 24px;
+        min-height: 60px;
+        font-size: 16px;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1rem;
+    }
+    
+    .features-grid {
+        gap: 20px;
+    }
+    
+    .feature-card {
+        padding: 20px 16px;
+    }
+    
+    .icon-bg {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.125rem;
+    }
+    
+    .feature-card p {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    .feature-link {
+        font-size: 14px;
+        min-height: 52px;
+        padding: 16px 0;
     }
 }
 

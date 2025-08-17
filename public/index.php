@@ -5,10 +5,16 @@
  * 모든 요청은 이 파일을 통해 처리됩니다.
  */
 
-// 상수 정의 (paths.php 로드 전이므로 여기서 정의)
-define('ROOT_PATH', dirname(__DIR__));
-define('SRC_PATH', ROOT_PATH . '/src');
-define('CONFIG_PATH', SRC_PATH . '/config');
+// 상수 정의 (paths.php 로드 전이므로 여기서 정의) - 중복 정의 방지
+if (!defined('ROOT_PATH')) {
+    define('ROOT_PATH', dirname(__DIR__));
+}
+if (!defined('SRC_PATH')) {
+    define('SRC_PATH', ROOT_PATH . '/src');
+}
+if (!defined('CONFIG_PATH')) {
+    define('CONFIG_PATH', SRC_PATH . '/config');
+}
 
 // paths.php 로드
 require_once CONFIG_PATH . '/paths.php';
@@ -32,10 +38,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['REQUEST_URI'], '/l
     file_put_contents(DEBUG_STORE_FLOW_LOG, "FILES 데이터 존재: " . (empty($_FILES) ? 'NO' : 'YES') . "\n", FILE_APPEND);
 }
 
-// 오류 표시 (프로덕션에서는 비활성화)
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(0);
+// 공지사항 편집 디버깅을 위한 로그
+if ((($_SERVER['REQUEST_METHOD'] === 'PUT') || ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_method']) && $_POST['_method'] === 'PUT')) && strpos($_SERVER['REQUEST_URI'], '/api/notices/') !== false) {
+    file_put_contents('/tmp/notice_debug.log', "=== INDEX.PHP에서 캐치 ===\n", FILE_APPEND);
+    file_put_contents('/tmp/notice_debug.log', "REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n", FILE_APPEND);
+    file_put_contents('/tmp/notice_debug.log', "REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD'] . "\n", FILE_APPEND);
+    file_put_contents('/tmp/notice_debug.log', "_method: " . ($_POST['_method'] ?? 'NOT_SET') . "\n", FILE_APPEND);
+    file_put_contents('/tmp/notice_debug.log', "CONTENT_TYPE: " . ($_SERVER['CONTENT_TYPE'] ?? 'NOT_SET') . "\n", FILE_APPEND);
+    file_put_contents('/tmp/notice_debug.log', "POST 데이터 존재: " . (empty($_POST) ? 'NO' : 'YES') . "\n", FILE_APPEND);
+    file_put_contents('/tmp/notice_debug.log', "FILES 데이터 존재: " . (empty($_FILES) ? 'NO' : 'YES') . "\n", FILE_APPEND);
+}
+
+// 오류 표시 (긴급 디버깅용 임시 활성화)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 try {
     // 설정 파일 로드

@@ -172,9 +172,9 @@ class JWTHelper {
         
         return [
             'user_id' => $payload['user_id'],
-            'username' => $payload['username'] ?? null,
+            'username' => $payload['username'] ?? $payload['nickname'] ?? null,
             'phone' => $payload['phone'] ?? null,
-            'user_role' => $payload['user_role'] ?? 'GENERAL',
+            'user_role' => $payload['user_role'] ?? $payload['role'] ?? 'GENERAL',
             'exp' => $payload['exp'] ?? null,
             'iat' => $payload['iat'] ?? null
         ];

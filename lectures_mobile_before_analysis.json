@@ -1,0 +1,26 @@
+{
+  "iPhone SE": {
+    "viewport": {
+      "width": 375,
+      "height": 667
+    },
+    "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.lectures-header') to be visible\u001b[22m\n",
+    "status": "failed"
+  },
+  "iPad": {
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.lectures-header') to be visible\u001b[22m\n",
+    "status": "failed"
+  },
+  "Small Mobile": {
+    "viewport": {
+      "width": 320,
+      "height": 568
+    },
+    "error": "page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.lectures-header') to be visible\u001b[22m\n",
+    "status": "failed"
+  }
+}

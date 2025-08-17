@@ -1,0 +1,206 @@
+{
+  "iPhone SE": {
+    "viewport": {
+      "width": 375,
+      "height": 667
+    },
+    "screenshot": "lectures_iphone_se_fixed.png",
+    "measurements": {
+      "touchTargets": {
+        ".month-nav-btn": {
+          "width": 104.453125,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 18px"
+        },
+        ".view-btn": {
+          "width": 108.453125,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 18px"
+        },
+        ".btn-create": {
+          "width": 132.890625,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 20px"
+        },
+        ".legend-item": {
+          "width": 361,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "10px"
+        },
+        ".sidebar-lecture-item": {
+          "width": 317,
+          "height": 96.390625,
+          "fontSize": "16px",
+          "padding": "12px"
+        }
+      },
+      "fontSizes": {
+        ".sidebar-lecture-title": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        },
+        ".sidebar-lecture-meta": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        },
+        ".lecture-list-title": {
+          "fontSize": "20px",
+          "lineHeight": "26px"
+        },
+        ".lecture-list-meta": {
+          "fontSize": "16px",
+          "lineHeight": "22.4px"
+        },
+        ".lecture-list-description": {
+          "fontSize": "16px",
+          "lineHeight": "24px"
+        },
+        ".legend-item": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        }
+      }
+    },
+    "status": "completed"
+  },
+  "iPad": {
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "screenshot": "lectures_ipad_fixed.png",
+    "measurements": {
+      "touchTargets": {
+        ".month-nav-btn": {
+          "width": 104.453125,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 18px"
+        },
+        ".view-btn": {
+          "width": 108.453125,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 18px"
+        },
+        ".btn-create": {
+          "width": 136.890625,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 22px"
+        },
+        ".legend-item": {
+          "width": 172.890625,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "12px"
+        },
+        ".sidebar-lecture-item": {
+          "width": 696,
+          "height": 100.390625,
+          "fontSize": "16px",
+          "padding": "14px"
+        }
+      },
+      "fontSizes": {
+        ".sidebar-lecture-title": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        },
+        ".sidebar-lecture-meta": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        },
+        ".lecture-list-title": {
+          "fontSize": "20px",
+          "lineHeight": "26px"
+        },
+        ".lecture-list-meta": {
+          "fontSize": "16px",
+          "lineHeight": "22.4px"
+        },
+        ".lecture-list-description": {
+          "fontSize": "16px",
+          "lineHeight": "24px"
+        },
+        ".legend-item": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        }
+      }
+    },
+    "status": "completed"
+  },
+  "Small Mobile": {
+    "viewport": {
+      "width": 320,
+      "height": 568
+    },
+    "screenshot": "lectures_small_mobile_fixed.png",
+    "measurements": {
+      "touchTargets": {
+        ".month-nav-btn": {
+          "width": 101.828125,
+          "height": 66.375,
+          "fontSize": "16px",
+          "padding": "14px 18px"
+        },
+        ".view-btn": {
+          "width": 108.453125,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 18px"
+        },
+        ".btn-create": {
+          "width": 132.890625,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "14px 20px"
+        },
+        ".legend-item": {
+          "width": 306,
+          "height": 48,
+          "fontSize": "16px",
+          "padding": "10px"
+        },
+        ".sidebar-lecture-item": {
+          "width": 262,
+          "height": 96.390625,
+          "fontSize": "16px",
+          "padding": "12px"
+        }
+      },
+      "fontSizes": {
+        ".sidebar-lecture-title": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        },
+        ".sidebar-lecture-meta": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        },
+        ".lecture-list-title": {
+          "fontSize": "20px",
+          "lineHeight": "26px"
+        },
+        ".lecture-list-meta": {
+          "fontSize": "16px",
+          "lineHeight": "22.4px"
+        },
+        ".lecture-list-description": {
+          "fontSize": "16px",
+          "lineHeight": "24px"
+        },
+        ".legend-item": {
+          "fontSize": "16px",
+          "lineHeight": "20.8px"
+        }
+      }
+    },
+    "status": "completed"
+  }
+}

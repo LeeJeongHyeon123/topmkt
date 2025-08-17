@@ -23,9 +23,9 @@ body.admin-page {
 
 /* 관리자 컨테이너 */
 .admin-container {
-    width: 1920px;
-    min-width: 1920px;
-    margin: 0 auto;
+    width: 100%;
+    min-width: 1200px;
+    margin: 0;
     display: flex;
     min-height: 100vh;
 }

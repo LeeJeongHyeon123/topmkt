@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-17T08:14:15.393Z",
+  "testUrl": "https://www.topmktx.com/lectures/3?view=list",
+  "viewports": [
+    {
+      "name": "Mobile (iPhone SE)",
+      "size": "375x667"
+    },
+    {
+      "name": "Small Mobile (iPhone 5)",
+      "size": "320x568"
+    }
+  ],
+  "screenshots": [
+    "lectures_detail_mobile_broken.png",
+    "lectures_detail_small_broken.png"
+  ],
+  "issues": [
+    "🚨 작은 터치 타겟: 13개 (권장 최소 44px)",
+    "🚨 가독성 문제: 8개 요소의 폰트 크기가 14px 미만",
+    "📊 메인 콘텐츠 레이아웃: grid, 그리드: 345px",
+    "📊 사이드바 크기: 345px × 578.40625px"
+  ],
+  "jsErrors": [],
+  "criticalProblems": [
+    "🚨 작은 터치 타겟: 13개 (권장 최소 44px)",
+    "🚨 가독성 문제: 8개 요소의 폰트 크기가 14px 미만"
+  ],
+  "recommendations": [
+    "1. 수평 스크롤 제거 - max-width: 100% 적용",
+    "2. 터치 타겟 크기 확대 - 최소 44px × 44px",
+    "3. 폰트 크기 조정 - 최소 14px 이상",
+    "4. 그리드 레이아웃을 플렉스박스로 변경",
+    "5. 사이드바를 모바일에서 하단으로 이동"
+  ]
+}

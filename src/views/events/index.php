@@ -81,15 +81,19 @@ $monthNames = [
     background: #4A90E2;
     color: white;
     border: none;
-    padding: 8px 12px;
+    padding: 0;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 48px !important;  /* 개선: 터치 타겟 더 확실하게 */
+    height: 48px !important; /* 개선: 터치 타겟 더 확실하게 */
+    min-width: 48px;
+    min-height: 48px;
+    box-sizing: border-box;
+    font-size: 14px;
 }
 
 .nav-btn:hover {
@@ -113,13 +117,20 @@ $monthNames = [
 }
 
 .view-btn {
-    padding: 10px 20px;
+    padding: 14px 20px; /* 개선: 터치 타겟 더 확대 */
     border: none;
     background: white;
     color: #666;
     cursor: pointer;
     transition: all 0.3s;
     font-weight: 500;
+    min-height: 48px !important; /* 개선: 터치 타겟 더 확실하게 */
+    height: 48px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
 }
 
 .view-btn.active {
@@ -131,7 +142,7 @@ $monthNames = [
     background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 20px; /* 개선: 사이즈 조정 */
     border-radius: 50px;
     text-decoration: none !important;
     font-weight: 600;
@@ -139,7 +150,10 @@ $monthNames = [
     transition: all 0.3s;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px; /* 개선: 아이콘과 텍스트 간격 조정 */
+    min-height: 44px; /* 개선: 터치 타겟 최소 높이 */
+    box-sizing: border-box;
+    font-size: 14px; /* 개선: "새 행사 등록" 2줄 방지 */
 }
 
 .create-event-btn:link,
@@ -180,10 +194,10 @@ $monthNames = [
 }
 
 .calendar-day-header {
-    padding: 15px;
+    padding: 12px; /* 개선: 컴팩트한 헤더 */
     text-align: center;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 14px; /* 개선: 0.9rem -> 14px */
 }
 
 .calendar-day {
@@ -220,15 +234,19 @@ $monthNames = [
 .event-item {
     background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
     color: white;
-    padding: 4px 8px;
-    margin-bottom: 2px;
+    padding: 6px 8px; /* 개선: 터치 영역 확대 */
+    margin-bottom: 3px;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 12px; /* 개선: 0.75rem -> 12px */
     cursor: pointer;
     transition: transform 0.2s;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    min-height: 32px; /* 개선: 최소 터치 타겟 보장 */
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
 }
 
 .event-item:hover {
@@ -238,12 +256,17 @@ $monthNames = [
 
 .more-events {
     color: #4A90E2;
-    font-size: 0.7rem;
+    font-size: 11px; /* 개선: 0.7rem -> 11px */
     cursor: pointer;
     text-align: center;
-    padding: 2px;
+    padding: 4px; /* 개선: 터치 영역 확대 */
     border-radius: 3px;
     background: #e0f2fe;
+    min-height: 28px; /* 개선: 최소 터치 타겟 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .more-events:hover {
@@ -295,7 +318,13 @@ $monthNames = [
     font-size: 1.5rem;
     cursor: pointer;
     color: #64748b;
-    padding: 5px;
+    padding: 8px; /* 개선: 5px -> 8px */
+    min-height: 44px; /* 개선: 터치 타겟 최소 높이 */
+    min-width: 44px;  /* 개선: 터치 타겟 최소 너비 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .modal-close:hover {
@@ -330,50 +359,209 @@ $monthNames = [
 
 .event-details {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 13px; /* 개선: 0.9rem -> 13px */
     display: flex;
     flex-direction: column;
     gap: 3px;
 }
 
 
-/* 반응형 */
+/* 📱 모바일 반응형 최적화 (v3.11.7) */
+/* 터치 타겟 44px+ 유지하되 세련된 UI */
 @media (max-width: 768px) {
     .events-container {
-        padding: 20px 10px;
+        padding: 15px 10px; /* 개선: 컴팩트한 패딩 */
     }
     
     .events-header {
-        margin-top: 20px;
-        padding: 30px 20px;
+        margin-top: 15px;
+        padding: 25px 15px; /* 개선: 세련된 헤더 */
     }
     
     .events-header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem; /* 개선: 2rem -> 1.8rem */
+    }
+    
+    .events-header p {
+        font-size: 15px; /* 개선: 명시적 크기 */
     }
     
     .events-controls {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px; /* 개선: 15px -> 12px */
     }
     
     .events-navigation {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
+    }
+    
+    .month-nav {
+        padding: 8px 16px; /* 개선: 10px 20px -> 8px 16px */
+    }
+    
+    .current-month {
+        font-size: 1.2rem; /* 개선: 1.3rem -> 1.2rem */
+        min-width: 100px;
+    }
+    
+    .nav-btn {
+        width: 48px !important; /* 개선: 터치 타겟 유지 */
+        height: 48px !important;
+        min-width: 48px;
+        min-height: 48px;
+    }
+    
+    .view-btn {
+        padding: 14px 18px; /* 개선: 모바일 터치 최적화 */
+        font-size: 14px;
+        min-height: 48px !important;
+        height: 48px;
+    }
+    
+    .create-event-btn {
+        padding: 12px 18px;
+        font-size: 14px;
+        gap: 5px; /* 개선: 아이콘 간격 조정 */
+    }
+    
+    .calendar-day {
+        min-height: 90px; /* 개선: 80px -> 90px */
+        padding: 6px; /* 개선: 5px -> 6px */
+    }
+    
+    .calendar-day-number {
+        font-size: 14px; /* 개선: 0.9rem -> 14px */
+        margin-bottom: 4px;
+    }
+    
+    .event-item {
+        font-size: 11px; /* 개선: 0.7rem -> 11px */
+        padding: 4px 6px; /* 개선: 3px 6px -> 4px 6px */
+        min-height: 28px;
+    }
+    
+    .more-events {
+        font-size: 10px; /* 개선: 작은 화면 최적화 */
+        padding: 3px;
+        min-height: 24px;
+    }
+    
+    /* 모달 모바일 최적화 */
+    .event-modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 20px; /* 개선: 30px -> 20px */
+    }
+    
+    .event-modal-title {
+        font-size: 1.3rem; /* 개선: 1.5rem -> 1.3rem */
+    }
+    
+    .event-list-item {
+        padding: 12px; /* 개선: 15px -> 12px */
+    }
+    
+    .event-title {
+        font-size: 15px; /* 개선: 명시적 크기 */
+    }
+    
+    .event-details {
+        font-size: 13px;
+    }
+}
+
+/* 소형 모바일 최적화 (320px 이하) */
+@media (max-width: 480px) {
+    .events-container {
+        padding: 10px 8px;
+    }
+    
+    .events-header {
+        margin-top: 10px;
+        padding: 20px 12px;
+    }
+    
+    .events-header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .events-header p {
+        font-size: 14px;
+    }
+    
+    .month-nav {
+        padding: 6px 12px;
+    }
+    
+    .current-month {
+        font-size: 1.1rem;
+        min-width: 90px;
+    }
+    
+    .nav-btn {
+        width: 48px !important; /* 개선: 터치 타겟 유지 */
+        height: 48px !important;
+        min-width: 48px;
+        min-height: 48px;
+        font-size: 12px;
+    }
+    
+    .view-btn {
+        padding: 12px 14px;
+        font-size: 13px;
+        min-height: 48px !important;
+        height: 48px;
+    }
+    
+    .create-event-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+        gap: 4px;
     }
     
     .calendar-day {
         min-height: 80px;
-        padding: 5px;
+        padding: 4px;
     }
     
     .calendar-day-number {
-        font-size: 0.9rem;
+        font-size: 13px;
+        margin-bottom: 3px;
     }
     
     .event-item {
-        font-size: 0.7rem;
-        padding: 3px 6px;
+        font-size: 10px;
+        padding: 3px 5px;
+        min-height: 24px;
+    }
+    
+    .more-events {
+        font-size: 9px;
+        padding: 2px;
+        min-height: 20px;
+    }
+    
+    .event-modal-content {
+        width: 96%;
+        margin: 15% auto;
+        padding: 16px;
+    }
+    
+    .event-modal-title {
+        font-size: 1.2rem;
+    }
+    
+    .event-list-item {
+        padding: 10px;
+    }
+    
+    .event-title {
+        font-size: 14px;
+    }
+    
+    .event-details {
+        font-size: 12px;
     }
 }
 </style>
@@ -502,6 +690,11 @@ $monthNames = [
 </div>
 
 <script>
+// 디바이스 감지는 header.php에서 자동으로 처리됩니다.
+document.addEventListener('DOMContentLoaded', function() {
+    console.log(`📐 현재 디바이스: ${window.DeviceDetection?.utils?.getDeviceType() || 'unknown'}, 뷰: <?= $view ?>`);
+});
+
 // 월 네비게이션
 function navigateMonth(year, month) {
     window.location.href = `/events?year=${year}&month=${month}&view=<?= $view ?>`;

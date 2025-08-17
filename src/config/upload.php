@@ -15,6 +15,11 @@ class UploadConfig {
     public const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
     
     /**
+     * 파일 업로드 용량 제한 (MB 단위)
+     */
+    public const MAX_FILE_SIZE_MB = 30;
+    
+    /**
      * 허용되는 이미지 확장자
      */
     public const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];

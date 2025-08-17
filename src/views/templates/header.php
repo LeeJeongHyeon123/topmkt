@@ -106,6 +106,11 @@
     <script src="/assets/js/jwt-auth.js" defer></script>
     <script src="/assets/js/main.js" defer></script>
     
+    <!-- 디바이스 감지 및 반응형 시스템 (모든 페이지 공통) -->
+    <script>
+    <?php include SRC_PATH . '/views/includes/device-detection.js.php'; ?>
+    </script>
+    
     <!-- Firebase SDK (채팅 알림용) -->
     <?php if (isset($currentUserId) && $currentUserId && $_SERVER['REQUEST_URI'] !== '/chat'): ?>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

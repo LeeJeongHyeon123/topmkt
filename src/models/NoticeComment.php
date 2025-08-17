@@ -29,6 +29,7 @@ class NoticeComment {
         
         $comments = $this->db->fetchAll("
             SELECT c.*, 
+                   u.nickname, 
                    u.nickname as author_name, 
                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
             FROM notice_comments c
@@ -56,6 +57,7 @@ class NoticeComment {
     public function getAllByNoticeId($noticeId) {
         $sql = "
             SELECT c.*, 
+                   u.nickname, 
                    u.nickname as author_name, 
                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
             FROM notice_comments c
@@ -219,6 +221,7 @@ class NoticeComment {
     public function getReplies($parentId) {
         $sql = "
             SELECT c.*, 
+                   u.nickname,
                    u.nickname as author_name,
                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
             FROM notice_comments c
@@ -246,6 +249,7 @@ class NoticeComment {
     public function getById($id) {
         $sql = "
             SELECT c.*, 
+                   u.nickname,
                    u.nickname as author_name,
                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
             FROM notice_comments c
@@ -373,6 +377,7 @@ class NoticeComment {
     public function getRecentComments($limit = 10) {
         $sql = "
             SELECT c.*, 
+                   u.nickname,
                    u.nickname as author_name,
                    n.title as notice_title,
                    n.id as notice_id,
@@ -412,6 +417,7 @@ class NoticeComment {
     public function searchComments($keyword, $limit = 20) {
         $sql = "
             SELECT c.*, 
+                   u.nickname,
                    u.nickname as author_name,
                    n.title as notice_title,
                    n.id as notice_id,

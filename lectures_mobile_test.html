@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>강의일정 - 모바일 사용성 테스트</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* 기본 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: white !important;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* 강의 일정 페이지 스타일 */
+        .lectures-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px 15px 20px 15px;
+            min-height: calc(100vh - 200px);
+            overflow-x: auto;
+            background: white !important;
+        }
+
+        .lectures-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .lectures-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .lectures-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+            background: white !important;
+        }
+
+        .month-navigation {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .month-nav-btn {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-height: 48px;      /* 개선: 44px -> 48px */
+            min-width: 48px;       /* 개선: 44px -> 48px */
+            padding: 14px 22px;    /* 개선: 12px 20px -> 14px 22px */
+            font-size: 16px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;      /* 개선: 명시적 line-height */
+        }
+
+        .month-nav-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .current-month {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .view-btn {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #4a5568;
+            min-height: 48px;      /* 개선: 44px -> 48px */
+            min-width: 48px;       /* 개선: 44px -> 48px */
+            padding: 14px 22px;    /* 개선: 12px 20px -> 14px 22px */
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;      /* 개선: 명시적 line-height */
+        }
+
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-create {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none !important;
+            transition: all 0.3s ease;
+            min-height: 48px;      /* 개선: 44px -> 48px */
+            padding: 14px 26px;    /* 개선: 12px 24px -> 14px 26px */
+            font-size: 16px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;      /* 개선: 명시적 line-height */
+        }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        /* 색상 범례 스타일 */
+        .color-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8fafc !important;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;       /* 개선: 기존 16px 유지 */
+            line-height: 1.4;      /* 개선: 명시적 line-height */
+            padding: 10px;         /* 개선: 터치 영역 확대 */
+            min-height: 44px;      /* 개선: 최소 터치 타겟 보장 */
+            font-weight: 500;
+            color: #4a5568 !important;
+            justify-content: center;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-color.offline {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .legend-color.online {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        /* 사이드바 */
+        .lectures-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .lectures-sidebar {
+            background: white !important;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            height: fit-content;
+            max-width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .sidebar-lecture-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            margin-bottom: 10px;
+            min-height: 48px;      /* 개선: 터치 타겟 높이 보장 */
+            padding: 14px;         /* 개선: 12px -> 14px */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .sidebar-lecture-item:hover {
+            background: #e2e8f0;
+            transform: translateX(4px);
+        }
+
+        .sidebar-lecture-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 16px;       /* 개선: 0.9rem -> 16px */
+            line-height: 1.3;      /* 개선: 명시적 line-height */
+            margin-bottom: 4px;
+        }
+
+        .sidebar-lecture-meta {
+            font-size: 16px;       /* 개선: 14px -> 16px */
+            line-height: 1.3;      /* 개선: 명시적 line-height */
+            color: #718096;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 4px;       /* 개선: 제목과의 간격 */
+        }
+
+        /* 리스트 뷰 - 카드형 디자인 */
+        .list-view {
+            background: transparent;
+            border-radius: 0;
+            overflow: visible;
+            box-shadow: none;
+            border: none;
+            padding: 10px 0;
+        }
+
+        .lecture-list-item {
+            background: white !important;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            min-height: 48px;      /* 개선: 터치 타겟 높이 보장 */
+            padding: 22px;         /* 개선: 20px -> 22px */
+            box-sizing: border-box;
+        }
+
+        .lecture-list-item:hover {
+            background-color: #fbfcfe !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #c3d4f7;
+        }
+
+        .lecture-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .lecture-list-title {
+            font-size: 20px;       /* 개선: 18px -> 20px */
+            line-height: 1.3;      /* 개선: 명시적 line-height */
+            font-weight: 600;      /* 개선: 더 명확한 제목 */
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .lecture-list-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 16px;       /* 개선: 0.9rem -> 16px */
+            line-height: 1.4;      /* 개선: 명시적 line-height */
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lecture-list-description {
+            color: #4a5568;
+            font-size: 16px;       /* 개선: 0.9rem -> 16px */
+            line-height: 1.5;      /* 개선: 명시적 line-height */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .empty-sidebar {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.9rem;
+            padding: 20px 0;
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 1024px) {
+            .lectures-layout {
+                grid-template-columns: 1fr;
+                max-width: none;
+            }
+            
+            .lectures-sidebar {
+                order: -1;
+                max-width: 100%;
+                overflow: hidden;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lectures-container {
+                padding: 15px 0 10px 0;
+                overflow-x: hidden;
+            }
+            
+            .lectures-header {
+                padding: 20px 10px;
+                margin-top: 10px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            
+            .lectures-header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .lectures-header p {
+                font-size: 0.9rem;
+            }
+            
+            /* 캘린더 컨트롤 모바일 최적화 */
+            .calendar-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                margin: 10px 0;
+                padding: 0 5px;
+            }
+            
+            .month-navigation {
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .month-nav-btn {
+                padding: 14px 18px; /* 개선: 터치 타겟 더욱 확대 */
+                font-size: 16px;
+                min-height: 48px; /* 개선: 44px -> 48px */
+                min-width: 48px;  /* 개선: 44px -> 48px */
+                line-height: 1.2; /* 개선: 명시적 line-height */
+            }
+            
+            .current-month {
+                font-size: 1.2rem;
+            }
+            
+            .view-controls {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .view-btn {
+                padding: 14px 18px; /* 개선: 터치 타겟 더욱 확대 */
+                font-size: 16px;
+                min-height: 48px; /* 개선: 44px -> 48px */
+                min-width: 48px;  /* 개선: 44px -> 48px */
+                line-height: 1.2; /* 개선: 명시적 line-height */
+            }
+            
+            .btn-create {
+                padding: 14px 22px; /* 개선: 터치 타겟 더욱 확대 */
+                font-size: 16px;
+                min-height: 48px; /* 개선: 44px -> 48px */
+                min-width: 120px;
+                line-height: 1.2; /* 개선: 명시적 line-height */
+            }
+            
+            /* 색상범례 모바일 최적화 */
+            .color-legend {
+                flex-direction: row;
+                justify-content: center;
+                gap: 15px;
+                margin: 10px 0;
+                padding: 8px;
+            }
+            
+            .legend-item {
+                font-size: 16px; /* 개선: 모바일 가독성 확보 */
+                padding: 12px; /* 개선: 8px -> 12px */
+                min-height: 48px; /* 개선: 44px -> 48px */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1.3; /* 개선: 명시적 line-height */
+            }
+            
+            .legend-color {
+                width: 16px;
+                height: 16px;
+            }
+            
+            /* 사이드바 모바일 최적화 */
+            .lectures-sidebar {
+                max-width: calc(100vw - 40px) !important;
+                width: calc(100vw - 40px) !important;
+                overflow: hidden;
+                margin-left: 20px !important;
+                margin-right: 20px !important;
+                box-sizing: border-box;
+                padding: 15px !important;
+            }
+            
+            .sidebar-section {
+                margin-bottom: 20px;
+            }
+            
+            .sidebar-title {
+                font-size: 1rem;
+            }
+            
+            .lecture-list-meta {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important; /* 개선: 8px -> 12px */
+                font-size: 16px !important;
+                line-height: 1.4 !important; /* 개선: 명시적 line-height */
+            }
+            
+            /* 작은 모바일에서 목록형 뷰 추가 최적화 */
+            .list-view {
+                max-width: calc(100vw - 30px) !important;
+                width: calc(100vw - 30px) !important;
+                margin-left: 15px !important;
+                margin-right: 15px !important;
+            }
+            
+            .lecture-list-item {
+                padding: 16px !important; /* 개선: 12px -> 16px */
+                margin-bottom: 12px !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+                min-height: 48px !important; /* 개선: 최소 터치 타겟 보장 */
+            }
+            
+            .lecture-list-title {
+                font-size: 20px !important; /* 개선: 18px -> 20px */
+                line-height: 1.3 !important;
+                font-weight: 600 !important;
+                margin-bottom: 8px !important;
+            }
+        }
+
+        /* 매우 작은 화면 (모바일 세로) */
+        @media (max-width: 480px) {
+            .lectures-container {
+                padding: 10px 0;
+                overflow-x: hidden;
+            }
+            
+            .lectures-header {
+                padding: 15px 8px;
+                margin-top: 5px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            
+            .lectures-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .lectures-header p {
+                font-size: 0.85rem;
+            }
+            
+            /* 색상범례 더 컴팩트하게 */
+            .color-legend {
+                flex-direction: column;
+                gap: 8px;
+                padding: 6px;
+                margin: 8px 0;
+            }
+            
+            .legend-item {
+                font-size: 16px !important; /* 개선: 14px -> 16px */
+                padding: 10px !important; /* 개선: 6px -> 10px */
+                min-height: 48px !important; /* 개선: 44px -> 48px */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1.3 !important; /* 개선: 명시적 line-height */
+            }
+            
+            .legend-color {
+                width: 14px;
+                height: 14px;
+            }
+            
+            /* 캘린더 컨트롤 더 컴팩트하게 */
+            .month-navigation {
+                gap: 10px;
+            }
+            
+            .month-nav-btn {
+                padding: 14px 18px !important; /* 개선: 더 큰 터치 타겟 */
+                font-size: 16px !important;
+                min-height: 48px !important; /* 개선: 44px -> 48px */
+                min-width: 48px !important;
+                line-height: 1.2 !important; /* 개선: 명시적 line-height */
+            }
+            
+            .current-month {
+                font-size: 1.1rem;
+            }
+            
+            .view-btn {
+                padding: 14px 18px !important; /* 개선: 더 큰 터치 타겟 */
+                font-size: 16px !important;
+                min-height: 48px !important; /* 개선: 44px -> 48px */
+                min-width: 48px !important;
+                line-height: 1.2 !important; /* 개선: 명시적 line-height */
+            }
+            
+            .btn-create {
+                padding: 14px 20px !important; /* 개선: 더 큰 터치 타겟 */
+                font-size: 16px !important;
+                min-height: 48px !important; /* 개선: 44px -> 48px */
+                min-width: 100px !important;
+                line-height: 1.2 !important; /* 개선: 명시적 line-height */
+            }
+            
+            /* 사이드바 더 컴팩트하게 */
+            .lectures-sidebar {
+                max-width: calc(100vw - 32px) !important;
+                width: calc(100vw - 32px) !important;
+                margin-left: 16px !important;
+                margin-right: 16px !important;
+                padding: 12px !important;
+                box-sizing: border-box;
+            }
+            
+            .sidebar-title {
+                font-size: 18px !important; /* 개선: 16px -> 18px */
+                margin-bottom: 12px !important;
+                font-weight: 700 !important;
+                line-height: 1.3 !important; /* 개선: 명시적 line-height */
+            }
+            
+            .sidebar-lecture-item {
+                padding: 12px !important; /* 개선: 8px -> 12px */
+                min-height: 48px !important; /* 개선: 최소 터치 타겟 보장 */
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .sidebar-lecture-title {
+                font-size: 16px !important; /* 개선: 480px에서도 명확한 강의 제목 */
+                font-weight: 600 !important;
+                line-height: 1.3 !important; /* 개선: 명시적 line-height */
+            }
+            
+            .sidebar-lecture-meta {
+                font-size: 16px !important; /* 개선: 14px -> 16px */
+                line-height: 1.3 !important; /* 개선: 명시적 line-height */
+                margin-top: 4px !important; /* 개선: 제목과의 간격 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lectures-container">
+        <!-- 헤더 섹션 -->
+        <div class="lectures-header">
+            <h1>📅 강의 일정</h1>
+            <p>다양한 마케팅 강의와 세미나 일정을 확인하고 신청하세요</p>
+        </div>
+        
+        <!-- 색상 범례 -->
+        <div class="color-legend">
+            <div class="legend-item">
+                <div class="legend-color offline"></div>
+                <span>🏢 오프라인 강의</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color online"></div>
+                <span>💻 온라인 강의</span>
+            </div>
+        </div>
+        
+        <!-- 캘린더 컨트롤 영역 -->
+        <div class="calendar-controls">
+            <!-- 월 네비게이션 -->
+            <div class="month-navigation">
+                <a href="#" class="month-nav-btn">← 이전달</a>
+                <div class="current-month">2025년 8월</div>
+                <a href="#" class="month-nav-btn">다음달 →</a>
+            </div>
+            
+            <!-- 뷰 전환 및 액션 -->
+            <div class="view-controls">
+                <div class="view-toggle">
+                    <a href="#" class="view-btn active">📅 캘린더</a>
+                    <a href="#" class="view-btn">📋 목록</a>
+                </div>
+                
+                <a href="#" class="btn-create">➕ 강의 등록</a>
+            </div>
+        </div>
+        
+        <div class="lectures-layout">
+            <!-- 메인 콘텐츠 -->
+            <div class="lectures-main">
+                <!-- 리스트 뷰 -->
+                <div class="list-view">
+                    <a href="#" class="lecture-list-item">
+                        <div class="lecture-list-header">
+                            <div>
+                                <div class="lecture-list-title">디지털 마케팅 전략과 실무</div>
+                                <div class="lecture-list-meta">
+                                    <div class="meta-item">📅 2025-08-20</div>
+                                    <div class="meta-item">🕒 14:00 - 17:00</div>
+                                    <div class="meta-item">👨‍🏫 김마케팅</div>
+                                    <div class="meta-item">📍 서울시 강남구</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="lecture-list-description">
+                            최신 디지털 마케팅 트렌드와 실무에 바로 적용할 수 있는 전략을 배우는 강의입니다. SNS 마케팅, 콘텐츠 마케팅, 데이터 분석 등을 다룹니다.
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="lecture-list-item">
+                        <div class="lecture-list-header">
+                            <div>
+                                <div class="lecture-list-title">온라인 브랜딩 마스터클래스</div>
+                                <div class="lecture-list-meta">
+                                    <div class="meta-item">📅 2025-08-22</div>
+                                    <div class="meta-item">🕒 10:00 - 12:00</div>
+                                    <div class="meta-item">👨‍🏫 박브랜드</div>
+                                    <div class="meta-item">💻 온라인</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="lecture-list-description">
+                            브랜드 아이덴티티 구축부터 온라인 브랜딩 전략까지, 성공적인 브랜드를 만드는 모든 것을 배우는 마스터클래스입니다.
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="lecture-list-item">
+                        <div class="lecture-list-header">
+                            <div>
+                                <div class="lecture-list-title">글로벌 네트워크 마케팅 전략</div>
+                                <div class="lecture-list-meta">
+                                    <div class="meta-item">📅 2025-08-25</div>
+                                    <div class="meta-item">🕒 09:00 - 18:00</div>
+                                    <div class="meta-item">👨‍🏫 이글로벌</div>
+                                    <div class="meta-item">📍 부산시 해운대구</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="lecture-list-description">
+                            해외 시장 진출을 위한 글로벌 네트워크 마케팅 전략과 문화적 차이를 고려한 마케팅 접근법을 학습합니다.
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 사이드바 -->
+            <div class="lectures-sidebar">
+                <!-- 오늘의 강의 -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">🚀 오늘의 강의</h3>
+                    <div class="today-lectures">
+                        <a href="#" class="sidebar-lecture-item">
+                            <div class="sidebar-lecture-title">모바일 마케팅 최신 트렌드</div>
+                            <div class="sidebar-lecture-meta">
+                                <span>🕒 14:00</span>
+                                <span>👨‍🏫 정모바일</span>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="sidebar-lecture-item">
+                            <div class="sidebar-lecture-title">인플루언서 마케팅 실무</div>
+                            <div class="sidebar-lecture-meta">
+                                <span>🕒 16:30</span>
+                                <span>👨‍🏫 김인플루</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 다가오는 강의 -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">📋 다가오는 강의</h3>
+                    <div class="upcoming-lectures">
+                        <a href="#" class="sidebar-lecture-item">
+                            <div class="sidebar-lecture-title">데이터 마케팅 분석 심화</div>
+                            <div class="sidebar-lecture-meta">
+                                <span>📅 08/18</span>
+                                <span>🕒 10:00</span>
+                                <span>👨‍🏫 박데이터</span>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="sidebar-lecture-item">
+                            <div class="sidebar-lecture-title">SEO 최적화 전략</div>
+                            <div class="sidebar-lecture-meta">
+                                <span>📅 08/19</span>
+                                <span>🕒 15:00</span>
+                                <span>👨‍🏫 최SEO</span>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="sidebar-lecture-item">
+                            <div class="sidebar-lecture-title">콘텐츠 마케팅 워크샵</div>
+                            <div class="sidebar-lecture-meta">
+                                <span>📅 08/21</span>
+                                <span>🕒 13:00</span>
+                                <span>👨‍🏫 안콘텐츠</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

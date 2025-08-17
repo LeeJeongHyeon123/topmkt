@@ -75,7 +75,7 @@ $monthNames = [
 }
 
 .month-nav-btn {
-    padding: 8px 16px;
+    padding: 12px 20px;
     background: #667eea;
     color: white;
     border: none;
@@ -84,6 +84,9 @@ $monthNames = [
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s ease;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-size: 16px;
 }
 
 .month-nav-btn:hover {
@@ -112,14 +115,16 @@ $monthNames = [
 }
 
 .view-btn {
-    padding: 8px 16px;
+    padding: 12px 20px;
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     transition: all 0.3s ease;
     text-decoration: none;
     color: #4a5568;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .view-btn.active {
@@ -130,13 +135,16 @@ $monthNames = [
 .btn-create {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
     text-decoration: none !important;
     transition: all 0.3s ease;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-size: 16px;
 }
 
 .btn-create:link,
@@ -168,7 +176,7 @@ $monthNames = [
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     color: #4a5568;
 }
@@ -333,6 +341,9 @@ $monthNames = [
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
     height: fit-content;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .sidebar-section {
@@ -392,31 +403,57 @@ $monthNames = [
     padding: 20px 0;
 }
 
-/* 리스트 뷰 */
+/* 리스트 뷰 - 카드형 디자인 */
 .list-view {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    background: transparent;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    border: none;
+    padding: 10px 0;
 }
 
 .lecture-list-item {
+    background: white;
     padding: 20px;
-    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
     text-decoration: none;
     color: inherit;
     display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.lecture-list-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .lecture-list-item:hover {
-    background-color: #f8fafc;
+    background-color: #fbfcfe;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #c3d4f7;
+}
+
+.lecture-list-item:hover::before {
+    opacity: 1;
 }
 
 .lecture-list-item:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .lecture-list-header {
@@ -472,6 +509,138 @@ $monthNames = [
     overflow: hidden;
 }
 
+/* 🔧 모바일 터치 타겟 및 폰트 크기 개선 (v3.11.7) */
+/* 모든 인터랙티브 요소 44px+ 터치 타겟 보장 */
+.month-nav-btn {
+    min-height: 44px;      /* 개선: 44px 터치 타겟 유지 */
+    min-width: 44px;
+    padding: 10px 16px;    /* 개선: 세련된 패딩 */
+    font-size: 14px;       /* 개선: 2줄 방지, 깔끔한 버튼 */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.view-btn {
+    min-height: 44px;      /* 개선: 44px 터치 타겟 유지 */
+    min-width: 44px;
+    padding: 10px 16px;    /* 개선: 세련된 패딩 */
+    font-size: 14px;       /* 개선: 깔끔한 버튼 텍스트 */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.btn-create {
+    min-height: 44px;      /* 개선: 44px 터치 타겟 유지 */
+    padding: 10px 20px;    /* 개선: 2줄 방지, 세련된 크기 */
+    font-size: 14px;       /* 개선: "강의 등록" 텍스트 2줄 방지 */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+/* 터치 영역 확대를 위한 추가 패딩 */
+.sidebar-lecture-item {
+    min-height: 44px;      /* 개선: 터치 타겟 높이 보장 */
+    padding: 12px;         /* 개선: 적절한 패딩 */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.lecture-list-item {
+    min-height: 44px;      /* 개선: 터치 타겟 높이 보장 */
+    padding: 18px;         /* 개선: 적절한 패딩 */
+    box-sizing: border-box;
+}
+
+/* 폰트 크기 개선 - iOS Safari 자동 줌 방지를 위한 16px+ */
+.legend-item {
+    font-size: 14px;       /* 개선: 세련된 범례 크기 */
+    line-height: 1.4;
+    padding: 8px;          /* 개선: 적절한 터치 영역 */
+    min-height: 40px;      /* 개선: 범례는 조금 더 컴팩트 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-lecture-title {
+    font-size: 15px;       /* 개선: 사이드바 제목 적절한 크기 */
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.sidebar-lecture-meta {
+    font-size: 13px;       /* 개선: 메타 정보는 상대적으로 작게 */
+    line-height: 1.3;
+    color: #718096;
+    margin-top: 4px;
+}
+
+.lecture-list-title {
+    font-size: 16px;       /* 개선: 적절한 제목 크기 */
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.lecture-list-meta {
+    font-size: 14px;       /* 개선: 메타 정보 적절한 크기 */
+    line-height: 1.4;
+}
+
+.lecture-list-description {
+    font-size: 14px;       /* 개선: 설명 텍스트 적절한 크기 */
+    line-height: 1.5;
+}
+
+/* 모달 관련 터치 타겟 개선 */
+.modal-close {
+    min-height: 44px;      /* 개선: 터치 타겟 높이 보장 */
+    min-width: 44px;       /* 개선: 터치 타겟 너비 보장 */
+    padding: 10px;         /* 개선: 적절한 패딩 */
+    font-size: 18px;       /* 개선: 1.5rem -> 18px */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-lecture-item {
+    min-height: 48px;      /* 개선: 터치 타겟 높이 보장 */
+    padding: 16px;         /* 개선: 15px -> 16px */
+    box-sizing: border-box;
+}
+
+/* 캘린더 셀 내 강의 아이템 터치 개선 */
+.lecture-item {
+    min-height: 28px;      /* 개선: 캘린더 셀 내에서도 터치 가능하게 */
+    padding: 6px 8px;      /* 개선: 4px 6px -> 6px 8px */
+    margin-bottom: 4px;    /* 개선: 3px -> 4px (터치 간격 확대) */
+    font-size: 12px;       /* 개선: 0.8rem -> 12px (공간 제약 고려) */
+    line-height: 1.2;      /* 개선: 명시적 line-height */
+    box-sizing: border-box;
+    display: block;
+}
+
+.lecture-time {
+    font-size: 11px;       /* 개선: 0.75rem -> 11px */
+    line-height: 1.2;      /* 개선: 명시적 line-height */
+}
+
+.lecture-title {
+    font-size: 12px;       /* 개선: 0.8rem -> 12px */
+    line-height: 1.2;      /* 개선: 명시적 line-height */
+}
+
 /* 모바일 반응형 */
 @media (max-width: 1024px) {
     .lectures-layout {
@@ -481,55 +650,228 @@ $monthNames = [
     
     .lectures-sidebar {
         order: -1;
+        max-width: 100%;
+        overflow: hidden;
     }
     
     .calendar-view {
         min-width: 800px;
     }
     
+    /* 목록형 뷰 모바일 최적화 */
+    .list-view {
+        max-width: calc(100vw - 40px) !important;
+        width: calc(100vw - 40px) !important;
+        overflow: hidden;
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        box-sizing: border-box;
+    }
+    
+    .lecture-list-item {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 15px !important;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    
+    .lecture-list-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px;
+    }
+    
+    .lecture-list-meta {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .lecture-list-description {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box;
+        overflow: hidden;
+        word-wrap: break-word;
+    }
+    
+    /* 카드형 디자인 모바일 최적화 */
+    .lecture-list-item {
+        margin-bottom: 12px !important;
+        padding: 15px !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+    }
+    
+    .lecture-list-item:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+    }
+}
+    
     .lectures-header,
     .calendar-controls {
         max-width: none;
+    }
+    
+    /* 색상범례 모바일 최적화 */
+    .color-legend {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+    
+    .legend-item {
+        justify-content: center;
+        font-size: 13px;
     }
 }
 
 @media (max-width: 768px) {
     .lectures-container {
-        padding: 20px 10px 15px 10px;
+        padding: 15px 0 10px 0;
+        overflow-x: hidden;
     }
     
     .lectures-header {
-        padding: 30px 15px;
-        margin-top: 15px;
+        padding: 20px 10px;
+        margin-top: 10px;
         margin-left: 0;
         margin-right: 0;
     }
     
     .lectures-header h1 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
     
+    .lectures-header p {
+        font-size: 0.9rem;
+    }
+    
+    /* 캘린더 컨트롤 모바일 최적화 */
     .calendar-controls {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
-        margin-left: 0;
-        margin-right: 0;
+        gap: 8px;
+        margin: 10px 0;
+        padding: 0 5px;
     }
     
     .month-navigation {
         justify-content: center;
+        gap: 15px;
     }
     
+    .month-nav-btn {
+        padding: 14px 18px; /* 개선: 터치 타겟 더욱 확대 */
+        font-size: 16px; /* 개선: iOS 줌 방지 및 가독성 */
+        min-height: 48px; /* 개선: 44px -> 48px */
+        min-width: 48px;  /* 개선: 44px -> 48px */
+        line-height: 1.2; /* 개선: 명시적 line-height */
+    }
+    
+    .current-month {
+        font-size: 1.2rem;
+    }
+    
+    .view-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .view-btn {
+        padding: 14px 18px; /* 개선: 터치 타겟 더욱 확대 */
+        font-size: 16px; /* 개선: iOS 줌 방지 및 가독성 */
+        min-height: 48px; /* 개선: 44px -> 48px */
+        min-width: 48px;  /* 개선: 44px -> 48px */
+        line-height: 1.2; /* 개선: 명시적 line-height */
+    }
+    
+    .btn-create {
+        padding: 14px 22px; /* 개선: 터치 타겟 더욱 확대 */
+        font-size: 16px; /* 개선: iOS 줌 방지 및 가독성 */
+        min-height: 48px; /* 개선: 44px -> 48px */
+        min-width: 120px; /* 개선: 최소 너비 보장 */
+        line-height: 1.2; /* 개선: 명시적 line-height */
+    }
+    
+    /* 색상범례 모바일 최적화 */
+    .color-legend {
+        flex-direction: row;
+        justify-content: center;
+        gap: 15px;
+        margin: 10px 0;
+        padding: 8px;
+    }
+    
+    .legend-item {
+        font-size: 16px; /* 개선: 모바일 가독성 확보 */
+        padding: 12px; /* 개선: 8px -> 12px (터치 영역 더욱 확대) */
+        min-height: 48px; /* 개선: 44px -> 48px */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.3; /* 개선: 명시적 line-height */
+    }
+    
+    .legend-color {
+        width: 16px;
+        height: 16px;
+    }
+    
+    /* 사이드바 모바일 최적화 */
+    .lectures-sidebar {
+        max-width: calc(100vw - 40px) !important;
+        width: calc(100vw - 40px) !important;
+        overflow: hidden;
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        box-sizing: border-box;
+        padding: 15px !important;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 20px;
+    }
+    
+    .sidebar-title {
+        font-size: 1rem;
+    }
+    
+    /* 달력 모바일 최적화 */
     .calendar-view {
-        min-width: 700px;
+        min-width: unset !important;
+        width: calc(100vw - 40px) !important;
+        max-width: calc(100vw - 40px) !important;
+        overflow-x: auto;
         border-radius: 8px;
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        box-sizing: border-box;
+    }
+    
+    .calendar-header,
+    .calendar-body {
+        min-width: unset !important;
+        width: 100%;
+    }
+    
+    .day-header {
+        min-width: calc((100vw - 80px) / 7) !important;
+        max-width: calc((100vw - 80px) / 7) !important;
+        padding: 12px 6px;
+        font-size: 0.85rem;
+        box-sizing: border-box;
     }
     
     .calendar-day {
         min-height: 100px;
-        min-width: 100px;
-        padding: 5px;
+        min-width: calc((100vw - 80px) / 7) !important;
+        max-width: calc((100vw - 80px) / 7) !important;
+        padding: 4px;
+        box-sizing: border-box;
     }
     
     .lecture-item {
@@ -552,44 +894,191 @@ $monthNames = [
     }
     
     .lecture-list-meta {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important; /* 개선: 8px -> 12px (터치 간격 더욱 확대) */
+        font-size: 16px !important; /* 개선: 모바일 가독성 */
+        line-height: 1.4 !important; /* 개선: 명시적 line-height */
     }
     
-    /* 모바일에서 범례 세로 배치 */
-    .color-legend {
-        flex-direction: column;
-        gap: 15px;
-        align-items: center;
-        margin: 15px 0;
-        padding: 12px;
+    /* 작은 모바일에서 목록형 뷰 추가 최적화 */
+    .list-view {
+        max-width: calc(100vw - 30px) !important;
+        width: calc(100vw - 30px) !important;
+        margin-left: 15px !important;
+        margin-right: 15px !important;
+    }
+    
+    .lecture-list-item {
+        padding: 16px !important; /* 개선: 12px -> 16px (터치 영역 확대) */
+        margin-bottom: 12px !important; /* 개선: 10px -> 12px */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+        min-height: 48px !important; /* 개선: 최소 터치 타겟 보장 */
+    }
+    
+    .lecture-list-item:hover {
+        transform: translateY(-0.5px) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .lecture-list-title {
+        font-size: 20px !important; /* 개선: 18px -> 20px (더 명확한 제목 크기) */
+        line-height: 1.3 !important; /* 개선: 1.4 -> 1.3 (더 긴밀한 간격) */
+        font-weight: 600 !important; /* 개선: 모바일에서 더 명확한 제목 */
+        margin-bottom: 8px !important; /* 개선: 제목 하단 여백 */
+    }
+    
+    .lecture-list-header {
+        margin-bottom: 8px !important;
     }
 }
 
 /* 매우 작은 화면 (모바일 세로) */
 @media (max-width: 480px) {
     .lectures-container {
-        padding: 15px 5px;
+        padding: 10px 0;
+        overflow-x: hidden;
     }
     
     .lectures-header {
-        padding: 20px 10px;
-        margin-top: 10px;
+        padding: 15px 8px;
+        margin-top: 5px;
         margin-left: 0;
         margin-right: 0;
     }
     
     .lectures-header h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
     
+    .lectures-header p {
+        font-size: 0.85rem;
+    }
+    
+    /* 색상범례 더 컴팩트하게 */
+    .color-legend {
+        flex-direction: column;
+        gap: 8px;
+        padding: 6px;
+        margin: 8px 0;
+    }
+    
+    .legend-item {
+        font-size: 16px !important; /* 개선: 14px -> 16px (iOS 줌 방지) */
+        padding: 10px !important; /* 개선: 6px -> 10px (터치 영역 확대) */
+        min-height: 48px !important; /* 개선: 44px -> 48px */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.3 !important; /* 개선: 명시적 line-height */
+    }
+    
+    .legend-color {
+        width: 14px;
+        height: 14px;
+    }
+    
+    /* 캘린더 컨트롤 더 컴팩트하게 */
+    .month-navigation {
+        gap: 10px;
+    }
+    
+    .month-nav-btn {
+        padding: 14px 18px !important; /* 개선: 더 큰 터치 타겟 */
+        font-size: 16px !important; /* 개선: 작은 화면에서도 가독성 확보 */
+        min-height: 48px !important; /* 개선: 44px -> 48px */
+        min-width: 48px !important; /* 개선: 44px -> 48px */
+        line-height: 1.2 !important; /* 개선: 명시적 line-height */
+    }
+    
+    .current-month {
+        font-size: 1.1rem;
+    }
+    
+    .view-btn {
+        padding: 14px 18px !important; /* 개선: 더 큰 터치 타겟 */
+        font-size: 16px !important; /* 개선: 작은 화면에서도 가독성 확보 */
+        min-height: 48px !important; /* 개선: 44px -> 48px */
+        min-width: 48px !important; /* 개선: 44px -> 48px */
+        line-height: 1.2 !important; /* 개선: 명시적 line-height */
+    }
+    
+    .btn-create {
+        padding: 14px 20px !important; /* 개선: 더 큰 터치 타겟 */
+        font-size: 16px !important; /* 개선: 작은 화면에서도 가독성 확보 */
+        min-height: 48px !important; /* 개선: 44px -> 48px */
+        min-width: 100px !important; /* 개선: 작은 화면에서도 최소 터치 영역 */
+        line-height: 1.2 !important; /* 개선: 명시적 line-height */
+    }
+    
+    /* 사이드바 더 컴팩트하게 */
+    .lectures-sidebar {
+        max-width: calc(100vw - 32px) !important;
+        width: calc(100vw - 32px) !important;
+        margin-left: 16px !important;
+        margin-right: 16px !important;
+        padding: 12px !important;
+        box-sizing: border-box;
+    }
+    
+    .sidebar-title {
+        font-size: 18px !important; /* 개선: 16px -> 18px (더 명확한 섹션 제목) */
+        margin-bottom: 12px !important; /* 개선: 10px -> 12px */
+        font-weight: 700 !important; /* 개선: 작은 화면에서도 섹션 구분 명확화 */
+        line-height: 1.3 !important; /* 개선: 명시적 line-height */
+    }
+    
+    .sidebar-lecture-item {
+        padding: 12px !important; /* 개선: 8px -> 12px (터치 영역 확대) */
+        min-height: 48px !important; /* 개선: 최소 터치 타겟 보장 */
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .sidebar-lecture-title {
+        font-size: 16px !important; /* 개선: 480px에서도 명확한 강의 제목 */
+        font-weight: 600 !important;
+        line-height: 1.3 !important; /* 개선: 명시적 line-height */
+    }
+    
+    .sidebar-lecture-meta {
+        font-size: 16px !important; /* 개선: 14px -> 16px (iOS 줌 방지) */
+        line-height: 1.3 !important; /* 개선: 명시적 line-height */
+        margin-top: 4px !important; /* 개선: 제목과의 간격 */
+    }
+    
+    /* 달력 더 컴팩트하게 */
     .calendar-view {
-        min-width: 500px;
+        min-width: unset !important;
+        width: calc(100vw - 32px) !important;
+        max-width: calc(100vw - 32px) !important;
+        overflow-x: auto;
+        margin-left: 16px !important;
+        margin-right: 16px !important;
+        box-sizing: border-box;
+    }
+    
+    .calendar-header,
+    .calendar-body {
+        min-width: unset !important;
+        width: 100%;
+    }
+    
+    .day-header {
+        min-width: calc((100vw - 64px) / 7) !important;
+        max-width: calc((100vw - 64px) / 7) !important;
+        padding: 8px 4px;
+        font-size: 0.75rem;
+        box-sizing: border-box;
     }
     
     .calendar-day {
         min-height: 80px;
-        min-width: 70px;
-        padding: 3px;
+        min-width: calc((100vw - 64px) / 7) !important;
+        max-width: calc((100vw - 64px) / 7) !important;
+        padding: 2px;
+        box-sizing: border-box;
     }
     
     .lecture-item {
@@ -610,41 +1099,28 @@ $monthNames = [
         font-size: 0.9rem;
         margin-bottom: 3px;
     }
-    
-    .month-nav-btn {
-        padding: 6px 12px;
-        font-size: 0.9rem;
-    }
-    
-    .current-month {
-        font-size: 1.2rem;
-    }
 }
 
-/* 캘린더 스크롤 힌트 */
-.calendar-view::after {
-    content: '← 좌우로 스크롤하세요 →';
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
+/* 캘린더 스크롤 힌트 - 스크롤이 필요한 경우에만 표시 */
 @media (max-width: 768px) {
     .calendar-view {
         position: relative;
     }
     
-    .calendar-view::after {
+    /* 700px 이상의 최소 너비를 가진 달력에만 스크롤 힌트 표시 */
+    .calendar-view[style*="min-width: 700px"]::after {
+        content: '← 좌우로 스크롤하세요 →';
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
         opacity: 1;
+        pointer-events: none;
         animation: scrollHint 3s ease-in-out infinite;
     }
 }
@@ -1235,6 +1711,9 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📅 강의 일정 페이지 로드 완료');
     console.log('📊 이번 달 강의 수:', <?= count($lectures ?? []) ?>);
     console.log('📄 현재 뷰:', '<?= $view ?>');
+    
+    // 디바이스 감지는 header.php에서 자동으로 처리됩니다.
+    console.log(`📐 현재 디바이스: ${window.DeviceDetection?.utils?.getDeviceType() || 'unknown'}, 뷰: <?= $view ?>`);
     
     // 캘린더 강의 아이템 호버 효과
     const lectureItems = document.querySelectorAll('.lecture-item');

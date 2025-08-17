@@ -415,10 +415,9 @@ window.addEventListener('load', function() {
 
 // 브라우저 히스토리 변경 감지 (뒤로가기, 앞으로가기)
 window.addEventListener('beforeunload', function(e) {
-    if (topMarketingLoader) {
-        topMarketingLoader.show();
-        topMarketingLoader.setMessage('페이지를 이동하는 중...');
-    }
+    // ⚠️ beforeunload 이벤트에서는 로딩 UI를 표시하지 않음
+    // 사용자가 confirm에서 취소하면 로딩이 계속 표시되는 문제를 방지
+    // 실제 페이지 이동은 다른 이벤트에서 처리됨
 });
 
 // pageshow 이벤트로 캐시된 페이지 로드 감지

@@ -85,12 +85,14 @@ require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 }
 
 .search-input {
-    padding: 10px 15px;
+    padding: 12px 16px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
     width: 250px;
     transition: border-color 0.3s ease;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -100,15 +102,17 @@ require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 }
 
 .company-filter {
-    padding: 10px 15px;
+    padding: 12px 16px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
     background: #fff;
     color: #4a5568;
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 120px;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .company-filter:focus {
@@ -118,24 +122,25 @@ require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 }
 
 .btn {
-    padding: 8px 16px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     transition: all 0.3s ease;
-    line-height: 1.3;
+    line-height: 1.4;
     white-space: nowrap;
-    min-height: 36px;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .btn i {
-    font-size: 12px !important;
+    font-size: 16px !important;
 }
 
 .btn-primary {
@@ -163,30 +168,31 @@ a.btn-write {
     background: #059669 !important;
     color: white !important;
     font-weight: 500 !important;
-    padding: 8px 16px !important;
-    font-size: 14px !important;
-    border-radius: 6px !important;
+    padding: 12px 20px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
     border: none !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 8px !important;
     transition: all 0.3s ease !important;
-    line-height: 1.3 !important;
+    line-height: 1.4 !important;
     white-space: nowrap !important;
     box-shadow: none !important;
     height: auto !important;
-    min-height: 36px !important;
+    min-height: 44px !important;
     vertical-align: top !important;
     margin: 0 !important;
     overflow: hidden !important;
+    box-sizing: border-box !important;
 }
 
 /* Font Awesome 아이콘 - 다른 버튼과 일치 */
 a.btn-write i {
-    font-size: 12px !important;
-    line-height: 1.3 !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
     display: inline-block !important;
     vertical-align: middle !important;
     text-align: center !important;
@@ -195,7 +201,7 @@ a.btn-write i {
 }
 
 a.btn-write i::before {
-    line-height: 1.3 !important;
+    line-height: 1.4 !important;
     vertical-align: baseline !important;
 }
 
@@ -568,6 +574,66 @@ body {
 .notice-item.featured {
     background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 10%, #fef3c7 100%) !important;
 }
+/* 소형 모바일에서 추가 최적화 */
+@media (max-width: 480px) {
+    .notices-container {
+        padding: 12px;
+    }
+    
+    .notices-header {
+        padding: 20px 12px;
+        margin-left: -12px;
+        margin-right: -12px;
+    }
+    
+    .notices-header h1 {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .notices-header p {
+        font-size: 0.9rem;
+    }
+    
+    .search-input, .company-filter {
+        font-size: 16px; /* iOS 줌 방지 */
+        padding: 16px;
+        min-height: 52px;
+    }
+    
+    .btn, .btn-write {
+        font-size: 16px !important;
+        padding: 16px 20px !important;
+        min-height: 52px !important;
+    }
+    
+    .notice-item {
+        padding: 16px 12px;
+        gap: 10px;
+    }
+    
+    .company-avatar {
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+    }
+    
+    .notice-title {
+        font-size: 15px;
+    }
+    
+    .notice-content-preview,
+    .notice-meta {
+        font-size: 13px;
+    }
+    
+    .pagination a,
+    .pagination span {
+        min-width: 48px;
+        min-height: 48px;
+        font-size: 15px;
+    }
+}
 </style>
 
 <div class="notices-container">
@@ -691,7 +757,7 @@ body {
     <?php if (!empty($notices)): ?>
         <div class="notice-list">
             <?php foreach ($notices as $notice): ?>
-                <div class="notice-item <?= $notice['is_featured'] ? 'featured' : '' ?>" 
+                <div class="notice-item" 
                      onclick="location.href='/notices/<?= $notice['id'] ?>'">
                     
                     <!-- 기업 아바타 (통합 컴포넌트 사용) -->
@@ -724,11 +790,6 @@ body {
                             }
                             echo $displayTitle;
                             ?>
-                            <?php if ($notice['is_featured']): ?>
-                                <span class="notice-badge featured">
-                                    <i class="fas fa-star"></i> 중요
-                                </span>
-                            <?php endif; ?>
                             <?php if (($notice['comment_count'] ?? 0) > 0): ?>
                                 <span style="color: #2563eb; font-size: 0.9rem; margin-left: 8px;">[<?= $notice['comment_count'] ?>]</span>
                             <?php endif; ?>
@@ -980,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, index * 100);
     });
     
-    // 중요 공지사항 강조 효과
+    // 일반 공지사항 스타일
     const featuredNotices = document.querySelectorAll('.notice-item.featured');
     featuredNotices.forEach((notice, index) => {
         setTimeout(() => {

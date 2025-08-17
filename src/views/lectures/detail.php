@@ -36,6 +36,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     margin: 0 auto;
     padding: 20px;
     min-height: calc(100vh - 200px);
+    /* 헤더 겹침 방지: 고정 헤더 높이만큼 상단 여백 추가 */
+    margin-top: 80px; /* 데스크톱: 헤더 높이(66px) + 여유 공간(14px) */
+    padding-top: 20px;
 }
 
 .lecture-header {
@@ -44,7 +47,6 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
-    margin-top: 60px;
     margin-bottom: 20px;
 }
 
@@ -446,6 +448,23 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 20px;
+}
+
+/* 768px 이하에서 단일 컬럼 강제 적용 */
+@media (max-width: 768px) {
+    .lecture-detail-container .lecture-content {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .lecture-detail-container .lecture-sidebar {
+        order: 10 !important;
+    }
+    
+    .lecture-detail-container .lecture-main {
+        order: 1 !important;
+    }
 }
 
 .lecture-main {
@@ -986,53 +1005,130 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 /* 모바일 반응형 */
 @media (max-width: 1024px) {
     .lecture-content {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
     }
     
     .lecture-sidebar {
-        order: -1;
+        order: 10 !important;
     }
 }
 
+/* 포괄적 모바일 최적화 - 768px 이하 태블릿/모바일 */
 @media (max-width: 768px) {
+    /* 기본 컨테이너 최적화 */
     .lecture-detail-container {
-        padding: 15px;
+        padding: 12px;
+        margin: 0;
+        /* 모바일 헤더 겹침 방지: 모바일 헤더 높이에 맞춰 조정 */
+        margin-top: 85px; /* 모바일: 헤더 높이(70px) + 여유 공간(15px) */
+        padding-top: 15px;
     }
     
+    /* 배너 영역 최적화 */
     .lecture-banner {
-        padding: 30px 20px;
-    }
-    
-    .lecture-title {
-        font-size: 2rem;
-    }
-    
-    .lecture-actions {
-        position: static;
-        justify-content: center;
+        padding: 40px 20px 30px 20px;
         margin-top: 20px;
     }
     
+    .lecture-title {
+        font-size: 24px !important; /* 2rem에서 24px로 명시적 설정 */
+        line-height: 1.3;
+        margin-bottom: 12px;
+    }
+    
+    .lecture-subtitle {
+        font-size: 16px !important;
+        line-height: 1.4;
+    }
+    
+    .lecture-category {
+        font-size: 14px !important;
+        padding: 8px 16px;
+    }
+    
+    /* 메타 정보 모바일 최적화 */
     .lecture-meta-basic {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 12px;
     }
     
+    .meta-item {
+        font-size: 16px !important;
+        padding: 4px 0;
+    }
+    
+    .meta-icon {
+        font-size: 18px !important;
+    }
+    
+    /* 콘텐츠 레이아웃 단일 컬럼으로 변경 */
+    .lecture-content {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+    
+    /* 메인 콘텐츠 최적화 */
+    .lecture-main {
+        padding: 20px 16px;
+        margin-bottom: 15px;
+    }
+    
+    /* 사이드바를 하단으로 이동 */
+    .lecture-sidebar {
+        order: 10 !important;
+        margin-top: 15px;
+        padding: 16px;
+    }
+    
+    /* 사이드바 카드들 */
+    .sidebar-card {
+        padding: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .sidebar-card h3 {
+        font-size: 18px !important;
+        margin-bottom: 12px;
+    }
+    
+    /* 스케줄 그리드 */
     .schedule-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
     
-    /* 강사 카드 모바일 대응 */
+    .schedule-item {
+        padding: 16px;
+    }
+    
+    .schedule-date {
+        font-size: 16px !important;
+    }
+    
+    .schedule-time {
+        font-size: 14px !important;
+    }
+    
+    /* 강사 카드 모바일 최적화 */
     .instructor-card {
         flex-direction: column;
         text-align: center;
         gap: 15px;
+        padding: 20px 16px;
     }
     
     .instructor-avatar {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         margin: 0 auto;
+    }
+    
+    .instructor-name {
+        font-size: 18px !important;
+    }
+    
+    .instructor-title {
+        font-size: 14px !important;
     }
     
     .instructor-header {
@@ -1042,6 +1138,170 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     
     .instructor-experience {
         text-align: left;
+    }
+    
+    /* 액션 버튼들 최적화 */
+    .lecture-actions {
+        position: static;
+        justify-content: center;
+        margin-top: 20px;
+        padding: 0 16px;
+    }
+    
+    /* 모든 버튼 터치 타겟 44px+ 확보 */
+    .btn, button, .btn-primary, .btn-secondary, .btn-register, .btn-edit, .btn-danger, .btn-success,
+    a[class*="btn"], input[type="button"], input[type="submit"], [role="button"] {
+        min-height: 48px !important;
+        min-width: 48px !important;
+        padding: 12px 20px !important;
+        font-size: 16px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-radius: 8px;
+        touch-action: manipulation;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* 숨겨진 버튼들 강제 표시 */
+    .lecture-detail-container button[style*="display: none"],
+    .lecture-detail-container .btn[style*="display: none"] {
+        display: inline-flex !important;
+        visibility: visible !important;
+    }
+    
+    /* 모든 텍스트 최소 16px 확보 */
+    .lecture-description, .sidebar-card p, .schedule-item, .instructor-info {
+        font-size: 16px !important;
+        line-height: 1.5;
+    }
+    
+    /* 특정 작은 텍스트들 강제 확대 */
+    .lecture-detail-container p, 
+    .lecture-detail-container span,
+    .lecture-detail-container div:not(.lecture-title):not(.lecture-subtitle) {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+    }
+    
+    /* 이모지 영역 폰트 크기 강제 설정 */
+    .status-indicator, .capacity-indicator, .venue-indicator {
+        font-size: 16px !important;
+    }
+    
+    /* 참가자 목록 최적화 */
+    .participant-item {
+        padding: 12px 16px !important;
+        margin-bottom: 8px;
+    }
+    
+    .participant-name {
+        font-size: 16px !important;
+    }
+    
+    /* 관련 강의 목록 최적화 */
+    .related-lecture-item {
+        padding: 16px !important;
+        margin-bottom: 12px;
+    }
+    
+    .related-lecture-title {
+        font-size: 16px !important;
+        line-height: 1.4;
+    }
+    
+    /* 프로필 관련 버튼들 */
+    .btn-visit-profile, .btn-chat-author {
+        min-height: 44px !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+    }
+    
+    /* 수평 스크롤 완전 제거 */
+    * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* 이미지 반응형 처리 */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* 테이블 반응형 처리 */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* 소형 모바일 최적화 - 480px 이하 */
+@media (max-width: 480px) {
+    /* 컨테이너 여백 최소화 */
+    .lecture-detail-container {
+        padding: 8px;
+    }
+    
+    /* 배너 더 컴팩트하게 */
+    .lecture-banner {
+        padding: 30px 16px 24px 16px;
+        margin-top: 10px;
+    }
+    
+    .lecture-title {
+        font-size: 20px !important;
+        line-height: 1.2;
+    }
+    
+    .lecture-subtitle {
+        font-size: 14px !important;
+    }
+    
+    /* 메인 콘텐츠 패딩 축소 */
+    .lecture-main {
+        padding: 16px 12px;
+    }
+    
+    .sidebar-card {
+        padding: 12px;
+    }
+    
+    /* 버튼 크기 조정 (여전히 44px+ 유지) */
+    .btn, .btn-register {
+        padding: 14px 16px !important;
+        font-size: 15px !important;
+        border-radius: 6px;
+    }
+    
+    /* 강사 아바타 크기 조정 */
+    .instructor-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* 스케줄 아이템 패딩 축소 */
+    .schedule-item {
+        padding: 12px;
+    }
+    
+    /* 텍스트 크기 세밀 조정 */
+    .meta-item {
+        font-size: 15px !important;
+    }
+    
+    .sidebar-card h3 {
+        font-size: 16px !important;
+    }
+    
+    /* 액션 영역 패딩 축소 */
+    .lecture-actions {
+        padding: 0 12px;
+        margin-top: 16px;
     }
 }
 

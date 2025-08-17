@@ -42,7 +42,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     margin: 0 auto;
     padding: 30px 15px;
     min-height: calc(100vh - 200px);
-    padding-top: 60px;
+    /* 헤더 겹침 방지: 고정 헤더 높이만큼 상단 여백 추가 */
+    margin-top: 80px; /* 데스크톱: 헤더 높이(66px) + 여유 공간(14px) */
+    padding-top: 20px;
 }
 
 .event-hero {
@@ -68,10 +70,10 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 
 /* 기본 버튼 스타일 */
 .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
@@ -80,6 +82,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     gap: 8px;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 48px;
+    min-width: 48px;
+    justify-content: center;
 }
 
 .btn:hover {
@@ -141,7 +146,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     background: rgba(255, 255, 255, 0.2);
     padding: 8px 16px;
     border-radius: 20px;
-    font-size: 0.9rem;
+    font-size: 16px;
     margin-bottom: 20px;
     backdrop-filter: blur(10px);
 }
@@ -299,7 +304,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .instructor-title {
-    font-size: 0.9rem;
+    font-size: 16px;
     color: #4A90E2;
     font-weight: 500;
 }
@@ -307,7 +312,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 .instructor-bio {
     color: #64748b;
     line-height: 1.5;
-    font-size: 0.9rem;
+    font-size: 16px;
 }
 
 .info-card {
@@ -350,7 +355,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 
 .info-label {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 16px;
 }
 
 .info-value {
@@ -387,6 +392,8 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     transition: all 0.3s;
     width: 100%;
     font-size: 1.1rem;
+    min-height: 48px;
+    padding: 12px 24px;
 }
 
 .register-btn:hover {
@@ -435,7 +442,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .event-status-message .status-description {
-    font-size: 14px;
+    font-size: 16px;
     opacity: 0.9;
     line-height: 1.4;
 }
@@ -515,7 +522,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 
 .instructor-bio {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 16px;
     line-height: 1.5;
 }
 
@@ -730,7 +737,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     background: rgba(0, 0, 0, 0.5);
     padding: 8px 16px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .networking-notice {
@@ -794,7 +801,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 @media (max-width: 768px) {
     .event-detail-container {
         padding: 20px 10px;
-        padding-top: 40px;
+        /* 모바일 헤더 겹침 방지: 모바일 헤더 높이에 맞춰 조정 */
+        margin-top: 85px; /* 모바일: 헤더 높이(70px) + 여유 공간(15px) */
+        padding-top: 15px;
     }
     
     .event-hero {
@@ -811,8 +820,15 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     }
     
     .event-content {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 30px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .event-sidebar {
+        order: 10 !important;
+        margin-top: 20px;
     }
     
     .content-section {
@@ -827,14 +843,55 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     }
     
     .event-admin-actions .btn {
-        padding: 8px 12px;
-        font-size: 13px;
+        padding: 10px 16px;
+        font-size: 16px;
+        min-height: 48px;
+        min-width: 48px;
     }
     
     /* 모바일에서 공유 버튼 크기 조정 */
     .btn-share {
-        padding: 10px 20px;
-        font-size: 0.9rem;
+        padding: 12px 24px;
+        font-size: 16px;
+        min-height: 48px;
+    }
+    
+    /* 모바일 수평 스크롤 방지 */
+    .event-detail-container {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    /* 모든 버튼 터치 타겟 최적화 */
+    .btn, button, .register-btn,
+    .btn-visit-profile, .btn-chat-author,
+    .close, .modal-close,
+    a[href], input[type="submit"], input[type="button"] {
+        min-height: 48px !important;
+        min-width: 48px !important;
+        font-size: 16px !important;
+        padding: 12px 24px !important;
+        touch-action: manipulation;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* 모달 버튼들도 터치 친화적으로 */
+    .modal-footer .btn {
+        min-height: 48px !important;
+        padding: 12px 24px !important;
+        font-size: 16px !important;
+    }
+    
+    /* 텍스트 가독성 개선 */
+    .content-section p,
+    .instructor-bio,
+    .info-label,
+    .event-status-message .status-description {
+        font-size: 16px !important;
+        line-height: 1.6 !important;
     }
     
     /* 모바일 모달 네비게이션 */
@@ -1086,7 +1143,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     margin-bottom: 6px;
     font-weight: 600;
     color: #374151;
-    font-size: 0.9rem;
+    font-size: 16px;
     text-align: left;
 }
 
@@ -1097,7 +1154,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     padding: 12px 16px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 16px;
     transition: all 0.2s ease;
     background: white;
     text-align: left;
@@ -1124,7 +1181,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 0.9rem;
+    font-size: 16px;
 }
 
 .btn-primary {
@@ -1323,7 +1380,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     background: rgba(0, 0, 0, 0.7);
     padding: 8px 16px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 /* 반응형 디자인 */

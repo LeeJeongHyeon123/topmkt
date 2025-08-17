@@ -64,6 +64,9 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
     margin: 0 auto;
     padding: 20px;
     min-height: calc(100vh - 200px);
+    /* 헤더 겹침 방지: 고정 헤더 높이만큼 상단 여백 추가 */
+    margin-top: 80px; /* 데스크톱: 헤더 높이(66px) + 여유 공간(14px) */
+    padding-top: 20px;
 }
 
 .detail-navigation {
@@ -621,6 +624,9 @@ $pageImage = !empty($notice['images']) ? $notice['images'][0]['file_path'] : '/a
 @media (max-width: 768px) {
     .detail-container {
         padding: 15px;
+        /* 모바일 헤더 겹침 방지: 모바일 헤더 높이에 맞춰 조정 */
+        margin-top: 85px; /* 모바일: 헤더 높이(70px) + 여유 공간(15px) */
+        padding-top: 15px;
     }
     
     .notice-header {
@@ -885,12 +891,7 @@ body {
     <!-- 공지사항 본문 -->
     <div class="notice-container">
         <!-- 헤더 -->
-        <div class="notice-header <?= $notice['is_featured'] ? 'featured' : '' ?>">
-            <?php if ($notice['is_featured']): ?>
-                <div class="notice-featured-badge">
-                    <i class="fas fa-star"></i> 중요 공지
-                </div>
-            <?php endif; ?>
+        <div class="notice-header">
             
             <h1 class="notice-title"><?= htmlspecialchars($notice['title']) ?></h1>
             

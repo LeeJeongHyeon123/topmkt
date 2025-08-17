@@ -393,7 +393,7 @@ $monthNames = [
                         </div>
                         
                         <div class="event-description">
-                            <?= htmlspecialchars(mb_substr($event['description'], 0, 150)) ?><?= mb_strlen($event['description']) > 150 ? '...' : '' ?>
+                            <?= htmlspecialchars(HtmlSanitizerHelper::htmlToPlainText($event['description'], 150)) ?>
                         </div>
                     </div>
                     
