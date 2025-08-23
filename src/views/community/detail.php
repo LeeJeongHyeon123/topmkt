@@ -110,6 +110,27 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     white-space: pre-wrap;
 }
 
+/* 게시글 내 이미지 반응형 크기 제한 */
+.content-body img,
+.post-content img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+    display: block;
+}
+
+/* 모바일에서 이미지 추가 최적화 */
+@media (max-width: 768px) {
+    .content-body img,
+    .post-content img {
+        max-width: 100% !important;
+        width: 100% !important;
+        object-fit: contain;
+    }
+}
+
 .post-footer {
     padding: 20px 30px;
     background: #f8fafc;

@@ -531,6 +531,7 @@ html #quill-editor .ql-editor * {
                       style="display: none;"
                       required><?= isset($post) ? htmlspecialchars($post['content']) : '' ?></textarea>
             <div id="contentCounter" class="char-counter">0 / 10,000</div>
+            <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
             <div class="editor-tips" style="margin-top: 8px; font-size: 12px; color: #718096;">
                 💡 <strong>에디터 사용법:</strong> 
                 텍스트 선택 후 포맷 적용 | 이미지 업로드 버튼 클릭 | Ctrl+Z로 실행 취소
@@ -599,6 +600,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // 이미지 개수 제한 검사 (20개)
+            const currentImages = quill.container.querySelectorAll('img').length;
+            if (currentImages >= 20) {
+                alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+                return;
+            }
+            
             let range = null;
             let loadingTextInserted = false;
             
@@ -660,6 +668,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     quill.insertEmbed(range.index, 'image', result.data.url);
                     quill.setSelection(range.index + 1);
                     console.log('✅ 이미지 업로드 성공:', result.data.url);
+                    
+                    // 이미지 카운터 업데이트
+                    updateImageCounter();
                 } else {
                     throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
                 }
@@ -689,6 +700,34 @@ document.addEventListener('DOMContentLoaded', function() {
         input.click();
     }
     
+    // 이미지 개수 카운터 업데이트 함수
+    function updateImageCounter() {
+        const imageCounter = document.getElementById('imageCounter');
+        if (!imageCounter) return;
+        
+        const currentImages = quill.container.querySelectorAll('img').length;
+        const maxImages = 20;
+        
+        // 색상 및 스타일 설정
+        let counterClass = '';
+        let warningText = '';
+        
+        if (currentImages >= 18) { // 90% 이상
+            counterClass = 'error'; // 빨간색
+            warningText = ' ⚠️';
+        } else if (currentImages >= 15) { // 75% 이상
+            counterClass = 'warning'; // 주황색
+            warningText = ' ⚠️';
+        } else {
+            counterClass = ''; // 기본 색상
+        }
+        
+        imageCounter.className = `char-counter ${counterClass}`;
+        imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
+        
+        console.log(`📊 이미지 카운터 업데이트: ${currentImages}/${maxImages}`);
+    }
+    
     // Quill 에디터 초기화
     quill = new Quill('#quill-editor', {
         theme: 'snow',
@@ -712,6 +751,28 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         bounds: '#quill-editor'
     });
+    
+    // 텍스트 변경 시 이미지 카운터 업데이트 및 제한 검사
+    quill.on('text-change', function(delta, oldDelta, source) {
+        // 이미지 개수 확인
+        const currentImages = quill.container.querySelectorAll('img').length;
+        
+        // 20개 초과 시 초과분 제거
+        if (currentImages > 20) {
+            console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
+            const images = quill.container.querySelectorAll('img');
+            for (let i = 20; i < images.length; i++) {
+                images[i].remove();
+            }
+            alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+        }
+        
+        // 이미지 카운터 업데이트
+        setTimeout(updateImageCounter, 100); // 약간의 지연으로 DOM 업데이트 후 실행
+    });
+    
+    // 초기 이미지 카운터 설정
+    setTimeout(updateImageCounter, 500);
     
     // Quill 에디터의 기본 이벤트를 덮어쓰기
     const editor = quill.root;
@@ -769,6 +830,61 @@ document.addEventListener('DOMContentLoaded', function() {
     editor.setAttribute('contenteditable', 'true');
     
     console.log('Quill 에디터 초기화 완료, 에디터 요소:', editor);
+    
+    // 추가 입력 방지를 위한 키보드 이벤트 처리
+    quill.root.addEventListener('keydown', function(e) {
+        const currentLength = quill.getText().length;
+        const maxLength = 10000;
+        
+        // 10,000자에 도달했을 때 추가 문자 입력 방지
+        if (currentLength >= maxLength) {
+            // 백스페이스, 삭제, 방향키, Ctrl 조합 등은 허용
+            const allowedKeys = [
+                'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 
+                'ArrowUp', 'ArrowDown', 'Home', 'End', 'Tab'
+            ];
+            
+            // Ctrl이나 Cmd와 함께 사용하는 키 조합 허용 (복사, 붙여넣기 등)
+            const isControlKey = e.ctrlKey || e.metaKey;
+            const isNavigation = allowedKeys.includes(e.key);
+            
+            if (!isControlKey && !isNavigation && e.key.length === 1) {
+                e.preventDefault();
+                
+                // 알림 표시 (너무 자주 표시되지 않도록 제한)
+                if (!window.maxLengthKeyWarningShown) {
+                    showMaxLengthWarning();
+                    window.maxLengthKeyWarningShown = true;
+                    setTimeout(() => {
+                        window.maxLengthKeyWarningShown = false;
+                    }, 2000);
+                }
+                
+                console.log(`⚠️ 키 입력 차단: ${e.key} (현재 ${currentLength}/${maxLength}자)`);
+            }
+        }
+    });
+    
+    // 복사-붙여넣기 시 글자 수 제한 처리
+    quill.root.addEventListener('paste', function(e) {
+        setTimeout(() => {
+            const currentLength = quill.getText().length;
+            const maxLength = 10000;
+            
+            if (currentLength > maxLength) {
+                console.log(`⚠️ 붙여넣기 후 글자 수 초과: ${currentLength}/${maxLength}`);
+                
+                // 전체 텍스트를 10,000자로 제한
+                const fullText = quill.getText();
+                const limitedText = fullText.substring(0, maxLength);
+                
+                // 에디터 내용을 제한된 길이로 설정
+                quill.setText(limitedText);
+                
+                showMaxLengthWarning();
+            }
+        }, 10);
+    });
     
     // 텍스트 선택 강제 활성화
     setTimeout(function() {
@@ -926,14 +1042,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 100);
     
-    // 에디터 내용이 변경될 때마다 히든 textarea 업데이트
-    quill.on('text-change', function() {
+    // 에디터 내용이 변경될 때마다 히든 textarea 업데이트 및 글자 수 제한
+    quill.on('text-change', function(delta, oldDelta, source) {
         const htmlContent = quill.root.innerHTML;
-        contentTextarea.value = htmlContent;
-        
-        // 텍스트 길이 계산 (HTML 태그 제외)
         const textContent = quill.getText();
-        updateContentCharCounter(textContent.length);
+        const currentLength = textContent.length;
+        const maxLength = 10000;
+        
+        // 10,000자 초과 시 입력 방지
+        if (currentLength > maxLength) {
+            console.log(`⚠️ 글자 수 초과: ${currentLength}/${maxLength}`);
+            
+            // 이전 상태로 복원
+            quill.history.undo();
+            
+            // 사용자에게 알림 (한 번만 표시하도록 제어)
+            if (!window.maxLengthWarningShown) {
+                showMaxLengthWarning();
+                window.maxLengthWarningShown = true;
+                
+                // 5초 후 다시 알림 가능하도록 설정
+                setTimeout(() => {
+                    window.maxLengthWarningShown = false;
+                }, 5000);
+            }
+            
+            // 글자 수 카운터 업데이트 (제한된 길이로)
+            const limitedText = quill.getText();
+            updateContentCharCounter(limitedText.length);
+            contentTextarea.value = quill.root.innerHTML;
+        } else {
+            // 정상 범위 내에서는 일반적인 업데이트
+            contentTextarea.value = htmlContent;
+            updateContentCharCounter(currentLength);
+        }
     });
     
     // 기존 내용이 있으면 에디터에 설정
@@ -968,6 +1110,127 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentLength >= maxLength) {
             contentCounter.classList.add('error');
         }
+    }
+    
+    // 최대 글자 수 도달 알림 표시 함수
+    function showMaxLengthWarning() {
+        // 기존 알림이 있으면 제거
+        const existingWarning = document.querySelector('.max-length-warning');
+        if (existingWarning) {
+            existingWarning.remove();
+        }
+        
+        // 알림 요소 생성
+        const warningDiv = document.createElement('div');
+        warningDiv.className = 'max-length-warning';
+        warningDiv.innerHTML = `
+            <div class="warning-content">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-message">
+                    <strong>글자 수 제한 도달</strong><br>
+                    최대 10,000자까지만 입력할 수 있습니다.
+                </div>
+                <button class="warning-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+        
+        // 스타일 적용
+        warningDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 0;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease-out;
+            max-width: 350px;
+            font-family: inherit;
+        `;
+        
+        // 내부 콘텐츠 스타일
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            .max-length-warning .warning-content {
+                display: flex;
+                align-items: flex-start;
+                padding: 16px;
+                gap: 12px;
+            }
+            
+            .max-length-warning .warning-icon {
+                font-size: 24px;
+                line-height: 1;
+                flex-shrink: 0;
+            }
+            
+            .max-length-warning .warning-message {
+                flex: 1;
+                font-size: 14px;
+                line-height: 1.4;
+                color: #856404;
+            }
+            
+            .max-length-warning .warning-message strong {
+                color: #533f03;
+                font-weight: 600;
+            }
+            
+            .max-length-warning .warning-close {
+                background: none;
+                border: none;
+                font-size: 20px;
+                font-weight: bold;
+                color: #856404;
+                cursor: pointer;
+                padding: 0;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+                flex-shrink: 0;
+            }
+            
+            .max-length-warning .warning-close:hover {
+                color: #533f03;
+                background: rgba(0, 0, 0, 0.1);
+                border-radius: 50%;
+            }
+        `;
+        
+        if (!document.querySelector('style[data-max-length-warning]')) {
+            style.setAttribute('data-max-length-warning', 'true');
+            document.head.appendChild(style);
+        }
+        
+        // 페이지에 추가
+        document.body.appendChild(warningDiv);
+        
+        // 자동으로 5초 후 제거
+        setTimeout(() => {
+            if (warningDiv && warningDiv.parentElement) {
+                warningDiv.style.animation = 'slideInRight 0.3s ease-in reverse';
+                setTimeout(() => {
+                    if (warningDiv && warningDiv.parentElement) {
+                        warningDiv.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+        
+        // 에디터에 포커스를 다시 맞춤 (사용자가 계속 작성할 수 있도록)
+        setTimeout(() => {
+            quill.focus();
+        }, 100);
     }
     
     // 초기 문자 수 카운터 설정
@@ -1038,13 +1301,16 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             hideLoading();
             
-            if (data.success) {
+            if (data.status === 'success') {
+                // alert를 표시한 후 setTimeout을 사용하여 리다이렉트 보장
                 alert(data.message);
-                if (data.data && data.data.redirectUrl) {
-                    window.location.href = data.data.redirectUrl;
-                } else {
-                    window.location.href = '/community';
-                }
+                setTimeout(() => {
+                    if (data.data && data.data.redirectUrl) {
+                        window.location.href = data.data.redirectUrl;
+                    } else {
+                        window.location.href = '/community';
+                    }
+                }, 100); // 100ms 지연으로 alert 완료 후 리다이렉트
             } else {
                 alert(data.message || '오류가 발생했습니다.');
             }
@@ -1079,9 +1345,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 hideLoading();
                 
-                if (data.success) {
+                if (data.status === 'success') {
                     alert(data.message);
-                    window.location.href = data.data.redirectUrl || '/community';
+                    setTimeout(() => {
+                        window.location.href = data.data.redirectUrl || '/community';
+                    }, 100); // 100ms 지연으로 alert 완료 후 리다이렉트
                 } else {
                     alert(data.message || '삭제 중 오류가 발생했습니다.');
                 }
