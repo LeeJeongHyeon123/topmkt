@@ -407,6 +407,26 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     cursor: not-allowed;
 }
 
+/* 글자 수 카운터 스타일 */
+.char-counter {
+    text-align: right;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 4px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.char-counter span {
+    font-weight: 600;
+}
+
+/* 텍스트에어리어 스타일 개선 */
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .registration-modal-content {
@@ -2393,36 +2413,37 @@ body {
                     </div>
                     
                         
-                        <!-- 일반 사용자만 신청 관련 UI 표시 -->
-                        <?php if ($userRegistration): ?>
+                        <?php if ($isLoggedIn && $canEdit): ?>
+                            <!-- 강의 작성자/관리자는 신청 UI 대신 관리 메시지 표시 -->
+                            <div style="text-align: center; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                <div style="font-size: 1rem; font-weight: 600; color: #667eea; margin-bottom: 5px;">
+                                    ✏️ 강의 관리자
+                                </div>
+                                <div style="font-size: 0.9rem; color: #718096;">
+                                    본인이 개설한 강의입니다
+                                </div>
+                            </div>
+                        <?php elseif (!$isLoggedIn): ?>
+                            <!-- 비로그인 사용자 - 항상 로그인 버튼만 표시 -->
+                            <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn-register">
+                                🔑 로그인 후 신청
+                            </a>
+                        <?php elseif ($userRegistration): ?>
+                            <!-- 로그인된 사용자 - 이미 신청한 경우 -->
                             <div class="btn-register" style="background: #68d391; cursor: default;">
                                 ✅ 신청 완료
                             </div>
                         <?php elseif ($canRegister): ?>
+                            <!-- 로그인된 사용자 - 신청 가능한 경우 -->
                             <a href="/lectures/<?= $lecture['id'] ?>/register" class="btn-register">
                                 📝 지금 신청하기
                             </a>
                         <?php else: ?>
+                            <!-- 로그인된 사용자 - 신청 불가능한 경우 -->
                             <div class="btn-register" style="background: #a0aec0; cursor: not-allowed;">
                                 ❌ 신청 마감
                             </div>
                         <?php endif; ?>
-                    <?php if ($isLoggedIn && $canEdit): ?>
-                        <!-- 강의 작성자/관리자는 신청 UI 대신 관리 메시지 표시 -->
-                        <div style="text-align: center; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <div style="font-size: 1rem; font-weight: 600; color: #667eea; margin-bottom: 5px;">
-                                ✏️ 강의 관리자
-                            </div>
-                            <div style="font-size: 0.9rem; color: #718096;">
-                                본인이 개설한 강의입니다
-                            </div>
-                        </div>
-                    <?php elseif (!$isLoggedIn): ?>
-                        <!-- 비로그인 사용자 -->
-                        <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn-register">
-                            🔑 로그인 후 신청
-                        </a>
-                    <?php endif; ?>
                 </div>
             </div>
             
@@ -2568,13 +2589,13 @@ document.addEventListener('DOMContentLoaded', function() {
             img.parentElement.classList.add('loading');
             
             img.addEventListener('load', function() {
-                console.log(`✅ 강사 이미지 ${index + 1} 로딩 성공:`, this.src);
+                console.log('✅ 강사 이미지 ' + (index + 1) + ' 로딩 성공:', this.src);
                 this.parentElement.classList.remove('loading');
                 this.style.opacity = '1';
             });
             
             img.addEventListener('error', function() {
-                console.warn(`❌ 강사 이미지 ${index + 1} 로딩 실패:`, this.src);
+                console.warn('❌ 강사 이미지 ' + (index + 1) + ' 로딩 실패:', this.src);
                 this.parentElement.classList.remove('loading');
                 this.parentElement.classList.add('error');
                 
@@ -2591,7 +2612,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (img.complete && img.naturalHeight !== 0) {
                 img.parentElement.classList.remove('loading');
                 img.style.opacity = '1';
-                console.log(`✅ 강사 이미지 ${index + 1} 캐시에서 로드됨:`, img.src);
+                console.log('✅ 강사 이미지 ' + (index + 1) + ' 캐시에서 로드됨:', img.src);
             }
         });
         
@@ -2623,7 +2644,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 참가자 목록 애니메이션
     const participantItems = document.querySelectorAll('.participant-item');
     participantItems.forEach((item, index) => {
-        item.style.animationDelay = `${index * 0.1}s`;
+        item.style.animationDelay = (index * 0.1) + 's';
         item.style.animation = 'fadeInUp 0.5s ease forwards';
     });
     
@@ -2649,18 +2670,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 애니메이션 키프레임 추가
 const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
+style.textContent = '@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }';
 document.head.appendChild(style);
 
 // 이미지 갤러리 관련 변수
@@ -2716,7 +2726,7 @@ function openImageModal(index) {
     
     modal.style.display = 'block';
     modalImg.src = lectureImages[currentImageIndex].url;
-    counter.textContent = `${currentImageIndex + 1} / ${lectureImages.length}`;
+    counter.textContent = (currentImageIndex + 1) + ' / ' + lectureImages.length;
     
     document.body.style.overflow = 'hidden';
 }
@@ -2735,7 +2745,7 @@ function openInstructorImageModal(index) {
     
     modal.style.display = 'block';
     modalImg.src = instructorImages[currentImageIndex].url;
-    counter.textContent = `강사 이미지 ${currentImageIndex + 1} / ${instructorImages.length}`;
+    counter.textContent = '강사 이미지 ' + (currentImageIndex + 1) + ' / ' + instructorImages.length;
     
     document.body.style.overflow = 'hidden';
 }
@@ -2784,9 +2794,9 @@ function changeImage(direction) {
     modalImg.src = currentImages[currentImageIndex].url;
     
     if (currentGalleryType === 'instructor') {
-        counter.textContent = `강사 이미지 ${currentImageIndex + 1} / ${currentImages.length}`;
+        counter.textContent = '강사 이미지 ' + (currentImageIndex + 1) + ' / ' + currentImages.length;
     } else {
-        counter.textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
+        counter.textContent = (currentImageIndex + 1) + ' / ' + currentImages.length;
     }
 }
 
@@ -2839,7 +2849,7 @@ function startChatWithAuthor(authorId, authorName) {
     }
     
     // 채팅 페이지로 이동하면서 해당 사용자와 채팅 시작
-    window.location.href = `/chat#user-${authorId}`;
+    window.location.href = '/chat#user-' + authorId;
 }
 
 function shareContent() {
@@ -2911,51 +2921,21 @@ function fallbackShare(title, url) {
  */
 function showShareModal(title, url) {
     const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    `;
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;';
     
     const content = document.createElement('div');
-    content.style.cssText = `
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        max-width: 500px;
-        width: 90%;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    `;
+    content.style.cssText = 'background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
     
-    content.innerHTML = `
-        <h3 style="margin-bottom: 20px; color: #2d3748;">🔗 강의 공유하기</h3>
-        <p style="margin-bottom: 20px; color: #4a5568;">${title}</p>
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; word-break: break-all; font-family: monospace; font-size: 14px;">
-            ${url}
-        </div>
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button onclick="copyToClipboard('${url}')" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                📋 복사하기
-            </button>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px;">
-                📘 Facebook
-            </a>
-            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px;">
-                🐦 Twitter
-            </a>
-            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 10px 20px; background: #a0aec0; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                닫기
-            </button>
-        </div>
-    `;
+    content.innerHTML = 
+        '<h3 style="margin-bottom: 20px; color: #2d3748;">🔗 강의 공유하기</h3>' +
+        '<p style="margin-bottom: 20px; color: #4a5568;">' + title + '</p>' +
+        '<div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; word-break: break-all; font-family: monospace; font-size: 14px;">' + url + '</div>' +
+        '<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">' +
+            '<button onclick="copyToClipboard(\'' + url + '\')" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">📋 복사하기</button>' +
+            '<a href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url) + '" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px;">📘 Facebook</a>' +
+            '<a href="https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url) + '" target="_blank" style="padding: 10px 20px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px;">🐦 Twitter</a>' +
+            '<button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 10px 20px; background: #a0aec0; color: white; border: none; border-radius: 6px; cursor: pointer;">닫기</button>' +
+        '</div>';
     
     modal.appendChild(content);
     document.body.appendChild(modal);
@@ -3019,6 +2999,49 @@ function openInstructorImageModal(imageSrc, imageAlt) {
 
 // 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 
+// 상태 메시지 표시 함수 (함수 호출 전에 정의)
+function showLectureStatusMessage(statusClass, iconClass, title, description) {
+    console.log('🎯 showLectureStatusMessage 호출됨');
+    console.log('📊 파라미터:', { statusClass, iconClass, title, description });
+    
+    const statusMessage = document.getElementById('lecture-status-message');
+    const statusTitle = document.getElementById('lecture-status-title');
+    const statusDescription = document.getElementById('lecture-status-description');
+    const statusIcon = statusMessage?.querySelector('.status-icon i');
+    
+    console.log('🔍 showLectureStatusMessage DOM 요소:');
+    console.log('- statusMessage:', statusMessage);
+    console.log('- statusTitle:', statusTitle);
+    console.log('- statusDescription:', statusDescription);
+    console.log('- statusIcon:', statusIcon);
+    
+    if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
+        console.error('❌ showLectureStatusMessage: 필수 DOM 요소 누락!');
+        return;
+    }
+    
+    console.log('🎨 스타일 적용 시작...');
+    statusMessage.className = 'lecture-status-message ' + statusClass;
+    statusMessage.style.display = 'block';
+    statusIcon.className = 'fas ' + iconClass;
+    statusTitle.textContent = title;
+    statusDescription.textContent = description;
+    
+    console.log('✅ 스타일 적용 완료:');
+    console.log('- className:', statusMessage.className);
+    console.log('- display:', statusMessage.style.display);
+    console.log('- 최종 표시 여부:', getComputedStyle(statusMessage).display);
+    console.log('- 위치 정보:', statusMessage.getBoundingClientRect());
+}
+
+// 상태 메시지 숨김 함수
+function hideLectureStatusMessage() {
+    const statusMessage = document.getElementById('lecture-status-message');
+    if (statusMessage) {
+        statusMessage.style.display = 'none';
+    }
+}
+
 /**
  * 강의 신청 시스템
  */
@@ -3033,9 +3056,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const staticButtons = document.querySelectorAll('.btn-register');
     console.log('🧹 정적 버튼 정리:', staticButtons.length + '개 발견');
     
-    // 🔥 긴급 수정: 강제로 API 호출 (조건 무시)
-    console.log('🔥 강제 API 호출 - 거절 메시지 표시를 위해');
-    checkRegistrationStatus();
+    // 로그인된 사용자에게만 API 호출
+    const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
+    if (isLoggedIn) {
+        console.log('✅ 로그인 사용자 - 신청 상태 확인 API 호출');
+        checkRegistrationStatus();
+    } else {
+        console.log('🔑 비로그인 사용자 - API 호출 생략');
+    }
 });
 
 // 신청 상태 확인
@@ -3043,7 +3071,7 @@ async function checkRegistrationStatus() {
     try {
         console.log('🔍 신청 상태 확인 시작...');
         
-        const response = await fetch(`/api/lectures/<?= $lecture['id'] ?>/registration-status`, {
+        const response = await fetch('/api/lectures/<?= $lecture["id"] ?>/registration-status', {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -3061,16 +3089,12 @@ async function checkRegistrationStatus() {
             console.log('✅ API 성공 응답, data 사용');
             updateRegistrationUI(result.data);
         } else {
-            console.error('❌ API 응답 오류:', result);
-            // 🔥 긴급 수정: API 실패해도 강제로 거절 메시지 표시
-            console.log('🔥 강제로 거절 메시지 표시');
-            showLectureStatusMessage('rejected', 'fa-times-circle', '신청이 거절되었습니다', '너 안 됨!!!!');
+            console.log('ℹ️ API 응답 오류 또는 비로그인 상태:', result);
+            // 비로그인 사용자는 메시지 표시하지 않음
         }
     } catch (error) {
-        console.error('❌ 신청 상태 확인 오류:', error);
-        // 🔥 긴급 수정: 오류 발생해도 강제로 거절 메시지 표시
-        console.log('🔥 오류 발생했지만 강제로 거절 메시지 표시');
-        showLectureStatusMessage('rejected', 'fa-times-circle', '신청이 거절되었습니다', '너 안 됨!!!!');
+        console.log('ℹ️ 신청 상태 확인 실패 (정상):', error.message);
+        // 비로그인 사용자는 메시지 표시하지 않음
     }
 }
 
@@ -3125,62 +3149,27 @@ function updateRegistrationStatusUI(registration, isLectureStarted) {
     if (sidebarRegistrationInfo) {
         // sidebar-card에 동적 버튼 추가
         let sidebarButtonHtml = '';
-        switch (status) {
-            case 'pending':
-                sidebarButtonHtml = `
-                    <div class="btn-register" style="background: #ed8936; cursor: default; margin-bottom: 8px;">
-                        ⏳ 승인 대기중
-                    </div>
-                    <button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">
-                        ❌ 신청 취소
-                    </button>
-                `;
-                break;
-            case 'approved':
-                if (isLectureStarted) {
-                    sidebarButtonHtml = `
-                        <div class="btn-register" style="background: #48bb78; cursor: default;">
-                            ✅ 참석 완료
-                        </div>
-                    `;
-                } else {
-                    sidebarButtonHtml = `
-                        <div class="btn-register" style="background: #48bb78; cursor: default; margin-bottom: 8px;">
-                            ✅ 신청 승인됨
-                        </div>
-                        <button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">
-                            ❌ 신청 취소
-                        </button>
-                    `;
-                }
-                break;
-            case 'waiting':
-                sidebarButtonHtml = `
-                    <div class="btn-register" style="background: #4299e1; cursor: default; margin-bottom: 8px;">
-                        ⏰ 대기자 ${registration.waiting_order}번
-                    </div>
-                    <button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">
-                        ❌ 신청 취소
-                    </button>
-                `;
-                break;
-            case 'rejected':
-                sidebarButtonHtml = `
-                    <div class="btn-register" style="background: #e53e3e; cursor: default; margin-bottom: 8px; color: white;">
-                        ❌ 신청 거절됨
-                    </div>
-                    <button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">
-                        🔄 다시 신청하기
-                    </button>
-                `;
-                break;
-            case 'cancelled':
-                sidebarButtonHtml = `
-                    <button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">
-                        📝 다시 신청하기
-                    </button>
-                `;
-                break;
+        // 강의가 시작된 경우 모든 액션 버튼 비활성화
+        if (isLectureStarted) {
+            sidebarButtonHtml = '<div class="btn-register" style="background: #a0a0a0; cursor: default; color: white;">⏰ 이미 종료된 강의입니다</div>';
+        } else {
+            switch (status) {
+                case 'pending':
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #ed8936; cursor: default; margin-bottom: 8px;">⏳ 승인 대기중</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">❌ 신청 취소</button>';
+                    break;
+                case 'approved':
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #48bb78; cursor: default; margin-bottom: 8px;">✅ 신청 승인됨</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">❌ 신청 취소</button>';
+                    break;
+                case 'waiting':
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #4299e1; cursor: default; margin-bottom: 8px;">⏰ 대기자 ' + registration.waiting_order + '번</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">❌ 신청 취소</button>';
+                    break;
+                case 'rejected':
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #e53e3e; cursor: default; margin-bottom: 8px; color: white;">❌ 신청 거절됨</div><button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">🔄 다시 신청하기</button>';
+                    break;
+                case 'cancelled':
+                    sidebarButtonHtml = '<button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">📝 다시 신청하기</button>';
+                    break;
+            }
         }
         sidebarRegistrationInfo.innerHTML = sidebarButtonHtml;
     }
@@ -3189,74 +3178,65 @@ function updateRegistrationStatusUI(registration, isLectureStarted) {
     let statusText = '';
     let statusClass = '';
     
-    switch (status) {
-        case 'pending':
-            statusText = '⏳ 승인 대기중';
-            statusClass = 'btn-warning';
-            buttonHtml = `
-                <button class="btn ${statusClass}" disabled>
-                    ${statusText}
-                </button>
-                <button class="btn btn-outline" onclick="cancelRegistration()">
-                    ❌ 신청 취소
-                </button>
-            `;
-            break;
-            
-        case 'approved':
-            if (isLectureStarted) {
-                statusText = '✅ 참석 완료';
-                statusClass = 'btn-success';
-                buttonHtml = `<button class="btn ${statusClass}" disabled>${statusText}</button>`;
-            } else {
+    // 강의가 시작된 경우 모든 상태에 대해 액션 비활성화
+    if (isLectureStarted) {
+        statusText = '⏰ 이미 종료된 강의입니다';
+        statusClass = 'btn-secondary';
+        buttonHtml = '<button class="btn ' + statusClass + '" disabled>' + statusText + '</button>';
+    } else {
+        switch (status) {
+            case 'pending':
+                statusText = '⏳ 승인 대기중';
+                statusClass = 'btn-warning';
+                buttonHtml = 
+                    '<button class="btn ' + statusClass + '" disabled>' +
+                        statusText +
+                    '</button>' +
+                    '<button class="btn btn-outline" onclick="cancelRegistration()">' +
+                        '❌ 신청 취소' +
+                    '</button>';
+                break;
+                
+            case 'approved':
                 statusText = '✅ 신청 승인됨';
                 statusClass = 'btn-success';
+                buttonHtml = 
+                    '<button class="btn ' + statusClass + '" disabled>' +
+                        statusText +
+                    '</button>' +
+                    '<button class="btn btn-outline" onclick="cancelRegistration()">' +
+                        '❌ 신청 취소' +
+                    '</button>';
+                break;
+                
+            case 'rejected':
+                statusText = '❌ 신청 거절됨';
+                statusClass = 'btn-danger';
+                buttonHtml = 
+                    '<button class="btn ' + statusClass + '" disabled>' +
+                        statusText +
+                    '</button>' +
+                    '<button class="btn btn-primary" onclick="showRegistrationModal()">' +
+                        '🔄 다시 신청하기' +
+                    '</button>';
+                break;
+            
+            case 'cancelled':
+                statusText = '⭕ 신청 취소됨';
+                statusClass = 'btn-secondary';
                 buttonHtml = `
-                    <button class="btn ${statusClass}" disabled>
-                        ${statusText}
-                    </button>
-                    <button class="btn btn-outline" onclick="cancelRegistration()">
-                        ❌ 신청 취소
+                    <button class="btn btn-primary" onclick="showRegistrationModal()">
+                        🚀 다시 신청하기
                     </button>
                 `;
-            }
-            break;
-            
-        case 'rejected':
-            statusText = '❌ 신청 거절됨';
-            statusClass = 'btn-danger';
-            buttonHtml = `
-                <button class="btn ${statusClass}" disabled>
-                    ${statusText}
-                </button>
-                <button class="btn btn-primary" onclick="showRegistrationModal()">
-                    🔄 다시 신청하기
-                </button>
-            `;
-            break;
-            
-        case 'cancelled':
-            statusText = '⭕ 신청 취소됨';
-            statusClass = 'btn-secondary';
-            buttonHtml = `
-                <button class="btn btn-primary" onclick="showRegistrationModal()">
-                    🚀 다시 신청하기
-                </button>
-            `;
-            break;
-            
-        case 'waiting':
-            statusText = `⏰ 대기순번 ${registration.waiting_order}번`;
-            statusClass = 'btn-info';
-            buttonHtml = `
-                <button class="btn ${statusClass}" disabled>
-                    ${statusText}
-                </button>
-                <button class="btn btn-outline" onclick="cancelRegistration()">
-                    ❌ 대기 취소
-                </button>
-            `;
-            break;
+                break;
+                
+            case 'waiting':
+                statusText = '⏰ 대기순번 ' + registration.waiting_order + '번';
+                statusClass = 'btn-info';
+                buttonHtml = '<button class="btn ' + statusClass + '" disabled>' + statusText + '</button>' + '<button class="btn btn-outline" onclick="cancelRegistration()">❌ 대기 취소</button>';
+                break;
+        }
     }
     
     actionsContainer.innerHTML = buttonHtml;
@@ -3279,11 +3259,59 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
         return;
     }
     
+    // 비로그인 사용자인 경우 로그인 버튼만 표시
+    const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
+    if (!isLoggedIn) {
+        // DOM 요소 직접 생성하여 안전하게 처리
+        const loginLink = document.createElement('a');
+        loginLink.href = '/auth/login?return_to=' + encodeURIComponent(window.location.pathname + window.location.search);
+        loginLink.className = 'btn btn-primary';
+        loginLink.textContent = '🔑 로그인 후 신청하기';
+        
+        actionsContainer.innerHTML = '';
+        actionsContainer.appendChild(loginLink);
+        
+        // sidebar-card 내의 신청 버튼도 로그인 버튼으로 교체
+        const sidebarRegistrationInfo = document.querySelector('.sidebar-card .registration-info');
+        if (sidebarRegistrationInfo) {
+            const existingLoginButton = sidebarRegistrationInfo.querySelector('a[href*="auth/login"]');
+            if (!existingLoginButton) {
+                const sidebarLoginLink = document.createElement('a');
+                sidebarLoginLink.href = '/auth/login?redirect=' + encodeURIComponent(window.location.href);
+                sidebarLoginLink.className = 'btn-register';
+                sidebarLoginLink.textContent = '🔑 로그인 후 신청';
+                
+                sidebarRegistrationInfo.innerHTML = '';
+                sidebarRegistrationInfo.appendChild(sidebarLoginLink);
+            }
+        }
+        return;
+    }
+    
     // 기존 정적 버튼들도 숨기기
     const staticButtons = document.querySelectorAll('.btn-register');
     staticButtons.forEach(btn => {
         btn.style.display = 'none';
     });
+    
+    // lectureInfo 유효성 검사
+    if (!lectureInfo || typeof lectureInfo !== 'object') {
+        console.error('❌ lectureInfo가 유효하지 않습니다:', lectureInfo);
+        showDefaultRegistrationButton();
+        return;
+    }
+    
+    if (isLectureStarted) {
+        // 메인 액션 컨테이너 처리
+        actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled>⏰ 이미 종료된 강의입니다</button>';
+        
+        // sidebar-card 내의 신청 버튼도 비활성화
+        const sidebarRegistrationInfo = document.querySelector('.sidebar-card .registration-info');
+        if (sidebarRegistrationInfo) {
+            sidebarRegistrationInfo.innerHTML = '<button class="btn-register" disabled style="background: #a0a0a0; color: white; border: none; cursor: not-allowed;">⏰ 이미 종료된 강의입니다</button>';
+        }
+        return;
+    }
     
     // sidebar-card 내의 신청 정보 섹션도 업데이트 (신청 안한 상태)
     const sidebarRegistrationInfo = document.querySelector('.sidebar-card .registration-info');
@@ -3295,33 +3323,13 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
         `;
     }
     
-    // lectureInfo 유효성 검사
-    if (!lectureInfo || typeof lectureInfo !== 'object') {
-        console.error('❌ lectureInfo가 유효하지 않습니다:', lectureInfo);
-        showDefaultRegistrationButton();
-        return;
-    }
-    
-    if (isLectureStarted) {
-        actionsContainer.innerHTML = `
-            <button class="btn btn-secondary" disabled>
-                ⏰ 강의가 이미 시작되었습니다
-            </button>
-        `;
-        return;
-    }
-    
     // 신청 마감일 확인
     if (lectureInfo.registration_end_date) {
         const registrationEndDate = new Date(lectureInfo.registration_end_date);
         const now = new Date();
         
         if (now > registrationEndDate) {
-            actionsContainer.innerHTML = `
-                <button class="btn btn-secondary" disabled>
-                    📅 신청 마감되었습니다
-                </button>
-            `;
+            actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled>📅 신청 마감되었습니다</button>';
             return;
         }
     }
@@ -3329,27 +3337,15 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     // 정원 확인
     if (lectureInfo.max_participants && lectureInfo.current_participants >= lectureInfo.max_participants) {
         if (lectureInfo.allow_waiting_list) {
-            actionsContainer.innerHTML = `
-                <button class="btn btn-warning" onclick="showWaitingListModal()">
-                    ⏰ 대기자로 신청하기
-                </button>
-            `;
+            actionsContainer.innerHTML = '<button class="btn btn-warning" onclick="showWaitingListModal()">⏰ 대기자로 신청하기</button>';
         } else {
-            actionsContainer.innerHTML = `
-                <button class="btn btn-secondary" disabled>
-                    👥 정원이 마감되었습니다
-                </button>
-            `;
+            actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled>👥 정원이 마감되었습니다</button>';
         }
         return;
     }
     
     // 일반 신청 버튼
-    actionsContainer.innerHTML = `
-        <button class="btn btn-primary" onclick="showRegistrationModal()">
-            🚀 지금 신청하기
-        </button>
-    `;
+    actionsContainer.innerHTML = '<button class="btn btn-primary" onclick="showRegistrationModal()">🚀 지금 신청하기</button>';
 }
 
 // 기본 신청 버튼 표시 (오류 시)
@@ -3373,11 +3369,7 @@ function showDefaultRegistrationButton() {
         return;
     }
     
-    actionsContainer.innerHTML = `
-        <button class="btn btn-primary" onclick="showRegistrationModal()">
-            🚀 지금 신청하기
-        </button>
-    `;
+    actionsContainer.innerHTML = '<button class="btn btn-primary" onclick="showRegistrationModal()">🚀 지금 신청하기</button>';
     
     console.log('✅ 기본 신청 버튼 표시 완료');
 }
@@ -3399,6 +3391,9 @@ function showRegistrationModal() {
     
     // 폼 초기화
     resetRegistrationForm();
+    
+    // 글자 수 카운터 초기화
+    initCharacterCounters();
     
     // 사용자 정보 자동 입력 (비동기, 오류가 있어도 모달은 표시)
     loadUserInfo().catch(error => {
@@ -3462,10 +3457,13 @@ async function loadUserInfo() {
         if (userResponse.ok) {
             const userData = await userResponse.json();
             userInfo = userData.user;
+            console.log('👤 로드된 사용자 정보 전체:', JSON.stringify(userInfo, null, 2));
+        } else {
+            console.log('❌ 사용자 정보 로드 실패:', userResponse.status, userResponse.statusText);
         }
         
         // 이전 신청 내역 로드 (취소된 것 포함)
-        const registrationResponse = await fetch(`/api/lectures/<?= $lecture['id'] ?>/previous-registration`, {
+        const registrationResponse = await fetch('/api/lectures/<?= $lecture["id"] ?>/previous-registration', {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -3507,15 +3505,23 @@ function fillRegistrationForm(userInfo, previousRegistration) {
     // 1단계: 사용자 계정 기본 정보로 채우기
     if (userInfo) {
         console.log('✅ 사용자 기본 정보로 채우기:', userInfo.nickname);
+        console.log('📧 사용자 이메일 데이터:', userInfo.email);
+        console.log('📱 사용자 전화번호 데이터:', userInfo.phone);
+        console.log('🔍 이메일 필드 요소:', participantEmail);
         
         if (participantName && userInfo.nickname) {
             participantName.value = userInfo.nickname;
+            console.log('✅ 이름 자동 입력 완료:', userInfo.nickname);
         }
         if (participantEmail && userInfo.email) {
             participantEmail.value = userInfo.email;
+            console.log('✅ 이메일 자동 입력 완료:', userInfo.email);
+        } else {
+            console.log('❌ 이메일 자동 입력 실패 - participantEmail:', !!participantEmail, 'userInfo.email:', userInfo.email);
         }
         if (participantPhone && userInfo.phone) {
             participantPhone.value = userInfo.phone;
+            console.log('✅ 전화번호 자동 입력 완료:', userInfo.phone);
         }
     }
     
@@ -3586,7 +3592,7 @@ async function submitRegistration() {
         data.csrf_token = csrfToken;
         
         // 신청 요청
-        const response = await fetch(`/api/lectures/<?= $lecture['id'] ?>/registration`, {
+        const response = await fetch('/api/lectures/<?= $lecture["id"] ?>/registration', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -3725,7 +3731,7 @@ async function cancelRegistration() {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         
-        const response = await fetch(`/api/lectures/<?= $lecture['id'] ?>/registration`, {
+        const response = await fetch('/api/lectures/<?= $lecture["id"] ?>/registration', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -3787,14 +3793,14 @@ function confirmDeleteLecture(lectureId) {
     console.log('=== 강의 삭제 디버깅 시작 ===');
     console.log('강의 ID:', lectureId);
     console.log('CSRF 토큰:', csrfToken);
-    console.log('요청 URL:', `/lectures/${lectureId}/delete`);
+    console.log('요청 URL:', '/lectures/' + lectureId + '/delete');
     console.log('요청 데이터:', {
         csrf_token: csrfToken,
         confirm_delete: true
     });
 
     // 삭제 요청
-    fetch(`/lectures/${lectureId}/delete`, {
+    fetch('/lectures/' + lectureId + '/delete', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -3867,7 +3873,7 @@ function confirmDeleteLecture(lectureId) {
     <div class="registration-modal-content">
         <div class="registration-modal-header">
             <h2>🚀 강의 신청하기</h2>
-            <button class="registration-modal-close" onclick="closeRegistrationModal()">&times;</button>
+            <button class="registration-modal-close" onclick="confirmCloseRegistrationModal()">&times;</button>
         </div>
         
         <form id="registrationForm" novalidate>
@@ -3926,8 +3932,11 @@ function confirmDeleteLecture(lectureId) {
                     
                     <div class="form-group">
                         <label for="motivation">참가 동기/목적</label>
-                        <textarea id="motivation" name="motivation" 
+                        <textarea id="motivation" name="motivation" maxlength="2000"
                                   placeholder="이 강의에 참가하시는 이유나 기대하시는 점을 간단히 적어주세요 (선택사항)"></textarea>
+                        <div class="char-counter">
+                            <span id="motivation-counter">0</span>/2,000자
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -3947,14 +3956,17 @@ function confirmDeleteLecture(lectureId) {
                     
                     <div class="form-group">
                         <label for="special_requests">특별 요청사항</label>
-                        <textarea id="special_requests" name="special_requests" 
+                        <textarea id="special_requests" name="special_requests" maxlength="2000"
                                   placeholder="식단 제한, 접근성 지원 등 특별한 요청사항이 있으시면 적어주세요 (선택사항)"></textarea>
+                        <div class="char-counter">
+                            <span id="special-requests-counter">0</span>/2,000자
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="registration-modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeRegistrationModal()">
+                <button type="button" class="btn btn-secondary" onclick="confirmCloseRegistrationModal()">
                     취소
                 </button>
                 <button type="button" id="submitRegistrationBtn" class="btn btn-primary" onclick="submitRegistration()">
@@ -3969,16 +3981,52 @@ function confirmDeleteLecture(lectureId) {
 <script>
 document.getElementById('registrationModal').addEventListener('click', function(e) {
     if (e.target === this) {
-        closeRegistrationModal();
+        confirmCloseRegistrationModal();
     }
 });
+
+// 모달 닫기 확인 함수
+function confirmCloseRegistrationModal() {
+    // 폼에 입력된 내용이 있는지 확인
+    const form = document.getElementById('registrationForm');
+    if (!form) {
+        closeRegistrationModal();
+        return;
+    }
+    
+    const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea, select');
+    let hasContent = false;
+    
+    // 입력된 내용 확인
+    inputs.forEach(input => {
+        if (input.value && input.value.trim() !== '') {
+            hasContent = true;
+        }
+    });
+    
+    // 내용이 있으면 확인 다이얼로그 표시
+    if (hasContent) {
+        const shouldClose = confirm(
+            '📝 작성 중인 내용이 있습니다.\n' +
+            '정말로 창을 닫으시겠습니까?\n\n' +
+            '⚠️ 작성한 내용이 모두 삭제됩니다.'
+        );
+        
+        if (shouldClose) {
+            closeRegistrationModal();
+        }
+    } else {
+        // 내용이 없으면 바로 닫기
+        closeRegistrationModal();
+    }
+}
 
 // ESC 키로 모달 닫기
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const modal = document.getElementById('registrationModal');
         if (modal && modal.style.display === 'block') {
-            closeRegistrationModal();
+            confirmCloseRegistrationModal();
         }
     }
 });
@@ -4032,7 +4080,7 @@ function updateLectureStatusMessage(registration) {
             
         case 'waiting':
             console.log('⏰ waiting 상태 처리');
-            showLectureStatusMessage('waiting', 'fa-hourglass-half', `대기열 ${registration.waiting_order}번입니다`, 
+            showLectureStatusMessage('waiting', 'fa-hourglass-half', '대기열 ' + registration.waiting_order + '번입니다', 
                 '정원이 초과되어 대기열에 등록되었습니다. 승인 시 알림을 드리겠습니다.');
             break;
             
@@ -4052,49 +4100,6 @@ function updateLectureStatusMessage(registration) {
             console.log('❓ 알 수 없는 상태:', registration.status);
             hideLectureStatusMessage();
     }
-    
-    // 상태 메시지 표시 함수
-    function showLectureStatusMessage(statusClass, iconClass, title, description) {
-        console.log('🎯 showLectureStatusMessage 호출됨');
-        console.log('📊 파라미터:', { statusClass, iconClass, title, description });
-        
-        const statusMessage = document.getElementById('lecture-status-message');
-        const statusTitle = document.getElementById('lecture-status-title');
-        const statusDescription = document.getElementById('lecture-status-description');
-        const statusIcon = statusMessage?.querySelector('.status-icon i');
-        
-        console.log('🔍 showLectureStatusMessage DOM 요소:');
-        console.log('- statusMessage:', statusMessage);
-        console.log('- statusTitle:', statusTitle);
-        console.log('- statusDescription:', statusDescription);
-        console.log('- statusIcon:', statusIcon);
-        
-        if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
-            console.error('❌ showLectureStatusMessage: 필수 DOM 요소 누락!');
-            return;
-        }
-        
-        console.log('🎨 스타일 적용 시작...');
-        statusMessage.className = `lecture-status-message ${statusClass}`;
-        statusMessage.style.display = 'block';
-        statusIcon.className = `fas ${iconClass}`;
-        statusTitle.textContent = title;
-        statusDescription.textContent = description;
-        
-        console.log('✅ 스타일 적용 완료:');
-        console.log('- className:', statusMessage.className);
-        console.log('- display:', statusMessage.style.display);
-        console.log('- 최종 표시 여부:', getComputedStyle(statusMessage).display);
-        console.log('- 위치 정보:', statusMessage.getBoundingClientRect());
-    }
-    
-    // 상태 메시지 숨김 함수
-    function hideLectureStatusMessage() {
-        const statusMessage = document.getElementById('lecture-status-message');
-        if (statusMessage) {
-            statusMessage.style.display = 'none';
-        }
-    }
 }
 
 // btn-register 클릭 이벤트 추가
@@ -4107,6 +4112,55 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// 글자 수 카운터 기능
+function initCharacterCounters() {
+    // 참가 동기 글자 수 카운터
+    const motivationTextarea = document.getElementById('motivation');
+    const motivationCounter = document.getElementById('motivation-counter');
+    
+    if (motivationTextarea && motivationCounter) {
+        // 초기 글자 수 설정
+        motivationCounter.textContent = motivationTextarea.value.length;
+        
+        // 실시간 글자 수 업데이트
+        motivationTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            motivationCounter.textContent = length;
+            
+            // 글자 수가 1800자를 넘으면 경고 색상
+            const counterDiv = motivationCounter.parentElement;
+            if (length >= 1800) {
+                counterDiv.style.color = length >= 2000 ? '#dc2626' : '#f59e0b';
+            } else {
+                counterDiv.style.color = '#6b7280';
+            }
+        });
+    }
+    
+    // 특별 요청사항 글자 수 카운터
+    const specialRequestsTextarea = document.getElementById('special_requests');
+    const specialRequestsCounter = document.getElementById('special-requests-counter');
+    
+    if (specialRequestsTextarea && specialRequestsCounter) {
+        // 초기 글자 수 설정
+        specialRequestsCounter.textContent = specialRequestsTextarea.value.length;
+        
+        // 실시간 글자 수 업데이트
+        specialRequestsTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            specialRequestsCounter.textContent = length;
+            
+            // 글자 수가 1800자를 넘으면 경고 색상
+            const counterDiv = specialRequestsCounter.parentElement;
+            if (length >= 1800) {
+                counterDiv.style.color = length >= 2000 ? '#dc2626' : '#f59e0b';
+            } else {
+                counterDiv.style.color = '#6b7280';
+            }
+        });
+    }
+}
 </script>
 
-<?php include SRC_PATH . '/views/templates/footer.php'; ?>
+<?php include SRC_PATH . '/views/templates/footer.php'; ?><\!-- Cache Buster: 1756642384 -->

@@ -5,6 +5,7 @@
 
 require_once SRC_PATH . '/helpers/SmsHelper.php';
 require_once SRC_PATH . '/helpers/JWTHelper.php';
+require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/models/User.php';
 
 class AuthController {
@@ -13,6 +14,11 @@ class AuthController {
     private $db;
     
     public function __construct() {
+        // 세션이 시작되지 않았으면 시작
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
         // CSRF 토큰 생성
         if (!isset($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -382,7 +388,7 @@ class AuthController {
         
         if (empty($nickname)) {
             $errors[] = '닉네임을 입력해주세요.';
-        } elseif (strlen($nickname) < 2 || strlen($nickname) > 20) {
+        } elseif (mb_strlen($nickname, 'UTF-8') < 2 || mb_strlen($nickname, 'UTF-8') > 20) {
             $errors[] = '닉네임은 2자 이상 20자 이하로 입력해주세요.';
         } elseif (!preg_match('/^[가-힣a-zA-Z0-9_]+$/', $nickname)) {
             $errors[] = '닉네임은 한글, 영문, 숫자, 언더스코어만 사용할 수 있습니다.';
@@ -502,7 +508,7 @@ class AuthController {
         if (empty($nickname)) {
             $errors[] = '닉네임을 입력해주세요.';
             error_log('❌ 닉네임 비어있음');
-        } elseif (strlen($nickname) < 2 || strlen($nickname) > 20) {
+        } elseif (mb_strlen($nickname, 'UTF-8') < 2 || mb_strlen($nickname, 'UTF-8') > 20) {
             $errors[] = '닉네임은 2자 이상 20자 이하로 입력해주세요.';
             error_log('❌ 닉네임 길이 오류: ' . strlen($nickname));
         } elseif (!preg_match('/^[가-힣a-zA-Z0-9_]+$/', $nickname)) {
@@ -607,12 +613,8 @@ class AuthController {
                 error_log('✅ 휴대폰 번호 사용 가능');
             }
             
-            if ($this->userModel->isEmailExists($email)) {
-                $errors[] = '이미 가입된 이메일입니다.';
-                error_log('❌ 이메일 중복: ' . $email);
-            } else {
-                error_log('✅ 이메일 사용 가능');
-            }
+            // 이메일 중복 허용 정책 - 휴대폰 번호 기반 로그인 시스템으로 이메일 중복 허용
+            error_log('✅ 이메일 중복 허용 정책 적용: ' . $email);
         } catch (Exception $e) {
             error_log('❌ 중복 검사 중 데이터베이스 오류: ' . $e->getMessage());
             $errors[] = '회원가입 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
@@ -883,6 +885,7 @@ class AuthController {
                 'user' => [
                     'id' => $user['id'],
                     'nickname' => $user['nickname'],
+                    'email' => $user['email'],
                     'phone' => $user['phone'],
                     'role' => $user['role'],
                     'profile_image' => $user['profile_image_thumb'] ?? null,
@@ -899,6 +902,290 @@ class AuthController {
             echo json_encode(['success' => false, 'message' => '사용자 정보 조회 중 오류가 발생했습니다.']);
             error_log('JWT 사용자 정보 조회 오류: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * 닉네임 실시간 중복 검사 API (보안 강화)
+     */
+    public function checkNickname() {
+        header('Content-Type: application/json');
+        
+        // HTTPS 강제 (프로덕션 환경에서)
+        if (!$this->isSecureConnection() && $_SERVER['HTTP_HOST'] !== 'localhost') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => '보안 연결만 허용됩니다.']);
+            return;
+        }
+        
+        // Rate Limiting 체크
+        if (!$this->checkRateLimit('nickname_check', 30, 300)) { // 5분당 30회 제한
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.']);
+            return;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'POST 메서드만 허용됩니다.']);
+            return;
+        }
+        
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => '잘못된 JSON 형식입니다.']);
+                return;
+            }
+            
+            $nickname = $this->sanitizeInput($input['nickname'] ?? '');
+            
+            // 강화된 입력 검증
+            if (empty($nickname)) {
+                echo json_encode([
+                    'success' => true,
+                    'available' => false,
+                    'message' => '닉네임을 입력해주세요.',
+                    'field' => 'nickname'
+                ]);
+                return;
+            }
+            
+            // 추가 보안 검증
+            if (!$this->validateDuplicationRequest($nickname, 'nickname')) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => '닉네임 형식이 올바르지 않습니다.',
+                    'field' => 'nickname'
+                ]);
+                return;
+            }
+            
+            // 길이 검증 (유니코드 문자 기준)
+            $nicknameLength = mb_strlen($nickname, 'UTF-8');
+            if ($nicknameLength < 2 || $nicknameLength > 20) {
+                echo json_encode([
+                    'success' => true,
+                    'available' => false,
+                    'message' => "닉네임은 2자 이상 20자 이하로 입력해주세요. (현재: {$nicknameLength}자)",
+                    'field' => 'nickname'
+                ]);
+                return;
+            }
+            
+            // 형식 검증
+            if (!preg_match('/^[가-힣a-zA-Z0-9_]+$/', $nickname)) {
+                echo json_encode([
+                    'success' => true,
+                    'available' => false,
+                    'message' => '닉네임은 한글, 영문, 숫자, 언더스코어만 사용할 수 있습니다.',
+                    'field' => 'nickname'
+                ]);
+                return;
+            }
+            
+            // 중복 검사
+            $exists = $this->userModel->isNicknameExists($nickname);
+            
+            if ($exists) {
+                echo json_encode([
+                    'success' => true,
+                    'available' => false,
+                    'message' => '이미 사용 중인 닉네임입니다.',
+                    'field' => 'nickname'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => true,
+                    'available' => true,
+                    'message' => '사용 가능한 닉네임입니다.',
+                    'field' => 'nickname'
+                ]);
+            }
+            
+            error_log("닉네임 중복검사: $nickname -> " . ($exists ? '중복' : '사용가능'));
+            
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false, 
+                'message' => '중복 검사 중 오류가 발생했습니다.',
+                'field' => 'nickname'
+            ]);
+            error_log('닉네임 중복검사 오류: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * 휴대폰 번호 실시간 중복 검사 API (보안 강화)
+     */
+    public function checkPhone() {
+        header('Content-Type: application/json');
+        
+        // HTTPS 강제 (프로덕션 환경에서)
+        if (!$this->isSecureConnection() && $_SERVER['HTTP_HOST'] !== 'localhost') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => '보안 연결만 허용됩니다.']);
+            return;
+        }
+        
+        // Rate Limiting 체크
+        if (!$this->checkRateLimit('phone_check', 30, 300)) { // 5분당 30회 제한
+            http_response_code(429);
+            echo json_encode(['success' => false, 'message' => '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.']);
+            return;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'POST 메서드만 허용됩니다.']);
+            return;
+        }
+        
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => '잘못된 JSON 형식입니다.']);
+                return;
+            }
+            
+            $phone = $this->sanitizePhone($input['phone'] ?? '');
+            
+            // 강화된 입력 검증
+            if (empty($phone)) {
+                echo json_encode([
+                    'success' => true,
+                    'available' => false,
+                    'message' => '휴대폰 번호를 입력해주세요.',
+                    'field' => 'phone'
+                ]);
+                return;
+            }
+            
+            // 추가 보안 검증
+            if (!$this->validateDuplicationRequest($phone, 'phone')) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => '휴대폰 번호 형식이 올바르지 않습니다.',
+                    'field' => 'phone'
+                ]);
+                return;
+            }
+            
+            // 휴대폰 번호 형식 검증
+            if (!$this->isValidPhone($phone)) {
+                echo json_encode([
+                    'success' => true,
+                    'available' => false,
+                    'message' => '010으로 시작하는 올바른 휴대폰 번호를 입력해주세요.',
+                    'field' => 'phone'
+                ]);
+                return;
+            }
+            
+            // 중복 검사
+            $exists = $this->userModel->isPhoneExists($phone);
+            
+            if ($exists) {
+                echo json_encode([
+                    'success' => true,
+                    'available' => false,
+                    'message' => '이미 가입된 휴대폰 번호입니다.',
+                    'field' => 'phone'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => true,
+                    'available' => true,
+                    'message' => '사용 가능한 휴대폰 번호입니다.',
+                    'field' => 'phone'
+                ]);
+            }
+            
+            error_log("휴대폰 중복검사: $phone -> " . ($exists ? '중복' : '사용가능'));
+            
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false, 
+                'message' => '중복 검사 중 오류가 발생했습니다.',
+                'field' => 'phone'
+            ]);
+            error_log('휴대폰 중복검사 오류: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * 보안 연결 확인 (HTTPS)
+     */
+    private function isSecureConnection() {
+        return (
+            (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+            $_SERVER['SERVER_PORT'] == 443 ||
+            (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        );
+    }
+    
+    /**
+     * Rate Limiting 체크 (세션 기반)
+     * @param string $key 제한 키
+     * @param int $maxRequests 최대 요청 수
+     * @param int $windowSeconds 제한 시간 (초)
+     * @return bool 허용 여부
+     */
+    private function checkRateLimit($key, $maxRequests, $windowSeconds) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $rateLimitKey = "rate_limit_{$key}";
+        $now = time();
+        
+        // 세션에서 기존 기록 조회
+        $requests = $_SESSION[$rateLimitKey] ?? [];
+        
+        // 만료된 요청 기록 제거
+        $requests = array_filter($requests, function($timestamp) use ($now, $windowSeconds) {
+            return ($now - $timestamp) < $windowSeconds;
+        });
+        
+        // 현재 요청 수가 제한을 초과하는지 확인
+        if (count($requests) >= $maxRequests) {
+            return false;
+        }
+        
+        // 현재 요청 기록 추가
+        $requests[] = $now;
+        $_SESSION[$rateLimitKey] = $requests;
+        
+        return true;
+    }
+    
+    /**
+     * 추가 입력 검증 강화
+     */
+    private function validateDuplicationRequest($input, $type) {
+        // 입력값 길이 제한
+        $maxLength = ($type === 'nickname') ? 30 : 15;
+        if (strlen($input) > $maxLength) {
+            return false;
+        }
+        
+        // 특수 문자 검증 강화
+        if ($type === 'nickname') {
+            // 닉네임: 한글, 영문, 숫자, 일부 특수문자만 허용
+            if (!preg_match('/^[가-힣a-zA-Z0-9_.-]+$/', $input)) {
+                return false;
+            }
+        } elseif ($type === 'phone') {
+            // 휴대폰: 숫자와 하이픈만 허용
+            if (!preg_match('/^[0-9-]+$/', $input)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     /**
@@ -1144,8 +1431,11 @@ class AuthController {
      * JSON 요청인지 확인
      */
     private function isJsonRequest() {
+        // Content-Type이 JSON인 경우
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-        return strpos($contentType, 'application/json') === 0;
+        $isJsonContentType = strpos($contentType, 'application/json') === 0;
+        
+        return $isJsonContentType;
     }
     
     /**
@@ -1179,5 +1469,461 @@ class AuthController {
         }
         
         return false;
+    }
+    
+    /**
+     * 비밀번호 찾기 페이지 표시
+     */
+    public function showForgotPassword() {
+        include SRC_PATH . '/views/auth/forgot-password.php';
+    }
+    
+    /**
+     * 비밀번호 찾기 처리 (SMS 인증 코드 발송)
+     */
+    public function forgotPassword() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('HTTP/1.1 405 Method Not Allowed');
+            return;
+        }
+        
+        // 요청 타입 확인
+        $isJsonRequest = $this->isJsonRequest();
+        $isAjaxRequest = $this->isAjaxRequest();
+        
+        try {
+            $input = $isJsonRequest ? json_decode(file_get_contents('php://input'), true) : $_POST;
+            
+            // CSRF 토큰 검증
+            if (!isset($input['csrf_token']) || !$this->verifyCsrfToken($input['csrf_token'])) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => 'CSRF 토큰이 유효하지 않습니다.']);
+                    return;
+                } else {
+                    $_SESSION['error'] = 'CSRF 토큰이 유효하지 않습니다.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            $phone = $input['phone'] ?? '';
+            
+            if (empty($phone)) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '휴대폰 번호를 입력해주세요.']);
+                    return;
+                } else {
+                    $_SESSION['error'] = '휴대폰 번호를 입력해주세요.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            // 휴대폰 번호 정제
+            $phone = $this->sanitizePhone($phone);
+            
+            // 휴대폰 번호 유효성 검사
+            if (!$this->isValidPhone($phone)) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '올바른 휴대폰 번호 형식이 아닙니다.']);
+                    return;
+                } else {
+                    $_SESSION['error'] = '올바른 휴대폰 번호 형식이 아닙니다.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            // 해당 휴대폰 번호로 가입된 사용자 확인
+            $user = $this->userModel->findByPhone($phone);
+            if (!$user) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(404);
+                    echo json_encode(['success' => false, 'error' => '해당 휴대폰 번호로 가입된 계정이 없습니다.']);
+                    return;
+                } else {
+                    $_SESSION['error'] = '해당 휴대폰 번호로 가입된 계정이 없습니다.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            // SMS 발송 제한 확인
+            if ($this->isSmsRateLimited($phone)) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(429);
+                    echo json_encode(['success' => false, 'error' => '너무 많은 요청입니다. 1분 후 다시 시도해주세요.']);
+                    return;
+                } else {
+                    $_SESSION['error'] = '너무 많은 요청입니다. 1분 후 다시 시도해주세요.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            // 6자리 인증 코드 생성
+            $verificationCode = sprintf('%06d', mt_rand(100000, 999999));
+            
+            // 세션에 인증 코드와 사용자 정보 저장
+            $_SESSION['password_reset_code'] = $verificationCode;
+            $_SESSION['password_reset_phone'] = $phone;
+            $_SESSION['password_reset_user_id'] = $user['id'];
+            $_SESSION['password_reset_expires'] = time() + 300; // 5분 후 만료
+            
+            // SMS 발송
+            $smsMessage = "[탑마케팅] 비밀번호 재설정 인증 코드: {$verificationCode} (5분간 유효)";
+            $smsResult = sendAuthCodeSms($phone, $verificationCode);
+            
+            if ($smsResult['success']) {
+                // SMS 요청 기록
+                $this->recordSmsRequest($phone);
+                
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(200);
+                    echo json_encode([
+                        'success' => true,
+                        'message' => '인증 코드가 발송되었습니다. 5분 내에 입력해주세요.',
+                        'phone' => $phone
+                    ]);
+                    return;
+                } else {
+                    $_SESSION['success'] = '인증 코드가 발송되었습니다. 5분 내에 입력해주세요.';
+                    header('Location: /auth/forgot-password');
+                }
+            } else {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'error' => 'SMS 발송에 실패했습니다. 다시 시도해주세요.']);
+                    return;
+                } else {
+                    $_SESSION['error'] = 'SMS 발송에 실패했습니다. 다시 시도해주세요.';
+                    header('Location: /auth/forgot-password');
+                }
+            }
+            
+        } catch (Exception $e) {
+            error_log('비밀번호 찾기 오류: ' . $e->getMessage());
+            if ($isAjaxRequest) {
+                header('Content-Type: application/json');
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => '서버 오류가 발생했습니다.']);
+                return;
+            } else {
+                $_SESSION['error'] = '서버 오류가 발생했습니다.';
+                header('Location: /auth/forgot-password');
+            }
+        }
+    }
+    
+    /**
+     * 인증 코드 검증 (다단계 플로우용)
+     */
+    public function verifyResetCode() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('HTTP/1.1 405 Method Not Allowed');
+            return;
+        }
+        
+        $isAjaxRequest = $this->isAjaxRequest();
+        
+        try {
+            // JSON 데이터 파싱
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$input) {
+                throw new Exception('Invalid JSON data');
+            }
+            
+            // CSRF 토큰 검증
+            if (!isset($input['csrf_token']) || !$this->verifyCsrfToken($input['csrf_token'])) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => 'CSRF 토큰이 유효하지 않습니다.']);
+                    return;
+                } else {
+                    $_SESSION['error'] = 'CSRF 토큰이 유효하지 않습니다.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            $phone = $input['phone'] ?? '';
+            $code = $input['verification_code'] ?? '';
+            
+            // 입력값 검증
+            if (empty($phone) || empty($code)) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '필수 정보가 누락되었습니다.']);
+                    return;
+                }
+            }
+            
+            // 세션에서 저장된 인증 코드 확인
+            if (!isset($_SESSION['password_reset_code']) || 
+                !isset($_SESSION['password_reset_phone']) ||
+                !isset($_SESSION['password_reset_expires'])) {
+                
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '인증 세션이 만료되었습니다. 다시 시작해주세요.']);
+                    return;
+                }
+            }
+            
+            // 만료 시간 확인
+            if (time() > $_SESSION['password_reset_expires']) {
+                // 만료된 세션 정리
+                unset($_SESSION['password_reset_code']);
+                unset($_SESSION['password_reset_phone']);
+                unset($_SESSION['password_reset_expires']);
+                
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '인증 코드가 만료되었습니다. 다시 발송받아주세요.']);
+                    return;
+                }
+            }
+            
+            // 휴대폰 번호 일치 확인
+            if ($_SESSION['password_reset_phone'] !== $phone) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '휴대폰 번호가 일치하지 않습니다.']);
+                    return;
+                }
+            }
+            
+            // 인증 코드 일치 확인
+            if ($_SESSION['password_reset_code'] !== $code) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '인증 코드가 올바르지 않습니다.']);
+                    return;
+                }
+            }
+            
+            // 인증 성공
+            if ($isAjaxRequest) {
+                header('Content-Type: application/json');
+                http_response_code(200);
+                echo json_encode([
+                    'success' => true,
+                    'message' => '인증이 완료되었습니다.'
+                ]);
+                return;
+            }
+            
+        } catch (Exception $e) {
+            error_log('인증 코드 검증 오류: ' . $e->getMessage());
+            if ($isAjaxRequest) {
+                header('Content-Type: application/json');
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => '서버 오류가 발생했습니다.']);
+                return;
+            } else {
+                $_SESSION['error'] = '서버 오류가 발생했습니다.';
+                header('Location: /auth/forgot-password');
+            }
+        }
+    }
+    
+    /**
+     * 비밀번호 재설정 페이지 표시
+     */
+    public function showResetPassword() {
+        // 인증 코드 세션 확인
+        if (!isset($_SESSION['password_reset_code']) || !isset($_SESSION['password_reset_phone'])) {
+            $_SESSION['error'] = '잘못된 접근입니다. 비밀번호 찾기를 다시 시도해주세요.';
+            header('Location: /auth/forgot-password');
+            return;
+        }
+        
+        // 인증 코드 만료 확인
+        if (time() > $_SESSION['password_reset_expires']) {
+            unset($_SESSION['password_reset_code'], $_SESSION['password_reset_phone'], $_SESSION['password_reset_user_id'], $_SESSION['password_reset_expires']);
+            $_SESSION['error'] = '인증 코드가 만료되었습니다. 다시 시도해주세요.';
+            header('Location: /auth/forgot-password');
+            return;
+        }
+        
+        include SRC_PATH . '/views/auth/reset-password.php';
+    }
+    
+    /**
+     * 비밀번호 재설정 처리
+     */
+    public function resetPassword() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('HTTP/1.1 405 Method Not Allowed');
+            return;
+        }
+        
+        // 요청 타입 확인
+        $isJsonRequest = $this->isJsonRequest();
+        $isAjaxRequest = $this->isAjaxRequest();
+        
+        try {
+            $input = $isJsonRequest ? json_decode(file_get_contents('php://input'), true) : $_POST;
+            
+            // CSRF 토큰 검증
+            if (!isset($input['csrf_token']) || !$this->verifyCsrfToken($input['csrf_token'])) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(403);
+                    echo json_encode(['success' => false, 'error' => 'CSRF 토큰이 유효하지 않습니다.']);
+                } else {
+                    $_SESSION['error'] = 'CSRF 토큰이 유효하지 않습니다.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            // 다단계 플로우 파라미터
+            $phone = $input['phone'] ?? '';
+            $verificationCode = $input['verification_code'] ?? '';
+            $newPassword = $input['new_password'] ?? '';
+            $confirmPassword = $input['confirm_password'] ?? '';
+            
+            // 입력값 검증
+            if (empty($phone) || empty($verificationCode) || empty($newPassword) || empty($confirmPassword)) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '모든 필드를 입력해주세요.']);
+                } else {
+                    $_SESSION['error'] = '모든 필드를 입력해주세요.';
+                    header('Location: /auth/reset-password');
+                }
+                return;
+            }
+            
+            // 세션 확인
+            if (!isset($_SESSION['password_reset_code']) || !isset($_SESSION['password_reset_user_id'])) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '잘못된 접근입니다.']);
+                } else {
+                    $_SESSION['error'] = '잘못된 접근입니다.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            // 인증 코드 만료 확인
+            if (time() > $_SESSION['password_reset_expires']) {
+                unset($_SESSION['password_reset_code'], $_SESSION['password_reset_phone'], $_SESSION['password_reset_user_id'], $_SESSION['password_reset_expires']);
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '인증 코드가 만료되었습니다.']);
+                } else {
+                    $_SESSION['error'] = '인증 코드가 만료되었습니다.';
+                    header('Location: /auth/forgot-password');
+                }
+                return;
+            }
+            
+            // 인증 코드 확인
+            if ($verificationCode !== $_SESSION['password_reset_code']) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '인증 코드가 올바르지 않습니다.']);
+                } else {
+                    $_SESSION['error'] = '인증 코드가 올바르지 않습니다.';
+                    header('Location: /auth/reset-password');
+                }
+                return;
+            }
+            
+            // 비밀번호 확인
+            if ($newPassword !== $confirmPassword) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '비밀번호가 일치하지 않습니다.']);
+                } else {
+                    $_SESSION['error'] = '비밀번호가 일치하지 않습니다.';
+                    header('Location: /auth/reset-password');
+                }
+                return;
+            }
+            
+            // 비밀번호 강도 검증
+            if (strlen($newPassword) < 8) {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => '비밀번호는 8자 이상이어야 합니다.']);
+                } else {
+                    $_SESSION['error'] = '비밀번호는 8자 이상이어야 합니다.';
+                    header('Location: /auth/reset-password');
+                }
+                return;
+            }
+            
+            // 비밀번호 업데이트
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $userId = $_SESSION['password_reset_user_id'];
+            
+            $result = $this->db->execute(
+                "UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?",
+                [$hashedPassword, $userId]
+            );
+            
+            if ($result) {
+                // 세션 정리
+                unset($_SESSION['password_reset_code'], $_SESSION['password_reset_phone'], $_SESSION['password_reset_user_id'], $_SESSION['password_reset_expires']);
+                
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success' => true,
+                        'message' => '비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인해주세요.'
+                    ]);
+                } else {
+                    $_SESSION['success'] = '비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인해주세요.';
+                    header('Location: /auth/login');
+                }
+            } else {
+                if ($isAjaxRequest) {
+                    header('Content-Type: application/json');
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'error' => '비밀번호 변경에 실패했습니다.']);
+                } else {
+                    $_SESSION['error'] = '비밀번호 변경에 실패했습니다.';
+                    header('Location: /auth/reset-password');
+                }
+            }
+            
+        } catch (Exception $e) {
+            error_log('비밀번호 재설정 오류: ' . $e->getMessage());
+            if ($isAjaxRequest) {
+                header('Content-Type: application/json');
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => '서버 오류가 발생했습니다.']);
+            } else {
+                $_SESSION['error'] = '서버 오류가 발생했습니다.';
+                header('Location: /auth/reset-password');
+            }
+        }
     }
 } 

@@ -4,6 +4,11 @@
  * 기업회원 인증 및 관리 기능
  */
 
+// SRC_PATH 상수 정의 확인
+if (!defined('SRC_PATH')) {
+    define('SRC_PATH', dirname(__DIR__));
+}
+
 require_once SRC_PATH . '/config/database.php';
 
 class Corporate {
@@ -26,8 +31,8 @@ class Corporate {
                 throw new Exception('이미 기업 인증을 신청하셨습니다.');
             }
             
-            // 사업자번호 중복 체크
-            if ($this->checkBusinessNumberExists($companyData['business_number'], $userId)) {
+            // 사업자번호 중복 체크 (해외 기업 제외)
+            if (!empty($companyData['business_number']) && $this->checkBusinessNumberExists($companyData['business_number'], $userId)) {
                 throw new Exception('이미 등록된 사업자번호입니다.');
             }
             
@@ -131,8 +136,8 @@ class Corporate {
                 throw new Exception('거절된 신청만 재신청할 수 있습니다.');
             }
             
-            // 사업자번호 중복 체크 (본인 제외)
-            if ($this->checkBusinessNumberExists($companyData['business_number'], $userId)) {
+            // 사업자번호 중복 체크 (본인 제외, 해외 기업 제외)
+            if (!empty($companyData['business_number']) && $this->checkBusinessNumberExists($companyData['business_number'], $userId)) {
                 throw new Exception('이미 등록된 사업자번호입니다.');
             }
             
@@ -224,6 +229,11 @@ class Corporate {
      * 사업자번호 중복 체크
      */
     public function checkBusinessNumberExists($businessNumber, $excludeUserId = null) {
+        // null이나 빈 값은 중복 체크하지 않음 (해외 기업)
+        if (empty($businessNumber)) {
+            return false;
+        }
+        
         $sql = "SELECT id FROM company_profiles WHERE business_number = ?";
         $params = [$businessNumber];
         
@@ -233,7 +243,7 @@ class Corporate {
         }
         
         $result = $this->db->fetch($sql, $params);
-        return $result !== false;
+        return !empty($result);
     }
     
     /**
