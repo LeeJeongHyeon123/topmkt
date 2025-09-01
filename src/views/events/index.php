@@ -1,6 +1,6 @@
 <?php
 /**
- * 행사 일정 메인 페이지 (캘린더 뷰)
+ * 행사 일정 메인 페이지 (캘린더 뷰) - 강의 일정과 동일한 구조
  */
 
 // 로그인 상태 확인
@@ -9,7 +9,8 @@ require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
-// 월 이름 배열
+// Controller에서 전달되는 변수 사용: $year, $month, $prev_month, $next_month
+
 $monthNames = [
     1 => '1월', 2 => '2월', 3 => '3월', 4 => '4월', 5 => '5월', 6 => '6월',
     7 => '7월', 8 => '8월', 9 => '9월', 10 => '10월', 11 => '11월', 12 => '12월'
@@ -17,7 +18,7 @@ $monthNames = [
 ?>
 
 <style>
-/* 행사 일정 페이지 스타일 (파란색 테마) */
+/* 행사 일정 페이지 스타일 - 파란색 테마 유지 */
 .events-container {
     max-width: 1600px;
     margin: 0 auto;
@@ -48,89 +49,78 @@ $monthNames = [
 .events-header p {
     font-size: 1.1rem;
     opacity: 0.9;
+    margin: 0;
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
-}
-
-.events-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-bottom: 30px;
-    align-items: center;
-}
-
-.events-navigation {
-    display: flex;
-    align-items: center;
-    gap: 20px;
     flex-wrap: wrap;
-    justify-content: center;
+    gap: 15px;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.month-nav {
+.month-navigation {
     display: flex;
     align-items: center;
-    gap: 15px;
-    background: white;
-    padding: 10px 20px;
-    border-radius: 50px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    gap: 20px;
 }
 
-.nav-btn {
+.month-nav-btn {
+    padding: 12px 20px;
     background: #4A90E2;
     color: white;
     border: none;
-    padding: 0;
-    border-radius: 50%;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px !important;  /* 개선: 터치 타겟 더 확실하게 */
-    height: 48px !important; /* 개선: 터치 타겟 더 확실하게 */
-    min-width: 48px;
-    min-height: 48px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    min-height: 44px;
     box-sizing: border-box;
-    font-size: 14px;
+    font-size: 16px;
 }
 
-.nav-btn:hover {
+.month-nav-btn:hover {
     background: #357ABD;
+    transform: translateY(-1px);
 }
 
 .current-month {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #2E86AB;
-    min-width: 120px;
-    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.view-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .view-toggle {
     display: flex;
-    background: white;
-    border-radius: 50px;
+    background: #f8fafc;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
 }
 
 .view-btn {
-    padding: 14px 20px; /* 개선: 터치 타겟 더 확대 */
+    padding: 12px 20px;
+    background: transparent;
     border: none;
-    background: white;
-    color: #666;
     cursor: pointer;
-    transition: all 0.3s;
-    font-weight: 500;
-    min-height: 48px !important; /* 개선: 터치 타겟 더 확실하게 */
-    height: 48px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #4a5568;
+    min-height: 44px;
     box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
 }
 
 .view-btn.active {
@@ -138,348 +128,555 @@ $monthNames = [
     color: white;
 }
 
-.create-event-btn {
+.btn-create {
     background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
     color: white;
+    padding: 12px 24px;
     border: none;
-    padding: 12px 20px; /* 개선: 사이즈 조정 */
-    border-radius: 50px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
     text-decoration: none !important;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
-    transition: all 0.3s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px; /* 개선: 아이콘과 텍스트 간격 조정 */
-    min-height: 44px; /* 개선: 터치 타겟 최소 높이 */
+    transition: all 0.3s ease;
+    min-height: 44px;
     box-sizing: border-box;
-    font-size: 14px; /* 개선: "새 행사 등록" 2줄 방지 */
+    font-size: 16px;
 }
 
-.create-event-btn:link,
-.create-event-btn:visited,
-.create-event-btn:focus,
-.create-event-btn:active {
+.btn-create:link,
+.btn-create:visited,
+.btn-create:focus,
+.btn-create:active {
     text-decoration: none !important;
 }
 
-.create-event-btn:hover {
+.btn-create:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
-    color: white;
+    box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
     text-decoration: none !important;
 }
 
 /* 캘린더 스타일 */
-.calendar-container {
+.calendar-view {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     overflow: hidden;
-    margin-bottom: 30px;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    background: #f1f5f9;
+    overflow-x: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    min-width: 980px;
 }
 
 .calendar-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    background: #2E86AB;
-    color: white;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.calendar-day-header {
-    padding: 12px; /* 개선: 컴팩트한 헤더 */
+.day-header {
+    padding: 18px 12px;
     text-align: center;
-    font-weight: 600;
-    font-size: 14px; /* 개선: 0.9rem -> 14px */
+    font-weight: 700;
+    color: #4a5568;
+    border-right: 1px solid #e2e8f0;
+    font-size: 1rem;
+}
+
+.day-header:last-child {
+    border-right: none;
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
 }
 
 .calendar-day {
-    background: white;
-    min-height: 120px;
+    min-height: 140px;
+    min-width: 140px;
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
     padding: 8px;
+    background: white;
     position: relative;
-    transition: background 0.2s;
+    overflow: hidden;
 }
 
-.calendar-day:hover {
-    background: #f8fafc;
-}
-
-.calendar-day.other-month {
-    background: #f8fafc;
-    color: #94a3b8;
+.calendar-day:nth-child(7n) {
+    border-right: none;
 }
 
 .calendar-day.today {
-    background: #e0f2fe;
+    background: #f0f7ff;
+    border: 2px solid #4A90E2;
 }
 
-.calendar-day-number {
-    font-weight: 600;
-    margin-bottom: 5px;
-    color: #1e293b;
+.calendar-day.empty-day {
+    background: transparent;
+    border: 1px solid #e2e8f0; /* 테두리 유지하되 연한 회색으로 */
+    pointer-events: none;
+    opacity: 0.3; /* 시각적으로 비활성화 표시 */
 }
 
-.calendar-day.other-month .calendar-day-number {
-    color: #94a3b8;
+.day-number {
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
 }
 
 .event-item {
     background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
     color: white;
-    padding: 6px 8px; /* 개선: 터치 영역 확대 */
-    margin-bottom: 3px;
+    padding: 4px 6px;
     border-radius: 4px;
-    font-size: 12px; /* 개선: 0.75rem -> 12px */
+    font-size: 0.8rem;
+    margin-bottom: 3px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.2s ease;
+    display: block;
+    text-decoration: none;
+    line-height: 1.3;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-height: 32px; /* 개선: 최소 터치 타겟 보장 */
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
 }
 
 .event-item:hover {
     transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
 }
 
-
-.more-events {
-    color: #4A90E2;
-    font-size: 11px; /* 개선: 0.7rem -> 11px */
-    cursor: pointer;
-    text-align: center;
-    padding: 4px; /* 개선: 터치 영역 확대 */
-    border-radius: 3px;
-    background: #e0f2fe;
-    min-height: 28px; /* 개선: 최소 터치 타겟 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-}
-
-.more-events:hover {
-    background: #b3e5fc;
-}
-
-/* 이벤트 모달 */
-.event-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.event-modal-content {
-    background: white;
-    border-radius: 12px;
-    padding: 30px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.event-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.event-modal-title {
-    color: #2E86AB;
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #64748b;
-    padding: 8px; /* 개선: 5px -> 8px */
-    min-height: 44px; /* 개선: 터치 타겟 최소 높이 */
-    min-width: 44px;  /* 개선: 터치 타겟 최소 너비 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-}
-
-.modal-close:hover {
-    color: #2E86AB;
-}
-
-.event-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.event-list-item {
-    padding: 15px;
-    border-bottom: 1px solid #e2e8f0;
-    transition: background 0.2s;
-}
-
-.event-list-item:hover {
-    background: #f8fafc;
-}
-
-.event-list-item:last-child {
-    border-bottom: none;
+.event-time {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    display: block;
+    font-weight: 500;
 }
 
 .event-title {
     font-weight: 600;
-    color: #1e293b;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+}
+
+/* 더보기 버튼 스타일 */
+.more-events-btn {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.more-events-btn:hover {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+    transform: scale(1.02);
+    box-shadow: 0 2px 6px rgba(108, 117, 125, 0.4);
+}
+
+.more-text {
+    font-weight: 600;
+    font-size: 0.7rem;
+}
+
+/* 사이드바 */
+.events-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.events-sidebar {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    height: fit-content;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.sidebar-section {
+    margin-bottom: 30px;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #4A90E2;
+}
+
+.today-events, .upcoming-events {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-event-item {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #4A90E2;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.sidebar-event-item:hover {
+    background: #e2e8f0;
+    transform: translateX(4px);
+}
+
+.sidebar-event-title {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.sidebar-event-meta {
+    font-size: 0.8rem;
+    color: #718096;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.empty-sidebar {
+    text-align: center;
+    color: #a0aec0;
+    font-size: 0.9rem;
+    padding: 20px 0;
+}
+
+/* 리스트 뷰 - 카드형 디자인 */
+.list-view {
+    background: transparent;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    border: none;
+    padding: 10px 0;
+}
+
+.event-list-item {
+    background: white;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.event-list-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.event-list-item:hover {
+    background-color: #fbfcfe;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #b3d1f7;
+}
+
+.event-list-item:hover::before {
+    opacity: 1;
+}
+
+.event-list-item:last-child {
+    margin-bottom: 0;
+}
+
+.event-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.event-list-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
     margin-bottom: 5px;
 }
 
-.event-details {
-    color: #64748b;
-    font-size: 13px; /* 개선: 0.9rem -> 13px */
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+.event-badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
 }
 
+.badge-conference { background: #4A90E2; }
+.badge-seminar { background: #2E86AB; }
+.badge-workshop { background: #48bb78; }
+.badge-networking { background: #ed8936; }
+.badge-exhibition { background: #9f7aea; }
 
-/* 📱 모바일 반응형 최적화 (v3.11.7) */
-/* 터치 타겟 44px+ 유지하되 세련된 UI */
-@media (max-width: 768px) {
-    .events-container {
-        padding: 15px 10px; /* 개선: 컴팩트한 패딩 */
+.event-list-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 10px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.event-list-description {
+    color: #4a5568;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 🔧 모바일 터치 타겟 및 폰트 크기 개선 */
+/* 모든 인터랙티브 요소 44px+ 터치 타겟 보장 */
+.month-nav-btn {
+    min-height: 44px;      
+    min-width: 44px;
+    padding: 10px 16px;    
+    font-size: 14px;       
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.view-btn {
+    min-height: 44px;      
+    min-width: 44px;
+    padding: 10px 16px;    
+    font-size: 14px;       
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.btn-create {
+    min-height: 44px;      
+    padding: 10px 20px;    
+    font-size: 14px;       
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+/* 터치 영역 확대를 위한 추가 패딩 */
+.sidebar-event-item {
+    min-height: 44px;      
+    padding: 12px;         
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.event-list-item {
+    min-height: 44px;      
+    padding: 18px;         
+    box-sizing: border-box;
+}
+
+.sidebar-event-title {
+    font-size: 15px;       
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.sidebar-event-meta {
+    font-size: 13px;       
+    line-height: 1.3;
+    color: #718096;
+    margin-top: 4px;
+}
+
+.event-list-title {
+    font-size: 16px;       
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.event-list-meta {
+    font-size: 14px;       
+    line-height: 1.4;
+}
+
+.event-list-description {
+    font-size: 14px;       
+    line-height: 1.5;
+}
+
+/* 모달 관련 터치 타겟 개선 */
+.modal-close {
+    min-height: 44px;      
+    min-width: 44px;       
+    padding: 10px;         
+    font-size: 18px;       
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-event-item {
+    min-height: 48px;      
+    padding: 16px;         
+    box-sizing: border-box;
+}
+
+/* 캘린더 셀 내 행사 아이템 터치 개선 */
+.event-item {
+    min-height: 28px;      
+    padding: 6px 8px;      
+    margin-bottom: 4px;    
+    font-size: 12px;       
+    line-height: 1.2;      
+    box-sizing: border-box;
+    display: block;
+}
+
+.event-time {
+    font-size: 11px;       
+    line-height: 1.2;      
+}
+
+.event-title {
+    font-size: 12px;       
+    line-height: 1.2;      
+}
+
+/* 모바일 반응형 */
+@media (max-width: 1024px) {
+    .events-layout {
+        grid-template-columns: 1fr;
+        max-width: none;
     }
     
-    .events-header {
-        margin-top: 15px;
-        padding: 25px 15px; /* 개선: 세련된 헤더 */
+    .events-sidebar {
+        order: -1;
+        max-width: 100%;
+        overflow: hidden;
     }
     
-    .events-header h1 {
-        font-size: 1.8rem; /* 개선: 2rem -> 1.8rem */
+    .calendar-view {
+        min-width: 800px;
     }
     
-    .events-header p {
-        font-size: 15px; /* 개선: 명시적 크기 */
-    }
-    
-    .events-controls {
-        flex-direction: column;
-        gap: 12px; /* 개선: 15px -> 12px */
-    }
-    
-    .events-navigation {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .month-nav {
-        padding: 8px 16px; /* 개선: 10px 20px -> 8px 16px */
-    }
-    
-    .current-month {
-        font-size: 1.2rem; /* 개선: 1.3rem -> 1.2rem */
-        min-width: 100px;
-    }
-    
-    .nav-btn {
-        width: 48px !important; /* 개선: 터치 타겟 유지 */
-        height: 48px !important;
-        min-width: 48px;
-        min-height: 48px;
-    }
-    
-    .view-btn {
-        padding: 14px 18px; /* 개선: 모바일 터치 최적화 */
-        font-size: 14px;
-        min-height: 48px !important;
-        height: 48px;
-    }
-    
-    .create-event-btn {
-        padding: 12px 18px;
-        font-size: 14px;
-        gap: 5px; /* 개선: 아이콘 간격 조정 */
-    }
-    
-    .calendar-day {
-        min-height: 90px; /* 개선: 80px -> 90px */
-        padding: 6px; /* 개선: 5px -> 6px */
-    }
-    
-    .calendar-day-number {
-        font-size: 14px; /* 개선: 0.9rem -> 14px */
-        margin-bottom: 4px;
-    }
-    
-    .event-item {
-        font-size: 11px; /* 개선: 0.7rem -> 11px */
-        padding: 4px 6px; /* 개선: 3px 6px -> 4px 6px */
-        min-height: 28px;
-    }
-    
-    .more-events {
-        font-size: 10px; /* 개선: 작은 화면 최적화 */
-        padding: 3px;
-        min-height: 24px;
-    }
-    
-    /* 모달 모바일 최적화 */
-    .event-modal-content {
-        width: 95%;
-        margin: 10% auto;
-        padding: 20px; /* 개선: 30px -> 20px */
-    }
-    
-    .event-modal-title {
-        font-size: 1.3rem; /* 개선: 1.5rem -> 1.3rem */
+    /* 목록형 뷰 모바일 최적화 */
+    .list-view {
+        max-width: calc(100vw - 40px) !important;
+        width: calc(100vw - 40px) !important;
+        overflow: hidden;
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        box-sizing: border-box;
     }
     
     .event-list-item {
-        padding: 12px; /* 개선: 15px -> 12px */
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 15px !important;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     
-    .event-title {
-        font-size: 15px; /* 개선: 명시적 크기 */
+    .event-list-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px;
     }
     
-    .event-details {
-        font-size: 13px;
+    .event-list-meta {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .event-list-description {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box;
+        overflow: hidden;
+        word-wrap: break-word;
+    }
+    
+    /* 카드형 디자인 모바일 최적화 */
+    .event-list-item {
+        margin-bottom: 12px !important;
+        padding: 15px !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+    }
+    
+    .event-list-item:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+    }
+}
+    
+    .events-header,
+    .calendar-controls {
+        max-width: none;
     }
 }
 
-/* 소형 모바일 최적화 (320px 이하) */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .events-container {
-        padding: 10px 8px;
+        padding: 15px 0 10px 0;
+        overflow-x: hidden;
     }
     
     .events-header {
-        margin-top: 10px;
-        padding: 20px 12px;
+        padding: 20px 10px;
+        margin-top: 30px; /* 개선: 적절한 간격으로 조정 */
+        margin-left: 0;
+        margin-right: 0;
     }
     
     .events-header h1 {
@@ -487,282 +684,1063 @@ $monthNames = [
     }
     
     .events-header p {
-        font-size: 14px;
+        font-size: 0.9rem;
     }
     
-    .month-nav {
-        padding: 6px 12px;
+    /* 캘린더 컨트롤 모바일 최적화 */
+    .calendar-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin: 10px 0;
+        padding: 0 5px;
+    }
+    
+    .month-navigation {
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .month-nav-btn {
+        padding: 8px 12px; 
+        font-size: 14px; 
+        min-height: 36px; 
+        min-width: 36px;  
+        line-height: 1.2; 
+    }
+    
+    .current-month {
+        font-size: 1.2rem;
+    }
+    
+    .view-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .view-btn {
+        padding: 8px 12px; 
+        font-size: 14px; 
+        min-height: 36px; 
+        min-width: 36px;  
+        line-height: 1.2; 
+    }
+    
+    .btn-create {
+        padding: 8px 16px; 
+        font-size: 14px; 
+        min-height: 36px; 
+        min-width: 90px; 
+        line-height: 1.2; 
+    }
+    
+    /* 사이드바 모바일 최적화 */
+    .events-sidebar {
+        max-width: calc(100vw - 40px) !important;
+        width: calc(100vw - 40px) !important;
+        overflow: hidden;
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        box-sizing: border-box;
+        padding: 15px !important;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 20px;
+    }
+    
+    .sidebar-title {
+        font-size: 1rem;
+    }
+    
+    /* 달력 모바일 최적화 */
+    .calendar-view {
+        min-width: unset !important;
+        width: calc(100vw - 40px) !important;
+        max-width: calc(100vw - 40px) !important;
+        overflow-x: auto;
+        border-radius: 8px;
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+        box-sizing: border-box;
+    }
+    
+    .calendar-header,
+    .calendar-body {
+        min-width: unset !important;
+        width: 100%;
+    }
+    
+    .day-header {
+        min-width: calc((100vw - 80px) / 7) !important;
+        max-width: calc((100vw - 80px) / 7) !important;
+        padding: 12px 6px;
+        font-size: 0.85rem;
+        box-sizing: border-box;
+    }
+    
+    .calendar-day {
+        min-height: 100px;
+        min-width: calc((100vw - 80px) / 7) !important;
+        max-width: calc((100vw - 80px) / 7) !important;
+        padding: 4px;
+        box-sizing: border-box;
+    }
+    
+    .event-item {
+        font-size: 0.7rem;
+        padding: 3px 4px;
+        margin-bottom: 2px;
+    }
+    
+    .event-time {
+        font-size: 0.65rem;
+    }
+    
+    .event-title {
+        font-size: 0.7rem;
+    }
+    
+    .day-number {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    
+    .event-list-meta {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important; 
+        font-size: 16px !important; 
+        line-height: 1.4 !important; 
+    }
+    
+    /* 작은 모바일에서 목록형 뷰 추가 최적화 */
+    .list-view {
+        max-width: calc(100vw - 30px) !important;
+        width: calc(100vw - 30px) !important;
+        margin-left: 15px !important;
+        margin-right: 15px !important;
+    }
+    
+    .event-list-item {
+        padding: 16px !important; 
+        margin-bottom: 12px !important; 
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+        min-height: 48px !important; 
+    }
+    
+    .event-list-item:hover {
+        transform: translateY(-0.5px) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .event-list-title {
+        font-size: 20px !important; 
+        line-height: 1.3 !important; 
+        font-weight: 600 !important; 
+        margin-bottom: 8px !important; 
+    }
+    
+    .event-list-header {
+        margin-bottom: 8px !important;
+    }
+}
+
+/* 매우 작은 화면 (모바일 세로) */
+@media (max-width: 480px) {
+    .events-container {
+        padding: 10px 0;
+        overflow-x: hidden;
+    }
+    
+    .events-header {
+        padding: 15px 8px;
+        margin-top: 30px; /* 개선: 작은 화면에서 적절한 간격 */
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .events-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .events-header p {
+        font-size: 0.85rem;
+    }
+    
+    /* 캘린더 컨트롤 더 컴팩트하게 */
+    .month-navigation {
+        gap: 10px;
+    }
+    
+    .month-nav-btn {
+        padding: 8px 12px !important; 
+        font-size: 14px !important; 
+        min-height: 36px !important; 
+        min-width: 36px !important; 
+        line-height: 1.2 !important; 
     }
     
     .current-month {
         font-size: 1.1rem;
-        min-width: 90px;
-    }
-    
-    .nav-btn {
-        width: 48px !important; /* 개선: 터치 타겟 유지 */
-        height: 48px !important;
-        min-width: 48px;
-        min-height: 48px;
-        font-size: 12px;
     }
     
     .view-btn {
-        padding: 12px 14px;
-        font-size: 13px;
-        min-height: 48px !important;
-        height: 48px;
+        padding: 8px 12px !important; 
+        font-size: 14px !important; 
+        min-height: 36px !important; 
+        min-width: 36px !important; 
+        line-height: 1.2 !important; 
     }
     
-    .create-event-btn {
-        padding: 10px 16px;
-        font-size: 13px;
-        gap: 4px;
+    .btn-create {
+        padding: 8px 14px !important; 
+        font-size: 14px !important; 
+        min-height: 36px !important; 
+        min-width: 80px !important; 
+        line-height: 1.2 !important; 
+    }
+    
+    /* 사이드바 더 컴팩트하게 */
+    .events-sidebar {
+        max-width: calc(100vw - 32px) !important;
+        width: calc(100vw - 32px) !important;
+        margin-left: 16px !important;
+        margin-right: 16px !important;
+        padding: 12px !important;
+        box-sizing: border-box;
+    }
+    
+    .sidebar-title {
+        font-size: 18px !important; 
+        margin-bottom: 12px !important; 
+        font-weight: 700 !important; 
+        line-height: 1.3 !important; 
+    }
+    
+    .sidebar-event-item {
+        padding: 12px !important; 
+        min-height: 48px !important; 
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .sidebar-event-title {
+        font-size: 16px !important; 
+        font-weight: 600 !important;
+        line-height: 1.3 !important; 
+    }
+    
+    .sidebar-event-meta {
+        font-size: 16px !important; 
+        line-height: 1.3 !important; 
+        margin-top: 4px !important; 
+    }
+    
+    /* 달력 더 컴팩트하게 */
+    .calendar-view {
+        min-width: unset !important;
+        width: calc(100vw - 32px) !important;
+        max-width: calc(100vw - 32px) !important;
+        overflow-x: auto;
+        margin-left: 16px !important;
+        margin-right: 16px !important;
+        box-sizing: border-box;
+    }
+    
+    .calendar-header,
+    .calendar-body {
+        min-width: unset !important;
+        width: 100%;
+    }
+    
+    .day-header {
+        min-width: calc((100vw - 64px) / 7) !important;
+        max-width: calc((100vw - 64px) / 7) !important;
+        padding: 8px 4px;
+        font-size: 0.75rem;
+        box-sizing: border-box;
     }
     
     .calendar-day {
         min-height: 80px;
-        padding: 4px;
-    }
-    
-    .calendar-day-number {
-        font-size: 13px;
-        margin-bottom: 3px;
+        min-width: calc((100vw - 64px) / 7) !important;
+        max-width: calc((100vw - 64px) / 7) !important;
+        padding: 2px;
+        box-sizing: border-box;
     }
     
     .event-item {
-        font-size: 10px;
-        padding: 3px 5px;
-        min-height: 24px;
+        font-size: 0.6rem;
+        padding: 2px 3px;
+        margin-bottom: 1px;
     }
     
-    .more-events {
-        font-size: 9px;
-        padding: 2px;
-        min-height: 20px;
-    }
-    
-    .event-modal-content {
-        width: 96%;
-        margin: 15% auto;
-        padding: 16px;
-    }
-    
-    .event-modal-title {
-        font-size: 1.2rem;
-    }
-    
-    .event-list-item {
-        padding: 10px;
+    .event-time {
+        font-size: 0.55rem;
     }
     
     .event-title {
-        font-size: 14px;
+        font-size: 0.6rem;
     }
     
-    .event-details {
-        font-size: 12px;
+    .day-number {
+        font-size: 0.9rem;
+        margin-bottom: 3px;
     }
+}
+
+/* 캘린더 스크롤 힌트 - 스크롤이 필요한 경우에만 표시 */
+@media (max-width: 768px) {
+    .calendar-view {
+        position: relative;
+    }
+    
+    /* 700px 이상의 최소 너비를 가진 달력에만 스크롤 힌트 표시 */
+    .calendar-view[style*="min-width: 700px"]::after {
+        content: '← 좌우로 스크롤하세요 →';
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        opacity: 1;
+        pointer-events: none;
+        animation: scrollHint 3s ease-in-out infinite;
+    }
+}
+
+@keyframes scrollHint {
+    0%, 70%, 100% { opacity: 0; }
+    10%, 60% { opacity: 1; }
+}
+
+/* 일정 상세 모달 */
+.day-events-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 12px 12px 0 0;
+    position: relative;
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.modal-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin: 5px 0 0 0;
+}
+
+.modal-close {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 20px 25px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.modal-event-item {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-left: 4px solid #4A90E2;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.modal-event-item:hover {
+    background: #e2e8f0;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
+}
+
+.modal-event-time {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4A90E2;
+    margin-bottom: 5px;
+}
+
+.modal-event-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.modal-event-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.8rem;
+    color: #718096;
+    flex-wrap: wrap;
+}
+
+.modal-event-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.modal-empty {
+    text-align: center;
+    color: #a0aec0;
+    font-size: 0.9rem;
+    padding: 40px 20px;
+}
+
+/* 모바일 모달 반응형 */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        max-height: 85vh;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-title {
+        font-size: 1.1rem;
+    }
+    
+    .modal-body {
+        padding: 15px 20px;
+    }
+    
+    .modal-event-item {
+        padding: 12px;
+    }
+    
+    .modal-event-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+/* PC와 모바일 모든 화면 크기에서 화이트 배경 일관성 유지 */
+
+/* 글로벌 화이트 배경 강제 적용 */
+body {
+    background-color: white !important;
+}
+
+/* 모든 화면 크기에서 화이트 배경 유지 */
+.events-container {
+    background: white !important;
+}
+
+.calendar-view, .events-sidebar, .list-view {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+}
+
+.calendar-header {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+.day-header {
+    color: #4a5568 !important;
+    border-color: #e2e8f0 !important;
+}
+
+.calendar-day {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+}
+
+.calendar-day.today {
+    background: #f0f7ff !important;
+    border-color: #4A90E2 !important;
+}
+
+.day-number {
+    color: #2d3748 !important;
+}
+
+.calendar-controls {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+}
+
+.month-navigation button {
+    background: white !important;
+    color: #4a5568 !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* 행사 아이템 색상은 파란색 시스템 유지 */
+
+/* 모바일에서도 화이트 배경 강제 유지 */
+@media (max-width: 768px) {
+    body {
+        background-color: white !important;
+    }
+    
+    .events-container {
+        background: white !important;
+        padding: 20px 10px 15px 10px;
+    }
+    
+    .calendar-view, .events-sidebar, .list-view {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .calendar-day {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .calendar-day.today {
+        background: #f0f7ff !important;
+        border-color: #4A90E2 !important;
+    }
+}
+
+/* 다크모드 감지되어도 화이트 배경 강제 유지 */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: white !important;
+    }
+    
+    .events-container {
+        background: white !important;
+    }
+    
+    .calendar-view, .events-sidebar, .list-view {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .calendar-header {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .day-header {
+        color: #4a5568 !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .calendar-day {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .calendar-day.today {
+        background: #f0f7ff !important;
+        border-color: #4A90E2 !important;
+    }
+    
+    .day-number {
+        color: #2d3748 !important;
+    }
+    
+    .calendar-controls {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    .month-navigation button {
+        background: white !important;
+        color: #4a5568 !important;
+        border-color: #e2e8f0 !important;
+    }
+    
+    /* 행사 아이템 색상은 파란색 시스템 유지 - 다크모드에서도 */
 }
 </style>
 
 <div class="events-container">
-    <!-- 헤더 -->
+    <!-- 헤더 섹션 -->
     <div class="events-header">
         <h1>🎉 행사 일정</h1>
         <p>다양한 마케팅 행사와 네트워킹 행사에 참여하세요</p>
     </div>
-
-    <!-- 컨트롤 영역 -->
-    <div class="events-controls">
-        <div class="events-navigation">
-            <!-- 월 네비게이션 -->
-            <div class="month-nav">
-                <button class="nav-btn" onclick="navigateMonth(<?= $prev_month['year'] ?>, <?= $prev_month['month'] ?>)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="current-month">
-                    <?= $year ?>년 <?= $monthNames[$month] ?>
-                </div>
-                <button class="nav-btn" onclick="navigateMonth(<?= $next_month['year'] ?>, <?= $next_month['month'] ?>)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+    
+    <!-- 캘린더 컨트롤 영역 -->
+    <div class="calendar-controls">
+        <!-- 월 네비게이션 -->
+        <div class="month-navigation">
+            <a href="?year=<?= $prev_month['year'] ?>&month=<?= $prev_month['month'] ?>&view=<?= $view ?>" class="month-nav-btn">
+                ← 이전달
+            </a>
+            <div class="current-month">
+                <?= $year ?>년 <?= $monthNames[$month] ?>
             </div>
-
-            <!-- 뷰 토글 -->
-            <div class="view-toggle">
-                <button class="view-btn <?= $view === 'calendar' ? 'active' : '' ?>" 
-                        onclick="toggleView('calendar')">
-                    <i class="fas fa-calendar-alt"></i> 캘린더
-                </button>
-                <button class="view-btn <?= $view === 'list' ? 'active' : '' ?>" 
-                        onclick="toggleView('list')">
-                    <i class="fas fa-list"></i> 목록
-                </button>
-            </div>
+            <a href="?year=<?= $next_month['year'] ?>&month=<?= $next_month['month'] ?>&view=<?= $view ?>" class="month-nav-btn">
+                다음달 →
+            </a>
         </div>
-
-        <!-- 행사 등록 버튼 -->
-        <?php if ($isLoggedIn): ?>
-            <?php 
-            // 기업회원 권한 확인
-            require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
-            $permission = CorporateMiddleware::checkLectureEventPermission();
-            
-            if ($permission['hasPermission']): ?>
-                <a href="/events/create" class="create-event-btn">
-                    <i class="fas fa-plus"></i>
-                    새 행사 등록
+        
+        <!-- 뷰 전환 및 액션 -->
+        <div class="view-controls">
+            <div class="view-toggle">
+                <a href="?year=<?= $year ?>&month=<?= $month ?>&view=calendar" 
+                   class="view-btn <?= $view === 'calendar' ? 'active' : '' ?>">
+                    📅 캘린더
                 </a>
+                <a href="?year=<?= $year ?>&month=<?= $month ?>&view=list" 
+                   class="view-btn <?= $view === 'list' ? 'active' : '' ?>">
+                    📋 목록
+                </a>
+            </div>
+            
+            <?php if ($isLoggedIn): ?>
+                <?php 
+                // 기업회원 권한 확인
+                require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+                $permission = CorporateMiddleware::checkLectureEventPermission();
+                
+                if ($permission['hasPermission']): ?>
+                    <a href="/events/create" class="btn-create">
+                        ➕ 행사 등록
+                    </a>
+                <?php else: ?>
+                    <a href="/corp/info" class="btn-create" style="background: #a0aec0;" 
+                       title="<?= htmlspecialchars($permission['message']) ?>">
+                        📝 행사 일정 등록
+                    </a>
+                <?php endif; ?>
             <?php else: ?>
-                <a href="/corp/info" class="create-event-btn" style="background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);" 
-                   title="<?= htmlspecialchars($permission['message']) ?>">
-                    <i class="fas fa-calendar-plus"></i>
-                    행사 일정 등록
+                <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn-create">
+                    🔑 로그인 후 등록
                 </a>
             <?php endif; ?>
-        <?php else: ?>
-            <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI'] ?? '/events') ?>" class="create-event-btn">
-                <i class="fas fa-sign-in-alt"></i>
-                로그인 후 등록
-            </a>
-        <?php endif; ?>
-    </div>
-
-    <!-- 캘린더 -->
-    <div class="calendar-container">
-        <!-- 요일 헤더 -->
-        <div class="calendar-header">
-            <div class="calendar-day-header">일</div>
-            <div class="calendar-day-header">월</div>
-            <div class="calendar-day-header">화</div>
-            <div class="calendar-day-header">수</div>
-            <div class="calendar-day-header">목</div>
-            <div class="calendar-day-header">금</div>
-            <div class="calendar-day-header">토</div>
         </div>
-
-        <!-- 캘린더 그리드 -->
-        <div class="calendar-grid">
-            <?php foreach ($calendar_data as $week): ?>
-                <?php foreach ($week as $day): ?>
-                    <div class="calendar-day <?= $day['class'] ?>" data-date="<?= $day['date'] ?>">
-                        <div class="calendar-day-number"><?= $day['day'] ?></div>
-                        
-                        <?php 
-                        $dayEvents = array_filter($events, function($event) use ($day) {
-                            return $event['start_date'] === $day['date'];
-                        });
-                        
-                        $displayEvents = array_slice($dayEvents, 0, 3);
-                        $remainingCount = count($dayEvents) - 3;
-                        ?>
-                        
-                        <?php foreach ($displayEvents as $event): ?>
-                            <div class="event-item" 
-                                 onclick="showEventDetail(<?= $event['id'] ?>)"
-                                 title="<?= htmlspecialchars($event['title']) ?>">
-                                <?= htmlspecialchars(mb_substr($event['title'], 0, 15)) ?>
-                            </div>
-                        <?php endforeach; ?>
-                        
-                        <?php if ($remainingCount > 0): ?>
-                            <div class="more-events" onclick="showDayEvents('<?= $day['date'] ?>')">
-                                +<?= $remainingCount ?>개 더보기
-                            </div>
-                        <?php endif; ?>
+    </div>
+    
+    <div class="events-layout">
+        <!-- 메인 콘텐츠 -->
+        <div class="events-main">
+            <?php if ($view === 'calendar'): ?>
+                <!-- 캘린더 뷰 -->
+                <div class="calendar-view">
+                    <div class="calendar-header">
+                        <div class="day-header">일</div>
+                        <div class="day-header">월</div>
+                        <div class="day-header">화</div>
+                        <div class="day-header">수</div>
+                        <div class="day-header">목</div>
+                        <div class="day-header">금</div>
+                        <div class="day-header">토</div>
                     </div>
-                <?php endforeach; ?>
-            <?php endforeach; ?>
+                    
+                    <div class="calendar-body">
+                        <?php foreach ($calendar_data as $week): ?>
+                            <?php foreach ($week as $day): ?>
+                                <?php if ($day === null): ?>
+                                    <div class="calendar-day empty-day"></div>
+                                <?php else: ?>
+                                    <div class="calendar-day <?= $day['class'] ?>" 
+                                         data-date="<?= $day['date'] ?>"
+                                         data-event-count="<?= count($day['events'] ?? []) ?>">
+                                        <div class="day-number"><?= $day['day'] ?></div>
+                                        <?php 
+                                        $dayEvents = $day['events'] ?? [];
+                                        $maxVisible = 3; // 최대 표시할 일정 수
+                                        $visibleEvents = array_slice($dayEvents, 0, $maxVisible);
+                                        $remainingCount = count($dayEvents) - $maxVisible;
+                                        ?>
+                                        
+                                        <?php foreach ($visibleEvents as $event): ?>
+                                            <a href="/events/detail?id=<?= $event['id'] ?>" 
+                                               class="event-item"
+                                               title="<?= htmlspecialchars($event['title']) ?>">
+                                                <span class="event-time"><?= date('H:i', strtotime($event['start_time'])) ?></span>
+                                                <span class="event-title"><?= htmlspecialchars($event['title']) ?></span>
+                                            </a>
+                                        <?php endforeach; ?>
+                                        
+                                        <?php if ($remainingCount > 0): ?>
+                                            <div class="more-events-btn" 
+                                                 onclick="showDayEvents('<?= $day['date'] ?>', <?= $day['day'] ?>, <?= htmlspecialchars(json_encode($dayEvents), ENT_QUOTES) ?>)">
+                                                <span class="more-text">+<?= $remainingCount ?>개 더보기</span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                
+            <?php else: ?>
+                <!-- 리스트 뷰 -->
+                <div class="list-view">
+                    <?php if (!empty($events)): ?>
+                        <?php foreach ($events as $event): ?>
+                            <a href="/events/detail?id=<?= $event['id'] ?>" class="event-list-item">
+                                <div class="event-list-header">
+                                    <div>
+                                        <div class="event-list-title"><?= htmlspecialchars($event['title']) ?></div>
+                                        <div class="event-list-meta">
+                                            <div class="meta-item">
+                                                📅 <?= date('Y-m-d', strtotime($event['start_date'])) ?>
+                                            </div>
+                                            <div class="meta-item">
+                                                🕒 <?= date('H:i', strtotime($event['start_time'])) ?> - <?= date('H:i', strtotime($event['end_time'])) ?>
+                                            </div>
+                                            <div class="meta-item">
+                                                👨‍🏫 <?= htmlspecialchars($event['organizer_name']) ?>
+                                            </div>
+                                            <div class="meta-item">
+                                                📍 <?= htmlspecialchars($event['venue_name'] ?? '오프라인') ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="event-badge badge-<?= $event['category'] ?>">
+                                        <?= [
+                                            'conference' => '컨퍼런스',
+                                            'seminar' => '세미나',
+                                            'workshop' => '워크샵',
+                                            'networking' => '네트워킹',
+                                            'exhibition' => '전시회'
+                                        ][$event['category']] ?? $event['category'] ?>
+                                    </span>
+                                </div>
+                                
+                                <div class="event-list-description">
+                                    <?= htmlspecialchars(HtmlSanitizerHelper::htmlToPlainText($event['description'], 200)) ?>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="empty-sidebar">
+                            <p>📅 이번 달에 예정된 행사가 없습니다.</p>
+                            <?php if ($isLoggedIn && in_array($_SESSION['user_role'] ?? '', ['ROLE_CORPORATE', 'ADMIN', 'SUPER_ADMIN'])): ?>
+                                <a href="/events/create" class="btn-create" style="margin-top: 10px; display: inline-block;">
+                                    ➕ 첫 번째 행사 등록하기
+                                </a>
+                            <?php elseif ($isLoggedIn): ?>
+                                <p style="margin-top: 10px; color: #718096; font-size: 0.9rem;">
+                                    🏢 기업회원만 행사를 등록할 수 있습니다
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        
+        <!-- 사이드바 -->
+        <div class="events-sidebar">
+            <!-- 오늘의 행사 -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🚀 오늘의 행사</h3>
+                <?php if (!empty($todayEvents)): ?>
+                    <div class="today-events">
+                        <?php foreach ($todayEvents as $event): ?>
+                            <a href="/events/detail?id=<?= $event['id'] ?>" class="sidebar-event-item">
+                                <div class="sidebar-event-title"><?= htmlspecialchars($event['title']) ?></div>
+                                <div class="sidebar-event-meta">
+                                    <span>🕒 <?= date('H:i', strtotime($event['start_time'])) ?></span>
+                                    <span>👨‍🏫 <?= htmlspecialchars($event['organizer_name']) ?></span>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-sidebar">
+                        오늘 예정된 행사가 없습니다.
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <!-- 다가오는 행사 -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📋 다가오는 행사</h3>
+                <?php if (!empty($upcomingEvents)): ?>
+                    <div class="upcoming-events">
+                        <?php foreach ($upcomingEvents as $event): ?>
+                            <a href="/events/detail?id=<?= $event['id'] ?>" class="sidebar-event-item">
+                                <div class="sidebar-event-title"><?= htmlspecialchars($event['title']) ?></div>
+                                <div class="sidebar-event-meta">
+                                    <span>📅 <?= date('m/d', strtotime($event['start_date'])) ?></span>
+                                    <span>🕒 <?= date('H:i', strtotime($event['start_time'])) ?></span>
+                                    <span>👨‍🏫 <?= htmlspecialchars($event['organizer_name']) ?></span>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-sidebar">
+                        예정된 행사가 없습니다.
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- 이벤트 모달 -->
-<div id="eventModal" class="event-modal">
-    <div class="event-modal-content">
-        <div class="event-modal-header">
-            <h3 class="event-modal-title" id="modalTitle">행사 목록</h3>
-            <button class="modal-close" onclick="closeEventModal()">&times;</button>
+<!-- 일정 상세 모달 -->
+<div id="dayEventsModal" class="day-events-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">일정 상세</h3>
+            <p class="modal-subtitle" id="modalSubtitle">날짜별 일정 목록</p>
+            <button class="modal-close" onclick="closeDayEventsModal()">&times;</button>
         </div>
-        <ul id="modalEventList" class="event-list"></ul>
+        <div class="modal-body" id="modalBody">
+            <!-- 일정 목록이 여기에 동적으로 삽입됩니다 -->
+        </div>
     </div>
 </div>
 
 <script>
-// 디바이스 감지는 header.php에서 자동으로 처리됩니다.
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎉 행사 일정 페이지 로드 완료');
+    console.log('📊 이번 달 행사 수:', <?= count($events ?? []) ?>);
+    console.log('📄 현재 뷰:', '<?= $view ?>');
+    
+    // 디바이스 감지는 header.php에서 자동으로 처리됩니다.
     console.log(`📐 현재 디바이스: ${window.DeviceDetection?.utils?.getDeviceType() || 'unknown'}, 뷰: <?= $view ?>`);
-});
-
-// 월 네비게이션
-function navigateMonth(year, month) {
-    window.location.href = `/events?year=${year}&month=${month}&view=<?= $view ?>`;
-}
-
-// 뷰 전환
-function toggleView(viewType) {
-    window.location.href = `/events?year=<?= $year ?>&month=<?= $month ?>&view=${viewType}`;
-}
-
-// 행사 상세 보기
-function showEventDetail(eventId) {
-    window.location.href = `/events/detail?id=${eventId}`;
-}
-
-// 특정 날짜의 모든 행사 보기
-function showDayEvents(date) {
-    const events = <?= json_encode($events) ?>;
-    const dayEvents = events.filter(event => event.start_date === date);
     
-    if (dayEvents.length === 0) return;
-    
-    const modal = document.getElementById('eventModal');
-    const title = document.getElementById('modalTitle');
-    const list = document.getElementById('modalEventList');
-    
-    title.textContent = `${date} 행사 목록`;
-    list.innerHTML = '';
-    
-    dayEvents.forEach(event => {
-        const li = document.createElement('li');
-        li.className = 'event-list-item';
-        li.style.cursor = 'pointer';
-        li.onclick = () => showEventDetail(event.id);
+    // 캘린더 행사 아이템 호버 효과
+    const eventItems = document.querySelectorAll('.event-item');
+    eventItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
         
-        li.innerHTML = `
-            <div class="event-title">
-                ${event.title}
-            </div>
-            <div class="event-details">
-                <div><i class="fas fa-clock"></i> ${event.start_time}</div>
-                <div><i class="fas fa-map-marker-alt"></i> ${event.location_type === 'online' ? '온라인' : event.venue_name || '오프라인'}</div>
-                ${event.registration_fee ? `<div><i class="fas fa-won-sign"></i> ${event.registration_fee.toLocaleString()}원</div>` : ''}
-            </div>
-        `;
-        
-        list.appendChild(li);
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1.02)';
+        });
     });
     
-    modal.style.display = 'flex';
-}
-
-// 모달 닫기
-function closeEventModal() {
-    document.getElementById('eventModal').style.display = 'none';
-}
-
-// 모달 외부 클릭시 닫기
-document.getElementById('eventModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeEventModal();
+    // 행사 일정 관련 전역 객체 정의
+    if (typeof window.events === 'undefined') {
+        window.events = {
+            initialized: true,
+            currentYear: <?= json_encode($year ?? date('Y')) ?>,
+            currentMonth: <?= json_encode($month ?? date('n')) ?>,
+            currentView: <?= json_encode($view ?? 'calendar') ?>,
+            eventCount: <?= json_encode(count($events ?? [])) ?>,
+            todayCount: <?= json_encode(count($todayEvents ?? [])) ?>,
+            upcomingCount: <?= json_encode(count($upcomingEvents ?? [])) ?>
+        };
     }
+    
+    // 키보드 네비게이션
+    document.addEventListener('keydown', function(e) {
+        // 좌우 화살표로 월 네비게이션
+        if (e.key === 'ArrowLeft' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            window.location.href = '?year=<?= $prev_month['year'] ?>&month=<?= $prev_month['month'] ?>&view=<?= $view ?>';
+        } else if (e.key === 'ArrowRight' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            window.location.href = '?year=<?= $next_month['year'] ?>&month=<?= $next_month['month'] ?>&view=<?= $view ?>';
+        }
+        
+        // 'c'키로 캘린더 뷰, 'l'키로 리스트 뷰
+        if (e.key === 'c' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            window.location.href = '?year=<?= $year ?>&month=<?= $month ?>&view=calendar';
+        } else if (e.key === 'l' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            window.location.href = '?year=<?= $year ?>&month=<?= $month ?>&view=list';
+        }
+    });
+    
+    // 전역 오류 핸들러
+    window.addEventListener('error', function(event) {
+        if (event.filename && event.filename.includes('events')) {
+            console.warn('🎉 행사 일정 페이지 JavaScript 오류 감지:', {
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno
+            });
+            event.preventDefault();
+        }
+    });
 });
 
-// 키보드 ESC로 모달 닫기
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeEventModal();
+/**
+ * 날짜별 일정 상세 모달 표시
+ */
+function showDayEvents(date, day, events) {
+    try {
+        const modal = document.getElementById('dayEventsModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        if (!modal || !modalTitle || !modalSubtitle || !modalBody) {
+            console.error('모달 요소를 찾을 수 없습니다');
+            return;
+        }
+        
+        // 날짜 포맷팅
+        const dateObj = new Date(date + 'T00:00:00');
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            weekday: 'long'
+        };
+        const formattedDate = dateObj.toLocaleDateString('ko-KR', options);
+        
+        // 모달 헤더 설정
+        modalTitle.textContent = `${day}일 일정`;
+        modalSubtitle.textContent = `${formattedDate} · 총 ${events.length}개 일정`;
+        
+        // 모달 바디 내용 생성
+        let modalContent = '';
+        
+        if (events.length === 0) {
+            modalContent = '<div class="modal-empty">📅 이 날에는 예정된 일정이 없습니다.</div>';
+        } else {
+            // 시간 순으로 정렬
+            events.sort((a, b) => {
+                return new Date(`2000-01-01T${a.start_time}`) - new Date(`2000-01-01T${b.start_time}`);
+            });
+            
+            events.forEach(event => {
+                const startTime = event.start_time.substring(0, 5); // HH:MM 형식
+                const endTime = event.end_time.substring(0, 5);
+                
+                const categoryMap = {
+                    'conference': '컨퍼런스',
+                    'seminar': '세미나', 
+                    'workshop': '워크샵',
+                    'networking': '네트워킹',
+                    'exhibition': '전시회'
+                };
+                
+                const categoryName = categoryMap[event.category] || event.category;
+                
+                modalContent += `
+                    <a href="/events/detail?id=${event.id}" class="modal-event-item">
+                        <div class="modal-event-time">${startTime} - ${endTime}</div>
+                        <div class="modal-event-title">${escapeHtml(event.title)}</div>
+                        <div class="modal-event-meta">
+                            <span>👨‍🏫 ${escapeHtml(event.organizer_name || '미정')}</span>
+                            <span>📍 ${escapeHtml(event.venue_name || '오프라인')}</span>
+                            <span>🏷️ ${categoryName}</span>
+                        </div>
+                    </a>
+                `;
+            });
+        }
+        
+        modalBody.innerHTML = modalContent;
+        
+        // 모달 표시
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+        
+        // 모달 외부 클릭 시 닫기
+        modal.onclick = function(event) {
+            if (event.target === modal) {
+                closeDayEventsModal();
+            }
+        };
+        
+        console.log(`📅 ${date} 일정 모달 표시 (${events.length}개)`);
+        
+    } catch (error) {
+        console.error('일정 모달 표시 오류:', error);
+        alert('일정을 불러오는 중 오류가 발생했습니다.');
+    }
+}
+
+/**
+ * 날짜별 일정 모달 닫기
+ */
+function closeDayEventsModal() {
+    const modal = document.getElementById('dayEventsModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // 배경 스크롤 복원
+    }
+}
+
+/**
+ * HTML 이스케이프 함수
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeDayEventsModal();
     }
 });
 </script>

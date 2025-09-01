@@ -164,12 +164,14 @@ $monthNames = [
 .color-legend {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    align-items: center;
+    gap: 40px;
     margin: 20px 0;
     padding: 15px;
     background: #f8fafc;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
+    flex-wrap: nowrap;
 }
 
 .legend-item {
@@ -714,12 +716,14 @@ $monthNames = [
         max-width: none;
     }
     
-    /* 색상범례 모바일 최적화 */
+    /* 색상범례 모바일 최적화 - 한 행 유지 */
     .color-legend {
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px;
+        flex-direction: row;
+        justify-content: center;
+        gap: 25px;
+        padding: 12px;
         margin: 10px 0;
+        flex-wrap: nowrap;
     }
     
     .legend-item {
@@ -736,7 +740,7 @@ $monthNames = [
     
     .lectures-header {
         padding: 20px 10px;
-        margin-top: 10px;
+        margin-top: 30px; /* 개선: 적절한 간격으로 조정 */
         margin-left: 0;
         margin-right: 0;
     }
@@ -764,10 +768,10 @@ $monthNames = [
     }
     
     .month-nav-btn {
-        padding: 14px 18px; /* 개선: 터치 타겟 더욱 확대 */
-        font-size: 16px; /* 개선: iOS 줌 방지 및 가독성 */
-        min-height: 48px; /* 개선: 44px -> 48px */
-        min-width: 48px;  /* 개선: 44px -> 48px */
+        padding: 8px 12px; /* 개선: 모바일에서 더 컴팩트하게 */
+        font-size: 14px; /* 개선: 크기 줄임 */
+        min-height: 36px; /* 개선: 48px -> 36px (여전히 터치 가능한 크기) */
+        min-width: 36px;  /* 개선: 48px -> 36px */
         line-height: 1.2; /* 개선: 명시적 line-height */
     }
     
@@ -782,28 +786,29 @@ $monthNames = [
     }
     
     .view-btn {
-        padding: 14px 18px; /* 개선: 터치 타겟 더욱 확대 */
-        font-size: 16px; /* 개선: iOS 줌 방지 및 가독성 */
-        min-height: 48px; /* 개선: 44px -> 48px */
-        min-width: 48px;  /* 개선: 44px -> 48px */
+        padding: 8px 12px; /* 개선: 모바일에서 더 컴팩트하게 */
+        font-size: 14px; /* 개선: 크기 줄임 */
+        min-height: 36px; /* 개선: 48px -> 36px */
+        min-width: 36px;  /* 개선: 48px -> 36px */
         line-height: 1.2; /* 개선: 명시적 line-height */
     }
     
     .btn-create {
-        padding: 14px 22px; /* 개선: 터치 타겟 더욱 확대 */
-        font-size: 16px; /* 개선: iOS 줌 방지 및 가독성 */
-        min-height: 48px; /* 개선: 44px -> 48px */
-        min-width: 120px; /* 개선: 최소 너비 보장 */
+        padding: 8px 16px; /* 개선: 모바일에서 더 컴팩트하게 */
+        font-size: 14px; /* 개선: 크기 줄임 */
+        min-height: 36px; /* 개선: 48px -> 36px */
+        min-width: 90px; /* 개선: 최소 너비 줄임 */
         line-height: 1.2; /* 개선: 명시적 line-height */
     }
     
-    /* 색상범례 모바일 최적화 */
+    /* 색상범례 모바일 최적화 - 한 행 유지 */
     .color-legend {
         flex-direction: row;
         justify-content: center;
-        gap: 15px;
+        gap: 20px;
         margin: 10px 0;
-        padding: 8px;
+        padding: 10px;
+        flex-wrap: nowrap;
     }
     
     .legend-item {
@@ -941,7 +946,7 @@ $monthNames = [
     
     .lectures-header {
         padding: 15px 8px;
-        margin-top: 5px;
+        margin-top: 30px; /* 개선: 작은 화면에서 적절한 간격 */
         margin-left: 0;
         margin-right: 0;
     }
@@ -954,12 +959,13 @@ $monthNames = [
         font-size: 0.85rem;
     }
     
-    /* 색상범례 더 컴팩트하게 */
+    /* 색상범례 작은 화면에서는 세로 배치 */
     .color-legend {
         flex-direction: column;
         gap: 8px;
-        padding: 6px;
+        padding: 8px;
         margin: 8px 0;
+        align-items: center;
     }
     
     .legend-item {
@@ -983,10 +989,10 @@ $monthNames = [
     }
     
     .month-nav-btn {
-        padding: 14px 18px !important; /* 개선: 더 큰 터치 타겟 */
-        font-size: 16px !important; /* 개선: 작은 화면에서도 가독성 확보 */
-        min-height: 48px !important; /* 개선: 44px -> 48px */
-        min-width: 48px !important; /* 개선: 44px -> 48px */
+        padding: 8px 12px !important; /* 개선: 모바일에서 컴팩트하게 */
+        font-size: 14px !important; /* 개선: 작은 화면에서 적절한 크기 */
+        min-height: 36px !important; /* 개선: 48px -> 36px */
+        min-width: 36px !important; /* 개선: 48px -> 36px */
         line-height: 1.2 !important; /* 개선: 명시적 line-height */
     }
     
@@ -995,18 +1001,18 @@ $monthNames = [
     }
     
     .view-btn {
-        padding: 14px 18px !important; /* 개선: 더 큰 터치 타겟 */
-        font-size: 16px !important; /* 개선: 작은 화면에서도 가독성 확보 */
-        min-height: 48px !important; /* 개선: 44px -> 48px */
-        min-width: 48px !important; /* 개선: 44px -> 48px */
+        padding: 8px 12px !important; /* 개선: 모바일에서 컴팩트하게 */
+        font-size: 14px !important; /* 개선: 작은 화면에서 적절한 크기 */
+        min-height: 36px !important; /* 개선: 48px -> 36px */
+        min-width: 36px !important; /* 개선: 48px -> 36px */
         line-height: 1.2 !important; /* 개선: 명시적 line-height */
     }
     
     .btn-create {
-        padding: 14px 20px !important; /* 개선: 더 큰 터치 타겟 */
-        font-size: 16px !important; /* 개선: 작은 화면에서도 가독성 확보 */
-        min-height: 48px !important; /* 개선: 44px -> 48px */
-        min-width: 100px !important; /* 개선: 작은 화면에서도 최소 터치 영역 */
+        padding: 8px 14px !important; /* 개선: 모바일에서 컴팩트하게 */
+        font-size: 14px !important; /* 개선: 작은 화면에서 적절한 크기 */
+        min-height: 36px !important; /* 개선: 48px -> 36px */
+        min-width: 80px !important; /* 개선: 작은 화면에서 최소 터치 영역 줄임 */
         line-height: 1.2 !important; /* 개선: 명시적 line-height */
     }
     

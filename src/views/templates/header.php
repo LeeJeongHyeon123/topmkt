@@ -154,7 +154,7 @@
     </script>
     <?php endif; ?>
 </head>
-<body>
+<body class="<?= isset($current_page) && $current_page === 'home' ? 'home-page' : '' ?>">
     <header class="main-header modern-header" style="overflow: visible;">
         <!-- 🎯 심플하고 깔끔한 모바일 햄버거 메뉴 (로고와 세로 중앙정렬) -->
         <button class="mobile-hamburger" id="mobile-hamburger" style="
@@ -615,10 +615,15 @@
         contain: none !important; /* CSS containment 비활성화 */
     }
     
-    /* 페이지 로딩 시 로켓 착륙 애니메이션 */
-    .header-rocket {
+    /* 페이지 로딩 시 로켓 착륙 애니메이션 - 메인 페이지에서만 동작 */
+    body.home-page .header-rocket {
         animation: rocketLanding 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
                    headerRocketFloat 4s ease-in-out infinite 2.5s;
+    }
+    
+    /* 메인 페이지가 아닌 경우 기본 플로팅 애니메이션만 적용 */
+    body:not(.home-page) .header-rocket {
+        animation: headerRocketFloat 4s ease-in-out infinite;
     }
     
     @keyframes rocketLanding {
@@ -690,8 +695,8 @@
     
     /* 반짝이는 라인선 제거됨 */
     
-    /* 착륙 시 추진 효과 */
-    .logo-icon::before {
+    /* 착륙 시 추진 효과 - 메인 페이지에서만 */
+    body.home-page .logo-icon::before {
         content: '';
         position: absolute;
         bottom: -8px;
@@ -703,9 +708,10 @@
         opacity: 0;
         transition: all 0.3s ease;
         z-index: 9995 !important; /* 파동 애니메이션 z-index 추가 */
+        animation: landingThruster 2.5s ease-out;
     }
     
-    .logo-icon::after {
+    body.home-page .logo-icon::after {
         content: '💨';
         position: absolute;
         left: -35px;
@@ -715,6 +721,12 @@
         font-size: 0.8rem;
         animation: landingSmoke 2.5s ease-out;
         z-index: 9994 !important; /* 연기 애니메이션 z-index 추가 */
+    }
+    
+    /* 메인 페이지가 아닌 경우 착륙 효과 제거 */
+    body:not(.home-page) .logo-icon::before,
+    body:not(.home-page) .logo-icon::after {
+        display: none;
     }
     
     /* 착륙 추진 효과 애니메이션 */
@@ -775,14 +787,10 @@
         }
     }
     
-    /* 착륙 시 로고 아이콘에 추진 효과 적용 */
+    /* 착륙 시 로고 아이콘에 추진 효과 적용 - 메인 페이지에서만 */
     .logo-icon {
         position: relative;
         overflow: visible;
-    }
-    
-    .logo-icon::before {
-        animation: landingThruster 2.5s ease-out;
     }
     
     /* 착륙 완료 시 충격파 효과 */
@@ -863,11 +871,29 @@
     /* 로고 텍스트 호버 효과 */
     .logo-text {
         transition: all 0.3s ease;
-        color: #1f2937;
+        /* 색상은 기본 CSS에서 처리 - !important 제거 */
         font-weight: 700;
         font-size: 1.5rem;
+    }
+    
+    /* 메인 페이지에서만 로고 텍스트 나타나기 애니메이션 */
+    body.home-page .logo-text {
         opacity: 0;
         animation: logoTextAppear 2.8s ease-out forwards;
+    }
+    
+    /* 메인 페이지가 아닌 경우 즉시 표시 */
+    body:not(.home-page) .logo-text {
+        opacity: 1;
+    }
+    
+    /* 로고 링크 텍스트 색상 - 기본 CSS에서 처리 */
+    .logo-link {
+        /* 색상은 기본 CSS에서 처리 - !important 제거 */
+    }
+    
+    .logo-link .logo-text {
+        /* 색상은 기본 CSS에서 처리 - !important 제거 */
     }
     
     @keyframes logoTextAppear {
@@ -913,10 +939,19 @@
         position: relative;
         overflow: visible;
         z-index: 9998 !important; /* 로켓보다 약간 낮은 z-index로 설정 */
+        contain: none !important; /* CSS containment 비활성화로 애니메이션 짤림 방지 */
+    }
+    
+    /* 메인 페이지에서만 로고 아이콘 나타나기 애니메이션 */
+    body.home-page .logo-icon {
         opacity: 0;
         animation: logoIconAppear 2.6s ease-out forwards,
                    landingShockwave 1s ease-out 2.3s;
-        contain: none !important; /* CSS containment 비활성화로 애니메이션 짤림 방지 */
+    }
+    
+    /* 메인 페이지가 아닌 경우 즉시 표시 */
+    body:not(.home-page) .logo-icon {
+        opacity: 1;
     }
     
     @keyframes logoIconAppear {
@@ -1262,9 +1297,9 @@
     
     // PHP에서 전달된 관리자 정보 디버깅
     console.log('🔍 PHP 관리자 권한 체크 결과:', {
-        php_isAdmin: <?= $isAdmin ? 'true' : 'false' ?>,
-        php_currentRole: '<?= $currentRole ?? 'UNKNOWN' ?>',
-        php_currentUserId: <?= $currentUserId ?? 0 ?>
+        php_isAdmin: <?= json_encode($isAdmin ?? false) ?>,
+        php_currentRole: <?= json_encode($currentRole ?? 'UNKNOWN') ?>,
+        php_currentUserId: <?= json_encode($currentUserId ?? 0) ?>
     });
     
     document.addEventListener('DOMContentLoaded', function() {

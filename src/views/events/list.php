@@ -33,6 +33,9 @@ $monthNames = [
     margin-top: 60px;
     margin-bottom: 30px;
     border-radius: 12px;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .events-header h1 {
@@ -44,7 +47,7 @@ $monthNames = [
 .events-header p {
     font-size: 1.1rem;
     opacity: 0.9;
-    margin-bottom: 20px;
+    margin: 0;
 }
 
 .events-controls {
@@ -264,12 +267,18 @@ $monthNames = [
     }
     
     .events-header {
-        margin-top: 20px;
-        padding: 30px 20px;
+        margin-top: 30px;
+        padding: 20px 10px;
+        margin-left: 0;
+        margin-right: 0;
     }
     
     .events-header h1 {
-        font-size: 2rem;
+        font-size: 1.6rem;
+    }
+    
+    .events-header p {
+        font-size: 0.9rem;
     }
     
     .events-controls {
@@ -298,6 +307,26 @@ $monthNames = [
         flex-direction: column;
         gap: 10px;
         align-items: flex-start;
+    }
+}
+
+/* 작은 모바일 화면 최적화 */
+@media (max-width: 480px) {
+    .events-container {
+        padding: 10px 8px;
+    }
+    
+    .events-header {
+        margin-top: 30px; /* 캘린더 뷰와 동일하게 */
+        padding: 15px 8px;
+    }
+    
+    .events-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .events-header p {
+        font-size: 0.85rem;
     }
 }
 </style>

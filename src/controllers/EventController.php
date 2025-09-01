@@ -79,7 +79,9 @@ class EventController extends LectureController {
                 'calendar_data' => $calendarData,
                 'prev_month' => $this->getPrevMonth($year, $month),
                 'next_month' => $this->getNextMonth($year, $month),
-                'current_user' => $this->getCurrentUser()
+                'current_user' => $this->getCurrentUser(),
+                'todayEvents' => $this->getTodayEvents(),
+                'upcomingEvents' => $this->getUpcomingEvents(5)
             ];
             
             // 뷰 렌더링
@@ -810,18 +812,9 @@ class EventController extends LectureController {
         $calendar = [];
         $week = [];
         
-        // 이전 달의 마지막 날들
-        $prevMonth = $month == 1 ? 12 : $month - 1;
-        $prevYear = $month == 1 ? $year - 1 : $year;
-        $daysInPrevMonth = date('t', mktime(0, 0, 0, $prevMonth, 1, $prevYear));
-        
+        // 이전 달의 마지막 날들 - 빈 셀로 처리
         for ($i = $firstWeekday - 1; $i >= 0; $i--) {
-            $day = $daysInPrevMonth - $i;
-            $week[] = [
-                'day' => $day,
-                'date' => sprintf('%04d-%02d-%02d', $prevYear, $prevMonth, $day),
-                'class' => 'other-month'
-            ];
+            $week[] = null;  // 빈 셀
         }
         
         // 현재 달의 날들
@@ -833,10 +826,19 @@ class EventController extends LectureController {
                 $class = 'today';
             }
             
+            // 해당 날짜의 행사 검색
+            $dayEvents = [];
+            foreach ($events as $event) {
+                if ($event['start_date'] === $date) {
+                    $dayEvents[] = $event;
+                }
+            }
+            
             $week[] = [
                 'day' => $day,
                 'date' => $date,
-                'class' => $class
+                'class' => $class,
+                'events' => $dayEvents
             ];
             
             if (count($week) == 7) {
@@ -845,17 +847,9 @@ class EventController extends LectureController {
             }
         }
         
-        // 다음 달의 첫날들
-        $nextMonth = $month == 12 ? 1 : $month + 1;
-        $nextYear = $month == 12 ? $year + 1 : $year;
-        $day = 1;
+        // 다음 달의 첫날들 - 빈 셀로 처리
         while (count($week) < 7) {
-            $week[] = [
-                'day' => $day,
-                'date' => sprintf('%04d-%02d-%02d', $nextYear, $nextMonth, $day),
-                'class' => 'other-month'
-            ];
-            $day++;
+            $week[] = null;  // 빈 셀
         }
         
         if (count($week) > 0) {
@@ -2758,6 +2752,52 @@ class EventController extends LectureController {
         } catch (Exception $e) {
             error_log("행사 주최자 Firebase 알림 업데이트 오류: " . $e->getMessage());
             throw $e;
+        }
+    }
+    
+    /**
+     * 오늘의 행사 목록 조회
+     */
+    private function getTodayEvents() {
+        try {
+            $sql = "
+                SELECT l.*, u.nickname as organizer_name
+                FROM lectures l
+                JOIN users u ON l.user_id = u.id
+                WHERE l.status = 'published'
+                AND l.content_type = 'event'
+                AND DATE(l.start_date) = CURDATE()
+                ORDER BY l.start_time ASC
+                LIMIT 5
+            ";
+            
+            return $this->db->fetchAll($sql);
+        } catch (Exception $e) {
+            error_log("오늘의 행사 조회 오류: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * 다가오는 행사 목록 조회
+     */
+    private function getUpcomingEvents($limit = 5) {
+        try {
+            $sql = "
+                SELECT l.*, u.nickname as organizer_name
+                FROM lectures l
+                JOIN users u ON l.user_id = u.id
+                WHERE l.status = 'published'
+                AND l.content_type = 'event'
+                AND l.start_date > CURDATE()
+                ORDER BY l.start_date ASC, l.start_time ASC
+                LIMIT :limit
+            ";
+            
+            return $this->db->fetchAll($sql, [':limit' => $limit]);
+        } catch (Exception $e) {
+            error_log("다가오는 행사 조회 오류: " . $e->getMessage());
+            return [];
         }
     }
     
