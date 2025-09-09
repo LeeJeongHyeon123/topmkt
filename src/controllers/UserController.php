@@ -20,7 +20,7 @@ class UserController {
     }
     
     /**
-     * 내 프로필 페이지 표시 (/profile)
+     * 프로필 페이지 표시 (/profile 또는 /profile?user_id=XX)
      */
     public function showMyProfile() {
         // 로그인 확인
@@ -29,7 +29,12 @@ class UserController {
             return;
         }
         
+        // user_id 파라미터가 있으면 해당 사용자 프로필, 없으면 내 프로필
+        $targetUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
         $currentUserId = AuthMiddleware::getCurrentUserId();
+        
+        // 타겟 사용자 결정 (user_id 파라미터가 있으면 해당 사용자, 없으면 현재 사용자)
+        $viewUserId = $targetUserId ?: $currentUserId;
         
         try {
             // 성능 모니터링 시작
@@ -38,11 +43,17 @@ class UserController {
             
             // 데이터베이스 쿼리 시간 측정 (최적화된 방식 사용)
             $dbStart = microtime(true);
-            $user = $this->userOptimized->getOptimizedProfileDataWithCache($currentUserId);
+            $user = $this->userOptimized->getOptimizedProfileDataWithCache($viewUserId);
             $dbTime = (microtime(true) - $dbStart) * 1000;
             
             if (!$user) {
-                header('Location: /auth/login');
+                if ($targetUserId) {
+                    // 다른 사용자 프로필 조회 실패 시 404 처리
+                    http_response_code(404);
+                    echo "사용자를 찾을 수 없습니다.";
+                } else {
+                    header('Location: /auth/login');
+                }
                 return;
             }
             
@@ -73,15 +84,15 @@ class UserController {
             
             // 느린 경우 경고 로그
             if ($totalTime > 500) {
-                error_log("⚠️ SLOW PROFILE: {$totalTime}ms for user {$currentUserId}");
+                error_log("⚠️ SLOW PROFILE: {$totalTime}ms for user {$viewUserId}");
             } else if ($totalTime > 200) {
-                error_log("⚠️ MODERATE PROFILE: {$totalTime}ms for user {$currentUserId}");
+                error_log("⚠️ MODERATE PROFILE: {$totalTime}ms for user {$viewUserId}");
             }
             
             // 페이지 변수 설정
             $pageSection = 'profile';
             $page_title = $user['nickname'] . '님의 프로필';
-            $isOwnProfile = true; // 내 프로필 페이지
+            $isOwnProfile = ($viewUserId === $currentUserId); // 내 프로필인지 확인
             
             // OG 태그 설정
             $page_description = !empty($user['bio']) ? 

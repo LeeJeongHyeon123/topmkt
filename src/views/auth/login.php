@@ -231,12 +231,13 @@ require_once SRC_PATH . '/views/templates/header.php';
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #64748b;
+    color: #ffffff;
     font-size: 14px;
+    font-weight: 600;
 }
 
 .security-feature i {
-    color: #10b981;
+    color: #10dc60;
     width: 20px;
 }
 
@@ -248,7 +249,8 @@ require_once SRC_PATH . '/views/templates/header.php';
 .login-benefits h3 {
     font-size: 16px;
     margin-bottom: 15px;
-    color: #1e293b;
+    color: #ffffff;
+    font-weight: 700;
 }
 
 .login-benefits ul {
@@ -261,12 +263,13 @@ require_once SRC_PATH . '/views/templates/header.php';
     align-items: center;
     gap: 10px;
     margin-bottom: 8px;
-    color: #64748b;
+    color: #f8fafc;
     font-size: 14px;
+    font-weight: 600;
 }
 
 .login-benefits li i {
-    color: #667eea;
+    color: #3b82f6;
     width: 16px;
 }
 
@@ -290,11 +293,40 @@ require_once SRC_PATH . '/views/templates/header.php';
     color: #0369a1;
 }
 
+/* 추가 가독성 개선 */
+.auth-side-info h2 {
+    color: #ffffff !important;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.auth-side-info > .side-info-content > p {
+    color: #f8fafc !important;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
     .form-options {
         flex-direction: column;
         align-items: flex-start;
+    }
+    
+    /* 모바일에서 더 높은 대비 */
+    .security-feature {
+        color: #f8fafc;
+        font-weight: 600;
+    }
+    
+    .login-benefits li {
+        color: #e2e8f0;
+        font-weight: 600;
+    }
+    
+    .login-benefits h3 {
+        color: #ffffff;
+        font-weight: 700;
     }
 }
 </style>

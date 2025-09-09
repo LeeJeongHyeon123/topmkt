@@ -146,7 +146,7 @@
         .footer-logo-text {
             font-size: 20px;
             font-weight: 700;
-            color: #1f2937;
+            color: #111827; /* 더 진한 검은색 */
         }
 
         .footer-tagline {
@@ -171,9 +171,9 @@
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
+            font-size: 15px; /* 더 큰 폰트 */
+            font-weight: 600; /* 더 굵게 */
+            color: #1f2937; /* 더 진한 색상 */
             text-decoration: none;
             transition: all 0.2s ease;
             backdrop-filter: blur(10px);
@@ -198,7 +198,8 @@
         }
 
         .footer-contact-inline a {
-            color: #6b7280;
+            color: #374151; /* 더 진한 색상 */
+            font-weight: 500; /* 더 굵게 */
             text-decoration: none;
             transition: color 0.2s ease;
         }
@@ -224,8 +225,9 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 6px;
-            font-size: 13px;
-            color: #6b7280;
+            font-size: 14px; /* 더 큰 폰트 */
+            font-weight: 500; /* 더 굵게 */
+            color: #374151; /* 더 진한 색상 */
         }
 
         .footer-company {
@@ -244,7 +246,8 @@
         }
 
         .footer-policy-link {
-            color: #6b7280;
+            color: #374151; /* 더 진한 색상 */
+            font-weight: 500; /* 더 굵게 */
             text-decoration: none;
             transition: color 0.2s ease;
         }

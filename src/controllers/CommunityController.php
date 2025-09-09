@@ -112,7 +112,14 @@ class CommunityController {
             // 페이지 범위 검증 - 존재하지 않는 페이지는 첫 페이지로 리다이렉트
             if ($page > $totalPages && $totalPages > 0) {
                 error_log("⚠️ 잘못된 페이지 요청: {$page} (최대: {$totalPages})");
-                $redirectUrl = '/community' . ($search ? '?search=' . urlencode($search) : '');
+                $redirectParams = [];
+                if ($search) {
+                    $redirectParams['search'] = $search;
+                }
+                if ($filter && $filter !== 'all') {
+                    $redirectParams['filter'] = $filter;
+                }
+                $redirectUrl = '/community' . (!empty($redirectParams) ? '?' . http_build_query($redirectParams) : '');
                 header('HTTP/1.1 301 Moved Permanently');
                 header('Location: ' . $redirectUrl);
                 exit;
@@ -161,6 +168,7 @@ class CommunityController {
             $data = [
                 'posts' => $posts,
                 'currentPage' => $page,
+                'page' => $page, // 중요: 뷰에서 사용하는 변수명과 일치
                 'totalPages' => $totalPages,
                 'totalCount' => $totalCount,
                 'search' => $search,
@@ -234,8 +242,8 @@ class CommunityController {
                 return;
             }
             
-            // 조회수 증가 (나중에 구현)
-            // $this->postModel->incrementViewCount($postId);
+            // 조회수 증가
+            $this->postModel->incrementViewCount($postId);
             
             // 현재 사용자가 작성자인지 확인
             $currentUserId = AuthMiddleware::getCurrentUserId();
@@ -254,11 +262,54 @@ class CommunityController {
                 }
             }
             
+            // 목록으로 돌아갈 URL 생성 (디버깅 추가)
+            if (class_exists('WebLogger')) {
+                WebLogger::debug('CommunityController::show - $_GET 파라미터 확인', [
+                    'get_params' => $_GET,
+                    'query_string' => $_SERVER['QUERY_STRING'] ?? '',
+                    'request_uri' => $_SERVER['REQUEST_URI'] ?? ''
+                ]);
+            }
+            
+            $listUrl = '/community';
+            $listParams = [];
+            
+            // QUERY_STRING에서 직접 파싱하여 라우터 문제 우회
+            if (!empty($_SERVER['QUERY_STRING'])) {
+                parse_str($_SERVER['QUERY_STRING'], $queryParams);
+                
+                if (isset($queryParams['page']) && $queryParams['page'] > 1) {
+                    $listParams['page'] = (int)$queryParams['page'];
+                }
+                if (!empty($queryParams['search'])) {
+                    $listParams['search'] = $queryParams['search'];
+                }
+                if (!empty($queryParams['filter']) && $queryParams['filter'] !== 'all') {
+                    $listParams['filter'] = $queryParams['filter'];
+                }
+            }
+            
+            // 기존 $_GET 방식도 백업으로 유지
+            if (isset($_GET['page']) && $_GET['page'] > 1) {
+                $listParams['page'] = (int)$_GET['page'];
+            }
+            if (!empty($_GET['search'])) {
+                $listParams['search'] = $_GET['search'];
+            }
+            if (!empty($_GET['filter']) && $_GET['filter'] !== 'all') {
+                $listParams['filter'] = $_GET['filter'];
+            }
+            
+            if (!empty($listParams)) {
+                $listUrl .= '?' . http_build_query($listParams);
+            }
+            
             $data = [
                 'post' => $post,
                 'isOwner' => $isOwner,
                 'currentUserId' => $currentUserId,
-                'isLiked' => $isLiked
+                'isLiked' => $isLiked,
+                'listUrl' => $listUrl
             ];
             
             error_log('📖 게시글 조회 완료: ID=' . $postId . ', 제목=' . $post['title']);
@@ -442,9 +493,9 @@ class CommunityController {
             return;
         }
         
-        // POST 요청만 허용
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ResponseHelper::jsonError('잘못된 요청 방식입니다.', 405);
+        // PUT 요청만 허용 (RESTful API 방식)
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            ResponseHelper::jsonError('잘못된 요청 방식입니다. PUT 요청이 필요합니다.', 405);
             return;
         }
         
@@ -475,9 +526,18 @@ class CommunityController {
                 return;
             }
             
+            // JSON 입력 데이터 읽기 (PUT 요청)
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$input) {
+                ResponseHelper::jsonError('잘못된 JSON 형식입니다.', 400);
+                return;
+            }
+            
             // 입력 데이터 검증
-            $title = trim($_POST['title'] ?? '');
-            $content = trim($_POST['content'] ?? '');
+            $title = trim($input['title'] ?? '');
+            $content = trim($input['content'] ?? '');
+            $csrfToken = $input['csrf_token'] ?? '';
             
             // 유효성 검사
             $errors = [];
@@ -539,9 +599,9 @@ class CommunityController {
             return;
         }
         
-        // POST 요청만 허용
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ResponseHelper::jsonError('잘못된 요청 방식입니다.', 405);
+        // DELETE 요청만 허용 (RESTful API 방식)
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            ResponseHelper::jsonError('잘못된 요청 방식입니다. DELETE 요청이 필요합니다.', 405);
             return;
         }
         
@@ -569,6 +629,21 @@ class CommunityController {
             
             if (!$isOwner && !$isAdmin) {
                 ResponseHelper::jsonError('삭제 권한이 없습니다.', 403);
+                return;
+            }
+            
+            // JSON 입력 데이터 읽기 (DELETE 요청)
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$input) {
+                ResponseHelper::jsonError('잘못된 JSON 형식입니다.', 400);
+                return;
+            }
+            
+            // CSRF 토큰 확인
+            $csrfToken = $input['csrf_token'] ?? '';
+            if (empty($csrfToken)) {
+                ResponseHelper::jsonError('CSRF 토큰이 필요합니다.', 400);
                 return;
             }
             

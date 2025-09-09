@@ -648,6 +648,7 @@ if (!isset($_SESSION['csrf_token'])) {
             <div class="form-group">
                 <label for="bio" class="form-label">자기소개</label>
                 <div id="bio-editor" style="min-height: 120px; border: 2px solid #e2e8f0; border-radius: 8px; background: #fafafa;"></div>
+                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
                 <textarea id="bio" 
                           name="bio" 
                           class="form-input form-textarea"
@@ -929,6 +930,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
+                // 이미지 개수 제한 검사 (20개)
+                const currentImages = quill.container.querySelectorAll('img').length;
+                if (currentImages >= 20) {
+                    showAlert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`, 'error');
+                    return;
+                }
+                
                 // Base64로 변환하여 에디터에 삽입
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -951,6 +959,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const text = quill.getText();
         bioTextarea.value = html; // HTML 저장
         updateBioCounter(text);
+        
+        // 이미지 개수 확인 및 제한
+        const currentImages = quill.container.querySelectorAll('img').length;
+        
+        // 20개 초과 시 초과분 제거
+        if (currentImages > 20) {
+            console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
+            const images = quill.container.querySelectorAll('img');
+            for (let i = 20; i < images.length; i++) {
+                images[i].remove();
+            }
+            showAlert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.', 'warning');
+        }
+        
+        // 이미지 카운터 업데이트
+        setTimeout(updateImageCounter, 100);
     });
     
     // 자기소개 글자수 카운터
@@ -975,7 +999,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // 이미지 개수 카운터 업데이트 함수
+    function updateImageCounter() {
+        const imageCounter = document.getElementById('imageCounter');
+        if (!imageCounter) return;
+        
+        const currentImages = quill.container.querySelectorAll('img').length;
+        const maxImages = 20;
+        
+        // 색상 및 스타일 설정
+        let counterClass = '';
+        let warningText = '';
+        
+        if (currentImages >= 18) { // 90% 이상
+            counterClass = 'error'; // 빨간색
+            warningText = ' ⚠️';
+        } else if (currentImages >= 15) { // 75% 이상
+            counterClass = 'warning'; // 주황색
+            warningText = ' ⚠️';
+        } else {
+            counterClass = ''; // 기본 색상
+        }
+        
+        imageCounter.className = `char-counter ${counterClass}`;
+        imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
+        
+        console.log(`📊 이미지 카운터 업데이트: ${currentImages}/${maxImages}`);
+    }
+    
     updateBioCounter();
+    
+    // 초기 이미지 카운터 설정
+    setTimeout(updateImageCounter, 500);
     
     // 프로필 이미지 선택 시 크롭 모달 열기
     imageInput.addEventListener('change', function(e) {
@@ -1031,8 +1086,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 자기소개 글자수 검증 (순수 텍스트 기준)
         const bioText = quill.getText();
-        if (bioText.length - 1 > 2000) { // Quill은 마지막에 \n을 추가하므로 -1
-            showAlert('자기소개는 2000자 이하로 입력해주세요. (현재: ' + (bioText.length - 1) + '자)', 'error');
+        if (bioText.length - 1 > 10000) { // Quill은 마지막에 \n을 추가하므로 -1
+            showAlert('자기소개는 10,000자 이하로 입력해주세요. (현재: ' + (bioText.length - 1) + '자)', 'error');
             return;
         }
         

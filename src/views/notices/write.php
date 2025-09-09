@@ -464,6 +464,7 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
                       name="content" 
                       style="display: none;" 
                       required><?= $isEdit ? htmlspecialchars($notice['content'] ?? '') : '' ?></textarea>
+            <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
         </div>
         
         <!-- 이미지 업로드 -->
@@ -536,7 +537,7 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
 // 공지사항 작성 페이지 JavaScript
 let quill;
 let uploadedFiles = [];
-const maxImages = 5;
+const maxImages = 20;
 const maxFileSize = <?= UploadConfig::MAX_FILE_SIZE ?>;
 let isFormSubmitted = false; // 폼 제출 상태 추적
 
@@ -578,6 +579,13 @@ function quillImageHandler() {
             return;
         }
         
+        // 이미지 개수 제한 검사 (20개)
+        const currentImages = document.getElementById('editor-container').querySelectorAll('img').length;
+        if (currentImages >= 20) {
+            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+            return;
+        }
+        
         // 업로드 진행
         uploadImageToQuill(file);
     });
@@ -611,6 +619,9 @@ function uploadImageToQuill(file) {
             quill.setSelection(range.index + 1, 0);  // 커서를 이미지 다음으로 이동
             
             console.log('✅ Quill 이미지 업로드 성공:', data.data.url);
+            
+            // 이미지 카운터 업데이트
+            updateImageCounter();
         } else {
             alert('이미지 업로드 실패: ' + data.message);
             console.error('❌ Quill 이미지 업로드 실패:', data.message);
@@ -623,6 +634,34 @@ function uploadImageToQuill(file) {
         alert('이미지 업로드 중 오류가 발생했습니다.');
         console.error('❌ Quill 이미지 업로드 오류:', error);
     });
+}
+
+// 이미지 개수 카운터 업데이트 함수
+function updateImageCounter() {
+    const imageCounter = document.getElementById('imageCounter');
+    if (!imageCounter) return;
+    
+    const currentImages = document.getElementById('editor-container').querySelectorAll('img').length;
+    const maxImages = 20;
+    
+    // 색상 및 스타일 설정
+    let counterClass = '';
+    let warningText = '';
+    
+    if (currentImages >= 18) { // 90% 이상
+        counterClass = 'error'; // 빨간색
+        warningText = ' ⚠️';
+    } else if (currentImages >= 15) { // 75% 이상
+        counterClass = 'warning'; // 주황색
+        warningText = ' ⚠️';
+    } else {
+        counterClass = ''; // 기본 색상
+    }
+    
+    imageCounter.className = `char-counter ${counterClass}`;
+    imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
+    
+    console.log(`📊 이미지 카운터 업데이트: ${currentImages}/${maxImages}`);
 }
 
 // Quill 에디터 초기화
@@ -659,7 +698,25 @@ function initializeEditor() {
     quill.on('text-change', function() {
         document.getElementById('content').value = quill.root.innerHTML;
         validateForm();
+        // 이미지 개수 확인 및 제한
+        const currentImages = document.getElementById('editor-container').querySelectorAll('img').length;
+        
+        // 20개 초과 시 초과분 제거
+        if (currentImages > 20) {
+            console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
+            const images = document.getElementById('editor-container').querySelectorAll('img');
+            for (let i = 20; i < images.length; i++) {
+                images[i].remove();
+            }
+            alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+        }
+        
+        // 이미지 카운터 업데이트 (약간의 지연으로 DOM 업데이트 후 실행)
+        setTimeout(updateImageCounter, 100);
     });
+
+    // 초기 이미지 카운터 설정
+    setTimeout(updateImageCounter, 500);
 
     console.log('✅ Quill 에디터 초기화 완료');
 }
@@ -865,7 +922,7 @@ function validateForm() {
     const isValid = title.length >= 2 && 
                    title.length <= 200 && 
                    content.length >= 3 && 
-                   content.length <= 50000;
+                   content.length <= 10000;
     
     console.log('🔍 폼 검증:', { title: title.length, content: content.length, isValid });
     

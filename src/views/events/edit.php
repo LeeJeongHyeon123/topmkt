@@ -415,6 +415,7 @@ if (!isset($_SESSION['csrf_token'])) {
             <div class="form-group">
                 <label for="description" class="form-label required">행사 설명</label>
                 <div id="description-editor" style="min-height: 200px;"></div>
+                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500; margin-top: 8px;">📷 이미지: 0 / 20</div>
                 <textarea id="description" name="description" class="form-textarea" style="display: none;" required><?= htmlspecialchars($event['description']) ?></textarea>
             </div>
             
@@ -644,27 +645,174 @@ const quill = new Quill('#description-editor', {
     theme: 'snow',
     placeholder: '행사에 대한 상세한 설명을 입력하세요...',
     modules: {
-        toolbar: [
-            ['bold', 'italic', 'underline', 'strike'],
-            ['blockquote', 'code-block'],
-            [{'header': 1}, {'header': 2}],
-            [{'list': 'ordered'}, {'list': 'bullet'}],
-            [{'script': 'sub'}, {'script': 'super'}],
-            [{'indent': '-1'}, {'indent': '+1'}],
-            [{'direction': 'rtl'}],
-            [{'size': ['small', false, 'large', 'huge']}],
-            [{'header': [1, 2, 3, 4, 5, 6, false]}],
-            [{'color': []}, {'background': []}],
-            [{'font': []}],
-            [{'align': []}],
-            ['clean'],
-            ['link', 'image', 'video']
-        ]
+        toolbar: {
+            container: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{'header': 1}, {'header': 2}],
+                [{'list': 'ordered'}, {'list': 'bullet'}],
+                [{'script': 'sub'}, {'script': 'super'}],
+                [{'indent': '-1'}, {'indent': '+1'}],
+                [{'direction': 'rtl'}],
+                [{'size': ['small', false, 'large', 'huge']}],
+                [{'header': [1, 2, 3, 4, 5, 6, false]}],
+                [{'color': []}, {'background': []}],
+                [{'font': []}],
+                [{'align': []}],
+                ['clean'],
+                ['link', 'image', 'video']
+            ],
+            handlers: {
+                'image': quillImageHandler
+            }
+        }
     }
 });
 
+// 커스텀 이미지 핸들러 함수 (20개 제한)
+function quillImageHandler() {
+    console.log('📷 이미지 업로드 버튼 클릭됨 (events/edit.php)');
+    
+    // 현재 이미지 개수 확인
+    const currentImages = quill.container.querySelectorAll('img').length;
+    if (currentImages >= 20) {
+        alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+        return;
+    }
+    
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    
+    input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        
+        // 파일 크기 검증 (30MB)
+        if (file.size > 30 * 1024 * 1024) {
+            alert('이미지 크기는 30MB를 초과할 수 없습니다.');
+            return;
+        }
+        
+        // 재차 이미지 개수 확인
+        const currentImages = quill.container.querySelectorAll('img').length;
+        if (currentImages >= 20) {
+            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+            return;
+        }
+        
+        const range = quill.getSelection();
+        if (!range) {
+            console.error('❌ Quill 에디터 선택 범위를 가져올 수 없습니다.');
+            return;
+        }
+        
+        // 업로드 중 표시
+        console.log('📤 이미지 업로드 시작...');
+        quill.insertText(range.index, '이미지 업로드 중...', 'italic', true);
+        let loadingTextInserted = true;
+        
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const response = await fetch('/upload-image', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            console.log('📦 응답 데이터:', result);
+            
+            // 업로드 중 텍스트 제거
+            if (loadingTextInserted) {
+                quill.deleteText(range.index, '이미지 업로드 중...'.length);
+                loadingTextInserted = false;
+            }
+            
+            if (result.success) {
+                // 이미지 삽입
+                quill.insertEmbed(range.index, 'image', result.data.url);
+                quill.setSelection(range.index + 1);
+                console.log('✅ 이미지 업로드 성공:', result.data.url);
+                
+                // 이미지 카운터 업데이트
+                updateImageCounter();
+            } else {
+                throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
+            }
+            
+        } catch (error) {
+            console.error('❌ 이미지 업로드 오류:', error);
+            
+            // 업로드 중 텍스트 제거 (오류 발생 시)
+            if (loadingTextInserted && range && typeof quill !== 'undefined' && quill) {
+                try {
+                    quill.deleteText(range.index, '이미지 업로드 중...'.length);
+                } catch (deleteError) {
+                    console.error('로딩 텍스트 제거 실패:', deleteError);
+                }
+            }
+            
+            alert('이미지 업로드 중 오류가 발생했습니다.\n상세: ' + error.message);
+        }
+    };
+    
+    input.click();
+}
+
 // 기존 내용 설정
 quill.root.innerHTML = `<?= addslashes($event['description']) ?>`;
+
+// 이미지 카운터 업데이트 함수
+function updateImageCounter() {
+    const imageCounter = document.getElementById('imageCounter');
+    if (imageCounter && typeof quill !== 'undefined' && quill) {
+        const currentImages = quill.container.querySelectorAll('img').length;
+        
+        // 카운터 텍스트 업데이트
+        imageCounter.innerHTML = `📷 이미지: ${currentImages} / 20`;
+        
+        // 카운터 색상 변경 (경고 표시)
+        if (currentImages >= 18) {
+            imageCounter.style.color = '#dc2626'; // 빨간색 (위험)
+            imageCounter.style.fontWeight = '700';
+        } else if (currentImages >= 15) {
+            imageCounter.style.color = '#ea580c'; // 오렌지색 (주의)
+            imageCounter.style.fontWeight = '600';
+        } else {
+            imageCounter.style.color = '#2563eb'; // 파란색 (정상)
+            imageCounter.style.fontWeight = '500';
+        }
+        
+        console.log(`📷 이미지 카운터 업데이트: ${currentImages}/20`);
+    }
+}
+
+// Quill 텍스트 변경 이벤트 모니터링 (20개 초과 시 자동 제거)
+quill.on('text-change', function(delta, oldDelta, source) {
+    const currentImages = quill.container.querySelectorAll('img').length;
+    if (currentImages > 20) {
+        console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
+        const images = quill.container.querySelectorAll('img');
+        for (let i = 20; i < images.length; i++) {
+            images[i].remove();
+        }
+        alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+    }
+    // 이미지 카운터 업데이트 (약간의 지연을 두어 DOM 변경 완료 후 실행)
+    setTimeout(updateImageCounter, 100);
+});
+
+// 초기 이미지 카운터 업데이트
+setTimeout(updateImageCounter, 500);
 
 // 폼 제출 시 에디터 내용을 hidden textarea에 복사
 document.getElementById('eventEditForm').addEventListener('submit', function(e) {
@@ -806,6 +954,31 @@ document.getElementById('eventEditForm').addEventListener('submit', function(e) 
     
     // 폼 데이터 수집
     const formData = new FormData(this);
+    
+    // 유효성 검사
+    const title = document.getElementById('title').value.trim();
+    const description = quill.getText().trim();
+    
+    if (!title) {
+        alert('행사 제목을 입력해주세요.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        return;
+    }
+    
+    if (!description || description.length < 10) {
+        alert('행사 설명을 10자 이상 입력해주세요.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        return;
+    }
+    
+    if (description.length > 10000) {
+        alert(`행사 설명은 10,000자를 초과할 수 없습니다. (현재: ${description.length}자)`);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        return;
+    }
     
     // 에디터 내용 추가
     formData.set('description', quill.root.innerHTML);

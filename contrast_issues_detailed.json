@@ -1,0 +1,202 @@
+[
+  {
+    "device": "Desktop",
+    "severity": "🔴 심각",
+    "text": "인증 코드 발송\n발송 중...",
+    "tagName": "BUTTON",
+    "className": "submit-button",
+    "id": "submitButton",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 644,
+      "left": 721,
+      "width": 478,
+      "height": 56
+    }
+  },
+  {
+    "device": "Desktop",
+    "severity": "🔴 심각",
+    "text": "인증 코드 발송",
+    "tagName": "SPAN",
+    "className": "button-content",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 661,
+      "left": 745,
+      "width": 430,
+      "height": 21
+    }
+  },
+  {
+    "device": "Desktop",
+    "severity": "🔴 심각",
+    "text": "인증 코드 발송",
+    "tagName": "SPAN",
+    "className": "button-text",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 661,
+      "left": 920,
+      "width": 105,
+      "height": 21
+    }
+  },
+  {
+    "device": "Desktop",
+    "severity": "🔴 심각",
+    "text": "발송 중...",
+    "tagName": "SPAN",
+    "className": "loading-spinner",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 634,
+      "left": 712,
+      "width": 119,
+      "height": 119
+    }
+  },
+  {
+    "device": "Desktop",
+    "severity": "🔴 심각",
+    "text": "발송 중...",
+    "tagName": "SPAN",
+    "className": "loading-text",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 648,
+      "left": 751,
+      "width": 34,
+      "height": 69
+    }
+  },
+  {
+    "device": "Mobile",
+    "severity": "🔴 심각",
+    "text": "인증 코드 발송\n발송 중...",
+    "tagName": "BUTTON",
+    "className": "submit-button",
+    "id": "submitButton",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 418,
+      "left": 37,
+      "width": 301,
+      "height": 56
+    }
+  },
+  {
+    "device": "Mobile",
+    "severity": "🔴 심각",
+    "text": "인증 코드 발송",
+    "tagName": "SPAN",
+    "className": "button-content",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 435,
+      "left": 61,
+      "width": 253,
+      "height": 21
+    }
+  },
+  {
+    "device": "Mobile",
+    "severity": "🔴 심각",
+    "text": "인증 코드 발송",
+    "tagName": "SPAN",
+    "className": "button-text",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 435,
+      "left": 147,
+      "width": 105,
+      "height": 21
+    }
+  },
+  {
+    "device": "Mobile",
+    "severity": "🔴 심각",
+    "text": "발송 중...",
+    "tagName": "SPAN",
+    "className": "loading-spinner",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 403,
+      "left": 22,
+      "width": 109,
+      "height": 109
+    }
+  },
+  {
+    "device": "Mobile",
+    "severity": "🔴 심각",
+    "text": "발송 중...",
+    "tagName": "SPAN",
+    "className": "loading-text",
+    "id": "",
+    "textColor": "rgb(255, 255, 255)",
+    "backgroundColor": "rgba(255, 255, 255, 0.98)",
+    "contrastRatio": "1.00",
+    "minRequired": "4.5",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "position": {
+      "top": 433,
+      "left": 34,
+      "width": 64,
+      "height": 61
+    }
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "timestamp": "2025-08-27T03:41:30.503Z",
+  "placeholder_current": "인증번호입력",
+  "placeholder_expected": "인증번호입력",
+  "placeholder_correct": true,
+  "verification_group_hidden": true,
+  "send_button_enabled": true,
+  "test_status": "SUCCESS"
+}

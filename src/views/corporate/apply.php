@@ -379,6 +379,16 @@
     </div>
     <?php endif; ?>
 
+    <!-- 오류 메시지 표시 -->
+    <?php if (isset($_SESSION['error_message'])): ?>
+    <div style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 20px; border-radius: 12px; margin-bottom: 30px; text-align: center; font-weight: 500;">
+        <strong>❌ 오류 발생</strong><br>
+        <?= htmlspecialchars($_SESSION['error_message']) ?>
+    </div>
+    <?php 
+        unset($_SESSION['error_message']); // 메시지 표시 후 삭제
+    endif; ?>
+
     <!-- 신청 폼 -->
     <form id="corpApplyForm" method="POST" enctype="multipart/form-data" class="form-container">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
@@ -407,7 +417,7 @@
                     <div class="form-help">사업자등록증에 표시된 정확한 회사명을 입력해주세요.</div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="business_number_group">
                     <label for="business_number" class="form-label">
                         사업자등록번호 <span class="required">*</span>
                     </label>
@@ -418,7 +428,7 @@
                            value="<?= htmlspecialchars($existingData['business_number'] ?? '') ?>"
                            placeholder="123-45-67890" 
                            required maxlength="100">
-                    <div class="form-help">하이픈(-)을 포함하여 입력해주세요. 해외 기업은 유사한 등록번호를 입력하세요.</div>
+                    <div class="form-help">하이픈(-)을 포함하여 입력해주세요.</div>
                 </div>
 
                 <div class="checkbox-group">
@@ -466,7 +476,7 @@
                            class="form-input" 
                            value="<?= htmlspecialchars($existingData['representative_phone'] ?? '') ?>"
                            placeholder="010-1234-5678" 
-                           required maxlength="20">
+                           required maxlength="13">
                     <div class="form-help">연락 가능한 대표자의 휴대폰 번호를 입력해주세요.</div>
                 </div>
             </div>
@@ -549,14 +559,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = document.getElementById('submitBtn');
 
     // 해외 기업 체크박스 처리
+    const businessNumberGroup = document.getElementById('business_number_group');
+    const businessNumberInput = document.getElementById('business_number');
+    
+    function toggleOverseasMode(isOverseas) {
+        if (isOverseas) {
+            // 해외 기업 모드
+            overseasInfo.style.display = 'block';
+            businessNumberGroup.style.display = 'none';
+            businessNumberInput.required = false;
+            businessNumberInput.value = ''; // 값 초기화
+        } else {
+            // 국내 기업 모드
+            overseasInfo.style.display = 'none';
+            businessNumberGroup.style.display = 'block';
+            businessNumberInput.required = true;
+        }
+    }
+    
     overseasCheckbox.addEventListener('change', function() {
-        overseasInfo.style.display = this.checked ? 'block' : 'none';
+        toggleOverseasMode(this.checked);
     });
 
     // 페이지 로드시 해외 기업 체크 상태 확인
-    if (overseasCheckbox.checked) {
-        overseasInfo.style.display = 'block';
-    }
+    toggleOverseasMode(overseasCheckbox.checked);
 
     // 사업자번호 자동 하이픈 추가
     document.getElementById('business_number').addEventListener('input', function(e) {
@@ -571,16 +597,22 @@ document.addEventListener('DOMContentLoaded', function() {
         e.target.value = value;
     });
 
-    // 전화번호 자동 하이픈 추가
+    // 전화번호 자동 하이픈 추가 (11자리 제한)
     document.getElementById('representative_phone').addEventListener('input', function(e) {
         let value = e.target.value.replace(/[^0-9]/g, '');
-        if (value.length <= 11) {
-            if (value.length > 7) {
-                value = value.replace(/(\d{3})(\d{4})(\d{0,4})/, '$1-$2-$3');
-            } else if (value.length > 3) {
-                value = value.replace(/(\d{3})(\d{0,4})/, '$1-$2');
-            }
+        
+        // 11자리 숫자로 제한
+        if (value.length > 11) {
+            value = value.substring(0, 11);
         }
+        
+        // 하이픈 형태로 포맷팅
+        if (value.length > 7) {
+            value = value.replace(/(\d{3})(\d{4})(\d{0,4})/, '$1-$2-$3');
+        } else if (value.length > 3) {
+            value = value.replace(/(\d{3})(\d{0,4})/, '$1-$2');
+        }
+        
         e.target.value = value;
     });
 
@@ -663,16 +695,59 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         submitBtn.classList.add('loading');
         submitBtn.innerHTML = '<span>⏳</span> ' + (<?= $isReapply ? 'true' : 'false' ?> ? '재신청 중...' : '신청 중...');
+        
+        // Ajax로 폼 제출 후 리다이렉트 처리
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        fetch('/corp/apply', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('[CORP_APPLY] Response 수신:', {
+                status: response.status,
+                statusText: response.statusText,
+                redirected: response.redirected,
+                url: response.url,
+                ok: response.ok
+            });
+            
+            if (response.redirected) {
+                console.log('[CORP_APPLY] 서버에서 리다이렉트됨:', response.url);
+                window.location.href = response.url;
+            } else if (response.ok) {
+                console.log('[CORP_APPLY] 성공 응답, /corp/status로 이동');
+                window.location.href = '/corp/status';
+            } else {
+                console.error('[CORP_APPLY] 서버 오류 응답:', response.status, response.statusText);
+                throw new Error('서버 오류가 발생했습니다: ' + response.status);
+            }
+        })
+        .catch(error => {
+            console.error('[CORP_APPLY] Fetch 오류:', error);
+            alert('신청 처리 중 오류가 발생했습니다. 다시 시도해주세요.\n오류: ' + error.message);
+            
+            // 버튼 원상복구
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+            submitBtn.innerHTML = '<span>📤</span> ' + (<?= $isReapply ? 'true' : 'false' ?> ? '재신청하기' : '신청하기');
+        });
     });
 
     function validateForm() {
         const requiredFields = [
             { id: 'company_name', name: '회사명' },
-            { id: 'business_number', name: '사업자등록번호' },
             { id: 'representative_name', name: '대표자명' },
             { id: 'representative_phone', name: '대표자 연락처' },
             { id: 'company_address', name: '회사 주소' }
         ];
+
+        // 해외 기업이 아닌 경우에만 사업자등록번호 검증
+        if (!overseasCheckbox.checked) {
+            requiredFields.splice(1, 0, { id: 'business_number', name: '사업자등록번호' });
+        }
 
         for (let field of requiredFields) {
             const element = document.getElementById(field.id);

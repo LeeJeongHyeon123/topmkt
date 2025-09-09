@@ -396,6 +396,7 @@ if (!isset($notice) || !$notice) {
             <div id="editor-container" style="min-height: 300px; background: white; border: 2px solid #e2e8f0; border-radius: 8px;">
                 <!-- Quill 에디터가 여기에 생성됩니다 -->
             </div>
+            <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500; margin-top: 8px;">📷 이미지: 0 / 20</div>
             <textarea id="content" 
                       name="content" 
                       style="display: none;" 
@@ -508,8 +509,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const existingImageCount = existingImages.length;
         const totalAfterUpload = existingImageCount + files.length;
         
-        if (totalAfterUpload > 5) {
-            showMessage('error', `총 이미지 개수가 5개를 초과합니다. 현재 ${existingImageCount}개 + 추가 ${files.length}개 = ${totalAfterUpload}개`);
+        if (totalAfterUpload > 20) {
+            showMessage('error', `총 이미지 개수가 20개를 초과합니다. 현재 ${existingImageCount}개 + 추가 ${files.length}개 = ${totalAfterUpload}개`);
             return;
         }
         
@@ -618,6 +619,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        if (trimmedContent.length > 10000) {
+            showMessage('error', `내용은 10,000자를 초과할 수 없습니다. (현재: ${trimmedContent.length}자)`);
+            return;
+        }
+        
         formData.append('notice_id', document.querySelector('[name="notice_id"]').value);
         formData.append('title', titleValue);
         formData.append('content', contentValue);
@@ -670,8 +676,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// 🚀 Ultra Think v3.13.0: Quill 커스텀 이미지 핸들러 (MediaController 연동)
+// 🚀 Ultra Think v3.13.0: Quill 커스텀 이미지 핸들러 (MediaController 연동) + 20개 제한
 function quillImageHandler() {
+    console.log('📷 이미지 업로드 버튼 클릭됨 (notices/edit.php)');
+    
+    // 현재 이미지 개수 확인 (20개 제한)
+    const currentImages = quill.container.querySelectorAll('img').length;
+    if (currentImages >= 20) {
+        alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+        return;
+    }
+    
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
@@ -689,6 +704,13 @@ function quillImageHandler() {
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
             alert('허용되지 않는 파일 형식입니다. (jpg, jpeg, png, gif, webp만 가능)');
+            return;
+        }
+        
+        // 재차 이미지 개수 확인 (업로드 직전)
+        const currentImages = quill.container.querySelectorAll('img').length;
+        if (currentImages >= 20) {
+            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
             return;
         }
         
@@ -723,6 +745,9 @@ function uploadImageToQuill(file) {
             // 성공시 이미지 삽입
             quill.insertEmbed(range.index, 'image', data.data.url, 'user');
             quill.setSelection(range.index + 1, 0);  // 커서를 이미지 다음으로 이동
+            
+            // 이미지 카운터 업데이트
+            updateImageCounter();
             
             console.log('✅ Quill 이미지 업로드 성공:', data.data.url);
         } else {
@@ -777,12 +802,54 @@ function initializeQuillEditor() {
         console.log('✅ 기존 내용 로드 완료:', tempDiv.textContent.substring(0, 50) + '...');
     }
 
-    // 에디터 내용 변경시 히든 필드 업데이트
+    // 이미지 카운터 업데이트 함수
+    function updateImageCounter() {
+        const imageCounter = document.getElementById('imageCounter');
+        if (imageCounter && quill) {
+            const currentImages = quill.container.querySelectorAll('img').length;
+            
+            // 카운터 텍스트 업데이트
+            imageCounter.innerHTML = `📷 이미지: ${currentImages} / 20`;
+            
+            // 카운터 색상 변경 (경고 표시)
+            if (currentImages >= 18) {
+                imageCounter.style.color = '#dc2626'; // 빨간색 (위험)
+                imageCounter.style.fontWeight = '700';
+            } else if (currentImages >= 15) {
+                imageCounter.style.color = '#ea580c'; // 오렌지색 (주의)
+                imageCounter.style.fontWeight = '600';
+            } else {
+                imageCounter.style.color = '#2563eb'; // 파란색 (정상)
+                imageCounter.style.fontWeight = '500';
+            }
+            
+            console.log(`📷 이미지 카운터 업데이트: ${currentImages}/20`);
+        }
+    }
+
+    // 에디터 내용 변경시 히든 필드 업데이트 + 이미지 제한 모니터링
     quill.on('text-change', function() {
         document.getElementById('content').value = quill.root.innerHTML;
+        
+        // 이미지 개수 확인 및 초과분 제거
+        const currentImages = quill.container.querySelectorAll('img').length;
+        if (currentImages > 20) {
+            console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
+            const images = quill.container.querySelectorAll('img');
+            for (let i = 20; i < images.length; i++) {
+                images[i].remove();
+            }
+            alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+        }
+        
+        // 이미지 카운터 업데이트 (약간의 지연을 두어 DOM 변경 완료 후 실행)
+        setTimeout(updateImageCounter, 100);
     });
 
-    console.log('✅ Quill 에디터 초기화 완료');
+    // 초기 이미지 카운터 업데이트
+    setTimeout(updateImageCounter, 500);
+
+    console.log('✅ Quill 에디터 초기화 완료 (이미지 제한 시스템 포함)');
 }
 
 // 파일 크기 검증 함수

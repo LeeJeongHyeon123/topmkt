@@ -26,14 +26,23 @@ class Router {
             'POST:/auth/signup' => ['AuthController', 'signup'],
             'GET:/auth/logout' => ['AuthController', 'logout'],
             'POST:/auth/logout' => ['AuthController', 'logout'],
+            'GET:/auth/forgot-password' => ['AuthController', 'showForgotPassword'],
+            'POST:/auth/forgot-password' => ['AuthController', 'forgotPassword'],
+            'GET:/auth/reset-password' => ['AuthController', 'showResetPassword'],
+            'POST:/auth/reset-password' => ['AuthController', 'resetPassword'],
             
             // 휴대폰 인증 라우트
             'POST:/auth/send-verification' => ['AuthController', 'sendVerification'],
             'POST:/auth/verify-code' => ['AuthController', 'verifyCode'],
+            'POST:/auth/verify-reset-code' => ['AuthController', 'verifyResetCode'],
             
             // JWT API 라우트
             'POST:/auth/refresh' => ['AuthController', 'refreshToken'],
             'GET:/auth/me' => ['AuthController', 'me'],
+            
+            // 실시간 중복 검사 API 라우트
+            'POST:/auth/check-nickname' => ['AuthController', 'checkNickname'],
+            'POST:/auth/check-phone' => ['AuthController', 'checkPhone'],
             
             // 법적 문서 라우트
             'GET:/terms' => ['LegalController', 'showTerms'],
@@ -194,6 +203,9 @@ class Router {
             
             // 테스트 라우트
             'GET:/test1' => ['TestController', 'test1'],
+            
+            // Sample 페이지 라우트 (불매 알림 페이지) - 비활성화됨
+            // 'GET:/sample' => ['SampleController', 'index'],
         ];
     }
     
@@ -222,6 +234,20 @@ class Router {
         $uri = rtrim($uri, '/');
         if (empty($uri)) {
             $uri = '/';
+        }
+        
+        // 🔧 GET 파라미터 보존: $_GET 슈퍼글로벌에 쿼리 파라미터 설정
+        $queryString = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+        if ($queryString) {
+            parse_str($queryString, $_GET);
+            
+            // 디버깅: GET 파라미터 확인
+            if (class_exists('WebLogger')) {
+                WebLogger::debug('라우터에서 GET 파라미터 복원', [
+                    'query_string' => $queryString,
+                    'parsed_get' => $_GET
+                ]);
+            }
         }
         
         // HTTP 메서드 가져오기

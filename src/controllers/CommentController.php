@@ -54,6 +54,12 @@ class CommentController {
                 return;
             }
             
+            // 글자수 제한 검증 (2,000자)
+            if (mb_strlen($content, 'UTF-8') > 2000) {
+                ResponseHelper::json(['success' => false, 'message' => '댓글은 최대 2,000자까지 입력 가능합니다. (현재: ' . mb_strlen($content, 'UTF-8') . '자)'], 400);
+                return;
+            }
+            
             // 댓글 저장
             $commentId = $this->commentModel->create([
                 'post_id' => $postId,
@@ -112,6 +118,12 @@ class CommentController {
             
             if (empty($content)) {
                 ResponseHelper::json(['success' => false, 'message' => '댓글 내용을 입력해주세요.'], 400);
+                return;
+            }
+            
+            // 글자수 제한 검증 (2,000자)
+            if (mb_strlen($content, 'UTF-8') > 2000) {
+                ResponseHelper::json(['success' => false, 'message' => '댓글은 최대 2,000자까지 입력 가능합니다. (현재: ' . mb_strlen($content, 'UTF-8') . '자)'], 400);
                 return;
             }
             

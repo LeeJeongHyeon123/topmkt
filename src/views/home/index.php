@@ -38,7 +38,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <span>무료로 시작하기</span>
                     <i class="fas fa-rocket rocket-icon"></i>
                 </a>
-                <a href="#features" class="btn btn-ghost">
+                <a href="/community" class="btn btn-ghost">
                     <i class="fas fa-play"></i>
                     <span>둘러보기</span>
                 </a>
@@ -57,7 +57,7 @@ require_once SRC_PATH . '/views/templates/header.php';
         </div>
         
         <div class="features-grid">
-            <div class="feature-card featured">
+            <div class="feature-card">
                 <div class="feature-icon">
                     <div class="icon-bg">
                         <i class="fas fa-users"></i>
@@ -296,14 +296,14 @@ require_once SRC_PATH . '/views/templates/header.php';
     padding: 32px;
     border-radius: 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 1px solid #e2e8f0;
+    border: 2px solid #3b82f6;
 }
 
 .feature-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: none !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
 }
+
 
 .feature-icon {
     margin-bottom: 24px;

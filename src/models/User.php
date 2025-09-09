@@ -154,26 +154,33 @@ class User {
     
     /**
      * 휴대폰 번호 중복 검사
+     * 
+     * 휴대폰 번호는 로그인 시 사용되므로 중복을 허용하지 않습니다.
      */
     public function isPhoneExists($phone) {
         $user = $this->findByPhone($phone);
-        return $user !== false;
+        return !empty($user);
     }
     
     /**
-     * 이메일 중복 검사
+     * 이메일 중복 검사 - 중복 허용 정책 적용
+     * 
+     * 탑마케팅은 휴대폰 번호 기반 로그인 시스템을 사용하므로
+     * 이메일 중복을 허용합니다. (가족/기업 공용 이메일 사용 가능)
      */
     public function isEmailExists($email) {
-        $user = $this->findByEmail($email);
-        return $user !== false;
+        // 이메일 중복 허용 정책 - 항상 false 리턴
+        return false;
     }
     
     /**
      * 닉네임 중복 검사
+     * 
+     * 닉네임은 사용자 식별을 위해 고유해야 하므로 중복을 허용하지 않습니다.
      */
     public function isNicknameExists($nickname) {
         $user = $this->findByNickname($nickname);
-        return $user !== false;
+        return !empty($user);
     }
     
     /**

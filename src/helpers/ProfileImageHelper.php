@@ -126,15 +126,10 @@ class ProfileImageHelper {
         ];
         
         // 유효한 사용자 ID가 있을 때만 클릭 이벤트 추가
-        if ($mode === 'api' && $userId && !empty($user['nickname'])) {
-            // API 방식 (community, notices, chat) - 유효한 사용자만
-            $attributes['onclick'] = "event.stopPropagation(); profileModal.show({$userId}, '{$userName}', false)";
-        } elseif ($mode === 'direct') {
-            // 직접 표시 방식 (lectures, events, profile)
-            $originalImage = self::getOriginalImageUrl($user);
-            if ($originalImage) {
-                $attributes['onclick'] = "event.stopPropagation(); profileModal.show('{$originalImage}', '{$userName}', true)";
-            }
+        if ($userId && !empty($user['nickname'])) {
+            // 프로필 페이지로 이동 (로딩 UI 포함)
+            $attributes['onclick'] = "event.stopPropagation(); if(window.TopMarketingLoading) { window.TopMarketingLoading.show(); window.TopMarketingLoading.setMessage('프로필을 불러오는 중...'); } window.location.href='/profile?user_id=" . $userId . "';";
+            $attributes['style'] = 'cursor: pointer;';
         }
         
         return $attributes;

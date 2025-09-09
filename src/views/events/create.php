@@ -751,6 +751,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="quill-container">
                     <div id="quill-editor"></div>
                 </div>
+                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
                 <textarea name="description" id="description" style="display: none;"></textarea>
             </div>
         </div>
@@ -1119,6 +1120,9 @@ function initializeQuillEditor() {
         }
     });
     
+    // 전역 접근을 위해 window에 할당
+    window.quill = quill;
+    
     // 에디터 텍스트 선택 문제 해결
     const editorElement = document.querySelector('.ql-editor');
     if (editorElement) {
@@ -1145,6 +1149,13 @@ function imageHandler() {
         // 파일 크기 검증 (공통 설정 사용: 30MB)
         if (!window.validateFileSize || !window.validateFileSize(file.size)) {
             alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+            return;
+        }
+        
+        // 이미지 개수 제한 검사 (20개)
+        const currentImages = quill.container.querySelectorAll('img').length;
+        if (currentImages >= 20) {
+            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
             return;
         }
         
@@ -1209,6 +1220,9 @@ function imageHandler() {
                 quill.insertEmbed(range.index, 'image', result.data.url);
                 quill.setSelection(range.index + 1);
                 console.log('✅ 이미지 업로드 성공:', result.data.url);
+                
+                // 이미지 카운터 업데이트
+                window.updateImageCounter();
             } else {
                 throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
             }
@@ -1646,6 +1660,11 @@ function validateForm() {
         return false;
     }
     
+    if (description.length > 10000) {
+        alert(`행사 설명은 10,000자를 초과할 수 없습니다. (현재: ${description.length}자)`);
+        return false;
+    }
+    
     // 위치별 필수 필드 검사
     const locationType = document.querySelector('input[name="location_type"]:checked').value;
     
@@ -1676,6 +1695,57 @@ function validateForm() {
     
     return true;
 }
+
+// 전역 이미지 카운터 업데이트 함수
+window.updateImageCounter = function() {
+    const imageCounter = document.getElementById('imageCounter');
+    if (imageCounter && window.quill) {
+        const currentImages = window.quill.container.querySelectorAll('img').length;
+        
+        // 카운터 텍스트 업데이트
+        imageCounter.innerHTML = `📷 이미지: ${currentImages} / 20`;
+        
+        // 카운터 색상 변경 (경고 표시)
+        if (currentImages >= 18) {
+            imageCounter.style.color = '#dc2626'; // 빨간색 (위험)
+            imageCounter.style.fontWeight = '700';
+        } else if (currentImages >= 15) {
+            imageCounter.style.color = '#ea580c'; // 오렌지색 (주의)
+            imageCounter.style.fontWeight = '600';
+        } else {
+            imageCounter.style.color = '#2563eb'; // 파란색 (정상)
+            imageCounter.style.fontWeight = '500';
+        }
+        
+        console.log(`📷 이미지 카운터 업데이트: ${currentImages}/20`);
+    }
+};
+
+// Quill 텍스트 변경 이벤트 모니터링 (20개 초과 시 자동 제거)
+setTimeout(() => {
+    if (window.quill) {
+        window.quill.on('text-change', function(delta, oldDelta, source) {
+            const currentImages = window.quill.container.querySelectorAll('img').length;
+            if (currentImages > 20) {
+                console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
+                const images = window.quill.container.querySelectorAll('img');
+                for (let i = 20; i < images.length; i++) {
+                    images[i].remove();
+                }
+                alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+            }
+            // 이미지 카운터 업데이트 (약간의 지연을 두어 DOM 변경 완료 후 실행)
+            setTimeout(window.updateImageCounter, 100);
+        });
+        
+        // 초기 이미지 카운터 업데이트
+        window.updateImageCounter();
+        
+        console.log('✅ 이벤트 생성 페이지 - 이미지 제한 시스템 초기화 완료');
+    } else {
+        console.error('❌ Quill 에디터가 초기화되지 않았습니다.');
+    }
+}, 1500);
 </script>
 
 <?php if ($isEditMode): ?>

@@ -140,12 +140,15 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
 .btn-write {
     background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
     color: white;
-    font-weight: 700;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 12px 16px;
+    min-height: 44px;
 }
 
 .btn-write:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(55, 65, 81, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
     text-decoration: none;
 }
 
@@ -333,6 +336,15 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     margin-bottom: 20px;
 }
 
+.empty-state .btn {
+    font-size: 14px;
+    padding: 10px 20px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* 검색 하이라이트 스타일 */
 .search-highlight {
     background: linear-gradient(135deg, #fef5e7 0%, #fed7aa 100%);
@@ -344,23 +356,6 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     box-shadow: 0 1px 2px rgba(251, 191, 36, 0.1);
 }
 
-/* 검색 성능 정보 */
-.search-performance {
-    background: #f0fff4;
-    border: 1px solid #c6f6d5;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin-bottom: 15px;
-    font-size: 0.85rem;
-    color: #276749;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.search-performance .icon {
-    font-size: 1rem;
-}
 
 /* 검색 결과 요약 */
 .search-summary {
@@ -401,6 +396,8 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 100px;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .search-filter:focus {
@@ -410,14 +407,15 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
 }
 
 .search-input {
-    padding: 12px 45px 12px 15px;
+    padding: 12px 15px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
     font-size: 14px;
     width: 250px;
     transition: all 0.3s ease;
     background: #fff;
-    position: relative;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -433,10 +431,6 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
 }
 
 .search-btn {
-    position: absolute;
-    right: 4px;
-    top: 50%;
-    transform: translateY(-50%);
     background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
     border: none;
     border-radius: 8px;
@@ -453,10 +447,11 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .search-btn:hover {
-    transform: translateY(-50%) scale(1.05);
+    transform: translateY(-1px) scale(1.05);
     box-shadow: 0 4px 12px rgba(55, 65, 81, 0.4);
 }
 
@@ -568,19 +563,21 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     }
     
     .btn {
-        width: 100%;
         justify-content: center;
         font-size: 16px;
-        padding: 14px 20px;
-        min-height: 48px;
+        padding: 12px 16px;
+        min-height: 44px;
+        width: auto;
+        display: inline-flex;
     }
     
     .btn-write {
-        width: 100% !important;
-        justify-content: center !important;
-        font-size: 16px !important;
-        padding: 14px 20px !important;
-        min-height: 48px !important;
+        justify-content: center;
+        font-size: 14px;
+        padding: 10px 14px;
+        min-height: 42px;
+        width: auto;
+        display: inline-flex;
     }
     
     .search-performance,
@@ -753,10 +750,20 @@ body {
         min-height: 52px;
     }
     
-    .btn, .btn-write {
-        font-size: 16px !important;
-        padding: 16px 20px !important;
-        min-height: 52px !important;
+    .btn {
+        font-size: 14px !important;
+        padding: 10px 14px !important;
+        min-height: 42px !important;
+        width: auto !important;
+        display: inline-flex !important;
+    }
+    
+    .btn-write {
+        font-size: 14px !important;
+        padding: 10px 14px !important;
+        min-height: 42px !important;
+        width: auto !important;
+        display: inline-flex !important;
     }
     
     .post-item {
@@ -869,7 +876,7 @@ body {
                     <i class="fas fa-search"></i>
                 </button>
                 <?php if (!empty($search)): ?>
-                    <a href="/community" class="btn btn-secondary" style="margin-left: 10px;">
+                    <a href="/community<?= $filter && $filter !== 'all' ? '?filter=' . urlencode($filter) : '' ?>" class="btn btn-secondary" style="margin-left: 15px;">
                         ✖️ 검색 해제
                     </a>
                 <?php endif; ?>
@@ -898,50 +905,24 @@ body {
         <?php endif; ?>
     </div>
     
-    <!-- 검색 성능 정보 -->
-    <?php if (!empty($search)): ?>
-        <div class="search-performance">
-            <span class="icon">⚡</span>
-            <span>검색 완료: <?= $searchTime ?>ms | 총 <?= number_format($totalCount) ?>건 발견</span>
-            <?php if ($totalCount > $pageSize): ?>
-                <span style="margin-left: 8px; opacity: 0.7;">
-                    (페이지당 <?= $pageSize ?>건씩 표시)
-                </span>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
-    
-    <!-- 검색 결과 요약 -->
-    <?php if (!empty($search)): ?>
-        <div class="search-summary">
-            <div class="search-summary-title">
-                "<?= htmlspecialchars($search) ?>" 검색 결과
-            </div>
-            <div class="search-summary-text">
+    <!-- 통합 게시판 통계 -->
+    <div class="board-stats">
+        <p class="stats-text">
+            <?php if (!empty($search)): ?>
+                🔍 "<?= htmlspecialchars($search) ?>" 검색 결과: <strong><?= number_format($totalCount) ?></strong>개
                 <?php
                 $filterText = '';
                 switch ($filter ?? 'all') {
-                    case 'title': $filterText = '제목에서'; break;
-                    case 'content': $filterText = '내용에서'; break;
-                    case 'author': $filterText = '작성자에서'; break;
+                    case 'title': $filterText = '(제목에서 검색)'; break;
+                    case 'content': $filterText = '(내용에서 검색)'; break;
+                    case 'author': $filterText = '(작성자에서 검색)'; break;
                     case 'all': 
-                    default: $filterText = '전체에서'; break;
+                    default: $filterText = '(전체에서 검색)'; break;
                 }
                 ?>
-                <?= $filterText ?> <?= number_format($totalCount) ?>개의 관련 내용을 찾았습니다.
-                <span style="font-size: 0.9em; color: #666; margin-left: 10px;">
-                    ℹ️ 최근 500개 게시글 대상
-                </span>
-            </div>
-        </div>
-    <?php endif; ?>
-    
-    <!-- 게시판 통계 -->
-    <div class="board-stats">
-        <p class="stats-text">
-            📊 총 <strong><?= number_format($totalCount) ?></strong>개의 게시글이 있습니다
-            <?php if (!empty($search)): ?>
-                (검색 결과)
+                <span style="font-size: 0.9em; color: #666; margin-left: 8px;"><?= $filterText ?></span>
+            <?php else: ?>
+                📊 총 <strong><?= number_format($totalCount) ?></strong>개의 게시글이 있습니다
             <?php endif; ?>
         </p>
     </div>
@@ -950,7 +931,13 @@ body {
     <?php if (!empty($posts)): ?>
         <div class="post-list">
             <?php foreach ($posts as $post): ?>
-                <div class="post-item" onclick="location.href='/community/posts/<?= $post['id'] ?>'">
+                <div class="post-item" onclick="location.href='/community/posts/<?= $post['id'] ?><?php
+                    $params = [];
+                    if (isset($page) && $page > 1) $params['page'] = $page;
+                    if (!empty($search)) $params['search'] = $search;
+                    if (!empty($filter) && $filter !== 'all') $params['filter'] = $filter;
+                    echo !empty($params) ? '?' . http_build_query($params) : '';
+                ?>'">
                     <?php 
                     // 변수를 먼저 정의
                     $profileImage = $post['profile_image'] ?? null;
@@ -1036,11 +1023,24 @@ body {
         </div>
         
         <!-- 페이지네이션 -->
+        <?php 
+        // 페이지네이션 링크 생성 함수
+        function buildPaginationUrl($page, $search = null, $filter = 'all') {
+            $params = ['page' => $page];
+            if (!empty($search)) {
+                $params['search'] = $search;
+            }
+            if ($filter && $filter !== 'all') {
+                $params['filter'] = $filter;
+            }
+            return '?' . http_build_query($params);
+        }
+        ?>
         <?php if ($totalPages > 1): ?>
             <div class="pagination">
                 <!-- 이전 페이지 -->
                 <?php if ($hasPrevPage): ?>
-                    <a href="?page=<?= $currentPage - 1 ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" 
+                    <a href="<?= buildPaginationUrl($currentPage - 1, $search, $filter) ?>" 
                        class="page-link">
                         ← 이전
                     </a>
@@ -1054,7 +1054,7 @@ body {
                 $endPage = min($totalPages, $currentPage + 2);
                 
                 if ($startPage > 1): ?>
-                    <a href="?page=1<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" 
+                    <a href="<?= buildPaginationUrl(1, $search, $filter) ?>" 
                        class="page-link">1</a>
                     <?php if ($startPage > 2): ?>
                         <span class="page-link disabled">...</span>
@@ -1062,7 +1062,7 @@ body {
                 <?php endif; ?>
                 
                 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-                    <a href="?page=<?= $i ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" 
+                    <a href="<?= buildPaginationUrl($i, $search, $filter) ?>" 
                        class="page-link <?= $i === $currentPage ? 'active' : '' ?>">
                         <?= $i ?>
                     </a>
@@ -1073,14 +1073,14 @@ body {
                         <span class="page-link disabled">...</span>
                     <?php endif; ?>
                     <?php if ($totalPages > 0): ?>
-                        <a href="?page=<?= $totalPages ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" 
+                        <a href="<?= buildPaginationUrl($totalPages, $search, $filter) ?>" 
                            class="page-link"><?= number_format($totalPages) ?></a>
                     <?php endif; ?>
                 <?php endif; ?>
                 
                 <!-- 다음 페이지 -->
                 <?php if ($hasNextPage): ?>
-                    <a href="?page=<?= $currentPage + 1 ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" 
+                    <a href="<?= buildPaginationUrl($currentPage + 1, $search, $filter) ?>" 
                        class="page-link">
                         다음 →
                     </a>
@@ -1098,6 +1098,8 @@ body {
                 <h3>
                     <?php if (!empty($search)): ?>
                         "<?= htmlspecialchars($search) ?>" 검색 결과가 없습니다
+                    <?php elseif (isset($page) && $page > 50000): ?>
+                        접근할 수 없는 페이지입니다
                     <?php else: ?>
                         첫 번째 게시글을 작성해보세요!
                     <?php endif; ?>
@@ -1108,15 +1110,13 @@ body {
                         • 검색어의 철자를 확인해보세요<br>
                         • 더 간단한 키워드로 다시 검색해보세요<br>
                         • 관련된 다른 단어로 검색해보세요
+                    <?php elseif (isset($page) && $page > 50000): ?>
+                        요청하신 페이지 번호가 지원 범위를 초과합니다.<br>
+                        <a href="/community" style="color: #667eea;">커뮤니티 메인으로 이동</a>
                     <?php else: ?>
                         탑마케팅 커뮤니티의 첫 번째 이야기를 시작해보세요.
                     <?php endif; ?>
                 </p>
-                <?php if ($isLoggedIn): ?>
-                    <a href="/community/write" class="btn btn-primary">
-                        <i class="fas fa-pen"></i> 글쓰기
-                    </a>
-                <?php endif; ?>
             </div>
         </div>
     <?php endif; ?>
@@ -1220,16 +1220,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }, index * 100);
         });
         
-        // 검색 성능 측정 및 표시
+        // 검색 완료 후 입력 필드 상태 정상화
         <?php if (!empty($search)): ?>
-        const performanceInfo = document.querySelector('.search-performance');
-        if (performanceInfo) {
-            // 검색 완료 후 성능 정보 강조
-            setTimeout(() => {
-                performanceInfo.style.animation = 'fadeInUp 0.5s ease-out';
-            }, 500);
-        }
+        // 검색어가 있을 때만 실행 - 검색 완료 후 1초 후 시각적 상태 정상화
+        setTimeout(() => {
+            if (searchInput) {
+                // 검색 입력 필드 스타일 초기화 (정상 상태로)
+                searchInput.style.borderColor = '#e2e8f0';
+                searchInput.style.background = '#fff';
+                
+                // 검색 버튼 hover 효과 정상화
+                const searchBtn = document.querySelector('.search-btn');
+                if (searchBtn) {
+                    searchBtn.style.transform = 'none';
+                }
+                
+                console.log('🔍 검색 완료: 입력 필드 상태 정상화');
+            }
+        }, 1000);
         <?php endif; ?>
+        
     }
     
     // 게시글 항목 호버 효과 개선
@@ -1303,24 +1313,3 @@ document.addEventListener('DOMContentLoaded', function() {
 // 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 </script>
 
-<!-- 성능 디버그 정보 (검색 시 또는 debug 파라미터 시에만 표시) -->
-<?php if (isset($showDebugInfo) && $showDebugInfo && isset($performanceLogs)): ?>
-<div style="background: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 5px; font-family: monospace; font-size: 12px; border-left: 4px solid #007bff;">
-    <h4 style="margin: 0 0 10px 0; color: #007bff;">🔍 실시간 성능 로그</h4>
-    <?php foreach ($performanceLogs as $log): ?>
-        <?php
-        $color = '#333';
-        if (strpos($log, '[CONTROLLER]') !== false) $color = '#007bff';
-        if (strpos($log, '[SEARCH]') !== false) $color = '#28a745';
-        if (strpos($log, '[COUNT]') !== false) $color = '#ffc107';
-        if (strpos($log, '[CACHE]') !== false) $color = '#6f42c1';
-        ?>
-        <div style="color: <?= $color ?>; margin: 2px 0; line-height: 1.3;">
-            <?= htmlspecialchars($log) ?>
-        </div>
-    <?php endforeach; ?>
-    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 11px; color: #666;">
-        💡 이 정보는 검색 시 또는 URL에 ?debug 파라미터 추가 시에만 표시됩니다.
-    </div>
-</div>
-<?php endif; ?>

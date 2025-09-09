@@ -445,7 +445,11 @@ function renderComment($comment, $currentUserId = null, $depth = 0, $parentAutho
             <!-- 대댓글 작성 폼 -->
             <?php if ($depth < 1 && $currentUserId): ?>
             <div id="reply-form-<?= $comment['id'] ?>" class="reply-form">
-                <textarea class="reply-textarea" placeholder="답글을 입력하세요..." rows="3"></textarea>
+                <textarea class="reply-textarea" placeholder="답글을 입력하세요..." rows="3" maxlength="2000"></textarea>
+                <div class="reply-char-counter" style="margin-top: 5px; text-align: right;">
+                    <span class="reply-char-count" style="color: #64748b; font-size: 12px;">0</span>
+                    <span style="color: #94a3b8; font-size: 12px;">/2,000자</span>
+                </div>
                 <div class="reply-actions">
                     <button onclick="submitReply(<?= $comment['id'] ?>)" class="reply-submit">
                         답글 작성
@@ -516,13 +520,18 @@ $commentCount = count($comments);
             id="comment-content" 
             class="comment-textarea" 
             placeholder="댓글을 입력하세요..."
+            maxlength="2000"
             required
         ></textarea>
         <div class="comment-actions">
             <div>
                 <small style="color: #64748b;">마크다운 문법을 사용할 수 있습니다.</small>
+                <div class="comment-char-counter" style="margin-top: 5px;">
+                    <span id="comment-char-count" style="color: #64748b; font-size: 13px;">0</span>
+                    <span style="color: #94a3b8; font-size: 13px;">/2,000자</span>
+                </div>
             </div>
-            <button type="submit" class="comment-submit">
+            <button type="submit" class="comment-submit" id="comment-submit-btn">
                 댓글 작성
             </button>
         </div>
@@ -695,6 +704,33 @@ function normalizeText(text) {
         .trim();                 // Trim whitespace
 }
 
+// 글자수 카운터 업데이트 함수
+function updateCharacterCount(textarea, countElement, maxLength = 2000) {
+    const currentLength = textarea.value.length;
+    countElement.textContent = currentLength;
+    
+    // 글자수가 2000을 초과하거나 90% 이상일 때 색상 변경
+    if (currentLength > maxLength) {
+        countElement.style.color = '#dc2626'; // 빨간색
+        countElement.parentElement.style.fontWeight = 'bold';
+    } else if (currentLength > maxLength * 0.9) {
+        countElement.style.color = '#ea580c'; // 주황색
+        countElement.parentElement.style.fontWeight = 'normal';
+    } else {
+        countElement.style.color = '#64748b'; // 기본 회색
+        countElement.parentElement.style.fontWeight = 'normal';
+    }
+}
+
+// 폼 제출 전 글자수 검증 함수
+function validateCharacterLimit(content, maxLength = 2000) {
+    if (content.length > maxLength) {
+        alert(`댓글은 최대 ${maxLength.toLocaleString()}자까지 입력 가능합니다. (현재: ${content.length.toLocaleString()}자)`);
+        return false;
+    }
+    return true;
+}
+
 // 댓글 작성
 function submitComment(event) {
     event.preventDefault();
@@ -703,6 +739,11 @@ function submitComment(event) {
     const content = normalizeText(rawContent);
     if (!content) {
         alert('댓글 내용을 입력해주세요.');
+        return;
+    }
+    
+    // 글자수 제한 검증 추가
+    if (!validateCharacterLimit(content, 2000)) {
         return;
     }
     
@@ -779,6 +820,11 @@ function submitReply(parentId) {
     
     if (!content) {
         alert('답글 내용을 입력해주세요.');
+        return;
+    }
+    
+    // 글자수 제한 검증 추가
+    if (!validateCharacterLimit(content, 2000)) {
         return;
     }
     
@@ -872,10 +918,14 @@ function showInlineEditForm(commentId) {
     
     const currentContent = contentDiv.textContent.trim();
     
-    // 편집 폼 HTML 생성 (공지사항과 동일한 구조)
+    // 편집 폼 HTML 생성 (글자수 카운터 포함)
     const editFormHTML = `
         <div class="comment-edit-form" id="edit-form-${commentId}" style="margin-top: 10px;">
-            <textarea id="edit-content-${commentId}" style="width: 100%; min-height: 80px; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical; transition: border-color 0.3s ease; box-sizing: border-box;">${currentContent}</textarea>
+            <textarea id="edit-content-${commentId}" maxlength="2000" style="width: 100%; min-height: 80px; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical; transition: border-color 0.3s ease; box-sizing: border-box;">${currentContent}</textarea>
+            <div class="edit-char-counter" style="margin-top: 5px; text-align: right;">
+                <span id="edit-char-count-${commentId}" style="color: #64748b; font-size: 12px;">0</span>
+                <span style="color: #94a3b8; font-size: 12px;">/2,000자</span>
+            </div>
             <div class="comment-edit-actions" style="display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end;">
                 <button type="button" onclick="cancelEditComment(${commentId})" style="font-size: 12px; padding: 6px 12px; min-width: 80px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; color: #4a5568;">취소</button>
                 <button type="button" onclick="updateComment(${commentId})" style="font-size: 12px; padding: 6px 12px; min-width: 80px; background: #2563eb; color: white; border: 1px solid #2563eb; border-radius: 4px; cursor: pointer;">저장</button>
@@ -890,7 +940,16 @@ function showInlineEditForm(commentId) {
     contentDiv.style.display = 'none';
     
     const textarea = document.getElementById(`edit-content-${commentId}`);
+    const countElement = document.getElementById(`edit-char-count-${commentId}`);
     textarea.focus();
+    
+    // 초기 글자수 설정
+    updateCharacterCount(textarea, countElement, 2000);
+    
+    // 실시간 글자수 카운터
+    textarea.addEventListener('input', function() {
+        updateCharacterCount(this, countElement, 2000);
+    });
     
     // textarea 포커스 시 테두리 색상 변경
     textarea.addEventListener('focus', function() {
@@ -936,6 +995,11 @@ function updateComment(commentId) {
     
     if (content.length < 2) {
         alert('댓글은 2자 이상 입력해주세요.');
+        return;
+    }
+    
+    // 글자수 제한 검증 (2,000자)
+    if (!validateCharacterLimit(content, 2000)) {
         return;
     }
     
@@ -1004,12 +1068,28 @@ function deleteComment(commentId) {
             'X-CSRF-Token': getCsrfToken()
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Delete response status:', response.status);
+        return response.json();
+    })
     .then(data => {
-        if (data.success) {
+        console.log('Delete response data:', data);
+        
+        // 다양한 성공 응답 형태 처리 (댓글 작성과 동일한 로직)
+        const isSuccess = data.success === true || 
+                         (data.status === 'success' && data.data && data.data.success === true) ||
+                         (data.data && data.data.success === true) ||
+                         (data.status === 'success'); // ResponseHelper의 status 필드도 확인
+        
+        if (isSuccess) {
+            console.log('댓글 삭제 성공, 페이지 새로고침');
             location.reload();
         } else {
-            alert(data.message || '댓글 삭제에 실패했습니다.');
+            const errorMessage = data.message || 
+                               (data.data && data.data.message) || 
+                               '댓글 삭제에 실패했습니다.';
+            console.error('댓글 삭제 실패:', errorMessage);
+            alert(errorMessage);
         }
     })
     .catch(error => {
@@ -1031,6 +1111,50 @@ function startChatWithCommentAuthor(authorId, authorName) {
 
 // 페이지 로드 시 해시 앵커로 스크롤
 document.addEventListener('DOMContentLoaded', function() {
+    // 메인 댓글 textarea 글자수 카운터 설정
+    const mainCommentTextarea = document.getElementById('comment-content');
+    const mainCommentCountElement = document.getElementById('comment-char-count');
+    
+    if (mainCommentTextarea && mainCommentCountElement) {
+        // 실시간 글자수 카운터 업데이트
+        mainCommentTextarea.addEventListener('input', function() {
+            updateCharacterCount(this, mainCommentCountElement, 2000);
+        });
+        
+        // 페이지 로드시 초기 카운트 설정
+        updateCharacterCount(mainCommentTextarea, mainCommentCountElement, 2000);
+    }
+    
+    // 답글 textarea들에도 글자수 카운터 설정
+    function setupReplyCounters() {
+        const replyTextareas = document.querySelectorAll('.reply-textarea');
+        replyTextareas.forEach(function(textarea) {
+            const replyForm = textarea.closest('.reply-form');
+            const countElement = replyForm ? replyForm.querySelector('.reply-char-count') : null;
+            
+            if (countElement) {
+                // 실시간 글자수 카운터 업데이트
+                textarea.addEventListener('input', function() {
+                    updateCharacterCount(this, countElement, 2000);
+                });
+                
+                // 초기 카운트 설정
+                updateCharacterCount(textarea, countElement, 2000);
+            }
+        });
+    }
+    
+    // 초기 답글 카운터 설정
+    setupReplyCounters();
+    
+    // 답글 폼이 동적으로 생성될 때도 카운터 설정 (toggleReplyForm 함수가 호출될 때)
+    const originalToggleReplyForm = window.toggleReplyForm;
+    window.toggleReplyForm = function(commentId) {
+        originalToggleReplyForm(commentId);
+        // 약간의 딜레이 후 카운터 설정 (DOM 업데이트 후)
+        setTimeout(setupReplyCounters, 50);
+    };
+    
     // URL 해시가 comment-로 시작하는 경우 해당 댓글로 스크롤
     if (window.location.hash && window.location.hash.startsWith('#comment-')) {
         const commentId = window.location.hash.substring(9); // #comment- 제거

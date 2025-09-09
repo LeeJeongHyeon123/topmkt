@@ -19,6 +19,14 @@ if (!defined('CONFIG_PATH')) {
 // paths.php 로드
 require_once CONFIG_PATH . '/paths.php';
 
+// forgot-password 요청 디버깅
+if (strpos($_SERVER['REQUEST_URI'], '/auth/forgot-password') !== false) {
+    error_log("=== FORGOT-PASSWORD 요청 디버깅 ===");
+    error_log("REQUEST_URI: " . $_SERVER['REQUEST_URI']);
+    error_log("REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
+    error_log("Time: " . date('Y-m-d H:i:s'));
+}
+
 // 강의 신청 API 디버깅을 위한 로그
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['REQUEST_URI'], '/api/lectures/') !== false && strpos($_SERVER['REQUEST_URI'], '/registration') !== false) {
     error_log("=== API 강의 신청 요청 디버깅 ===");
@@ -131,8 +139,25 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/events/') !== false && strpos($_SERVER
     error_log("Time: " . date('Y-m-d H:i:s'));
 }
 
-$router = new Router();
+// forgot-password 라우터 디버깅
+if (strpos($_SERVER['REQUEST_URI'], '/auth/forgot-password') !== false) {
+    error_log("=== 라우터 생성 전 ===");
+    try {
+        $router = new Router();
+        error_log("=== 라우터 생성 성공 ===");
+        
+        // 라우터 디스패치 시도
+        error_log("=== 라우터 디스패치 시작 ===");
+        $router->dispatch();
+        error_log("=== 라우터 디스패치 완료 ===");
+    } catch (Exception $e) {
+        error_log("=== 라우터 오류: " . $e->getMessage() . " ===");
+        error_log("파일: " . $e->getFile() . ", 라인: " . $e->getLine());
+    }
+} else {
+    $router = new Router();
     $router->dispatch();
+}
     
     // 요청 완료 로그
     $endTime = microtime(true);

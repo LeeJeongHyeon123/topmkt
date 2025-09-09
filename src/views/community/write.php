@@ -1,7 +1,16 @@
 <?php
 /**
  * 커뮤니티 게시글 작성/수정 페이지
+ * v3.14.1+ - 취소 버튼 confirm 시스템
  */
+
+// 강력한 캐시 무효화 헤더
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: 0");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("ETag: \"" . md5(time()) . "\"");
 
 // 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
@@ -117,7 +126,8 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
 .form-buttons {
     display: flex;
     gap: 12px;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 30px;
     flex-wrap: wrap;
 }
@@ -253,13 +263,18 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
     }
     
     .form-buttons {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: space-between;
         align-items: center;
+        gap: 8px;
     }
     
     .btn {
-        width: 100%;
-        max-width: 200px;
+        flex: 1;
+        min-width: 80px;
+        max-width: 120px;
+        font-size: 14px;
+        padding: 10px 8px;
     }
 }
 
@@ -540,17 +555,20 @@ html #quill-editor .ql-editor * {
         
         <!-- 버튼 영역 -->
         <div class="form-buttons">
-            <button type="submit" id="submitBtn" class="btn btn-primary">
-                <span id="submitText"><?= $submitText ?></span>
-            </button>
-            <a href="/community" class="btn btn-secondary">
-                ❌ 취소
-            </a>
             <?php if ($isEdit): ?>
                 <button type="button" id="deleteBtn" class="btn btn-danger">
                     🗑️ 삭제
                 </button>
             <?php endif; ?>
+            <button type="button" id="cancelBtn" class="btn btn-secondary" 
+                    data-version="v3.14.1-FINAL" 
+                    data-timestamp="<?= time() ?>"
+                    title="v3.14.1-FINAL Enhanced Cancel Button - 작성된 내용이 있을 때만 확인">
+                ❌ 취소
+            </button>
+            <button type="submit" id="submitBtn" class="btn btn-primary">
+                <span id="submitText"><?= $submitText ?></span>
+            </button>
         </div>
     </form>
 </div>
@@ -751,6 +769,10 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         bounds: '#quill-editor'
     });
+    
+    // 🔥 Quill 에디터를 전역 접근 가능하도록 설정 (v3.14.1-FINAL)
+    window.quill = quill;
+    console.log('✅ window.quill 할당 완료:', !!window.quill);
     
     // 텍스트 변경 시 이미지 카운터 업데이트 및 제한 검사
     quill.on('text-change', function(delta, oldDelta, source) {
@@ -1283,20 +1305,37 @@ document.addEventListener('DOMContentLoaded', function() {
         // 로딩 표시
         showLoading();
         
-        // 폼 데이터 준비
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('content', editorHtml);
-        formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
-        
-        // API 요청
+        // API 요청 준비
         const url = isEdit ? `/community/posts/${postId}` : '/community/posts';
-        const method = 'POST';
+        let fetchOptions = {};
         
-        fetch(url, {
-            method: method,
-            body: formData
-        })
+        if (isEdit) {
+            // 수정 시: PUT 메서드와 JSON 사용
+            fetchOptions = {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: editorHtml,
+                    csrf_token: document.querySelector('input[name="csrf_token"]').value
+                })
+            };
+        } else {
+            // 생성 시: POST 메서드와 FormData 사용
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('content', editorHtml);
+            formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+            
+            fetchOptions = {
+                method: 'POST',
+                body: formData
+            };
+        }
+        
+        fetch(url, fetchOptions)
         .then(response => response.json())
         .then(data => {
             hideLoading();
@@ -1322,6 +1361,85 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // 🚨 페이지 로드 시 버전 확인 및 캐시 상태 출력 (v3.14.1+ FINAL)
+    const currentTime = new Date().toISOString();
+    console.log(`🕐 페이지 로드 시간: ${currentTime}`);
+    console.log(`🔄 캐시 무효화 버전: v3.14.1-FINAL-${Date.now()}`);
+    console.log('✅ 취소 버튼 confirm 시스템 v3.14.1+ 로드 완료');
+    
+    // 취소 버튼 처리 (최종 강화 버전 - v3.14.1-FINAL)
+    const cancelBtn = document.getElementById('cancelBtn');
+    if (cancelBtn) {
+        // 모든 기존 이벤트 완전 제거
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        
+        console.log('🔧 취소 버튼 이벤트 핸들러 완전 재생성 - v3.14.1-FINAL');
+        
+        // 최종 이벤트 리스너 등록
+        newCancelBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🚨 취소 버튼 클릭됨 - v3.14.1-FINAL ' + new Date().toLocaleTimeString());
+            
+            // 🔍 변수 상태 상세 디버깅
+            console.log('🔍 변수 상태 확인:');
+            console.log('  - titleInput:', titleInput);
+            console.log('  - titleInput 존재:', !!titleInput);
+            console.log('  - window.quill:', window.quill);
+            console.log('  - quill 존재:', !!window.quill);
+            
+            // 직접 DOM에서 요소 찾기
+            const titleElement = document.getElementById('title');
+            const quillElement = document.querySelector('.ql-editor');
+            console.log('  - titleElement:', titleElement);
+            console.log('  - quillElement:', quillElement);
+            
+            // 작성된 내용이 있는지 확인 (더 안전한 방법)
+            const titleValue = titleElement ? titleElement.value.trim() : '';
+            const quillText = window.quill ? window.quill.getText().trim() : (quillElement ? quillElement.textContent.trim() : '');
+            const hasContent = titleValue || quillText.length > 1;
+            
+            console.log(`📊 상세 내용 확인:`);
+            console.log(`  - 제목 값: "${titleValue}"`);
+            console.log(`  - 본문 텍스트: "${quillText}"`);
+            console.log(`  - 본문 길이: ${quillText.length}`);
+            console.log(`  - 내용 있음: ${hasContent}`);
+            
+            if (hasContent) {
+                console.log('⚠️ 내용이 있어서 confirm 표시');
+                const userConfirmed = confirm('작성 중인 내용이 사라집니다.\n정말로 취소하시겠습니까?');
+                console.log(`👤 사용자 선택: ${userConfirmed}`);
+                
+                if (!userConfirmed) {
+                    console.log('🚫 사용자가 취소를 선택함 - 페이지 유지');
+                    return;
+                }
+                console.log('✅ 사용자가 확인 - 페이지 이동');
+            } else {
+                console.log('📝 내용 없음 - 즉시 이동');
+            }
+            
+            // 🔥 beforeunload 이벤트 중복 방지 - 취소 버튼으로 이동할 때는 beforeunload 무시
+            console.log('🔧 beforeunload 이벤트 일시적 무력화');
+            isSubmitting = true;  // beforeunload 무시 플래그 설정
+            
+            console.log('✅ 커뮤니티 목록으로 이동');
+            // 취소 확정 시 커뮤니티 목록으로 이동
+            window.location.href = '/community';
+        });
+        
+        console.log('✅ 취소 버튼 이벤트 핸들러 등록 완료 - v3.14.1+');
+        
+        // 추가 안전장치: 브라우저 캐시 문제 대응
+        cancelBtn.setAttribute('data-version', 'v3.14.1-enhanced');
+        cancelBtn.title = 'v3.14.1+ Enhanced Cancel Button - 작성된 내용이 있을 때만 확인';
+        
+    } else {
+        console.error('❌ 취소 버튼을 찾을 수 없음');
+    }
+
     // 삭제 버튼 처리 (수정 페이지에서만)
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function() {
@@ -1329,15 +1447,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // 🔥 삭제 시 beforeunload 이벤트 무력화 - 삭제는 변경사항 저장과 다른 작업
+            console.log('🗑️ 삭제 진행: beforeunload 이벤트 무력화');
+            isSubmitting = true;  // beforeunload 무시 플래그 설정
+            
             showLoading();
             
             fetch(`/community/posts/${postId}`, {
-                method: 'POST',
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    _method: 'DELETE',
                     csrf_token: document.querySelector('input[name="csrf_token"]').value
                 })
             })

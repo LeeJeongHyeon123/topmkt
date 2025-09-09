@@ -3,6 +3,18 @@
  * 커뮤니티 게시글 상세보기 페이지
  */
 
+// 디버깅: 로깅 정책 준수 (WebLogger 사용)
+if (class_exists('WebLogger')) {
+    WebLogger::debug('커뮤니티 상세 페이지 - URL 파라미터 확인', [
+        'get_params' => $_GET,
+        'list_url' => $listUrl ?? 'NOT SET',
+        'post_id' => $post['id'] ?? 'NOT SET'
+    ]);
+} else {
+    error_log('🔍 [DEBUG] $_GET 파라미터: ' . json_encode($_GET));
+    error_log('🔍 [DEBUG] $listUrl: ' . ($listUrl ?? 'NOT SET'));
+}
+
 // 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
@@ -456,8 +468,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 <div class="detail-container">
     <!-- 네비게이션 -->
     <div class="detail-navigation">
+        
         <div class="breadcrumb">
-            <a href="/community">📋 커뮤니티</a>
+            <a href="<?= htmlspecialchars($listUrl) ?>">📋 커뮤니티</a>
             <span>›</span>
             <span>게시글 보기</span>
         </div>
@@ -558,7 +571,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                     </button>
                 <?php endif; ?>
                 
-                <a href="/community" class="btn btn-secondary">
+                <a href="<?= htmlspecialchars($listUrl) ?>" class="btn btn-secondary">
                     📋 목록으로
                 </a>
             </div>
@@ -593,9 +606,45 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 </div>
 
 <!-- 목록으로 돌아가기 플로팅 버튼 -->
-<button class="back-to-list" onclick="location.href='/community'" title="목록으로 돌아가기">
+<button class="back-to-list" id="backToListBtn" title="목록으로 돌아가기">
     📋
 </button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const backToListBtn = document.getElementById('backToListBtn');
+    const targetUrl = '<?= htmlspecialchars($listUrl ?? "/community") ?>';
+    
+    console.log('🔍 [DEBUG] 목록 버튼 이벤트 리스너 등록:', targetUrl);
+    
+    if (backToListBtn) {
+        // 기존 onclick 이벤트 제거
+        backToListBtn.onclick = null;
+        
+        // addEventListener로 이벤트 등록 (더 안정적)
+        backToListBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🔍 [DEBUG] 목록 버튼 클릭됨 - 이동할 URL:', targetUrl);
+            console.log('🔍 [DEBUG] 현재 URL:', window.location.href);
+            
+            // 즉시 이동
+            window.location.href = targetUrl;
+        });
+        
+        console.log('✅ 목록 버튼 이벤트 리스너 등록 완료');
+    } else {
+        console.error('❌ 목록 버튼을 찾을 수 없습니다');
+    }
+});
+</script>
+
+<!-- DEBUG: listUrl 변수 상태 확인 -->
+<script>
+console.log('🔍 [DEBUG] PHP listUrl 변수:', '<?= htmlspecialchars($listUrl ?? "NOT SET") ?>');
+console.log('🔍 [DEBUG] 현재 페이지에서 listUrl 존재 여부:', <?= isset($listUrl) ? 'true' : 'false' ?>);
+</script>
 
 <!-- 기존 프로필 이미지 모달 HTML 제거됨 - profile-modal.js 통합 시스템 사용 -->
 
@@ -624,13 +673,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const likeBtn = document.getElementById('likeBtn');
     if (likeBtn && isLoggedIn) {
         likeBtn.addEventListener('click', function() {
+            console.log('좋아요 버튼 클릭됨'); // 디버깅용
+            
             // 로딩 상태 표시
             const originalText = this.innerHTML;
+            console.log('원본 버튼 텍스트:', originalText); // 디버깅용
             this.disabled = true;
             this.innerHTML = '🔄 처리 중...';
             
             // CSRF 토큰 가져오기
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            console.log('API 호출:', `/api/posts/${postId}/like`); // 디버깅용
             
             fetch(`/api/posts/${postId}/like`, {
                 method: 'POST',
@@ -641,22 +694,33 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    // 좋아요 상태에 따라 버튼 텍스트 변경
-                    if (data.action === 'liked') {
-                        this.innerHTML = '❤️ 좋아요 ' + data.like_count;
+                console.log('좋아요 API 응답:', data); // 디버깅용
+                
+                if (data.status === 'success' && data.data) {
+                    console.log('좋아요 응답 성공:', data.data.action, '좋아요 수:', data.data.like_count); // 디버깅용
+                    
+                    // 좋아요 상태에 따라 버튼 텍스트 및 스타일 변경
+                    if (data.data.action === 'liked') {
+                        this.innerHTML = '❤️ 좋아요 ' + data.data.like_count;
                         this.classList.add('liked');
-                    } else {
-                        this.innerHTML = '🤍 좋아요 ' + data.like_count;
+                        console.log('좋아요 추가됨 - 버튼에 liked 클래스 추가'); // 디버깅용
+                    } else if (data.data.action === 'unliked') {
+                        this.innerHTML = '🤍 좋아요 ' + data.data.like_count;
                         this.classList.remove('liked');
+                        console.log('좋아요 취소됨 - 버튼에서 liked 클래스 제거'); // 디버깅용
                     }
                     
-                    // 통계 업데이트
-                    const likeStat = document.querySelector('.stat-item:has(❤️)');
-                    if (likeStat) {
-                        likeStat.innerHTML = '❤️ 좋아요 ' + data.like_count;
-                    }
+                    // 통계 업데이트 - 좋아요 수 표시하는 모든 요소 찾기
+                    const likeStats = document.querySelectorAll('.stat-item');
+                    likeStats.forEach(stat => {
+                        if (stat.textContent.includes('좋아요')) {
+                            stat.innerHTML = '❤️ 좋아요 ' + data.data.like_count;
+                        }
+                    });
+                    
+                    console.log('UI 업데이트 완료'); // 디버깅용
                 } else {
+                    console.error('좋아요 API 오류:', data); // 디버깅용
                     alert(data.message || '좋아요 처리 중 오류가 발생했습니다.');
                     this.innerHTML = originalText;
                 }
@@ -709,11 +773,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // 삭제 확인 재요청
-            if (!confirm('정말로 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
-                return;
-            }
-            
             // 로딩 표시
             deleteBtn.disabled = true;
             deleteBtn.innerHTML = '🔄 삭제 중...';
@@ -722,19 +781,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             
             fetch(`/community/posts/${postId}`, {
-                method: 'POST',
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    _method: 'DELETE',
                     csrf_token: csrfToken
                 })
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
+                if (data.status === 'success') {
                     window.location.href = data.data?.redirectUrl || '/community';
                 } else {
                     alert(data.message || '삭제 중 오류가 발생했습니다.');
@@ -773,7 +830,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // ESC: 목록으로 돌아가기
         if (e.key === 'Escape') {
             if (confirm('목록으로 돌아가시겠습니까?')) {
-                window.location.href = '/community';
+                window.location.href = '<?= htmlspecialchars($listUrl) ?>';
             }
         }
         

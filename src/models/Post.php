@@ -30,7 +30,7 @@ class Post {
     public function getList($page = 1, $pageSize = 20, $search = null, $filter = 'all') {
         // 큰 페이지는 최적화된 방식 사용
         if ($page > 500) {
-            return $this->getListOptimized($page, $pageSize, $search);
+            return $this->getListOptimized($page, $pageSize, $search, $filter);
         }
         
         // 작은 페이지는 기존 방식 사용
@@ -43,18 +43,19 @@ class Post {
      * @param int $page 페이지 번호
      * @param int $pageSize 페이지당 항목 수
      * @param string|null $search 검색어
+     * @param string $filter 검색 필터
      * @return array 게시글 목록
      */
-    public function getListOptimized($page = 1, $pageSize = 20, $search = null) {
+    public function getListOptimized($page = 1, $pageSize = 20, $search = null, $filter = 'all') {
         // 캐시 키 생성
         $cacheKey = CacheHelper::getPostListCacheKey($page, $pageSize, $search) . '_optimized';
         
-        return CacheHelper::remember($cacheKey, function() use ($page, $pageSize, $search) {
+        return CacheHelper::remember($cacheKey, function() use ($page, $pageSize, $search, $filter) {
             $params = [];
             
             if ($page <= 500) {
                 // 첫 500페이지는 기존 OFFSET 방식
-                return $this->getListWithOffset($page, $pageSize, $search);
+                return $this->getListWithOffset($page, $pageSize, $search, $filter);
             }
             
             // 큰 페이지는 커서 방식 사용
@@ -94,22 +95,41 @@ class Post {
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.status = 'published'
-                AND p.created_at <= :start_time
+                AND p.created_at <= ?
             ";
             
-            $params[':start_time'] = $startTime;
+            $params = [$startTime];
             
             if ($search) {
-                $sql .= " AND MATCH(p.title, p.content) AGAINST(:search IN NATURAL LANGUAGE MODE)";
-                $params[':search'] = $search;
+                // 필터에 따른 검색 조건 추가
+                switch ($filter) {
+                    case 'title':
+                        $sql .= " AND p.title LIKE ?";
+                        $params[] = "%$search%";
+                        break;
+                    case 'content':
+                        $sql .= " AND p.content LIKE ?";
+                        $params[] = "%$search%";
+                        break;
+                    case 'author':
+                        $sql .= " AND u.nickname LIKE ?";
+                        $params[] = "%$search%";
+                        break;
+                    case 'all':
+                    default:
+                        $sql .= " AND (p.title LIKE ? OR p.content LIKE ? OR u.nickname LIKE ?)";
+                        $params[] = "%$search%";
+                        $params[] = "%$search%";
+                        $params[] = "%$search%";
+                        break;
+                }
             }
             
-            $sql .= " ORDER BY p.created_at DESC LIMIT :limit";
+            $sql .= " ORDER BY p.created_at DESC LIMIT ?";
             
-            $executeParams = array_values($params);
-            $executeParams[] = $pageSize;
+            $params[] = $pageSize;
             
-            return $this->db->fetchAll($sql, $executeParams);
+            return $this->db->fetchAll($sql, $params);
         }, $page > 1000 ? 1800 : 300); // 큰 페이지는 30분, 작은 페이지는 5분 캐시
     }
     
@@ -152,7 +172,7 @@ class Post {
                     break;
             }
             
-            // 최근 500개 게시글에서 필터별 검색
+            // 전체 게시글에서 필터별 검색 (제한 없음)
             $sql = "
                 SELECT 
                     p.id,
@@ -174,14 +194,9 @@ class Post {
                         WHEN u.nickname LIKE ? THEN 2
                         ELSE 1
                     END as relevance_score
-                FROM (
-                    SELECT * FROM posts 
-                    WHERE status = 'published' 
-                    ORDER BY created_at DESC 
-                    LIMIT 500
-                ) p
+                FROM posts p
                 JOIN users u ON p.user_id = u.id
-                WHERE $whereCondition
+                WHERE p.status = 'published' AND $whereCondition
                 ORDER BY relevance_score DESC, p.created_at DESC 
                 LIMIT ? OFFSET ?
             ";
@@ -281,18 +296,12 @@ class Post {
                         break;
                 }
                 
-                // 최근 500개에서 필터별 검색 카운트
+                // 전체 게시글에서 필터별 검색 카운트 (제한 없음)
                 $sql = "
-                    SELECT COUNT(*) FROM (
-                        SELECT id, user_id, title, content FROM posts 
-                        WHERE status = 'published' 
-                        ORDER BY created_at DESC 
-                        LIMIT 500
-                    ) p
-                    JOIN (
-                        SELECT id, nickname FROM users
-                    ) u ON p.user_id = u.id
-                    WHERE $whereCondition
+                    SELECT COUNT(*) 
+                    FROM posts p
+                    JOIN users u ON p.user_id = u.id
+                    WHERE p.status = 'published' AND $whereCondition
                 ";
                 $result = $this->db->fetch($sql, $params);
                 $count = $result ? array_values($result)[0] : 0;
@@ -422,6 +431,17 @@ class Post {
                 }
             }
         }
+    }
+    
+    /**
+     * 조회수 증가
+     *
+     * @param int $id 게시글 ID
+     * @return bool 성공 여부
+     */
+    public function incrementViewCount($id) {
+        $sql = "UPDATE posts SET view_count = view_count + 1 WHERE id = ?";
+        return $this->db->execute($sql, [$id]) > 0;
     }
     
     /**

@@ -4,6 +4,11 @@
  * 기업회원 인증 및 관리 컨트롤러
  */
 
+// SRC_PATH 상수 정의 (정의되지 않은 경우)
+if (!defined('SRC_PATH')) {
+    define('SRC_PATH', dirname(__DIR__));
+}
+
 require_once SRC_PATH . '/config/database.php';
 require_once SRC_PATH . '/models/Corporate.php';
 require_once SRC_PATH . '/helpers/CorporateFileUpload.php';
@@ -93,53 +98,95 @@ class CorporateController {
      */
     private function handleApplicationSubmit() {
         try {
+            // 디버그 로그: 신청 처리 시작
+            error_log("[CORP_APPLY] 신청 처리 시작 - User ID: " . ($_SESSION['user_id'] ?? 'N/A'));
+            error_log("[CORP_APPLY] POST 데이터: " . json_encode($_POST, JSON_UNESCAPED_UNICODE));
+            error_log("[CORP_APPLY] FILES 데이터: " . json_encode($_FILES, JSON_UNESCAPED_UNICODE));
+            error_log("[CORP_APPLY] is_overseas 값: " . ($_POST['is_overseas'] ?? 'NOT_SET'));
+            error_log("[CORP_APPLY] business_number 값: " . ($_POST['business_number'] ?? 'NOT_SET'));
+            
             // CSRF 토큰 검증
             if (!$this->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+                error_log("[CORP_APPLY] CSRF 토큰 검증 실패");
                 throw new Exception('보안 토큰이 유효하지 않습니다.');
             }
+            error_log("[CORP_APPLY] CSRF 토큰 검증 성공");
             
             $userId = $_SESSION['user_id'];
             
             // 입력값 검증
+            error_log("[CORP_APPLY] 입력값 검증 시작");
             $validationResult = $this->validateApplicationData($_POST, $_FILES);
             if (!$validationResult['success']) {
+                error_log("[CORP_APPLY] 입력값 검증 실패: " . $validationResult['message']);
                 throw new Exception($validationResult['message']);
             }
+            error_log("[CORP_APPLY] 입력값 검증 성공");
             
-            // 파일 업로드 처리
-            $uploadResult = $this->handleFileUpload($_FILES['business_registration_file'], $userId);
-            if (!$uploadResult['success']) {
-                throw new Exception($uploadResult['message']);
+            // 파일 업로드 처리 (해외 기업이 아닌 경우만 필수)
+            $isOverseas = isset($_POST['is_overseas']) && ($_POST['is_overseas'] === '1' || $_POST['is_overseas'] === 'on');
+            $uploadedFileName = null;
+            
+            if (!$isOverseas || !empty($_FILES['business_registration_file']['tmp_name'])) {
+                error_log("[CORP_APPLY] 파일 업로드 처리 시작");
+                $uploadResult = $this->handleFileUpload($_FILES['business_registration_file'], $userId);
+                if (!$uploadResult['success']) {
+                    error_log("[CORP_APPLY] 파일 업로드 실패: " . $uploadResult['message']);
+                    throw new Exception($uploadResult['message']);
+                }
+                $uploadedFileName = $uploadResult['filename'];
+                error_log("[CORP_APPLY] 파일 업로드 성공: " . $uploadedFileName);
+            } else {
+                error_log("[CORP_APPLY] 해외 기업 - 파일 업로드 건너뜀");
             }
             
-            // 신청 데이터 준비
+            // 신청 데이터 준비  
             $companyData = [
                 'company_name' => trim($_POST['company_name']),
-                'business_number' => trim($_POST['business_number']),
+                'business_number' => $isOverseas ? null : trim($_POST['business_number']),
                 'representative_name' => trim($_POST['representative_name']),
                 'representative_phone' => trim($_POST['representative_phone']),
                 'company_address' => trim($_POST['company_address']),
-                'business_registration_file' => $uploadResult['filename'],
-                'is_overseas' => isset($_POST['is_overseas']) ? 1 : 0
+                'business_registration_file' => $uploadedFileName,
+                'is_overseas' => $isOverseas ? 1 : 0
             ];
             
             // 신청 처리 (신규 신청 또는 재신청)
+            error_log("[CORP_APPLY] 신청 상태 확인");
             $applicationStatus = $this->corporateModel->getApplicationStatus($userId);
+            error_log("[CORP_APPLY] 현재 신청 상태: " . $applicationStatus['status']);
+            
             if ($applicationStatus['status'] === 'rejected') {
+                error_log("[CORP_APPLY] 재신청 처리 시작");
                 $this->corporateModel->reapply($userId, $companyData);
                 $message = '기업 인증이 재신청되었습니다. 1~3일 내 심사 후 결과를 알려드립니다.';
+                error_log("[CORP_APPLY] 재신청 완료");
             } else {
+                error_log("[CORP_APPLY] 신규 신청 처리 시작");
                 $this->corporateModel->submitApplication($userId, $companyData);
                 $message = '기업 인증 신청이 완료되었습니다. 1~3일 내 심사 후 결과를 알려드립니다.';
+                error_log("[CORP_APPLY] 신규 신청 완료");
             }
             
             // 성공 메시지와 함께 상태 페이지로 리다이렉트
             $_SESSION['success_message'] = $message;
-            header('Location: /corp/status'); exit;
+            error_log("[CORP_APPLY] 리다이렉트 실행: /corp/status");
+            error_log("[CORP_APPLY] 세션 메시지 설정: " . $message);
+            header('Location: /corp/status'); 
+            exit;
             
         } catch (Exception $e) {
+            // 파일 로그도 저장
+            $logMessage = date('Y-m-d H:i:s') . " [CORP_APPLY] 오류: " . $e->getMessage() . "\n";
+            $logMessage .= "스택 트레이스: " . $e->getTraceAsString() . "\n\n";
+            file_put_contents('/tmp/corp-apply-debug.log', $logMessage, FILE_APPEND | LOCK_EX);
+            
+            error_log("[CORP_APPLY] 오류 발생: " . $e->getMessage());
+            error_log("[CORP_APPLY] 스택 트레이스: " . $e->getTraceAsString());
             $_SESSION['error_message'] = $e->getMessage();
-            header('Location: /corp/apply'); exit;
+            error_log("[CORP_APPLY] 오류로 인한 리다이렉트: /corp/apply");
+            header('Location: /corp/apply'); 
+            exit;
         }
     }
     
@@ -245,14 +292,30 @@ class CorporateController {
      * 신청 데이터 검증
      */
     private function validateApplicationData($post, $files) {
+        // 디버깅 로그 추가
+        error_log("[CORP_APPLY] validateApplicationData 시작");
+        error_log("[CORP_APPLY] POST 데이터 in validation: " . json_encode($post, JSON_UNESCAPED_UNICODE));
+        
         // 필수 필드 검증
         $requiredFields = [
             'company_name' => '회사명',
-            'business_number' => '사업자등록번호',
             'representative_name' => '대표자명',
             'representative_phone' => '대표자 연락처',
             'company_address' => '회사 주소'
         ];
+        
+        // 해외 기업이 아닌 경우에만 사업자등록번호 필수
+        $isOverseas = isset($post['is_overseas']) && ($post['is_overseas'] === '1' || $post['is_overseas'] === 'on');
+        error_log("[CORP_APPLY] is_overseas isset: " . (isset($post['is_overseas']) ? 'true' : 'false'));
+        error_log("[CORP_APPLY] is_overseas 값: " . ($post['is_overseas'] ?? 'NOT_SET'));
+        error_log("[CORP_APPLY] is_overseas === '1': " . ($isOverseas ? 'true' : 'false'));
+        
+        if (!$isOverseas) {
+            $requiredFields['business_number'] = '사업자등록번호';
+            error_log("[CORP_APPLY] 사업자등록번호가 필수 필드에 추가됨 (국내 기업)");
+        } else {
+            error_log("[CORP_APPLY] 사업자등록번호 필수 생략 (해외 기업)");
+        }
         
         foreach ($requiredFields as $field => $name) {
             if (empty($post[$field])) {
@@ -274,8 +337,8 @@ class CorporateController {
             return ['success' => false, 'message' => '올바른 전화번호 형식을 입력해주세요.'];
         }
         
-        // 파일 검증
-        if (empty($files['business_registration_file']['tmp_name'])) {
+        // 파일 검증 (해외 기업이 아닌 경우에만 필수)
+        if (!$isOverseas && empty($files['business_registration_file']['tmp_name'])) {
             return ['success' => false, 'message' => '사업자등록증 파일을 업로드해주세요.'];
         }
         
