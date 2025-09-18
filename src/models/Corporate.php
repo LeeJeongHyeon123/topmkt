@@ -10,12 +10,76 @@ if (!defined('SRC_PATH')) {
 }
 
 require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
 class Corporate {
     private $db;
     
     public function __construct() {
         $this->db = Database::getInstance();
+    }
+
+    /**
+     * 기업정보 암호화 처리
+     */
+    private function encryptCorporateData($data) {
+        $encrypted = [];
+
+        // 사업자번호 암호화
+        if (isset($data['business_number']) && !empty($data['business_number'])) {
+            $encrypted['business_number'] = SecurityHelper::encrypt($data['business_number']);
+        }
+
+        // 대표자 휴대폰 번호 암호화
+        if (isset($data['representative_phone']) && !empty($data['representative_phone'])) {
+            $encrypted['representative_phone'] = SecurityHelper::encrypt($data['representative_phone']);
+        }
+
+        return array_merge($data, $encrypted);
+    }
+
+    /**
+     * 기업정보 복호화 처리
+     */
+    private function decryptCorporateData($corporateData) {
+        if (!$corporateData) {
+            return $corporateData;
+        }
+
+        // 배열인 경우 (여러 기업)
+        if (isset($corporateData[0])) {
+            return array_map([$this, 'decryptSingleCorporate'], $corporateData);
+        }
+
+        // 단일 기업인 경우
+        return $this->decryptSingleCorporate($corporateData);
+    }
+
+    /**
+     * 단일 기업정보 복호화
+     */
+    private function decryptSingleCorporate($corporate) {
+        if (!$corporate) {
+            return $corporate;
+        }
+
+        // 사업자번호 복호화
+        if (isset($corporate['business_number']) && SecurityHelper::isEncrypted($corporate['business_number'])) {
+            $decrypted = SecurityHelper::decrypt($corporate['business_number']);
+            if ($decrypted !== false) {
+                $corporate['business_number'] = $decrypted;
+            }
+        }
+
+        // 대표자 휴대폰 번호 복호화
+        if (isset($corporate['representative_phone']) && SecurityHelper::isEncrypted($corporate['representative_phone'])) {
+            $decrypted = SecurityHelper::decrypt($corporate['representative_phone']);
+            if ($decrypted !== false) {
+                $corporate['representative_phone'] = $decrypted;
+            }
+        }
+
+        return $corporate;
     }
     
     /**

@@ -4,6 +4,7 @@
  */
 
 require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
 class User {
     private $db;
@@ -14,28 +15,112 @@ class User {
     public function __construct() {
         $this->db = Database::getInstance();
     }
-    
+
+    /**
+     * 개인정보 암호화 처리
+     */
+    private function encryptPersonalData($data) {
+        $encrypted = [];
+
+        // 휴대폰 번호 암호화 및 검색용 해시 생성
+        if (isset($data['phone'])) {
+            $encrypted['phone'] = SecurityHelper::encrypt($data['phone']);
+            $encrypted['phone_search_hash'] = SecurityHelper::encryptSearchable($data['phone']);
+        }
+
+        // 이메일 암호화 및 검색용 해시 생성
+        if (isset($data['email'])) {
+            $encrypted['email'] = SecurityHelper::encrypt($data['email']);
+            $encrypted['email_search_hash'] = SecurityHelper::encryptSearchable($data['email']);
+        }
+
+        // 생년월일 암호화 및 연령대 변환
+        if (isset($data['birth_date']) && !empty($data['birth_date'])) {
+            $encrypted['birth_date'] = SecurityHelper::encrypt($data['birth_date']);
+            $encrypted['birth_date_age_group'] = SecurityHelper::convertToAgeGroup($data['birth_date']);
+        }
+
+        return array_merge($data, $encrypted);
+    }
+
+    /**
+     * 개인정보 복호화 처리
+     */
+    private function decryptPersonalData($userData) {
+        if (!$userData) {
+            return $userData;
+        }
+
+        // 배열인 경우 (여러 사용자)
+        if (isset($userData[0])) {
+            return array_map([$this, 'decryptSingleUser'], $userData);
+        }
+
+        // 단일 사용자인 경우
+        return $this->decryptSingleUser($userData);
+    }
+
+    /**
+     * 단일 사용자 개인정보 복호화
+     */
+    private function decryptSingleUser($user) {
+        if (!$user) {
+            return $user;
+        }
+
+        // 휴대폰 번호 복호화
+        if (isset($user['phone']) && SecurityHelper::isEncrypted($user['phone'])) {
+            $decrypted = SecurityHelper::decrypt($user['phone']);
+            if ($decrypted !== false) {
+                $user['phone'] = $decrypted;
+            }
+        }
+
+        // 이메일 복호화
+        if (isset($user['email']) && SecurityHelper::isEncrypted($user['email'])) {
+            $decrypted = SecurityHelper::decrypt($user['email']);
+            if ($decrypted !== false) {
+                $user['email'] = $decrypted;
+            }
+        }
+
+        // 생년월일 복호화
+        if (isset($user['birth_date']) && SecurityHelper::isEncrypted($user['birth_date'])) {
+            $decrypted = SecurityHelper::decrypt($user['birth_date']);
+            if ($decrypted !== false) {
+                $user['birth_date'] = $decrypted;
+            }
+        }
+
+        return $user;
+    }
+
     /**
      * 회원가입
      */
     public function create($userData) {
         try {
             $this->db->beginTransaction();
-            
+
+            // 개인정보 암호화
+            $encryptedData = $this->encryptPersonalData($userData);
+
             $sql = "INSERT INTO users (
-                phone, nickname, email, password_hash,
+                phone, phone_search_hash, nickname, email, email_search_hash, password_hash,
                 phone_verified, marketing_agreed,
                 status, created_at
             ) VALUES (
-                ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?,
                 ?, ?,
                 'active', NOW()
             )";
-            
+
             $params = [
-                $userData['phone'],
+                $encryptedData['phone'],
+                $encryptedData['phone_search_hash'],
                 $userData['nickname'],
-                $userData['email'],
+                $encryptedData['email'],
+                $encryptedData['email_search_hash'],
                 password_hash($userData['password'], PASSWORD_DEFAULT),
                 1,  // DB 스키마에 맞게 숫자로 변경
                 $userData['marketing_agreed'] ? 1 : 0
@@ -61,16 +146,30 @@ class User {
      * 휴대폰 번호로 사용자 조회
      */
     public function findByPhone($phone) {
-        $sql = "SELECT * FROM users WHERE phone = ? AND status != 'deleted'";
-        return $this->db->fetch($sql, [$phone]);
+        // 검색용 해시 생성
+        $phoneHash = SecurityHelper::encryptSearchable($phone);
+
+        // 해시로 조회 (성능 향상)
+        $sql = "SELECT * FROM users WHERE phone_search_hash = ? AND status != 'deleted'";
+        $user = $this->db->fetch($sql, [$phoneHash]);
+
+        // 개인정보 복호화 후 반환
+        return $this->decryptPersonalData($user);
     }
-    
+
     /**
      * 이메일로 사용자 조회
      */
     public function findByEmail($email) {
-        $sql = "SELECT * FROM users WHERE email = ? AND status != 'deleted'";
-        return $this->db->fetch($sql, [$email]);
+        // 검색용 해시 생성
+        $emailHash = SecurityHelper::encryptSearchable($email);
+
+        // 해시로 조회 (성능 향상)
+        $sql = "SELECT * FROM users WHERE email_search_hash = ? AND status != 'deleted'";
+        $user = $this->db->fetch($sql, [$emailHash]);
+
+        // 개인정보 복호화 후 반환
+        return $this->decryptPersonalData($user);
     }
     
     /**
@@ -78,15 +177,21 @@ class User {
      */
     public function findByNickname($nickname) {
         $sql = "SELECT * FROM users WHERE nickname = ? AND status != 'deleted'";
-        return $this->db->fetch($sql, [$nickname]);
+        $user = $this->db->fetch($sql, [$nickname]);
+
+        // 개인정보 복호화 후 반환
+        return $this->decryptPersonalData($user);
     }
-    
+
     /**
      * ID로 사용자 조회
      */
     public function findById($id) {
         $sql = "SELECT * FROM users WHERE id = ? AND status != 'deleted'";
-        return $this->db->fetch($sql, [$id]);
+        $user = $this->db->fetch($sql, [$id]);
+
+        // 개인정보 복호화 후 반환
+        return $this->decryptPersonalData($user);
     }
     
     /**
@@ -94,26 +199,49 @@ class User {
      */
     public function login($phone, $password) {
         $user = $this->findByPhone($phone);
-        
+
         if (!$user) {
-            return false;
+            throw new Exception('등록되지 않은 휴대폰 번호입니다.');
         }
-        
+
+        // 계정 상태 확인
+        if ($user['status'] === 'suspended') {
+            throw new Exception('계정이 정지되었습니다. 고객센터에 문의해주세요.');
+        }
+
+        if ($user['status'] === 'inactive') {
+            throw new Exception('비활성화된 계정입니다. 계정을 활성화해주세요.');
+        }
+
+        if ($user['status'] === 'deleted') {
+            throw new Exception('삭제된 계정입니다.');
+        }
+
         // 계정 잠금 확인
         if ($user['locked_until'] && strtotime($user['locked_until']) > time()) {
-            throw new Exception('계정이 잠겨있습니다. 잠시 후 다시 시도해주세요.');
+            $remainingTime = ceil((strtotime($user['locked_until']) - time()) / 60);
+            throw new Exception("계정이 잠겨있습니다. {$remainingTime}분 후 다시 시도해주세요.");
         }
-        
+
         // 비밀번호 확인
         if (!password_verify($password, $user['password_hash'])) {
             $this->incrementFailedLoginAttempts($user['id']);
-            return false;
+
+            // 실패 횟수에 따른 메시지
+            $updatedUser = $this->findById($user['id']);
+            $remainingAttempts = 5 - $updatedUser['login_attempts'];
+
+            if ($remainingAttempts <= 0) {
+                throw new Exception('로그인 5회 실패로 계정이 30분간 잠겼습니다. 잠시 후 다시 시도해주세요.');
+            } else {
+                throw new Exception("비밀번호가 일치하지 않습니다. {$remainingAttempts}회 더 실패하면 계정이 잠깁니다.");
+            }
         }
-        
+
         // 로그인 성공 처리
         $this->updateLoginInfo($user['id']);
         $this->logUserActivity($user['id'], 'LOGIN', '로그인 성공');
-        
+
         return $user;
     }
     
@@ -308,16 +436,27 @@ class User {
     }
     
     /**
-     * 최근 댓글 조회
+     * 최근 댓글 조회 (부모 댓글 상태 포함)
      */
     public function getRecentComments($userId, $limit = 5) {
-        $sql = "SELECT c.id, c.content, c.created_at, p.title as post_title, p.id as post_id
+        $sql = "SELECT c.id,
+                       c.content,
+                       c.created_at,
+                       c.parent_id,
+                       p.title as post_title,
+                       p.id as post_id,
+                       pc.id as parent_comment_id,
+                       pc.status as parent_status,
+                       pc.content as parent_content,
+                       pu.nickname as parent_author_name
                 FROM comments c
                 JOIN posts p ON c.post_id = p.id
+                LEFT JOIN comments pc ON c.parent_id = pc.id
+                LEFT JOIN users pu ON pc.user_id = pu.id
                 WHERE c.user_id = ? AND c.status = 'active'
-                ORDER BY c.created_at DESC 
+                ORDER BY c.created_at DESC
                 LIMIT ?";
-        
+
         return $this->db->fetchAll($sql, [$userId, $limit]);
     }
     
@@ -446,14 +585,24 @@ class User {
         
         $user['recent_posts'] = $this->db->fetchAll($recentPostsSql, [':user_id' => $userId]);
         
-        // 3. 최근 댓글 조회
-        $recentCommentsSql = "SELECT c.id, LEFT(c.content, 100) as content, c.created_at, 
-                                    p.title as post_title, c.post_id
-                             FROM comments c
-                             JOIN posts p ON c.post_id = p.id
-                             WHERE c.user_id = :user_id AND c.status = 'active'
-                             ORDER BY c.created_at DESC 
-                             LIMIT 5";
+        // 3. 최근 댓글 조회 (부모 댓글 상태 포함)
+        $recentCommentsSql = "SELECT c.id,
+                                     LEFT(c.content, 100) as content,
+                                     c.created_at,
+                                     c.parent_id,
+                                     p.title as post_title,
+                                     c.post_id,
+                                     pc.id as parent_comment_id,
+                                     pc.status as parent_status,
+                                     pc.content as parent_content,
+                                     pu.nickname as parent_author_name
+                              FROM comments c
+                              JOIN posts p ON c.post_id = p.id
+                              LEFT JOIN comments pc ON c.parent_id = pc.id
+                              LEFT JOIN users pu ON pc.user_id = pu.id
+                              WHERE c.user_id = :user_id AND c.status = 'active'
+                              ORDER BY c.created_at DESC
+                              LIMIT 5";
         
         $user['recent_comments'] = $this->db->fetchAll($recentCommentsSql, [':user_id' => $userId]);
         
@@ -571,20 +720,26 @@ class User {
      */
     public function searchUsers($query, $currentUserId = null) {
         try {
-            // 정확한 닉네임 일치 검색
-            $sql = "SELECT id, nickname, email, bio, profile_image_thumb as profile_image, created_at FROM users WHERE nickname = ? LIMIT 20";
+            // 활성 사용자만 검색, 정확한 일치만 지원
+            $sql = "SELECT id, nickname, email, bio, profile_image_thumb as profile_image, created_at
+                    FROM users
+                    WHERE status = 'active'
+                    AND nickname = ?
+                    ORDER BY nickname
+                    LIMIT 20";
+
             $result = $this->db->fetchAll($sql, [$query]);
-            
+
             error_log("사용자 검색 쿼리: " . $query);
             error_log("사용자 검색 결과 수: " . count($result));
-            
+
             // 현재 사용자 제외
             if ($currentUserId) {
                 $result = array_filter($result, function($user) use ($currentUserId) {
                     return $user['id'] != $currentUserId;
                 });
             }
-            
+
             return array_values($result);
         } catch (Exception $e) {
             error_log("User::searchUsers 오류: " . $e->getMessage());
