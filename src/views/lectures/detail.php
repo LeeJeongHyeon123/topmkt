@@ -37,24 +37,31 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     padding: 20px;
     min-height: calc(100vh - 200px);
     /* 헤더 겹침 방지: 고정 헤더 높이만큼 상단 여백 추가 */
-    margin-top: 80px; /* 데스크톱: 헤더 높이(66px) + 여유 공간(14px) */
+    margin-top: 30px; /* 데스크톱: 헤더와 적절한 간격 유지 */
     padding-top: 20px;
 }
 
 .lecture-header {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    background: transparent !important;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    border: none;
     margin-bottom: 20px;
+    padding: 0;
+    position: relative;
 }
 
 .lecture-banner {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 120px 40px 40px 40px;
+    padding: 80px 40px 40px 40px;
     position: relative;
+    border-radius: 12px;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
 }
 
 .lecture-category {
@@ -100,26 +107,46 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     font-size: 1.2rem;
 }
 
-.lecture-actions {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 10px;
+/* 버튼 위치 수정 v2.0 - 2025-09-19 */
+.lecture-banner .lecture-actions {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    display: flex !important;
+    gap: 6px !important;
+    z-index: 100 !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    padding: 4px !important;
+    border-radius: 6px !important;
+}
+
+.lecture-actions .btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    font-weight: 500 !important;
 }
 
 .btn {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.3s ease;
+    min-height: auto;
+    line-height: 1.2;
 }
 
 .btn-primary {
@@ -143,13 +170,48 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .btn-edit {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .btn-edit:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+/* 강의 액션 버튼들 전용 스타일 */
+.lecture-actions .btn-edit {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #4a5568 !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+}
+
+.lecture-actions .btn-edit:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    transform: translateY(-1px);
+}
+
+.lecture-actions .btn-danger {
+    background: rgba(229, 62, 62, 0.9) !important;
+    color: white !important;
+    border: 1px solid rgba(229, 62, 62, 0.9) !important;
+}
+
+.lecture-actions .btn-danger:hover {
+    background: rgba(229, 62, 62, 1) !important;
+    transform: translateY(-1px);
+}
+
+.lecture-actions .btn-secondary {
+    background: rgba(160, 174, 192, 0.9) !important;
+    color: white !important;
+    border: 1px solid rgba(160, 174, 192, 0.9) !important;
+}
+
+.lecture-actions .btn-secondary:hover {
+    background: rgba(160, 174, 192, 1) !important;
+    transform: translateY(-1px);
 }
 
 .btn-danger {
@@ -573,6 +635,8 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
     transition: all 0.3s ease;
     cursor: pointer;
+    aspect-ratio: 1 / 1;
+    display: block;
 }
 
 .instructor-avatar:hover {
@@ -598,6 +662,18 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     font-weight: 700;
     font-size: 1.5rem;
     position: relative;
+    aspect-ratio: 1 / 1;
+    width: 80px;
+    height: 80px;
+}
+
+/* 강사 이미지 원형 유지 강화 */
+.instructor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
 }
 
 .instructor-avatar.placeholder::after {
@@ -1040,14 +1116,14 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         padding: 12px;
         margin: 0;
         /* 모바일 헤더 겹침 방지: 모바일 헤더 높이에 맞춰 조정 */
-        margin-top: 85px; /* 모바일: 헤더 높이(70px) + 여유 공간(15px) */
+        margin-top: 30px; /* 모바일: 헤더와 적절한 간격 유지 */
         padding-top: 15px;
     }
     
     /* 배너 영역 최적화 */
     .lecture-banner {
-        padding: 40px 20px 30px 20px;
-        margin-top: 20px;
+        padding: 51px 21px 30px 21px;
+        margin: 19px -1px 0 -1px;
     }
     
     .lecture-title {
@@ -1161,16 +1237,21 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     }
     
     /* 액션 버튼들 최적화 */
-    .lecture-actions {
-        position: static;
-        justify-content: center;
-        margin-top: 20px;
-        padding: 0 16px;
+    .lecture-banner .lecture-actions {
+        position: absolute !important;
+        top: 8px !important;
+        right: 8px !important;
+        justify-content: flex-end !important;
+        margin-top: 0 !important;
+        padding: 0 !important;
     }
     
-    /* 모든 버튼 터치 타겟 44px+ 확보 */
-    .btn, button, .btn-primary, .btn-secondary, .btn-register, .btn-edit, .btn-danger, .btn-success,
-    a[class*="btn"], input[type="button"], input[type="submit"], [role="button"] {
+    /* 모든 버튼 터치 타겟 44px+ 확보 (강의 액션 버튼 제외) */
+    .btn:not(.lecture-actions .btn), button:not(.lecture-actions .btn),
+    .btn-primary:not(.lecture-actions .btn), .btn-secondary:not(.lecture-actions .btn),
+    .btn-register:not(.lecture-actions .btn), .btn-edit:not(.lecture-actions .btn),
+    .btn-danger:not(.lecture-actions .btn), .btn-success:not(.lecture-actions .btn),
+    a[class*="btn"]:not(.lecture-actions .btn), input[type="button"], input[type="submit"], [role="button"] {
         min-height: 48px !important;
         min-width: 48px !important;
         padding: 12px 20px !important;
@@ -1184,6 +1265,15 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         align-items: center !important;
         justify-content: center !important;
         box-sizing: border-box !important;
+    }
+
+    /* 강의 액션 버튼들은 모바일에서도 작게 유지 */
+    .lecture-actions .btn {
+        min-height: 28px !important;
+        max-height: 28px !important;
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        min-width: auto !important;
     }
     
     /* 숨겨진 버튼들 강제 표시 */
@@ -1269,8 +1359,8 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     
     /* 배너 더 컴팩트하게 */
     .lecture-banner {
-        padding: 30px 16px 24px 16px;
-        margin-top: 10px;
+        padding: 46px 17px 24px 17px;
+        margin: 9px -1px 0 -1px;
     }
     
     .lecture-title {
@@ -1319,9 +1409,12 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     }
     
     /* 액션 영역 패딩 축소 */
-    .lecture-actions {
-        padding: 0 12px;
-        margin-top: 16px;
+    .lecture-banner .lecture-actions {
+        position: absolute !important;
+        top: 6px !important;
+        right: 6px !important;
+        padding: 0 !important;
+        margin-top: 0 !important;
     }
 }
 
@@ -1621,9 +1714,14 @@ body {
     background: white !important;
 }
 
-.lecture-header, .lecture-main, .sidebar-card {
+.lecture-main, .sidebar-card {
     background: white !important;
     border-color: #e2e8f0 !important;
+}
+
+/* 강의 헤더는 투명 배경 유지 */
+.lecture-header {
+    background: transparent !important;
 }
 
 .schedule-item, .instructor-info, .participant-item, .related-lecture-item {
@@ -1656,9 +1754,13 @@ body {
         background: white !important;
     }
     
-    .lecture-header, .lecture-main, .sidebar-card {
+    .lecture-main, .sidebar-card {
         background: white !important;
         border-color: #e2e8f0 !important;
+    }
+
+    .lecture-header {
+        background: transparent !important;
     }
     
     .schedule-item, .instructor-info, .participant-item, .related-lecture-item {
@@ -1678,10 +1780,14 @@ body {
         background: white !important;
     }
     
-    .lecture-header, .lecture-main, .sidebar-card {
+    .lecture-main, .sidebar-card {
         background: white !important;
         border-color: #e2e8f0 !important;
         color: #333 !important;
+    }
+
+    .lecture-header {
+        background: transparent !important;
     }
     
     .schedule-item, .instructor-info, .participant-item, .related-lecture-item {
@@ -1710,9 +1816,9 @@ body {
         <div class="lecture-banner">
             <div class="lecture-actions">
                 <?php if ($canEdit): ?>
-                    <a href="/lectures/<?= $lecture['id'] ?>/edit" class="btn btn-edit">
+                    <button class="btn btn-edit" data-lecture-id="<?= $lecture['id'] ?>">
                         ✏️ 수정
-                    </a>
+                    </button>
                     <button class="btn btn-danger" onclick="confirmDeleteLecture(<?= $lecture['id'] ?>)">
                         🗑️ 삭제
                     </button>
@@ -3845,8 +3951,12 @@ function confirmDeleteLecture(lectureId) {
         if (isSuccess) {
             console.log('✅ 강의 삭제 성공');
             alert('✅ 강의가 성공적으로 삭제되었습니다.');
-            // 강의 목록 페이지로 리다이렉트
-            window.location.href = '/lectures';
+            // 이전 페이지로 돌아가기 (또는 강의 목록으로)
+            if (document.referrer && document.referrer !== window.location.href) {
+                window.location.href = document.referrer;
+            } else {
+                window.location.href = '/lectures';
+            }
         } else {
             console.error('❌ 강의 삭제 실패:', data);
             alert('❌ 강의 삭제에 실패했습니다.\n\n오류: ' + message);
@@ -4162,5 +4272,8 @@ function initCharacterCounters() {
     }
 }
 </script>
+
+<!-- edit-check.js 로드 -->
+<script src="/assets/js/edit-check.js"></script>
 
 <?php include SRC_PATH . '/views/templates/footer.php'; ?><\!-- Cache Buster: 1756642384 -->
