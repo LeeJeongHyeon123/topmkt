@@ -233,6 +233,38 @@ if (!isset($_SESSION['csrf_token'])) {
     background: #4a5568;
 }
 
+/* 주소 검색 버튼 전용 스타일 */
+.address-search-container {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+}
+
+.address-search-btn,
+#address_search_btn {
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+    height: 44px !important;
+    min-width: 90px !important;
+    max-width: 90px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    border-radius: 6px !important;
+    background: #718096 !important;
+    color: white !important;
+    border: 1px solid #718096 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.address-search-btn:hover,
+#address_search_btn:hover {
+    background: #4a5568 !important;
+    border-color: #4a5568 !important;
+}
+
 .btn-draft {
     background: #ed8936;
     color: white;
@@ -982,6 +1014,111 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     text-align: left;
     padding: 10px;
 }
+
+/* 글자 수 카운터 스타일 */
+.input-with-counter {
+    position: relative;
+}
+
+.character-counter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.character-counter span:first-child {
+    font-weight: 600;
+    margin-right: 2px;
+}
+
+.counter-limit {
+    opacity: 0.7;
+}
+
+.character-counter.warning {
+    color: #f59e0b;
+}
+
+.character-counter.warning span:first-child {
+    color: #f59e0b;
+}
+
+.character-counter.error {
+    color: #ef4444;
+}
+
+.character-counter.error span:first-child {
+    color: #ef4444;
+}
+
+.character-counter.success {
+    color: #10b981;
+}
+
+.character-counter.success span:first-child {
+    color: #10b981;
+}
+
+/* 강사 제한 안내 정보 스타일 */
+.instructor-limit-info {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #475569;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.instructor-limit-info i {
+    color: #0ea5e9;
+    margin-right: 8px;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.instructor-limit-info span {
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.instructor-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* 제한 도달 상태 스타일 */
+.instructor-limit-info.limit-reached {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #16a34a;
+    color: #166534;
+}
+
+.instructor-limit-info.limit-reached i {
+    color: #16a34a;
+}
+
+/* 비활성화된 버튼 스타일 개선 */
+.btn.btn-disabled {
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+    border-color: #cbd5e1 !important;
+    cursor: not-allowed !important;
+}
+
+.btn.btn-disabled:hover {
+    background: #f1f5f9 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
 </style>
 
 <!-- 공통 업로드 설정 (validateFileSize 함수 사용 전에 로드) -->
@@ -1009,9 +1146,14 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label for="title" class="form-label required">강의 제목</label>
-                    <input type="text" id="title" name="title" class="form-input" 
-                           value="<?= $isEditMode ? htmlspecialchars($lecture['title'] ?? '') : '' ?>"
-                           placeholder="예: 디지털 마케팅 전략 완벽 가이드" required>
+                    <div class="input-with-counter">
+                        <input type="text" id="title" name="title" class="form-input"
+                               value="<?= $isEditMode ? htmlspecialchars($lecture['title'] ?? '') : '' ?>"
+                               placeholder="5자 이상 입력하세요 (예: 디지털 마케팅 전략 완벽 가이드)" required>
+                        <div class="character-counter">
+                            <span id="title-counter">0</span><span class="counter-limit">/100자 (최소 5자)</span>
+                        </div>
+                    </div>
                     <div class="form-help">참가자들이 쉽게 이해할 수 있는 명확한 제목을 입력하세요</div>
                     <div class="form-error" id="title-error"></div>
                 </div>
@@ -1024,8 +1166,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                 
                 <div class="form-group full-width">
                     <label for="description" class="form-label required">강의 설명</label>
-                    <textarea id="description" name="description" class="form-textarea" 
-                              placeholder="강의 내용, 목표, 대상자 등을 자세히 설명해주세요" required><?= $isEditMode ? htmlspecialchars($lecture['description'] ?? '') : '' ?></textarea>
+                    <div class="input-with-counter">
+                        <textarea id="description" name="description" class="form-textarea"
+                                  placeholder="20자 이상 자세히 설명해주세요 (강의 내용, 목표, 대상자 등)" required><?= $isEditMode ? htmlspecialchars($lecture['description'] ?? '') : '' ?></textarea>
+                        <div class="character-counter">
+                            <span id="description-counter">0</span><span class="counter-limit">/2000자 (최소 20자)</span>
+                        </div>
+                    </div>
                     <div class="form-help">참가자들이 강의 내용을 충분히 이해할 수 있도록 상세히 작성해주세요</div>
                     <div class="form-error" id="description-error"></div>
                 </div>
@@ -1063,9 +1210,14 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="instructor_name_0" class="form-label required">강사명</label>
-                            <input type="text" id="instructor_name_0" name="instructors[0][name]" class="form-input" 
-                                   value="<?= $isEditMode ? htmlspecialchars($lecture['instructors'][0]['name'] ?? '') : '' ?>"
-                                   placeholder="예: 김마케팅" required>
+                            <div class="input-with-counter">
+                                <input type="text" id="instructor_name_0" name="instructors[0][name]" class="form-input"
+                                       value="<?= $isEditMode ? htmlspecialchars($lecture['instructors'][0]['name'] ?? '') : '' ?>"
+                                       placeholder="예: 김마케팅" required>
+                                <div class="character-counter">
+                                    <span id="instructor_name_0-counter">0</span><span class="counter-limit">/50자</span>
+                                </div>
+                            </div>
                             <div class="form-error" id="instructor_name_0-error"></div>
                         </div>
                         
@@ -1090,7 +1242,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                 <button type="button" id="add-instructor-btn" class="btn btn-outline">
                     <i class="fas fa-plus"></i> 강사 추가
                 </button>
-                <div class="form-help">최대 5명까지 강사를 추가할 수 있습니다</div>
+                <div class="instructor-limit-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>최대 5명까지 강사를 추가할 수 있습니다</span>
+                </div>
             </div>
         </div>
         
@@ -1115,8 +1270,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                 
                 <div class="form-group">
                     <label for="start_date" class="form-label required">시작 날짜</label>
-                    <input type="date" id="start_date" name="start_date" class="form-input" 
-                           value="<?= $isEditMode ? htmlspecialchars($lecture['start_date'] ?? '') : '' ?>" required>
+                    <input type="date" id="start_date" name="start_date" class="form-input"
+                           value="<?= $isEditMode ? htmlspecialchars($lecture['start_date'] ?? '') : '' ?>"
+                           min="<?= date('Y-m-d') ?>" required>
                     <div class="form-error" id="start_date-error"></div>
                 </div>
                 
@@ -1129,15 +1285,15 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                 
                 <div class="form-group">
                     <label for="start_time" class="form-label required">시작 시간</label>
-                    <input type="time" id="start_time" name="start_time" class="form-input" 
-                           value="<?= $isEditMode ? htmlspecialchars($lecture['start_time'] ?? '') : '' ?>" required>
+                    <input type="time" id="start_time" name="start_time" class="form-input"
+                           value="<?= $isEditMode ? htmlspecialchars($lecture['start_time'] ?? '') : '00:00' ?>" required>
                     <div class="form-error" id="start_time-error"></div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="end_time" class="form-label required">종료 시간</label>
-                    <input type="time" id="end_time" name="end_time" class="form-input" 
-                           value="<?= $isEditMode ? htmlspecialchars($lecture['end_time'] ?? '') : '' ?>" required>
+                    <input type="time" id="end_time" name="end_time" class="form-input"
+                           value="<?= $isEditMode ? htmlspecialchars($lecture['end_time'] ?? '') : '00:00' ?>" required>
                     <div class="form-error" id="end_time-error"></div>
                 </div>
                 
@@ -1174,19 +1330,24 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="venue_name" class="form-label">장소명</label>
-                        <input type="text" id="venue_name" name="venue_name" class="form-input" 
-                               value="<?= $isEditMode ? htmlspecialchars($lecture['venue_name'] ?? '') : '' ?>"
-                               placeholder="예: 강남구 세미나실">
+                        <div class="input-with-counter">
+                            <input type="text" id="venue_name" name="venue_name" class="form-input"
+                                   value="<?= $isEditMode ? htmlspecialchars($lecture['venue_name'] ?? '') : '' ?>"
+                                   placeholder="예: 강남구 세미나실">
+                            <div class="character-counter">
+                                <span id="venue_name-counter">0</span><span class="counter-limit">/100자</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group full-width">
                         <label for="venue_address" class="form-label">장소 주소</label>
-                        <div style="display: flex; gap: 10px; align-items: flex-start;">
-                            <input type="text" id="venue_address" name="venue_address" class="form-input" 
+                        <div class="address-search-container" style="display: flex !important; gap: 8px !important; align-items: stretch !important;">
+                            <input type="text" id="venue_address" name="venue_address" class="form-input"
                                    value="<?= $isEditMode ? htmlspecialchars($lecture['venue_address'] ?? '') : '' ?>"
                                    placeholder="주소 검색 버튼을 클릭하여 정확한 주소를 입력해주세요" readonly
-                                   style="flex: 1;">
-                            <button type="button" id="address_search_btn" class="btn btn-secondary"
-                                    style="padding: 10px 16px; white-space: nowrap;">
+                                   style="flex: 1 !important; min-height: 44px !important; height: 44px !important;">
+                            <button type="button" id="address_search_btn" class="btn btn-secondary address-search-btn"
+                                    style="padding: 6px 10px !important; white-space: nowrap !important; font-size: 13px !important; height: 44px !important; flex-shrink: 0 !important; min-width: 90px !important; max-width: 90px !important; border-radius: 6px !important;">
                                 🔍 주소 검색
                             </button>
                         </div>
@@ -1204,10 +1365,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
             <div id="online-fields" class="location-fields">
                 <div class="form-group">
                     <label for="online_link" class="form-label">온라인 링크</label>
-                    <input type="url" id="online_link" name="online_link" class="form-input" 
-                           value="<?= $isEditMode ? htmlspecialchars($lecture['online_link'] ?? '') : '' ?>"
-                           placeholder="Zoom, 유튜브 등의 링크를 입력해주세요">
+                    <div class="input-with-counter">
+                        <input type="url" id="online_link" name="online_link" class="form-input"
+                               value="<?= $isEditMode ? htmlspecialchars($lecture['online_link'] ?? '') : '' ?>"
+                               placeholder="Zoom, 유튜브 등의 링크를 입력해주세요">
+                        <div class="character-counter">
+                            <span id="online_link-counter">0</span><span class="counter-limit">/500자</span>
+                        </div>
+                    </div>
                     <div class="form-help">참가자들이 접속할 수 있는 링크를 입력하세요</div>
+                    <div class="form-error" id="online_link-error"></div>
                 </div>
             </div>
         </div>
@@ -1633,7 +1800,7 @@ function removeInstructorImage(index) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    
+
     const form = document.getElementById('lectureForm');
     const locationTypeInputs = document.querySelectorAll('input[name="location_type"]');
     const offlineFields = document.getElementById('offline-fields');
@@ -1737,8 +1904,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="form-grid">
                 <div class="form-group">
                     <label for="instructor_name_${instructorCount}" class="form-label required">강사명</label>
-                    <input type="text" id="instructor_name_${instructorCount}" name="instructors[${instructorCount}][name]" class="form-input" 
-                           placeholder="예: 김마케팅" required>
+                    <div class="input-with-counter">
+                        <input type="text" id="instructor_name_${instructorCount}" name="instructors[${instructorCount}][name]" class="form-input"
+                               placeholder="예: 김마케팅" required>
+                        <div class="character-counter">
+                            <span id="instructor_name_${instructorCount}-counter">0</span><span class="counter-limit">/50자</span>
+                        </div>
+                    </div>
                     <div class="form-error" id="instructor_name_${instructorCount}-error"></div>
                 </div>
                 
@@ -1763,7 +1935,42 @@ document.addEventListener('DOMContentLoaded', function() {
         newInstructor.querySelector('.remove-instructor-btn').addEventListener('click', function() {
             removeInstructorField(newInstructor);
         });
-        
+
+        // 새로 추가된 강사명 필드에 글자 수 카운터 이벤트 리스너 설정
+        const newInstructorInput = newInstructor.querySelector(`#instructor_name_${instructorCount}`);
+        const newInstructorCounter = newInstructor.querySelector(`#instructor_name_${instructorCount}-counter`);
+        if (newInstructorInput && newInstructorCounter) {
+            function updateNewInstructorCounter() {
+                const length = newInstructorInput.value.trim().length;
+                newInstructorCounter.textContent = length;
+
+                const counterContainer = newInstructorCounter.parentElement;
+                if (length === 0) {
+                    counterContainer.className = 'character-counter';
+                } else if (length > 50) {
+                    counterContainer.className = 'character-counter error';
+                    showError(`instructor_name_${instructorCount}`, '강사명은 50자 이하로 입력해주세요.');
+                } else {
+                    counterContainer.className = 'character-counter success';
+                    clearError(`instructor_name_${instructorCount}`);
+                }
+            }
+
+            newInstructorInput.addEventListener('input', updateNewInstructorCounter);
+            newInstructorInput.addEventListener('blur', function() {
+                const length = this.value.trim().length;
+                if (length === 0) {
+                    showError(`instructor_name_${instructorCount}`, '강사명을 입력해주세요.');
+                } else if (length > 50) {
+                    showError(`instructor_name_${instructorCount}`, '강사명은 50자 이하로 입력해주세요.');
+                } else {
+                    clearError(`instructor_name_${instructorCount}`);
+                }
+            });
+
+            updateNewInstructorCounter();
+        }
+
         instructorCount++;
     }
     
@@ -1789,24 +1996,60 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateInstructorButtons() {
         const removeButtons = document.querySelectorAll('.remove-instructor-btn');
         const addButton = document.getElementById('add-instructor-btn');
-        
-        // 강사가 1명일 때는 제거 버튼 숨김
+
+        // 강사가 1명일 때는 모든 제거 버튼 숨김
         if (instructorCount <= 1) {
             removeButtons.forEach(btn => btn.style.display = 'none');
         } else {
-            removeButtons.forEach(btn => btn.style.display = 'inline-block');
+            // 강사가 2명 이상일 때: 첫 번째 강사(인덱스 0)는 항상 숨김, 나머지만 표시
+            removeButtons.forEach((btn, index) => {
+                const instructorItem = btn.closest('.instructor-item');
+                const instructorIndex = instructorItem ? instructorItem.getAttribute('data-instructor-index') : null;
+
+                if (instructorIndex === '0') {
+                    // 첫 번째 강사(강사 1)는 항상 제거 버튼 숨김
+                    btn.style.display = 'none';
+                } else {
+                    // 추가된 강사들(강사 2, 3, 4, 5)만 제거 버튼 표시
+                    btn.style.display = 'inline-block';
+                }
+            });
         }
         
-        // 최대 강사 수에 도달하면 추가 버튼 비활성화
+        // 최대 강사 수에 도달하면 추가 버튼 비활성화 및 안내 메시지 업데이트
+        const limitInfo = document.querySelector('.instructor-limit-info');
         if (instructorCount >= maxInstructors) {
             addButton.disabled = true;
-            addButton.textContent = '최대 강사 수에 도달했습니다';
+            addButton.innerHTML = '<i class="fas fa-check"></i> 최대 강사 수 도달';
+            addButton.classList.add('btn-disabled');
+
+            // 안내 메시지 업데이트
+            if (limitInfo) {
+                limitInfo.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>최대 ${maxInstructors}명의 강사가 모두 등록되었습니다</span>
+                `;
+                limitInfo.classList.add('limit-reached');
+            }
         } else {
             addButton.disabled = false;
             addButton.innerHTML = '<i class="fas fa-plus"></i> 강사 추가';
+            addButton.classList.remove('btn-disabled');
+
+            // 안내 메시지 원상복귀
+            if (limitInfo) {
+                limitInfo.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <span>최대 ${maxInstructors}명까지 강사를 추가할 수 있습니다 (현재 ${instructorCount}명)</span>
+                `;
+                limitInfo.classList.remove('limit-reached');
+            }
         }
     }
-    
+
+    // 페이지 로드 시 강사 버튼 상태 초기화 (함수 선언 이후에 호출)
+    updateInstructorButtons();
+
     // 소요시간 자동 계산 (날짜와 시간 모두 고려)
     function calculateDuration() {
         const startDate = document.getElementById('start_date').value;
@@ -1884,8 +2127,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // console.log('소요시간 계산 이벤트 리스너 등록 중...');
         
         // 날짜 변경 이벤트
-        startDateElement.addEventListener('change', calculateDuration);
-        startDateElement.addEventListener('input', calculateDuration);
+        startDateElement.addEventListener('change', function() {
+            // 종료 날짜의 최소값을 시작 날짜로 업데이트
+            updateEndDateMin();
+            calculateDuration();
+        });
+        startDateElement.addEventListener('input', function() {
+            updateEndDateMin();
+            calculateDuration();
+        });
         endDateElement.addEventListener('change', calculateDuration);
         endDateElement.addEventListener('input', calculateDuration);
         
@@ -1902,6 +2152,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // 종료 날짜의 최소값 업데이트 함수
+    function updateEndDateMin() {
+        const startDateValue = startDateElement.value;
+        if (startDateValue) {
+            endDateElement.min = startDateValue;
+        }
+    }
+
+    // 시작 날짜 과거 날짜 방지 및 검증
+    function validateStartDate() {
+        const startDateValue = startDateElement.value;
+        const today = new Date().toISOString().split('T')[0];
+
+        if (startDateValue && startDateValue < today) {
+            showError('start_date', '시작 날짜는 오늘 이후로 선택해주세요.');
+            // 자동으로 오늘 날짜로 수정
+            startDateElement.value = today;
+            updateEndDateMin();
+            return false;
+        } else {
+            clearError('start_date');
+            return true;
+        }
+    }
+
+    // 시작 날짜 검증 이벤트 추가
+    startDateElement.addEventListener('change', validateStartDate);
+    startDateElement.addEventListener('blur', validateStartDate);
+
+    // 페이지 로드 시 초기화
+    updateEndDateMin();
+
     // 페이지 로딩 시 기존 값이 있다면 한 번 계산
     // console.log('초기 소요시간 계산 실행...');
     calculateDuration();
@@ -2213,12 +2495,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateDates() {
         const startDate = startDateInput.value;
         const endDate = endDateInput.value;
-        
+        const today = new Date().toISOString().split('T')[0];
+
+        // 시작 날짜 과거 검증
+        if (startDate && startDate < today) {
+            showError('start_date', '시작 날짜는 오늘 이후로 선택해주세요.');
+            return false;
+        } else {
+            clearError('start_date');
+        }
+
+        // 종료 날짜가 시작 날짜보다 빠른 경우 검증
         if (startDate && endDate && startDate > endDate) {
             showError('end_date', '종료 날짜는 시작 날짜보다 늦어야 합니다.');
             return false;
         }
-        
+
         clearError('end_date');
         return true;
     }
@@ -2247,72 +2539,205 @@ document.addEventListener('DOMContentLoaded', function() {
     function addRealTimeValidation() {
         // 제목 검증
         const titleInput = document.getElementById('title');
-        titleInput.addEventListener('blur', function() {
-            if (this.value.trim().length === 0) {
-                showError('title', '강의 제목을 입력해주세요.');
-            } else if (this.value.trim().length < 5) {
+        const titleCounter = document.getElementById('title-counter');
+
+        // 실시간 글자 수 업데이트 및 검증
+        function updateTitleCounter() {
+            const length = titleInput.value.trim().length;
+            titleCounter.textContent = length;
+
+            // 글자 수에 따른 색상 변경
+            const counterContainer = titleCounter.parentElement;
+            if (length === 0) {
+                counterContainer.className = 'character-counter';
+                clearError('title');
+            } else if (length < 5) {
+                counterContainer.className = 'character-counter warning';
                 showError('title', '강의 제목은 5자 이상 입력해주세요.');
+            } else if (length > 100) {
+                counterContainer.className = 'character-counter error';
+                showError('title', '강의 제목은 100자 이하로 입력해주세요.');
+            } else {
+                counterContainer.className = 'character-counter success';
+                clearError('title');
+            }
+        }
+
+        // 실시간 입력 이벤트
+        titleInput.addEventListener('input', updateTitleCounter);
+        titleInput.addEventListener('blur', function() {
+            const length = this.value.trim().length;
+            if (length === 0) {
+                showError('title', '강의 제목을 입력해주세요.');
+            } else if (length < 5) {
+                showError('title', '강의 제목은 5자 이상 입력해주세요.');
+            } else if (length > 100) {
+                showError('title', '강의 제목은 100자 이하로 입력해주세요.');
             } else {
                 clearError('title');
             }
         });
-        
-        // 제목 입력 시 실시간 에러 제거
-        titleInput.addEventListener('input', function() {
-            if (this.value.trim().length > 0) {
-                clearError('title');
-            }
-        });
-        
+
+        // 초기 글자 수 업데이트
+        updateTitleCounter();
+
         // 설명 검증
         const descriptionInput = document.getElementById('description');
-        descriptionInput.addEventListener('blur', function() {
-            if (this.value.trim().length === 0) {
-                showError('description', '강의 설명을 입력해주세요.');
-            } else if (this.value.trim().length < 20) {
+        const descriptionCounter = document.getElementById('description-counter');
+
+        // 실시간 글자 수 업데이트 및 검증
+        function updateDescriptionCounter() {
+            const length = descriptionInput.value.trim().length;
+            descriptionCounter.textContent = length;
+
+            // 글자 수에 따른 색상 변경
+            const counterContainer = descriptionCounter.parentElement;
+            if (length === 0) {
+                counterContainer.className = 'character-counter';
+                clearError('description');
+            } else if (length < 20) {
+                counterContainer.className = 'character-counter warning';
                 showError('description', '강의 설명은 20자 이상 입력해주세요.');
+            } else if (length > 2000) {
+                counterContainer.className = 'character-counter error';
+                showError('description', '강의 설명은 2000자 이하로 입력해주세요.');
+            } else {
+                counterContainer.className = 'character-counter success';
+                clearError('description');
+            }
+        }
+
+        // 실시간 입력 이벤트
+        descriptionInput.addEventListener('input', updateDescriptionCounter);
+        descriptionInput.addEventListener('blur', function() {
+            const length = this.value.trim().length;
+            if (length === 0) {
+                showError('description', '강의 설명을 입력해주세요.');
+            } else if (length < 20) {
+                showError('description', '강의 설명은 20자 이상 입력해주세요.');
+            } else if (length > 2000) {
+                showError('description', '강의 설명은 2000자 이하로 입력해주세요.');
             } else {
                 clearError('description');
             }
         });
-        
+
+        // 초기 글자 수 업데이트
+        updateDescriptionCounter();
+
         // 첫 번째 강사명 검증
         const firstInstructorInput = document.getElementById('instructor_name_0');
-        if (firstInstructorInput) {
+        const firstInstructorCounter = document.getElementById('instructor_name_0-counter');
+        if (firstInstructorInput && firstInstructorCounter) {
+            // 실시간 글자 수 업데이트 및 검증
+            function updateFirstInstructorCounter() {
+                const length = firstInstructorInput.value.trim().length;
+                firstInstructorCounter.textContent = length;
+
+                const counterContainer = firstInstructorCounter.parentElement;
+                if (length === 0) {
+                    counterContainer.className = 'character-counter';
+                } else if (length > 50) {
+                    counterContainer.className = 'character-counter error';
+                    showError('instructor_name_0', '강사명은 50자 이하로 입력해주세요.');
+                } else {
+                    counterContainer.className = 'character-counter success';
+                    clearError('instructor_name_0');
+                }
+            }
+
+            firstInstructorInput.addEventListener('input', updateFirstInstructorCounter);
             firstInstructorInput.addEventListener('blur', function() {
                 if (this.value.trim().length === 0) {
                     showError('instructor_name_0', '강사명을 입력해주세요.');
+                } else if (this.value.trim().length > 50) {
+                    showError('instructor_name_0', '강사명은 50자 이하로 입력해주세요.');
                 } else {
                     clearError('instructor_name_0');
                 }
             });
+
+            // 초기 글자 수 업데이트
+            updateFirstInstructorCounter();
         }
-        
+
+        // 장소명 검증
+        const venueInput = document.getElementById('venue_name');
+        const venueCounter = document.getElementById('venue_name-counter');
+        if (venueInput && venueCounter) {
+            function updateVenueCounter() {
+                const length = venueInput.value.trim().length;
+                venueCounter.textContent = length;
+
+                const counterContainer = venueCounter.parentElement;
+                if (length === 0) {
+                    counterContainer.className = 'character-counter';
+                } else if (length > 100) {
+                    counterContainer.className = 'character-counter error';
+                    showError('venue_name', '장소명은 100자 이하로 입력해주세요.');
+                } else {
+                    counterContainer.className = 'character-counter success';
+                    clearError('venue_name');
+                }
+            }
+
+            venueInput.addEventListener('input', updateVenueCounter);
+            updateVenueCounter();
+        }
+
         // 온라인 링크 검증
         const onlineLinkInput = document.getElementById('online_link');
-        if (onlineLinkInput) {
-            onlineLinkInput.addEventListener('blur', function() {
+        const onlineLinkCounter = document.getElementById('online_link-counter');
+        if (onlineLinkInput && onlineLinkCounter) {
+            function updateOnlineLinkCounter() {
+                const length = onlineLinkInput.value.trim().length;
+                onlineLinkCounter.textContent = length;
+
+                const counterContainer = onlineLinkCounter.parentElement;
+                if (length === 0) {
+                    counterContainer.className = 'character-counter';
+                } else if (length > 500) {
+                    counterContainer.className = 'character-counter error';
+                    showError('online_link', '온라인 링크는 500자 이하로 입력해주세요.');
+                } else {
+                    counterContainer.className = 'character-counter success';
+                    clearError('online_link');
+                }
+            }
+
+            onlineLinkInput.addEventListener('input', updateOnlineLinkCounter);
+            updateOnlineLinkCounter();
+        }
+
+        // 추가적인 온라인 링크 검증 (URL 형식 및 조건부 필수)
+        const onlineLinkInputForValidation = document.getElementById('online_link');
+        if (onlineLinkInputForValidation) {
+            onlineLinkInputForValidation.addEventListener('blur', function() {
                 const locationType = document.querySelector('input[name="location_type"]:checked');
                 if (locationType && locationType.value === 'online') {
                     if (this.value.trim().length === 0) {
                         showError('online_link', '온라인 링크를 입력해주세요.');
                     } else if (!isValidUrl(this.value)) {
                         showError('online_link', '올바른 URL 형식을 입력해주세요.');
+                    } else if (this.value.trim().length > 500) {
+                        showError('online_link', '온라인 링크는 500자 이하로 입력해주세요.');
                     } else {
                         clearError('online_link');
                     }
                 }
             });
         }
-        
-        // 장소명 검증
-        const venueInput = document.getElementById('venue_name');
-        if (venueInput) {
-            venueInput.addEventListener('blur', function() {
+
+        // 추가적인 장소명 검증 (조건부 필수)
+        const venueInputForValidation = document.getElementById('venue_name');
+        if (venueInputForValidation) {
+            venueInputForValidation.addEventListener('blur', function() {
                 const locationType = document.querySelector('input[name="location_type"]:checked');
                 if (locationType && locationType.value === 'offline') {
                     if (this.value.trim().length === 0) {
                         showError('venue_name', '장소명을 입력해주세요.');
+                    } else if (this.value.trim().length > 100) {
+                        showError('venue_name', '장소명은 100자 이하로 입력해주세요.');
                     } else {
                         clearError('venue_name');
                     }
@@ -3267,7 +3692,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 const titleField = document.querySelector(`input[name="instructors[${index}][title]"]`);
                 const infoField = document.querySelector(`textarea[name="instructors[${index}][info]"]`);
                 
-                if (nameField && instructor.name) nameField.value = instructor.name;
+                if (nameField && instructor.name) {
+                    nameField.value = instructor.name;
+
+                    // 강사명 필드에 글자 수 카운터 이벤트 리스너 설정
+                    const instructorCounter = document.querySelector(`#instructor_name_${index}-counter`);
+                    if (instructorCounter) {
+                        function updateInstructorCounter() {
+                            const length = nameField.value.trim().length;
+                            instructorCounter.textContent = length;
+
+                            const counterContainer = instructorCounter.parentElement;
+                            if (length === 0) {
+                                counterContainer.className = 'character-counter';
+                            } else if (length > 50) {
+                                counterContainer.className = 'character-counter error';
+                                showError(`instructor_name_${index}`, '강사명은 50자 이하로 입력해주세요.');
+                            } else {
+                                counterContainer.className = 'character-counter success';
+                                clearError(`instructor_name_${index}`);
+                            }
+                        }
+
+                        nameField.addEventListener('input', updateInstructorCounter);
+                        nameField.addEventListener('blur', function() {
+                            const length = this.value.trim().length;
+                            if (length === 0) {
+                                showError(`instructor_name_${index}`, '강사명을 입력해주세요.');
+                            } else if (length > 50) {
+                                showError(`instructor_name_${index}`, '강사명은 50자 이하로 입력해주세요.');
+                            } else {
+                                clearError(`instructor_name_${index}`);
+                            }
+                        });
+
+                        // 초기 카운터 업데이트
+                        updateInstructorCounter();
+                    }
+                }
                 if (titleField && instructor.title) titleField.value = instructor.title;
                 if (infoField && instructor.info) infoField.value = instructor.info;
                 
@@ -3355,8 +3817,13 @@ function createAdditionalInstructorField(container, index) {
         <div class="form-grid">
             <div class="form-group">
                 <label for="instructor_name_${index}" class="form-label required">강사명</label>
-                <input type="text" id="instructor_name_${index}" name="instructors[${index}][name]" class="form-input" 
-                       placeholder="예: 김마케팅" required>
+                <div class="input-with-counter">
+                    <input type="text" id="instructor_name_${index}" name="instructors[${index}][name]" class="form-input"
+                           placeholder="예: 김마케팅" required>
+                    <div class="character-counter">
+                        <span id="instructor_name_${index}-counter">0</span><span class="counter-limit">/50자</span>
+                    </div>
+                </div>
                 <div class="form-error" id="instructor_name_${index}-error"></div>
             </div>
             
@@ -3654,6 +4121,15 @@ function enableImageSorting() {
         });
     }
 }
+
+// 편집 모드에서 강사 버튼 상태 올바르게 초기화
+setTimeout(function() {
+    if (typeof updateInstructorButtons === 'function') {
+        updateInstructorButtons();
+        console.log('Edit mode: Instructor buttons updated');
+    }
+}, 100);
+
 </script>
 
 <?php endif; ?>
