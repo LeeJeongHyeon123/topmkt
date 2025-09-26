@@ -826,6 +826,30 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         flex-direction: column;
     }
     
+    /* 신청 마감 알림 모바일 최적화 */
+    .registration-deadline-notice {
+        padding: 16px !important;
+        margin: 15px 0 !important;
+    }
+
+    .registration-deadline-notice h3 {
+        font-size: 1.1rem !important;
+    }
+
+    .registration-deadline-notice p {
+        font-size: 0.9rem !important;
+    }
+
+    .registration-deadline-notice .fas.fa-clock {
+        font-size: 1.5rem !important;
+    }
+
+    /* 신청 현황 모바일 최적화 */
+    .info-value {
+        word-break: break-word;
+        line-height: 1.4;
+    }
+
     .event-sidebar {
         order: 10 !important;
         margin-top: 20px;
@@ -855,7 +879,67 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         font-size: 16px;
         min-height: 48px;
     }
-    
+
+    /* 🔥 모바일 행사 관리 버튼 크기 최적화 (강의 상세와 완전 동일하게) */
+    .event-admin-actions .btn {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        min-height: 28px !important;
+        max-height: 28px !important;
+        min-width: auto !important;
+        border-radius: 4px !important;
+        margin: 0 !important;
+        backdrop-filter: blur(10px) !important;
+        z-index: 15 !important;
+    }
+
+    /* 행사 관리 버튼 위치 조정 - 강의 상세와 동일한 위치로 */
+    .event-admin-actions {
+        position: absolute !important;
+        top: 8px !important;
+        right: 8px !important;
+        display: flex !important;
+        gap: 6px !important;
+        z-index: 15 !important;
+        backdrop-filter: blur(10px) !important;
+        background: rgba(0, 0, 0, 0.1) !important;
+        padding: 4px !important;
+        border-radius: 6px !important;
+    }
+
+    /* 행사 액션 버튼들 개별 색상 */
+    .event-admin-actions .btn-edit {
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: #4a5568 !important;
+        border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    }
+
+    .event-admin-actions .btn-danger {
+        background: rgba(229, 62, 62, 0.9) !important;
+        color: white !important;
+        border: 1px solid rgba(229, 62, 62, 0.9) !important;
+    }
+}
+
+/* 🔥 작은 모바일 (480px 이하)에서 행사 관리 버튼 더 작게 */
+@media (max-width: 480px) {
+    .event-admin-actions {
+        top: 6px !important;
+        right: 6px !important;
+        padding: 2px !important;
+        border-radius: 4px !important;
+    }
+
+    .event-admin-actions .btn {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+        min-height: 24px !important;
+        max-height: 24px !important;
+        gap: 4px !important;
+    }
+}
+
+@media (max-width: 768px) {
     /* 모바일 수평 스크롤 방지 */
     .event-detail-container {
         width: 100%;
@@ -864,10 +948,13 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     }
     
     /* 모든 버튼 터치 타겟 최적화 */
-    .btn, button, .register-btn,
+    .btn,
+    button,
+    .register-btn,
     .btn-visit-profile, .btn-chat-author,
     .close, .modal-close,
-    a[href], input[type="submit"], input[type="button"] {
+    a[href],
+    input[type="submit"], input[type="button"] {
         min-height: 48px !important;
         min-width: 48px !important;
         font-size: 16px !important;
@@ -877,7 +964,23 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         align-items: center !important;
         justify-content: center !important;
     }
-    
+
+    /* 🗺️ 네이버 지도 컨테이너 기본 설정 */
+    #eventVenueMap {
+        width: 100%;
+        height: 400px;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* 🚫 신청 취소 버튼 기본 숨김 처리 */
+    #event-cancel-btn {
+        display: none !important;
+    }
+
+
+
     /* 모달 버튼들도 터치 친화적으로 */
     .modal-footer .btn {
         min-height: 48px !important;
@@ -1547,9 +1650,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     <div class="event-hero">
         <div class="event-admin-actions">
             <?php if ($canEdit): ?>
-                <a href="/events/create?id=<?= $event['id'] ?>" class="btn btn-edit">
+                <button class="btn btn-edit" data-event-id="<?= $event['id'] ?>">
                     ✏️ 수정
-                </a>
+                </button>
                 <button class="btn btn-danger" onclick="confirmDeleteEvent(<?= $event['id'] ?>)">
                     🗑️ 삭제
                 </button>
@@ -1705,7 +1808,13 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         <div class="event-sidebar">
             <!-- 등록 정보 -->
             <div class="info-card register-card">
-                <h3><i class="fas fa-ticket-alt"></i> 참가 신청</h3>
+                <h3><i class="fas fa-ticket-alt"></i>
+                    <?php if ($event['registration_fee'] && $event['registration_fee'] > 0): ?>
+                        참가 신청 비용
+                    <?php else: ?>
+                        참가 신청
+                    <?php endif; ?>
+                </h3>
                 <div class="event-fee">
                     <?php if ($event['registration_fee']): ?>
                         <?= number_format($event['registration_fee']) ?>원
@@ -1715,19 +1824,196 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                 </div>
                 <?php if ($isLoggedIn): ?>
                     <?php
-                    // 등록 마감일 확인
+                    // 🔥 Ultra Think: 완전한 마감 조건 체크 시스템
+                    $now = new DateTime();
+
+                    // 1. 등록 마감일 확인
                     $isDeadlinePassed = false;
                     if (!empty($event['registration_deadline'])) {
-                        $now = new DateTime();
                         $deadline = new DateTime($event['registration_deadline']);
                         $isDeadlinePassed = $now > $deadline;
                     }
+
+                    // 2. 본인 행사 체크
+                    $isOwnEvent = ($event['user_id'] == $currentUserId);
+
+                    // 3. 정원 초과 체크
+                    $isCapacityFull = false;
+                    if ($event['max_participants'] && $event['max_participants'] > 0) {
+                        $isCapacityFull = ($event['current_registration_count'] >= $event['max_participants']);
+                    }
+
+                    // 4. 행사 시작일 지남 체크
+                    $isEventStarted = false;
+                    if ($event['start_date'] && $event['start_time']) {
+                        $eventStart = new DateTime($event['start_date'] . ' ' . $event['start_time']);
+                        $isEventStarted = $now > $eventStart;
+                    }
+
+                    // 마감 여부 종합 판단
+                    $cannotRegister = $isDeadlinePassed || $isOwnEvent || $isCapacityFull || $isEventStarted;
                     ?>
-                    
-                    <?php if ($isDeadlinePassed): ?>
-                        <button class="register-btn" disabled style="background: #9ca3af; cursor: not-allowed;">
-                            신청 마감됨
-                        </button>
+
+                    <?php if ($isOwnEvent): ?>
+                        <!-- 본인 행사 신청 방지 안내 -->
+                        <div class="own-event-notice" style="
+                            background: linear-gradient(135deg, #fff3cd 0%, #fdf5e6 100%);
+                            border: 2px solid #ffc107;
+                            border-radius: 12px;
+                            padding: 20px;
+                            text-align: center;
+                            margin: 20px 0;
+                            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.15);
+                        ">
+                            <div style="margin-bottom: 12px;">
+                                <i class="fas fa-user-edit" style="
+                                    font-size: 2rem;
+                                    color: #ffc107;
+                                    margin-bottom: 8px;
+                                "></i>
+                            </div>
+                            <h3 style="
+                                color: #856404;
+                                font-size: 1.3rem;
+                                font-weight: 700;
+                                margin: 0 0 8px 0;
+                            ">본인이 등록한 행사입니다</h3>
+                            <p style="
+                                color: #6c757d;
+                                font-size: 1rem;
+                                margin: 0;
+                                line-height: 1.5;
+                            ">자신이 등록한 행사에는 참가 신청할 수 없습니다</p>
+                        </div>
+                    <?php elseif ($isCapacityFull): ?>
+                        <!-- 정원 초과 안내 -->
+                        <div class="capacity-full-notice" style="
+                            background: linear-gradient(135deg, #f8d7da 0%, #f1c6cb 100%);
+                            border: 2px solid #dc3545;
+                            border-radius: 12px;
+                            padding: 20px;
+                            text-align: center;
+                            margin: 20px 0;
+                            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+                        ">
+                            <div style="margin-bottom: 12px;">
+                                <i class="fas fa-users" style="
+                                    font-size: 2rem;
+                                    color: #dc3545;
+                                    margin-bottom: 8px;
+                                "></i>
+                            </div>
+                            <h3 style="
+                                color: #dc3545;
+                                font-size: 1.3rem;
+                                font-weight: 700;
+                                margin: 0 0 8px 0;
+                            ">정원이 마감되었습니다</h3>
+                            <p style="
+                                color: #6c757d;
+                                font-size: 1rem;
+                                margin: 0 0 12px 0;
+                                line-height: 1.5;
+                            ">
+                                현재 <strong style="color: #dc3545;"><?= number_format($event['current_registration_count']) ?>명</strong>이 신청했습니다<br>
+                                <span style="font-size: 0.9rem;">( 정원: <?= number_format($event['max_participants']) ?>명 )</span>
+                            </p>
+                            <div style="
+                                background: #fff;
+                                border-radius: 8px;
+                                padding: 12px;
+                                border-left: 4px solid #17a2b8;
+                                margin-top: 15px;
+                            ">
+                                <i class="fas fa-clock" style="color: #17a2b8; margin-right: 8px;"></i>
+                                <span style="color: #495057; font-size: 0.95rem;">
+                                    취소 발생 시 선착순으로 신청 가능합니다
+                                </span>
+                            </div>
+                        </div>
+                    <?php elseif ($isEventStarted): ?>
+                        <!-- 행사 시작됨 안내 -->
+                        <div class="event-started-notice" style="
+                            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+                            border: 2px solid #17a2b8;
+                            border-radius: 12px;
+                            padding: 20px;
+                            text-align: center;
+                            margin: 20px 0;
+                            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.15);
+                        ">
+                            <div style="margin-bottom: 12px;">
+                                <i class="fas fa-play-circle" style="
+                                    font-size: 2rem;
+                                    color: #17a2b8;
+                                    margin-bottom: 8px;
+                                "></i>
+                            </div>
+                            <h3 style="
+                                color: #17a2b8;
+                                font-size: 1.3rem;
+                                font-weight: 700;
+                                margin: 0 0 8px 0;
+                            ">행사가 이미 시작되었습니다</h3>
+                            <p style="
+                                color: #6c757d;
+                                font-size: 1rem;
+                                margin: 0;
+                                line-height: 1.5;
+                            ">행사 시작 후에는 참가 신청할 수 없습니다</p>
+                        </div>
+                    <?php elseif ($isDeadlinePassed): ?>
+                        <?php
+                        // 마감 시간 관련 정보 계산
+                        $now = new DateTime();
+                        $deadline = new DateTime($event['registration_deadline']);
+                        $interval = $now->diff($deadline);
+
+                        // 마감 후 경과 시간 계산
+                        if ($interval->days > 0) {
+                            $timeAgo = $interval->days . '일 전';
+                        } elseif ($interval->h > 0) {
+                            $timeAgo = $interval->h . '시간 전';
+                        } else {
+                            $timeAgo = $interval->i . '분 전';
+                        }
+
+                        // 마감 날짜 포맷팅
+                        $deadlineFormatted = $deadline->format('Y년 m월 d일 H:i');
+                        ?>
+
+                        <div class="registration-deadline-notice" style="
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border: 2px solid #dc3545;
+                            border-radius: 12px;
+                            padding: 20px;
+                            text-align: center;
+                            margin: 20px 0;
+                            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+                        ">
+                            <div style="margin-bottom: 12px;">
+                                <i class="fas fa-clock" style="
+                                    font-size: 2rem;
+                                    color: #dc3545;
+                                    margin-bottom: 8px;
+                                "></i>
+                            </div>
+                            <h3 style="
+                                color: #dc3545;
+                                font-size: 1.3rem;
+                                font-weight: 700;
+                                margin: 0 0 8px 0;
+                            ">신청이 마감되었습니다</h3>
+                            <p style="
+                                color: #6c757d;
+                                font-size: 1rem;
+                                margin: 0 0 12px 0;
+                                line-height: 1.5;
+                            ">
+                                <strong><?= $deadlineFormatted ?></strong>에 마감<br>
+                                <span style="font-size: 0.9rem;">( <?= $timeAgo ?> 마감 )</span>
+                            </p>
+                        </div>
                     <?php elseif (!$event['allow_online_registration'] || $event['allow_online_registration'] == 0): ?>
                         <div class="no-registration-notice" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; color: #64748b;">
                             <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
@@ -1751,15 +2037,63 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                         <button id="event-register-btn" class="register-btn" onclick="registerEvent()">
                             참가 신청하기
                         </button>
-                        <button id="event-cancel-btn" class="register-btn" onclick="cancelEventRegistration()" style="display: none; background: #dc3545;">
+                        <button id="event-cancel-btn" class="register-btn" onclick="cancelEventRegistration()" style="display: none !important; background: #dc3545;">
                             신청 취소
                         </button>
                     <?php endif; ?>
                 <?php else: ?>
                     <?php if ($isDeadlinePassed): ?>
-                        <button class="register-btn" disabled style="background: #9ca3af; cursor: not-allowed;">
-                            신청 마감됨
-                        </button>
+                        <?php
+                        // 마감 시간 관련 정보 계산
+                        $now = new DateTime();
+                        $deadline = new DateTime($event['registration_deadline']);
+                        $interval = $now->diff($deadline);
+
+                        // 마감 후 경과 시간 계산
+                        if ($interval->days > 0) {
+                            $timeAgo = $interval->days . '일 전';
+                        } elseif ($interval->h > 0) {
+                            $timeAgo = $interval->h . '시간 전';
+                        } else {
+                            $timeAgo = $interval->i . '분 전';
+                        }
+
+                        // 마감 날짜 포맷팅
+                        $deadlineFormatted = $deadline->format('Y년 m월 d일 H:i');
+                        ?>
+
+                        <div class="registration-deadline-notice" style="
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border: 2px solid #dc3545;
+                            border-radius: 12px;
+                            padding: 20px;
+                            text-align: center;
+                            margin: 20px 0;
+                            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+                        ">
+                            <div style="margin-bottom: 12px;">
+                                <i class="fas fa-clock" style="
+                                    font-size: 2rem;
+                                    color: #dc3545;
+                                    margin-bottom: 8px;
+                                "></i>
+                            </div>
+                            <h3 style="
+                                color: #dc3545;
+                                font-size: 1.3rem;
+                                font-weight: 700;
+                                margin: 0 0 8px 0;
+                            ">신청이 마감되었습니다</h3>
+                            <p style="
+                                color: #6c757d;
+                                font-size: 1rem;
+                                margin: 0 0 12px 0;
+                                line-height: 1.5;
+                            ">
+                                <strong><?= $deadlineFormatted ?></strong>에 마감<br>
+                                <span style="font-size: 0.9rem;">( <?= $timeAgo ?> 마감 )</span>
+                            </p>
+                        </div>
                     <?php elseif (!$event['allow_online_registration'] || $event['allow_online_registration'] == 0): ?>
                         <div class="no-registration-notice" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; color: #64748b;">
                             <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
@@ -1814,8 +2148,26 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                     </li>
                     <?php if ($event['max_participants']): ?>
                     <li>
-                        <span class="info-label">정원</span>
-                        <span class="info-value"><?= number_format($event['max_participants']) ?>명</span>
+                        <span class="info-label">신청 현황</span>
+                        <span class="info-value">
+                            <strong style="color: #4A90E2;"><?= number_format($event['current_registration_count'] ?? 0) ?></strong>
+                            /
+                            <strong><?= number_format($event['max_participants']) ?></strong>명
+                            <?php
+                            // 신청률 계산
+                            $registrationRate = $event['max_participants'] > 0
+                                ? round(($event['current_registration_count'] ?? 0) / $event['max_participants'] * 100, 1)
+                                : 0;
+                            ?>
+                            <span style="
+                                font-size: 0.85em;
+                                color: <?= $registrationRate >= 80 ? '#dc3545' : ($registrationRate >= 50 ? '#ffc107' : '#28a745') ?>;
+                                margin-left: 8px;
+                                font-weight: 600;
+                            ">
+                                (<?= $registrationRate ?>%)
+                            </span>
+                        </span>
                     </li>
                     <?php endif; ?>
                     <?php if (!empty($event['registration_deadline'])): ?>
@@ -1966,8 +2318,16 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                 <div class="info-card author-info-card">
                     <h3><i class="fas fa-user-edit"></i> 작성자</h3>
                     <div class="author-info-compact">
-                        <?php 
-                        $user = $event; 
+                        <?php
+                        // 작성자 정보만 추출 (행사 데이터가 아닌 사용자 데이터로 변환)
+                        $user = [
+                            'id' => $event['user_id'], // 실제 작성자 user_id 사용
+                            'nickname' => $event['author_name'] ?? $event['nickname'] ?? '작성자',
+                            'profile_image' => $event['profile_image'] ?? null,
+                            'profile_image_original' => $event['profile_image_original'] ?? null,
+                            'profile_image_profile' => $event['profile_image_profile'] ?? null,
+                            'profile_image_thumb' => $event['profile_image_thumb'] ?? null
+                        ];
                         $size = ProfileImageHelper::SIZE_THUMB;
                         $mode = 'direct';
                         $extraClasses = ['author-avatar-small'];
@@ -2018,20 +2378,20 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                     <h4 class="form-section-title">
                         <i class="fas fa-user"></i> 개인 정보 (필수)
                     </h4>
-                    <div class="form-group">
-                        <label for="event_participant_name">이름 *</label>
-                        <input type="text" id="event_participant_name" name="participant_name" required>
-                    </div>
-                    
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="event_participant_email">이메일 *</label>
-                            <input type="email" id="event_participant_email" name="participant_email" required>
+                            <label for="event_participant_name">이름 *</label>
+                            <input type="text" id="event_participant_name" name="participant_name" required>
                         </div>
                         <div class="form-group">
                             <label for="event_participant_phone">연락처 *</label>
                             <input type="tel" id="event_participant_phone" name="participant_phone" required placeholder="010-1234-5678">
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event_participant_email">이메일 *</label>
+                        <input type="email" id="event_participant_email" name="participant_email" required>
                     </div>
                 </div>
                 
@@ -2042,42 +2402,31 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                     </h4>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="event_company_name">회사명</label>
-                            <input type="text" id="event_company_name" name="company_name">
+                            <label for="event_company_name">회사명/소속</label>
+                            <input type="text" id="event_company_name" name="company_name" placeholder="소속 회사나 기관명 (선택사항)">
                         </div>
                         <div class="form-group">
-                            <label for="event_position">직책</label>
-                            <input type="text" id="event_position" name="position">
+                            <label for="event_position">직책/직위</label>
+                            <input type="text" id="event_position" name="position" placeholder="직책이나 직위 (선택사항)">
                         </div>
                     </div>
                 </div>
                 
-                <!-- 참가 정보 섹션 -->
+                <!-- 추가 정보 섹션 -->
                 <div class="form-section">
                     <h4 class="form-section-title">
-                        <i class="fas fa-clipboard-check"></i> 참가 정보 (선택)
+                        <i class="fas fa-clipboard-check"></i> 추가 정보 (선택)
                     </h4>
                     <div class="form-group">
-                        <label for="event_motivation">참가 동기</label>
-                        <textarea id="event_motivation" name="motivation" placeholder="이 행사에 참가하시는 이유를 간단히 알려주세요."></textarea>
+                        <label for="event_motivation">참가 동기/목적</label>
+                        <textarea id="event_motivation" name="motivation" placeholder="이 행사에 참가하시는 이유나 기대하시는 점을 간단히 적어주세요 (선택사항)"></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="event_special_requests">특별 요청사항</label>
-                        <textarea id="event_special_requests" name="special_requests" placeholder="식이 제한, 접근성 요구사항 등이 있으시면 알려주세요."></textarea>
-                    </div>
-                </div>
-                
-                <!-- 기타 정보 섹션 -->
-                <div class="form-section">
-                    <h4 class="form-section-title">
-                        <i class="fas fa-info-circle"></i> 기타 정보 (선택)
-                    </h4>
+
                     <div class="form-group">
                         <label for="event_how_did_you_know">어떻게 알게 되셨나요?</label>
                         <select id="event_how_did_you_know" name="how_did_you_know">
-                            <option value="">선택해주세요</option>
-                            <option value="website">웹사이트</option>
+                            <option value="">선택해주세요 (선택사항)</option>
+                            <option value="website">웹사이트에서</option>
                             <option value="social_media">소셜미디어</option>
                             <option value="friend_referral">지인 추천</option>
                             <option value="company_notice">회사 공지</option>
@@ -2086,6 +2435,11 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                             <option value="advertisement">광고</option>
                             <option value="other">기타</option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event_special_requests">특별 요청사항</label>
+                        <textarea id="event_special_requests" name="special_requests" placeholder="식이 제한, 접근성 요구사항 등이 있으시면 알려주세요."></textarea>
                     </div>
                 </div>
             </form>
@@ -2212,15 +2566,11 @@ window.initEventVenueMap = function() {
         // 지도 중심 좌표
         var center = new naver.maps.LatLng(<?= floatval($eventCoords['lat']) ?>, <?= floatval($eventCoords['lng']) ?>);
         
-        // 지도 옵션
+        // 지도 옵션 (일반/위성 버튼 제거)
         var mapOptions = {
             center: center,
             zoom: 16,
-            mapTypeControl: true,
-            mapTypeControlOptions: {
-                style: naver.maps.MapTypeControlStyle.BUTTON,
-                position: naver.maps.Position.TOP_RIGHT
-            },
+            mapTypeControl: false,  // 일반/위성 버튼 완전 제거
             zoomControl: true,
             zoomControlOptions: {
                 style: naver.maps.ZoomControlStyle.SMALL,
@@ -2293,7 +2643,7 @@ window.initEventVenueMap = function() {
         }, 500);
         
         console.log('🗺️ 행사장 지도 초기화 완료');
-        
+
     } catch (error) {
         console.error('🗺️ 행사장 지도 초기화 오류:', error);
         showEventMapFallback();
@@ -2319,6 +2669,27 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // 행사 ID 전역 변수
 const eventId = <?= $event['id'] ?>;
+
+// 조건부 워딩을 위한 변수 설정
+const registrationButtonText = <?php echo json_encode(
+    ($event['registration_fee'] && $event['registration_fee'] > 0) ? '참가 신청하기' : '참가 신청하기'
+); ?>;
+
+// 🔥 Ultra Think: 마감 조건 상태를 JavaScript에서 사용할 수 있도록 전달
+const eventRegistrationStatus = <?php
+echo json_encode([
+    'canRegister' => !$cannotRegister,
+    'isOwnEvent' => $isOwnEvent,
+    'isCapacityFull' => $isCapacityFull,
+    'isEventStarted' => $isEventStarted,
+    'isDeadlinePassed' => $isDeadlinePassed,
+    'currentCount' => intval($event['current_registration_count'] ?? 0),
+    'maxParticipants' => $event['max_participants'] ? intval($event['max_participants']) : null,
+    'organizerId' => intval($event['user_id']),
+    'eventStartDateTime' => $event['start_date'] . ' ' . $event['start_time'],
+    'registrationDeadline' => $event['registration_deadline'] ?? null
+], JSON_UNESCAPED_UNICODE);
+?>;
 
 // 페이지 로드 시 행사 신청 상태 확인
 document.addEventListener('DOMContentLoaded', function() {
@@ -2360,9 +2731,13 @@ async function checkEventRegistrationStatus() {
             console.log('🔐 등록 상태 확인을 위해 로그인이 필요합니다.');
         } else {
             console.log('📊 등록 상태 정보 없음:', result.message || '알 수 없는 오류');
+            // 신청 안함 상태로 UI 초기화
+            updateEventRegistrationUI('none', null);
         }
     } catch (error) {
         console.error('행사 신청 상태 확인 오류:', error);
+        // 오류 시에도 기본 상태로 초기화
+        updateEventRegistrationUI('none', null);
     }
 }
 
@@ -2386,7 +2761,7 @@ function updateEventRegistrationUI(status, registration) {
     switch (status) {
         case 'pending':
             registerBtn.style.display = 'none';
-            cancelBtn.style.display = 'block';
+            cancelBtn.style.setProperty('display', 'block', 'important');
             cancelBtn.textContent = '신청 취소 (승인 대기중)';
             cancelBtn.style.background = '#dc3545';
             
@@ -2397,7 +2772,7 @@ function updateEventRegistrationUI(status, registration) {
             
         case 'approved':
             registerBtn.style.display = 'none';
-            cancelBtn.style.display = 'block';
+            cancelBtn.style.setProperty('display', 'block', 'important');
             cancelBtn.textContent = '신청 취소 (승인됨)';
             cancelBtn.style.background = '#dc3545';
             
@@ -2408,7 +2783,7 @@ function updateEventRegistrationUI(status, registration) {
             
         case 'waiting':
             registerBtn.style.display = 'none';
-            cancelBtn.style.display = 'block';
+            cancelBtn.style.setProperty('display', 'block', 'important');
             cancelBtn.textContent = `신청 취소 (대기: ${registration.waiting_order}번)`;
             cancelBtn.style.background = '#dc3545';
             
@@ -2420,7 +2795,7 @@ function updateEventRegistrationUI(status, registration) {
         case 'rejected':
             registerBtn.style.display = 'block';
             registerBtn.textContent = '다시 신청하기';
-            cancelBtn.style.display = 'none';
+            cancelBtn.style.setProperty('display', 'none', 'important');
             
             // 거절 상태 메시지 표시
             const rejectedMessage = registration?.admin_notes || '신청이 거절되었습니다. 다시 신청하실 수 있습니다.';
@@ -2430,14 +2805,22 @@ function updateEventRegistrationUI(status, registration) {
         case 'cancelled':
             registerBtn.style.display = 'block';
             registerBtn.textContent = '다시 신청하기';
-            cancelBtn.style.display = 'none';
+            cancelBtn.style.setProperty('display', 'none', 'important');
             hideStatusMessage();
             break;
-            
-        default:
+
+        case 'none':
+            // 신청 안함 상태 (기본 상태)
             registerBtn.style.display = 'block';
             registerBtn.textContent = '참가 신청하기';
-            cancelBtn.style.display = 'none';
+            cancelBtn.style.setProperty('display', 'none', 'important');
+            hideStatusMessage();
+            break;
+
+        default:
+            registerBtn.style.display = 'block';
+            registerBtn.textContent = registrationButtonText;
+            cancelBtn.style.setProperty('display', 'none', 'important');
             hideStatusMessage();
     }
     
@@ -2471,15 +2854,84 @@ function updateEventRegistrationUI(status, registration) {
     }
 }
 
+// 🔥 Ultra Think: 마감 조건 실시간 검증 함수
+function validateEventRegistrationConditions() {
+    const now = new Date();
+
+    // 1. 본인 행사 체크
+    if (eventRegistrationStatus.isOwnEvent) {
+        return {
+            canRegister: false,
+            message: '본인이 등록한 행사에는 참가 신청할 수 없습니다.',
+            type: 'own_event'
+        };
+    }
+
+    // 2. 정원 초과 체크
+    if (eventRegistrationStatus.maxParticipants &&
+        eventRegistrationStatus.currentCount >= eventRegistrationStatus.maxParticipants) {
+        return {
+            canRegister: false,
+            message: `정원이 마감되었습니다. (${eventRegistrationStatus.currentCount}/${eventRegistrationStatus.maxParticipants}명)`,
+            type: 'capacity_full'
+        };
+    }
+
+    // 3. 행사 시작일 지남 체크
+    const eventStart = new Date(eventRegistrationStatus.eventStartDateTime);
+    if (now > eventStart) {
+        return {
+            canRegister: false,
+            message: '행사가 이미 시작되어 참가 신청할 수 없습니다.',
+            type: 'event_started'
+        };
+    }
+
+    // 4. 등록 마감일 체크
+    if (eventRegistrationStatus.registrationDeadline) {
+        const deadline = new Date(eventRegistrationStatus.registrationDeadline);
+        if (now > deadline) {
+            return {
+                canRegister: false,
+                message: '등록 마감일이 지나 참가 신청할 수 없습니다.',
+                type: 'deadline_passed'
+            };
+        }
+    }
+
+    return {
+        canRegister: true,
+        message: '참가 신청이 가능합니다.',
+        type: 'available'
+    };
+}
+
 // 행사 신청 버튼 클릭
 async function registerEvent() {
     try {
+        // 🔥 Ultra Think: 실시간 마감 조건 검증
+        const validation = validateEventRegistrationConditions();
+
+        if (!validation.canRegister) {
+            // 마감 조건에 걸린 경우 사용자에게 안내
+            const alertMessages = {
+                'own_event': '⚠️ 본인이 등록한 행사입니다\n\n자신이 등록한 행사에는 참가 신청할 수 없습니다.',
+                'capacity_full': '🈵 정원이 마감되었습니다\n\n취소가 발생하면 선착순으로 신청 가능합니다.',
+                'event_started': '⏰ 행사가 이미 시작되었습니다\n\n다른 진행 예정인 행사를 확인해보세요.',
+                'deadline_passed': '⏳ 등록 마감일이 지났습니다\n\n다른 진행 예정인 행사를 확인해보세요.'
+            };
+
+            alert(alertMessages[validation.type] || validation.message);
+            return;
+        }
+
         // 이전 신청 데이터 조회 및 폼 자동 입력
         await loadEventUserInfo();
-        
+
         // 모달 표시
         document.getElementById('eventRegistrationModal').style.display = 'block';
         document.body.style.overflow = 'hidden';
+
     } catch (error) {
         console.error('행사 신청 모달 열기 오류:', error);
         alert('행사 신청 준비 중 오류가 발생했습니다.');
@@ -2495,18 +2947,26 @@ function redirectToLogin() {
 
 // 사용자 정보 및 이전 신청 데이터 로드
 async function loadEventUserInfo() {
+    console.log('📝 행사 신청: 사용자 정보 로드 시작...');
+
     try {
         // 사용자 정보 가져오기
         const userResponse = await fetch('/auth/me', {
             method: 'GET',
             headers: getAuthHeaders()
         });
-        
+
         if (userResponse.ok) {
             const userData = await userResponse.json();
-            if (userData.status === 'success' && userData.data) {
-                fillEventUserInfo(userData.data);
+            console.log('👤 행사 신청: API 응답 전체:', JSON.stringify(userData, null, 2));
+            if (userData.success && userData.user) {
+                console.log('✅ 행사 신청: 사용자 정보 자동 입력 시작');
+                fillEventUserInfo(userData.user);
+            } else {
+                console.log('❌ 행사 신청: 사용자 정보 구조 오류', userData);
             }
+        } else {
+            console.log('❌ 행사 신청: API 요청 실패:', userResponse.status, userResponse.statusText);
         }
         
         // 이전 신청 데이터 가져오기
@@ -2541,9 +3001,32 @@ async function loadEventUserInfo() {
 
 // 사용자 정보로 폼 채우기
 function fillEventUserInfo(userData) {
-    document.getElementById('event_participant_name').value = userData.nickname || '';
-    document.getElementById('event_participant_email').value = userData.email || '';
-    document.getElementById('event_participant_phone').value = userData.phone || '';
+    console.log('🔧 행사 신청: 폼 자동 채우기 실행', userData);
+
+    const nameField = document.getElementById('event_participant_name');
+    const emailField = document.getElementById('event_participant_email');
+    const phoneField = document.getElementById('event_participant_phone');
+
+    if (nameField) {
+        nameField.value = userData.nickname || '';
+        console.log('✅ 이름 필드 채움:', userData.nickname);
+    } else {
+        console.log('❌ 이름 필드 없음: event_participant_name');
+    }
+
+    if (emailField) {
+        emailField.value = userData.email || '';
+        console.log('✅ 이메일 필드 채움:', userData.email);
+    } else {
+        console.log('❌ 이메일 필드 없음: event_participant_email');
+    }
+
+    if (phoneField) {
+        phoneField.value = userData.phone || '';
+        console.log('✅ 전화번호 필드 채움:', userData.phone);
+    } else {
+        console.log('❌ 전화번호 필드 없음: event_participant_phone');
+    }
 }
 
 // 이전 신청 데이터로 폼 채우기
@@ -2567,9 +3050,25 @@ function closeEventRegistrationModal() {
 // 행사 신청 제출
 async function submitEventRegistration() {
     try {
+        // 🔥 Ultra Think: 제출 전 마감 조건 재검증
+        const validation = validateEventRegistrationConditions();
+
+        if (!validation.canRegister) {
+            const alertMessages = {
+                'own_event': '❌ 본인이 등록한 행사에는 신청할 수 없습니다.',
+                'capacity_full': '❌ 정원이 마감되어 신청할 수 없습니다.',
+                'event_started': '❌ 행사가 이미 시작되어 신청할 수 없습니다.',
+                'deadline_passed': '❌ 등록 마감일이 지나 신청할 수 없습니다.'
+            };
+
+            alert(alertMessages[validation.type] || validation.message);
+            closeEventRegistrationModal();
+            return;
+        }
+
         const form = document.getElementById('eventRegistrationForm');
         const formData = new FormData(form);
-        
+
         // CSRF 토큰 추가
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         formData.append('csrf_token', csrfToken);
@@ -3039,8 +3538,12 @@ function confirmDeleteEvent(eventId) {
         
         if (isSuccess) {
             alert('✅ 행사가 성공적으로 삭제되었습니다.');
-            // 행사 목록 페이지로 리다이렉트
-            window.location.href = '/events';
+            // 이전 페이지로 돌아가기 (또는 행사 목록으로)
+            if (document.referrer && document.referrer !== window.location.href) {
+                window.location.href = document.referrer;
+            } else {
+                window.location.href = '/events';
+            }
         } else {
             console.error('행사 삭제 실패:', message);
             alert('❌ 행사 삭제에 실패했습니다: ' + message);
@@ -3060,3 +3563,6 @@ function confirmDeleteEvent(eventId) {
     });
 }
 </script>
+
+<!-- edit-check.js 로드 -->
+<script src="/assets/js/edit-check.js"></script>
