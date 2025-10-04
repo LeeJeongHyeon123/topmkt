@@ -873,11 +873,7 @@ html body .events-header p,
     color: white;
 }
 
-.badge-conference { background: #4A90E2; }
-.badge-seminar { background: #2E86AB; }
-.badge-workshop { background: #48bb78; }
-.badge-networking { background: #ed8936; }
-.badge-exhibition { background: #9f7aea; }
+/* 🚀 v3.28.0: 배지 스타일은 /assets/css/badges.css에서 통합 관리 */
 
 .event-list-meta {
     display: grid;

@@ -482,11 +482,7 @@ $monthNames = [
     color: white;
 }
 
-.badge-seminar { background: #667eea; }
-.badge-workshop { background: #48bb78; }
-.badge-conference { background: #ed8936; }
-.badge-webinar { background: #38b2ac; }
-.badge-training { background: #9f7aea; }
+/* 🚀 v3.28.0: 배지 스타일은 /assets/css/badges.css에서 통합 관리 */
 
 .lecture-list-meta {
     display: grid;

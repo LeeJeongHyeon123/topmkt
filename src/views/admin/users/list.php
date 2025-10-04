@@ -301,10 +301,7 @@ $additional_styles = '
     text-transform: uppercase;
 }
 
-.status-active { background: #c6f6d5; color: #22543d; }
-.status-inactive { background: #fed7d7; color: #c53030; }
-.status-suspended { background: #ffd6cc; color: #c05621; }
-.status-pending { background: #fef5e7; color: #b7791f; }
+/* 🚀 v3.28.0: 상태 배지 스타일은 /assets/css/badges.css에서 통합 관리 */
 
 .role-badge {
     padding: 4px 8px;

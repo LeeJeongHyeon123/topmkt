@@ -1,0 +1,322 @@
+/**
+ * 탑마케팅 통합 배지 시스템
+ * v3.28.0 - 2025-10-04
+ *
+ * 모든 배지/태그 스타일을 통일하여 일관된 UI 제공
+ */
+
+/* ========================================
+   1. 공통 배지 기본 스타일
+   ======================================== */
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* 큰 배지 */
+.badge-large {
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    border-radius: 16px;
+}
+
+/* 작은 배지 */
+.badge-small {
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+}
+
+/* ========================================
+   2. 카테고리 배지 (강의/행사 통일)
+   ======================================== */
+
+/* 세미나 - 보라색 */
+.badge-seminar {
+    background: #667eea;
+    color: white;
+}
+
+/* 워크샵 - 초록색 */
+.badge-workshop {
+    background: #48bb78;
+    color: white;
+}
+
+/* 컨퍼런스 - 주황색 */
+.badge-conference {
+    background: #ed8936;
+    color: white;
+}
+
+/* 웨비나 - 청록색 */
+.badge-webinar {
+    background: #38b2ac;
+    color: white;
+}
+
+/* 교육/트레이닝 - 연보라색 */
+.badge-training {
+    background: #9f7aea;
+    color: white;
+}
+
+/* 네트워킹 - 파란색 */
+.badge-networking {
+    background: #4A90E2;
+    color: white;
+}
+
+/* 전시회 - 진한 보라색 */
+.badge-exhibition {
+    background: #7c3aed;
+    color: white;
+}
+
+/* ========================================
+   3. 상태 배지
+   ======================================== */
+
+/* 활성 - 연한 초록 */
+.badge-active,
+.status-active {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+/* 비활성 - 연한 빨강 */
+.badge-inactive,
+.status-inactive {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+/* 정지 - 연한 주황 */
+.badge-suspended,
+.status-suspended {
+    background: #ffd6cc;
+    color: #c05621;
+}
+
+/* 대기 - 연한 노랑 */
+.badge-pending,
+.status-pending {
+    background: #fef5e7;
+    color: #b7791f;
+}
+
+/* 승인됨 - 초록 */
+.badge-approved,
+.status-approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* 거절됨 - 빨강 */
+.badge-rejected,
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ========================================
+   4. 신청 상태 배지
+   ======================================== */
+
+/* 신청 가능 - 초록 */
+.badge-open,
+.registration-status-badge.open {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* 마감 - 빨강 */
+.badge-closed,
+.registration-status-badge.closed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* 정원 초과 - 노랑 */
+.badge-full,
+.registration-status-badge.full {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* 완료 - 파랑 */
+.badge-completed,
+.registration-status-badge.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* ========================================
+   5. 역할 배지
+   ======================================== */
+
+/* 일반회원 - 회색 */
+.badge-user,
+.role-user {
+    background: #e2e8f0;
+    color: #2d3748;
+}
+
+/* 기업회원 - 파란색 */
+.badge-corporate,
+.role-corporate {
+    background: #bee3f8;
+    color: #2c5282;
+}
+
+/* 관리자 - 보라색 */
+.badge-admin,
+.role-admin {
+    background: #e9d8fd;
+    color: #553c9a;
+}
+
+/* ========================================
+   6. 레거시 클래스 호환성 (하위 호환)
+   ======================================== */
+
+/* 강의 배지 */
+.lecture-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
+}
+
+/* 행사 배지 */
+.event-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
+}
+
+/* 상태 배지 */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* 역할 배지 */
+.role-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* 강사 배지 */
+.instructor-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #667eea;
+    color: white;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 8px;
+}
+
+/* 강의 ID 배지 */
+.lecture-id-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #e2e8f0;
+    color: #2d3748;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* ========================================
+   7. 반응형 (모바일 최적화)
+   ======================================== */
+
+@media (max-width: 768px) {
+    .badge {
+        padding: 3px 10px;
+        font-size: 0.8rem;
+    }
+
+    .badge-large {
+        padding: 6px 14px;
+        font-size: 0.9rem;
+    }
+
+    .badge-small {
+        padding: 2px 6px;
+        font-size: 0.7rem;
+    }
+}
+
+/* ========================================
+   8. 다크모드 지원
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    /* 카테고리 배지 - 다크모드에서 더 밝게 */
+    .badge-seminar { background: #7c3aed; }
+    .badge-workshop { background: #10b981; }
+    .badge-conference { background: #f59e0b; }
+    .badge-webinar { background: #06b6d4; }
+    .badge-training { background: #a78bfa; }
+    .badge-networking { background: #3b82f6; }
+    .badge-exhibition { background: #8b5cf6; }
+
+    /* 상태 배지 - 다크모드 대비 강화 */
+    .badge-active,
+    .status-active {
+        background: #065f46;
+        color: #d1fae5;
+    }
+
+    .badge-inactive,
+    .status-inactive {
+        background: #991b1b;
+        color: #fecaca;
+    }
+}
+
+/* ========================================
+   9. 애니메이션 효과 (선택사항)
+   ======================================== */
+
+.badge-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* 호버 효과 */
+.badge-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
