@@ -63,7 +63,7 @@
     <link rel="shortcut icon" href="/favicon.ico?v=20250609">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/main.css?v=<?= time() ?>">
     <link rel="stylesheet" href="/assets/css/loading.css">
     <link rel="stylesheet" href="/assets/css/badges.css"><!-- 🚀 v3.28.0: 통합 배지 시스템 -->
     <!-- Font Awesome 6.4.0 with fallback for connection issues -->
