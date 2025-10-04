@@ -8,6 +8,9 @@ require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 
+// 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Button.php';
+
 // 컨트롤러에서 전달받은 데이터 추출
 $notice = $data['notice'] ?? null;
 $isLoggedIn = $data['user']['isLoggedIn'] ?? false;
@@ -983,23 +986,27 @@ body {
             
             <div class="notice-actions">
                 <!-- 공유 버튼 -->
-                <button class="btn btn-secondary" onclick="shareContent()">
-                    🔗 공유하기
-                </button>
-                
+                <?= renderButton('🔗 공유하기', 'secondary', 'md', [
+                    'onclick' => 'shareContent()'
+                ]) ?>
+
                 <!-- 목록으로 버튼 -->
-                <a href="/notices" class="btn btn-secondary">
-                    <i class="fas fa-list"></i> 목록으로
-                </a>
-                
+                <?= renderButton('목록으로', 'secondary', 'md', [
+                    'href' => '/notices',
+                    'icon' => 'fas fa-list'
+                ]) ?>
+
                 <!-- 수정/삭제 버튼 (소유자만) -->
                 <?php if ($canEdit): ?>
-                    <a href="/notices/<?= $notice['id'] ?>/edit" class="btn btn-warning">
-                        <i class="fas fa-edit"></i> 수정
-                    </a>
-                    <button type="button" class="btn btn-danger" onclick="deleteNotice(<?= $notice['id'] ?>)">
-                        <i class="fas fa-trash"></i> 삭제
-                    </button>
+                    <?= renderButton('수정', 'warning', 'md', [
+                        'href' => '/notices/' . $notice['id'] . '/edit',
+                        'icon' => 'fas fa-edit'
+                    ]) ?>
+                    <?= renderButton('삭제', 'danger', 'md', [
+                        'onclick' => 'deleteNotice(' . $notice['id'] . ')',
+                        'icon' => 'fas fa-trash',
+                        'buttonType' => 'button'
+                    ]) ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -1019,12 +1026,16 @@ body {
                       placeholder="댓글을 입력하세요... (최소 2자 이상)"
                       maxlength="1000"></textarea>
             <div class="comment-form-actions">
-                <button type="button" class="btn btn-secondary" onclick="clearComment()">
-                    <i class="fas fa-times"></i> 취소
-                </button>
-                <button type="button" class="btn btn-primary" onclick="submitComment()">
-                    <i class="fas fa-paper-plane"></i> 댓글 작성
-                </button>
+                <?= renderButton('취소', 'secondary', 'md', [
+                    'onclick' => 'clearComment()',
+                    'icon' => 'fas fa-times',
+                    'buttonType' => 'button'
+                ]) ?>
+                <?= renderButton('댓글 작성', 'primary', 'md', [
+                    'onclick' => 'submitComment()',
+                    'icon' => 'fas fa-paper-plane',
+                    'buttonType' => 'button'
+                ]) ?>
             </div>
         </div>
         <?php else: ?>
@@ -1119,11 +1130,23 @@ function renderComment($comment, $currentUserId, $depth = 0, $parentComment = nu
     // 댓글 액션 버튼
     $html .= '<div class="comment-actions">';
     if (!$isReply) {
-        $html .= '<button type="button" class="comment-action-btn" onclick="showReplyForm(' . $comment['id'] . ')">답글</button>';
+        $html .= renderButton('답글', 'secondary', 'sm', [
+            'class' => 'comment-action-btn',
+            'onclick' => 'showReplyForm(' . $comment['id'] . ')',
+            'buttonType' => 'button'
+        ]);
     }
     if ($canEditComment) {
-        $html .= '<button type="button" class="comment-action-btn" onclick="editComment(' . $comment['id'] . ')">수정</button>';
-        $html .= '<button type="button" class="comment-action-btn" onclick="deleteComment(' . $comment['id'] . ')">삭제</button>';
+        $html .= renderButton('수정', 'secondary', 'sm', [
+            'class' => 'comment-action-btn',
+            'onclick' => 'editComment(' . $comment['id'] . ')',
+            'buttonType' => 'button'
+        ]);
+        $html .= renderButton('삭제', 'secondary', 'sm', [
+            'class' => 'comment-action-btn',
+            'onclick' => 'deleteComment(' . $comment['id'] . ')',
+            'buttonType' => 'button'
+        ]);
     }
     $html .= '</div>';
     $html .= '</div>';
@@ -1138,8 +1161,14 @@ function renderComment($comment, $currentUserId, $depth = 0, $parentComment = nu
         $html .= '<div class="comment-edit-form" id="editForm_' . $comment['id'] . '">';
         $html .= '<textarea id="editContent_' . $comment['id'] . '">' . htmlspecialchars($comment['content']) . '</textarea>';
         $html .= '<div class="comment-edit-actions">';
-        $html .= '<button type="button" class="btn btn-secondary" onclick="cancelEditComment(' . $comment['id'] . ')">취소</button>';
-        $html .= '<button type="button" class="btn btn-primary" onclick="updateComment(' . $comment['id'] . ')">저장</button>';
+        $html .= renderButton('취소', 'secondary', 'md', [
+            'onclick' => 'cancelEditComment(' . $comment['id'] . ')',
+            'buttonType' => 'button'
+        ]);
+        $html .= renderButton('저장', 'primary', 'md', [
+            'onclick' => 'updateComment(' . $comment['id'] . ')',
+            'buttonType' => 'button'
+        ]);
         $html .= '</div>';
         $html .= '</div>';
     }
@@ -1149,8 +1178,14 @@ function renderComment($comment, $currentUserId, $depth = 0, $parentComment = nu
         $html .= '<div class="reply-form" id="replyForm_' . $comment['id'] . '">';
         $html .= '<textarea id="replyContent_' . $comment['id'] . '" placeholder="답글을 입력하세요..."></textarea>';
         $html .= '<div class="reply-form-actions">';
-        $html .= '<button type="button" class="btn btn-secondary" onclick="hideReplyForm(' . $comment['id'] . ')">취소</button>';
-        $html .= '<button type="button" class="btn btn-primary" onclick="submitReply(' . $comment['id'] . ')">답글 작성</button>';
+        $html .= renderButton('취소', 'secondary', 'md', [
+            'onclick' => 'hideReplyForm(' . $comment['id'] . ')',
+            'buttonType' => 'button'
+        ]);
+        $html .= renderButton('답글 작성', 'primary', 'md', [
+            'onclick' => 'submitReply(' . $comment['id'] . ')',
+            'buttonType' => 'button'
+        ]);
         $html .= '</div>';
         $html .= '</div>';
     }

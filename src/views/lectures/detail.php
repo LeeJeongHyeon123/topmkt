@@ -8,6 +8,9 @@ require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
+
+// 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Button.php';
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
 // 편집 권한 확인 (강의 작성자이거나 관리자인지 확인)
@@ -1816,12 +1819,13 @@ body {
         <div class="lecture-banner">
             <div class="lecture-actions">
                 <?php if ($canEdit): ?>
-                    <button class="btn btn-edit" data-lecture-id="<?= $lecture['id'] ?>">
-                        ✏️ 수정
-                    </button>
-                    <button class="btn btn-danger" onclick="confirmDeleteLecture(<?= $lecture['id'] ?>)">
-                        🗑️ 삭제
-                    </button>
+                    <?= renderButton('✏️ 수정', 'secondary', 'md', [
+                        'class' => 'btn-edit',
+                        'attributes' => ['data-lecture-id' => $lecture['id']]
+                    ]) ?>
+                    <?= renderButton('🗑️ 삭제', 'danger', 'md', [
+                        'onclick' => 'confirmDeleteLecture(' . $lecture['id'] . ')'
+                    ]) ?>
                 <?php endif; ?>
                 
                 <?php if ($isLoggedIn && !$canEdit): ?>
@@ -1841,9 +1845,9 @@ body {
                     </a>
                 <?php endif; ?>
                 
-                <button class="btn btn-secondary" onclick="shareContent()">
-                    🔗 공유하기
-                </button>
+                <?= renderButton('🔗 공유하기', 'secondary', 'md', [
+                    'onclick' => 'shareContent()'
+                ]) ?>
             </div>
             
             <div class="lecture-category">
@@ -2621,9 +2625,12 @@ body {
                                 <i class="fas fa-user"></i> 프로필 방문
                             </a>
                             <?php if ($isLoggedIn && $lecture['user_id'] != $currentUserId): ?>
-                                <button onclick="startChatWithAuthor(<?= $lecture['user_id'] ?>, '<?= addslashes(htmlspecialchars($authorName)) ?>')" class="btn-chat-author" title="채팅하기">
-                                    <i class="fas fa-comment"></i>
-                                </button>
+                                <?= renderButton('', 'primary', 'md', [
+                                    'class' => 'btn-chat-author',
+                                    'onclick' => 'startChatWithAuthor(' . $lecture['user_id'] . ', \'' . addslashes(htmlspecialchars($authorName)) . '\')',
+                                    'icon' => 'fas fa-comment',
+                                    'ariaLabel' => '채팅하기'
+                                ]) ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
