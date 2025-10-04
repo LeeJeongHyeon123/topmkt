@@ -6,6 +6,9 @@
 // SecurityHelper 클래스 로드
 require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
+// Button 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Button.php';
+
 // 페이지 정보 설정
 $page_title = '기업회원 목록';
 $page_description = '승인된 기업회원 목록 및 관리';
@@ -714,7 +717,7 @@ $content = '
             
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeStatusModal()">취소</button>
-                <button type="submit" id="statusSubmitBtn" class="btn-primary">변경</button>
+                <?= renderButton('변경', 'primary', 'md', ['buttonType' => 'submit', 'id' => 'statusSubmitBtn']) ?>
             </div>
         </form>
     </div>

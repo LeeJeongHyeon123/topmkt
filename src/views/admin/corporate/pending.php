@@ -6,6 +6,9 @@
 // SecurityHelper 클래스 로드
 require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
+// Button 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Button.php';
+
 // CSRF 토큰 생성
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -620,7 +623,7 @@ $content = '
             
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeModal()">취소</button>
-                <button type="submit" id="submitBtn" class="btn-primary">처리</button>
+                <?= renderButton('처리', 'primary', 'md', ['buttonType' => 'submit', 'id' => 'submitBtn']) ?>
             </div>
         </form>
     </div>
