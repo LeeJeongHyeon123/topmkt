@@ -2958,7 +2958,7 @@ async function registerEvent() {
 
 // 로그인 페이지로 리다이렉트
 function redirectToLogin() {
-    if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+    if (await Modal.confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
         window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname);
     }
 }
@@ -3132,7 +3132,7 @@ async function submitEventRegistration() {
 
 // 행사 신청 취소
 async function cancelEventRegistration() {
-    if (!confirm('정말로 행사 신청을 취소하시겠습니까?')) {
+    if (!(await Modal.confirm('정말로 행사 신청을 취소하시겠습니까?', { type: 'warning' }))) {
         return;
     }
     
@@ -3482,15 +3482,20 @@ function confirmDeleteEvent(eventId) {
     }
 
     // 삭제 확인
-    const confirmed = confirm('⚠️ 정말로 이 행사를 삭제하시겠습니까?\n\n삭제된 행사는 복구할 수 없습니다.');
+    const confirmed = await Modal.confirm('⚠️ 정말로 이 행사를 삭제하시겠습니까?\n\n삭제된 행사는 복구할 수 없습니다.', { type: 'danger' });
     
     if (!confirmed) {
         return;
     }
 
     // 두 번째 확인
-    const doubleConfirmed = confirm('⚠️ 마지막 확인입니다!\n\n행사 제목: "<?= htmlspecialchars($event['title']) ?>"\n\n정말로 삭제하시겠습니까?');
-    
+    const doubleConfirmed = await Modal.confirm('⚠️ 마지막 확인입니다!\n\n행사 제목: "<?= htmlspecialchars($event['title']) ?>"\n\n정말로 삭제하시겠습니까?', {
+        type: 'danger',
+        title: '최종 확인',
+        confirmText: '삭제',
+        cancelText: '취소'
+    });
+
     if (!doubleConfirmed) {
         return;
     }

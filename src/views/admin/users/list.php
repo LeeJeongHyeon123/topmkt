@@ -1198,8 +1198,12 @@ async function executeBulkAction() {
         Toast.info('작업을 선택하고 대상 회원을 선택하세요.');
         return;
     }
-    
-    if (!confirm(`선택한 ${formatNumber(selectedUsers.size)}명의 회원에게 "${action}" 작업을 실행하시겠습니까?`)) {
+
+    if (!(await Modal.confirm(`선택한 ${formatNumber(selectedUsers.size)}명의 회원에게 "${action}" 작업을 실행하시겠습니까?`, {
+        type: 'warning',
+        confirmText: '실행',
+        cancelText: '취소'
+    }))) {
         return;
     }
     

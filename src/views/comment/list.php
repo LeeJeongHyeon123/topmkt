@@ -1083,7 +1083,7 @@ function updateComment(commentId) {
 
 // 댓글 삭제
 function deleteComment(commentId) {
-    if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+    if (!(await Modal.confirm('정말로 이 댓글을 삭제하시겠습니까?', { type: 'warning' }))) {
         return;
     }
     

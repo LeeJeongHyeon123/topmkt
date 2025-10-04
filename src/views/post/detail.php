@@ -18,7 +18,7 @@
         <?php if (isset($_SESSION['user_id'])): ?>
             <!-- 실제 구현에서는 게시글 작성자만 수정/삭제 가능하도록 검사 -->
             <a href="/posts/<?= $post['id'] ?>/edit" class="btn btn-secondary">수정</a>
-            <form action="/posts/<?= $post['id'] ?>" method="post" class="delete-form" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+            <form action="/posts/<?= $post['id'] ?>" method="post" class="delete-form post-delete-form">
                 <input type="hidden" name="_method" value="DELETE">
                 <button type="submit" class="btn btn-danger">삭제</button>
             </form>
@@ -60,7 +60,7 @@
                             <!-- 실제 구현에서는 댓글 작성자만 수정/삭제 가능하도록 검사 -->
                             <div class="comment-actions">
                                 <button class="btn-link btn-edit-comment" data-id="<?= $comment['id'] ?>">수정</button>
-                                <form action="/comments/<?= $comment['id'] ?>" method="post" class="delete-form" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                <form action="/comments/<?= $comment['id'] ?>" method="post" class="delete-form comment-delete-form">
                                     <input type="hidden" name="_method" value="DELETE">
                                     <button type="submit" class="btn-link btn-delete-comment">삭제</button>
                                 </form>
@@ -72,5 +72,39 @@
         </div>
     </div>
 </div>
+
+<script>
+// 게시글 삭제 확인 (Modal.confirm() 사용)
+document.querySelector('.post-delete-form')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const confirmed = await Modal.confirm('정말 삭제하시겠습니까?', {
+        type: 'danger',
+        confirmText: '삭제',
+        cancelText: '취소'
+    });
+
+    if (confirmed) {
+        this.submit();
+    }
+});
+
+// 댓글 삭제 확인 (Modal.confirm() 사용)
+document.querySelectorAll('.comment-delete-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const confirmed = await Modal.confirm('정말 삭제하시겠습니까?', {
+            type: 'danger',
+            confirmText: '삭제',
+            cancelText: '취소'
+        });
+
+        if (confirmed) {
+            this.submit();
+        }
+    });
+});
+</script>
 
 <?php include SRC_PATH . '/views/templates/footer.php'; ?> 

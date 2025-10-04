@@ -872,7 +872,7 @@
                 <div class="dropdown-divider"></div>
                 
                 <!-- 시스템 메뉴 -->
-                <a href="/auth/logout" class="dropdown-item logout-item" onclick="return confirmLogout()">
+                <a href="/auth/logout" class="dropdown-item logout-item">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>로그아웃</span>
                 </a>
@@ -1911,7 +1911,7 @@
                 </a>
                 ${adminMenuHtml}
                 <div class="dropdown-divider"></div>
-                <a href="/auth/logout" class="dropdown-item logout-item" onclick="return confirmLogout()">
+                <a href="/auth/logout" class="dropdown-item logout-item">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>로그아웃</span>
                 </a>
@@ -1984,11 +1984,27 @@
             });
         }
         
-        // 로그아웃 확인
-        window.confirmLogout = function() {
-            return confirm('정말 로그아웃하시겠습니까?');
+        // 로그아웃 확인 (Modal.confirm() 사용)
+        window.confirmLogout = async function() {
+            return await Modal.confirm('정말 로그아웃하시겠습니까?', {
+                type: 'warning',
+                confirmText: '로그아웃',
+                cancelText: '취소'
+            });
         };
-        
+
+        // 로그아웃 링크 이벤트 리스너 (동적 생성된 요소 포함)
+        document.addEventListener('click', async function(e) {
+            const logoutItem = e.target.closest('.logout-item');
+            if (logoutItem) {
+                e.preventDefault();
+                const confirmed = await confirmLogout();
+                if (confirmed) {
+                    window.location.href = logoutItem.href;
+                }
+            }
+        });
+
         // 전역 에러 핸들러 (브라우저 확장 프로그램 에러 방지)
         window.addEventListener('error', function(e) {
             // 브라우저 확장 프로그램 관련 에러는 무시

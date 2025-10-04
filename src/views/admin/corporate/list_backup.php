@@ -1632,24 +1632,28 @@ function switchTab(tabName) {
     document.getElementById(tabName + 'Tab').classList.add('active');
 }
 
-// 상태 변경 폼 제출
-document.getElementById('statusForm').addEventListener('submit', function(e) {
+// 상태 변경 폼 제출 (Modal.confirm() 사용)
+document.getElementById('statusForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const newStatus = formData.get('new_status');
     const reason = formData.get('reason');
-    
+
     if (!newStatus) {
         Toast.info('새로운 상태를 선택해주세요.');
         return;
     }
-    
+
     const statusText = newStatus === 'approved' ? '승인' : '일시정지';
-    if (!confirm(`정말 이 기업회원을 ${statusText} 상태로 변경하시겠습니까?`)) {
+    if (!(await Modal.confirm(`정말 이 기업회원을 ${statusText} 상태로 변경하시겠습니까?`, {
+        type: 'warning',
+        confirmText: '변경',
+        cancelText: '취소'
+    }))) {
         return;
     }
-    
+
     submitManageForm(this, '상태가 변경되었습니다.');
 });
 

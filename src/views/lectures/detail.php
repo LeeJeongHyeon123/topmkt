@@ -3829,15 +3829,15 @@ function showFormErrors(errors) {
 }
 
 // 대기자 신청 모달
-function showWaitingListModal() {
-    if (confirm('정원이 마감되어 대기자로 신청됩니다.\n\n대기자로 신청하시겠습니까?')) {
+async function showWaitingListModal() {
+    if (await Modal.confirm('정원이 마감되어 대기자로 신청됩니다.\n\n대기자로 신청하시겠습니까?')) {
         showRegistrationModal();
     }
 }
 
 // 신청 취소
 async function cancelRegistration() {
-    if (!confirm('정말로 신청을 취소하시겠습니까?')) {
+    if (!(await Modal.confirm('정말로 신청을 취소하시겠습니까?', { type: 'danger', confirmText: '취소', cancelText: '아니오' }))) {
         return;
     }
     
@@ -3882,14 +3882,14 @@ function confirmDeleteLecture(lectureId) {
     }
 
     // 삭제 확인
-    const confirmed = confirm('⚠️ 정말로 이 강의를 삭제하시겠습니까?\n\n삭제된 강의는 복구할 수 없습니다.');
+    const confirmed = await Modal.confirm('⚠️ 정말로 이 강의를 삭제하시겠습니까?\n\n삭제된 강의는 복구할 수 없습니다.', { type: 'danger', title: '강의 삭제', confirmText: '삭제', cancelText: '취소' });
     
     if (!confirmed) {
         return;
     }
 
     // 두 번째 확인
-    const doubleConfirmed = confirm('⚠️ 마지막 확인입니다!\n\n강의 제목: "<?= htmlspecialchars($lecture['title']) ?>"\n\n정말로 삭제하시겠습니까?');
+    const doubleConfirmed = await Modal.confirm('⚠️ 마지막 확인입니다!\n\n강의 제목: "<?= htmlspecialchars($lecture["title"]) ?>"\n\n정말로 삭제하시겠습니까?', { type: 'danger', title: '최종 확인', confirmText: '삭제', cancelText: '취소' });
     
     if (!doubleConfirmed) {
         return;
@@ -4131,7 +4131,7 @@ function confirmCloseRegistrationModal() {
     
     // 내용이 있으면 확인 다이얼로그 표시
     if (hasContent) {
-        const shouldClose = confirm(
+        const shouldClose = await Modal.confirm(
             '📝 작성 중인 내용이 있습니다.\n' +
             '정말로 창을 닫으시겠습니까?\n\n' +
             '⚠️ 작성한 내용이 모두 삭제됩니다.'

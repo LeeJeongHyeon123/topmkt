@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteBtn = document.getElementById('deleteBtn');
     if (deleteBtn && isOwner) {
         deleteBtn.addEventListener('click', function() {
-            if (!confirm('정말로 이 게시글을 삭제하시겠습니까?\n\n삭제된 게시글은 복구할 수 없습니다.')) {
+            if (!(await Modal.confirm('정말로 이 게시글을 삭제하시겠습니까?\n\n삭제된 게시글은 복구할 수 없습니다.', { type: 'warning' }))) {
                 return;
             }
             
@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', function(e) {
         // ESC: 목록으로 돌아가기
         if (e.key === 'Escape') {
-            if (confirm('목록으로 돌아가시겠습니까?')) {
+            if (await Modal.confirm('목록으로 돌아가시겠습니까?')) {
                 window.location.href = '<?= htmlspecialchars($listUrl) ?>';
             }
         }

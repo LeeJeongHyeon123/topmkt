@@ -877,7 +877,7 @@ function addImagePreview(imagePath, imageId) {
 
 // 이미지 제거
 function removeImage(button, imageId) {
-    if (!confirm('이미지를 제거하시겠습니까?')) {
+    if (!(await Modal.confirm('이미지를 제거하시겠습니까?', { type: 'warning' }))) {
         return;
     }
     
@@ -988,7 +988,7 @@ function submitForm() {
 
 // 공지사항 삭제
 function deleteNotice(noticeId) {
-    if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.')) {
+    if (!(await Modal.confirm('정말로 이 공지사항을 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.', { type: 'warning' }))) {
         return;
     }
     

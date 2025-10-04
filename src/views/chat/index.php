@@ -2893,7 +2893,7 @@ function leaveChatRoom() {
 
     if (!activeRoomId) return;
 
-    if (confirm('채팅방을 나가시겠습니까? 메시지를 보내면 대화가 다시 활성화됩니다.')) {
+    if (await Modal.confirm('채팅방을 나가시겠습니까? 메시지를 보내면 대화가 다시 활성화됩니다.')) {
         try {
             console.log(`🚪 채팅방 나가기 시작: 사용자 ${currentUserId}, 채팅방 ${activeRoomId}`);
 

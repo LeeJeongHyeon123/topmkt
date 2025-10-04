@@ -1847,7 +1847,7 @@ function loadEditData() {
 
 // 기존 이미지 삭제 함수
 function removeExistingImage(button, imageId) {
-    if (confirm('이 이미지를 삭제하시겠습니까?')) {
+    if (await Modal.confirm('이 이미지를 삭제하시겠습니까?', { type: 'danger' })) {
         const parentElement = button.parentElement;
         
         // 삭제할 이미지 ID를 추가 (서버에서 처리용)

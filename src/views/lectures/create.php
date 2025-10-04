@@ -1588,7 +1588,7 @@ function updateImageIndexes() {
             
             newBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (confirm('이 이미지를 삭제하시겠습니까?')) {
+                if (await Modal.confirm('이 이미지를 삭제하시겠습니까?', { type: 'danger' })) {
                     removeExistingImage(newIndex, item);
                 }
             });
@@ -1649,7 +1649,7 @@ function updateLectureImagesDisplay(updatedImages) {
         const removeBtn = imageItem.querySelector('.remove-existing-image');
         removeBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            if (confirm('이 이미지를 삭제하시겠습니까?')) {
+            if (await Modal.confirm('이 이미지를 삭제하시겠습니까?', { type: 'danger' })) {
                 removeExistingImage(index, imageItem);
             }
         });
@@ -3970,7 +3970,7 @@ function displayExistingImages(images) {
 
 // 기존 이미지 삭제 함수
 function removeExistingImage(index) {
-    if (confirm('이 이미지를 삭제하시겠습니까?')) {
+    if (await Modal.confirm('이 이미지를 삭제하시겠습니까?', { type: 'danger' })) {
         // currentImageData에서 제거
         if (currentImageData && currentImageData[index]) {
             currentImageData.splice(index, 1);

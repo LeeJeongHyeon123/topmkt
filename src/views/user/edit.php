@@ -1376,7 +1376,7 @@ document.getElementById('delete-account-btn').addEventListener('click', function
     <p style="margin: 0;">정말 회원탈퇴를 진행하시겠습니까?</p>
 </div>`;
 
-    if (!confirm('회원탈퇴를 진행하시겠습니까?\n\n탈퇴 시 모든 개인정보가 삭제되며 복구할 수 없습니다.')) {
+    if (!(await Modal.confirm('회원탈퇴를 진행하시겠습니까?\n\n탈퇴 시 모든 개인정보가 삭제되며 복구할 수 없습니다.', { type: 'warning' }))) {
         return;
     }
 
@@ -1478,7 +1478,7 @@ function confirmDeleteAccount() {
     }
 
     // 3차 최종 확인
-    if (!confirm('정말로 탈퇴하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
+    if (!(await Modal.confirm('정말로 탈퇴하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.', { type: 'warning' }))) {
         return;
     }
 

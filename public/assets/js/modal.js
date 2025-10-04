@@ -215,3 +215,155 @@ function showAlertModal(message, options = {}) {
     createModal(id, title, `<p>${message}</p>`, buttons);
     openModal(id);
 }
+
+/**
+ * Modal 클래스 (네임스페이스)
+ */
+const Modal = {
+    /**
+     * 확인 다이얼로그 표시 (Promise 기반)
+     * @param {string} message - 확인 메시지
+     * @param {Object} options - 추가 옵션
+     * @returns {Promise<boolean>} 확인: true, 취소: false
+     *
+     * @example
+     * // 기본 사용법
+     * const result = await Modal.confirm('삭제하시겠습니까?');
+     * if (result) {
+     *     deleteItem();
+     * }
+     *
+     * // 옵션 사용
+     * await Modal.confirm('정말 삭제하시겠습니까?', {
+     *     title: '삭제 확인',
+     *     confirmText: '삭제',
+     *     cancelText: '취소',
+     *     type: 'danger'
+     * });
+     */
+    confirm: function(message, options = {}) {
+        return new Promise((resolve) => {
+            const id = 'modal-confirm-' + Date.now();
+            const title = options.title || '확인';
+            const confirmText = options.confirmText || '확인';
+            const cancelText = options.cancelText || '취소';
+            const type = options.type || 'primary'; // primary, danger, warning, success
+
+            // 타입별 아이콘
+            const icons = {
+                primary: '❓',
+                danger: '⚠️',
+                warning: '⚠️',
+                success: '✅',
+                info: 'ℹ️'
+            };
+            const icon = options.icon || icons[type] || '❓';
+
+            // 모달 HTML 생성
+            const modalHTML = `
+                <div class="modal-content modal-confirm modal-confirm-${type}">
+                    <div class="modal-confirm-icon">
+                        ${icon}
+                    </div>
+                    <div class="modal-confirm-title">
+                        ${title}
+                    </div>
+                    <div class="modal-confirm-message">
+                        ${message}
+                    </div>
+                    <div class="modal-confirm-buttons">
+                        <button class="btn btn-secondary modal-confirm-cancel" id="${id}-cancel">
+                            ${cancelText}
+                        </button>
+                        <button class="btn btn-${type} modal-confirm-ok" id="${id}-confirm">
+                            ${confirmText}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // 기존 모달 제거
+            const existing = document.getElementById(id);
+            if (existing) {
+                existing.remove();
+            }
+
+            // 모달 엘리먼트 생성
+            const modal = document.createElement('div');
+            modal.id = id;
+            modal.className = 'modal modal-confirm-wrapper';
+            modal.innerHTML = modalHTML;
+            document.body.appendChild(modal);
+
+            // 버튼 이벤트 연결
+            const confirmBtn = document.getElementById(`${id}-confirm`);
+            const cancelBtn = document.getElementById(`${id}-cancel`);
+
+            confirmBtn.addEventListener('click', () => {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    document.body.style.overflow = '';
+                }, 300);
+                resolve(true);
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    document.body.style.overflow = '';
+                }, 300);
+                resolve(false);
+            });
+
+            // ESC 키 처리
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.remove();
+                        document.body.style.overflow = '';
+                    }, 300);
+                    document.removeEventListener('keydown', handleEscape);
+                    resolve(false);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+
+            // 배경 클릭 처리
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.remove();
+                        document.body.style.overflow = '';
+                    }, 300);
+                    resolve(false);
+                }
+            });
+
+            // 모달 표시
+            setTimeout(() => {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                confirmBtn.focus(); // 확인 버튼에 포커스
+            }, 10);
+        });
+    },
+
+    /**
+     * 모달 열기 (기존 함수 래핑)
+     */
+    open: openModal,
+
+    /**
+     * 모달 닫기 (기존 함수 래핑)
+     */
+    close: closeModal,
+
+    /**
+     * 모든 모달 닫기 (기존 함수 래핑)
+     */
+    closeAll: closeAllModals
+};

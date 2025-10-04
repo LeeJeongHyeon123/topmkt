@@ -1401,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (hasContent) {
                 console.log('⚠️ 내용이 있어서 confirm 표시');
-                const userConfirmed = confirm('작성 중인 내용이 사라집니다.\n정말로 취소하시겠습니까?');
+                const userConfirmed = await Modal.confirm('작성 중인 내용이 사라집니다.\n정말로 취소하시겠습니까?');
                 console.log(`👤 사용자 선택: ${userConfirmed}`);
                 
                 if (!userConfirmed) {
@@ -1435,7 +1435,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 삭제 버튼 처리 (수정 페이지에서만)
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function() {
-            if (!confirm('정말로 이 게시글을 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.')) {
+            if (!(await Modal.confirm('정말로 이 게시글을 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.', { type: 'warning' }))) {
                 return;
             }
             
