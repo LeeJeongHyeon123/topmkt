@@ -1468,12 +1468,9 @@ body {
 </style>
 
 <div class="lectures-container">
-    <!-- 헤더 섹션 -->
-    <div class="lectures-header">
-        <h1>📅 강의 일정</h1>
-        <p>다양한 마케팅 강의와 세미나 일정을 확인하고 신청하세요</p>
-    </div>
-    
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/LecturesHeader.php'; ?>
+
     <!-- 색상 범례 -->
     <div class="color-legend">
         <div class="legend-item">

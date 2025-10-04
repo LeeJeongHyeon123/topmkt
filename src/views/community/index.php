@@ -892,12 +892,9 @@ body {
 </style>
 
 <div class="community-container">
-    <!-- 헤더 섹션 -->
-    <div class="community-header">
-        <h1>💬 커뮤니티 게시판</h1>
-        <p>탑마케팅 커뮤니티에서 정보를 공유하고 함께 성장하세요</p>
-    </div>
-    
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/CommunityHeader.php'; ?>
+
     <!-- 게시판 컨트롤 영역 -->
     <div class="board-controls">
         <!-- 검색 폼 -->

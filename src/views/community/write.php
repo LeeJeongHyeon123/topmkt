@@ -15,6 +15,7 @@ header("ETag: \"" . md5(time()) . "\"");
 // 로그인 상태 확인
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/config/upload.php';
+require_once SRC_PATH . '/components/ui/GradientHeader.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -501,12 +502,15 @@ html #quill-editor .ql-editor * {
 <?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
 
 <div class="write-container">
-    <!-- 헤더 섹션 -->
-    <div class="write-header">
-        <h1><?= $isEdit ? '📝 게시글 수정' : '✍️ 새 게시글 작성' ?></h1>
-        <p><?= $isEdit ? '게시글을 수정해주세요' : '커뮤니티에 새로운 이야기를 공유해주세요' ?></p>
-    </div>
-    
+    <!-- 헤더 컴포넌트 -->
+    <?= renderGradientHeader([
+        'title' => $isEdit ? '📝 게시글 수정' : '✍️ 새 게시글 작성',
+        'subtitle' => $isEdit ? '게시글을 수정해주세요' : '커뮤니티에 새로운 이야기를 공유해주세요',
+        'theme' => 'purple',
+        'size' => 'md',
+        'align' => 'center'
+    ]) ?>
+
     <!-- 작성 팁 -->
     <div class="form-tips">
         <h4>💡 게시글 작성 팁</h4>
