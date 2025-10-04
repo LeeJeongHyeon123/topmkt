@@ -415,12 +415,9 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
 </style>
 
 <div class="write-container">
-    <!-- 헤더 섹션 -->
-    <div class="write-header">
-        <h1>📢 <?= $pageTitle ?></h1>
-        <p>중요한 소식을 공유해주세요</p>
-    </div>
-    
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/NoticeWriteHeader.php'; ?>
+
     <!-- 작성 안내 팁 -->
     <div class="form-tips">
         <h4>💡 공지사항 작성 가이드</h4>

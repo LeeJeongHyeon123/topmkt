@@ -369,11 +369,8 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 <?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
 
 <div class="corp-apply-container">
-    <!-- 헤더 -->
-    <div class="corp-apply-header">
-        <h1><?= $isReapply ? '🔄 기업 인증 재신청' : '📝 기업 인증 신청' ?></h1>
-        <p><?= $isReapply ? '거절 사유를 보완하여 다시 신청해주세요.' : '강의와 행사를 등록하기 위해 기업 인증을 신청하세요.' ?></p>
-    </div>
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/CorporateApplyHeader.php'; ?>
 
     <?php if ($isReapply): ?>
     <div class="reapply-notice">

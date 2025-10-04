@@ -1125,12 +1125,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 <?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
 
 <div class="lecture-create-container">
-    <!-- 헤더 섹션 -->
-    <div class="create-header">
-        <h1><?= $isEditMode ? '✏️ 강의 수정' : '➕ 강의 등록' ?></h1>
-        <p><?= $isEditMode ? '강의 정보를 수정하여 더 나은 내용을 제공하세요' : '새로운 강의나 세미나를 등록하여 많은 분들과 지식을 공유하세요' ?></p>
-    </div>
-    
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/LectureCreateHeader.php'; ?>
+
     <!-- 등록/수정 폼 -->
     <form id="lectureForm" class="create-form" method="POST" action="<?= $isEditMode ? "/lectures/{$lectureId}/update" : '/lectures/store' ?>">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">

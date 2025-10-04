@@ -358,11 +358,8 @@ $profile = $applicationStatus['profile'];
 </style>
 
 <div class="corp-status-container">
-    <!-- 헤더 -->
-    <div class="corp-status-header">
-        <h1>📊 기업 인증 현황</h1>
-        <p>기업 인증 신청 상태와 상세 정보를 확인하실 수 있습니다.</p>
-    </div>
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/CorporateStatusHeader.php'; ?>
 
     <!-- 현재 상태 카드 -->
     <div class="status-card">

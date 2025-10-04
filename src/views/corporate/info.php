@@ -323,12 +323,8 @@
 </style>
 
 <div class="corp-info-container">
-    <!-- 헤더 섹션 -->
-    <div class="corp-info-header">
-        <h1>🏢 기업회원 시스템</h1>
-        <p>강의와 행사를 등록하고 더 많은 사람들과 지식을 나누세요.<br>
-           기업회원만의 특별한 혜택을 경험해보세요.</p>
-    </div>
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/CorporateInfoHeader.php'; ?>
 
     <!-- 현재 상태 메시지 -->
     <?php if ($applicationStatus && $applicationStatus['status'] === 'pending'): ?>

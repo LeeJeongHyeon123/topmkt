@@ -702,11 +702,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </style>
 
 <div class="event-create-container">
-    <!-- 헤더 -->
-    <div class="event-create-header">
-        <h1>🎉 새로운 행사 등록</h1>
-        <p>참가자들에게 의미있는 경험을 선사할 행사를 등록해보세요</p>
-    </div>
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/EventCreateHeader.php'; ?>
 
     <!-- 행사 등록 폼 -->
     <form id="eventForm" method="POST" action="/events/store" enctype="multipart/form-data">
