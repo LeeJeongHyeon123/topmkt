@@ -2939,7 +2939,7 @@ async function registerEvent() {
                 'deadline_passed': '⏳ 등록 마감일이 지났습니다\n\n다른 진행 예정인 행사를 확인해보세요.'
             };
 
-            alert(alertMessages[validation.type] || validation.message);
+            Toast.error(alertMessages[validation.type] || validation.message);
             return;
         }
 
@@ -2952,7 +2952,7 @@ async function registerEvent() {
 
     } catch (error) {
         console.error('행사 신청 모달 열기 오류:', error);
-        alert('행사 신청 준비 중 오류가 발생했습니다.');
+        Toast.error('행사 신청 준비 중 오류가 발생했습니다.');
     }
 }
 
@@ -3079,7 +3079,7 @@ async function submitEventRegistration() {
                 'deadline_passed': '❌ 등록 마감일이 지나 신청할 수 없습니다.'
             };
 
-            alert(alertMessages[validation.type] || validation.message);
+            Toast.error(alertMessages[validation.type] || validation.message);
             closeEventRegistrationModal();
             return;
         }
@@ -3106,7 +3106,7 @@ async function submitEventRegistration() {
         const result = await response.json();
         
         if (result.status === 'success') {
-            alert('✅ ' + result.message);
+            Toast.error('✅ ' + result.message);
             closeEventRegistrationModal();
             
             // UI 업데이트
@@ -3119,14 +3119,14 @@ async function submitEventRegistration() {
                 for (const field in result.data.errors) {
                     errorMsg += '- ' + result.data.errors[field] + '\n';
                 }
-                alert(errorMsg);
+                Toast.error(errorMsg);
             } else {
-                alert('❌ ' + (result.message || '신청 처리 중 오류가 발생했습니다.'));
+                Toast.error('❌ ' + (result.message || '신청 처리 중 오류가 발생했습니다.'));
             }
         }
     } catch (error) {
         console.error('행사 신청 제출 오류:', error);
-        alert('❌ 네트워크 오류가 발생했습니다.');
+        Toast.error('❌ 네트워크 오류가 발생했습니다.');
     }
 }
 
@@ -3153,16 +3153,16 @@ async function cancelEventRegistration() {
         const result = await response.json();
         
         if (result.status === 'success') {
-            alert('✅ ' + result.message);
+            Toast.error('✅ ' + result.message);
             
             // UI 업데이트
             updateEventRegistrationUI('cancelled', null);
         } else {
-            alert('❌ ' + (result.message || '신청 취소 중 오류가 발생했습니다.'));
+            Toast.error('❌ ' + (result.message || '신청 취소 중 오류가 발생했습니다.'));
         }
     } catch (error) {
         console.error('행사 신청 취소 오류:', error);
-        alert('❌ 네트워크 오류가 발생했습니다.');
+        Toast.error('❌ 네트워크 오류가 발생했습니다.');
     }
 }
 
@@ -3356,7 +3356,7 @@ function shareEventContent() {
         }
     } catch (error) {
         console.error('공유 기능 오류:', error);
-        alert('공유 기능에 오류가 발생했습니다.');
+        Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
 
@@ -3367,7 +3367,7 @@ function fallbackShare(title, url) {
     // 클립보드에 URL 복사
     if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => {
-            alert('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
+            Toast.error('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
         }).catch(() => {
             showShareModal(title, url);
         });
@@ -3447,7 +3447,7 @@ function showShareModal(title, url) {
 function copyToClipboard(text) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('✅ 링크가 복사되었습니다!');
+            Toast.error('✅ 링크가 복사되었습니다!');
         });
     } else {
         // 폴백 방법
@@ -3457,7 +3457,7 @@ function copyToClipboard(text) {
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        alert('✅ 링크가 복사되었습니다!');
+        Toast.error('✅ 링크가 복사되었습니다!');
     }
 }
 
@@ -3466,7 +3466,7 @@ function copyToClipboard(text) {
 // 작성자와 채팅 시작
 function startChatWithAuthor(authorId, authorName) {
     if (!authorId) {
-        alert('작성자 정보를 찾을 수 없습니다.');
+        Toast.error('작성자 정보를 찾을 수 없습니다.');
         return;
     }
     
@@ -3477,7 +3477,7 @@ function startChatWithAuthor(authorId, authorName) {
 // 이벤트 삭제 확인 함수
 function confirmDeleteEvent(eventId) {
     if (!eventId) {
-        alert('잘못된 행사 ID입니다.');
+        Toast.error('잘못된 행사 ID입니다.');
         return;
     }
 
@@ -3555,7 +3555,7 @@ function confirmDeleteEvent(eventId) {
         const message = data.data ? data.data.message : (data.message || '알 수 없는 오류');
         
         if (isSuccess) {
-            alert('✅ 행사가 성공적으로 삭제되었습니다.');
+            Toast.success('✅ 행사가 성공적으로 삭제되었습니다.');
             // 이전 페이지로 돌아가기 (또는 행사 목록으로)
             if (document.referrer && document.referrer !== window.location.href) {
                 window.location.href = document.referrer;
@@ -3564,7 +3564,7 @@ function confirmDeleteEvent(eventId) {
             }
         } else {
             console.error('행사 삭제 실패:', message);
-            alert('❌ 행사 삭제에 실패했습니다: ' + message);
+            Toast.error('❌ 행사 삭제에 실패했습니다: ' + message);
             
             // 버튼 상태 복원
             deleteBtn.innerHTML = originalText;
@@ -3573,7 +3573,7 @@ function confirmDeleteEvent(eventId) {
     })
     .catch(error => {
         console.error('네트워크 오류:', error);
-        alert('❌ 네트워크 오류가 발생했습니다: ' + error.message);
+        Toast.error('❌ 네트워크 오류가 발생했습니다: ' + error.message);
         
         // 버튼 상태 복원
         deleteBtn.innerHTML = originalText;

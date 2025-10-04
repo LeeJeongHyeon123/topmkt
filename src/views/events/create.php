@@ -155,14 +155,14 @@ window.getCoordinates = function(address) {
                 }
                 
                 updateCoordinateStatus('❌ 주소 위치를 찾을 수 없습니다', false);
-                alert('주소의 정확한 좌표를 찾을 수 없습니다.\n다른 주소를 시도해보세요.');
+                Toast.error('주소의 정확한 좌표를 찾을 수 없습니다.\n다른 주소를 시도해보세요.');
             }
         });
     } else {
         // 네이버 Maps API가 로드되지 않은 경우
         console.error('네이버 Maps API가 로드되지 않았습니다');
         updateCoordinateStatus('❌ 지도 API 로드 실패', false);
-        alert('지도 서비스를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
+        Toast.error('지도 서비스를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
     }
 };
 
@@ -1073,13 +1073,13 @@ function initializeForm() {
             if (data) {
                 // 오류 응답 처리
                 console.error('Form submission error:', data);
-                alert('등록 중 오류가 발생했습니다.');
+                Toast.error('등록 중 오류가 발생했습니다.');
                 Loading.button(submitBtn, false);
             }
         })
         .catch(error => {
             console.error('Form submission error:', error);
-            alert('등록 중 오류가 발생했습니다.');
+            Toast.error('등록 중 오류가 발생했습니다.');
             Loading.button(submitBtn, false);
         });
     });
@@ -1142,14 +1142,14 @@ function imageHandler() {
         
         // 파일 크기 검증 (공통 설정 사용: 30MB)
         if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-            alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+            Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             return;
         }
         
         // 이미지 개수 제한 검사 (20개)
         const currentImages = quill.container.querySelectorAll('img').length;
         if (currentImages >= 20) {
-            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+            Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
             return;
         }
         
@@ -1239,7 +1239,7 @@ function imageHandler() {
                 errorMessage += '\n상세: ' + error.message;
             }
             
-            alert(errorMessage);
+            Toast.error(errorMessage);
         }
     };
     
@@ -1419,13 +1419,13 @@ function initializeImageUpload() {
 function validateImageFile(file) {
     // 파일 확장자 검증
     if (!window.validateImageExtension(file.name)) {
-        alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
+        Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
         return false;
     }
 
     // 파일 크기 검증
     if (!window.validateFileSize(file.size)) {
-        alert(window.getFileSizeErrorMessage());
+        Toast.error(window.getFileSizeErrorMessage());
         return false;
     }
     
@@ -1503,7 +1503,7 @@ function initializeInstructorSystem() {
     
     addInstructorBtn.addEventListener('click', function() {
         if (instructorCount >= 5) {
-            alert('최대 5명까지 강사를 추가할 수 있습니다.');
+            Toast.info('최대 5명까지 강사를 추가할 수 있습니다.');
             return;
         }
         
@@ -1635,27 +1635,27 @@ function validateForm() {
     const description = quill.getText().trim();
     
     if (!title) {
-        alert('행사 제목을 입력해주세요.');
+        Toast.error('행사 제목을 입력해주세요.');
         return false;
     }
     
     if (!category) {
-        alert('카테고리를 선택해주세요.');
+        Toast.info('카테고리를 선택해주세요.');
         return false;
     }
     
     if (!startDate || !startTime) {
-        alert('시작 날짜와 시간을 입력해주세요.');
+        Toast.error('시작 날짜와 시간을 입력해주세요.');
         return false;
     }
     
     if (!description || description.length < 10) {
-        alert('행사 설명을 10자 이상 입력해주세요.');
+        Toast.error('행사 설명을 10자 이상 입력해주세요.');
         return false;
     }
     
     if (description.length > 10000) {
-        alert(`행사 설명은 10,000자를 초과할 수 없습니다. (현재: ${description.length}자)`);
+        Toast.error(`행사 설명은 10,000자를 초과할 수 없습니다. (현재: ${description.length}자)`);
         return false;
     }
     
@@ -1669,20 +1669,20 @@ function validateForm() {
         const venueLongitude = document.getElementById('venue_longitude').value.trim();
         
         if (!venueName || !venueAddress) {
-            alert('오프라인 행사는 행사장명과 주소를 입력해주세요.');
+            Toast.error('오프라인 행사는 행사장명과 주소를 입력해주세요.');
             return false;
         }
         
         // 좌표 필수 검증
         if (!venueLatitude || !venueLongitude) {
-            alert('주소 검색을 통해 정확한 위치 좌표를 설정해주세요.\n네이버 API 인증 문제가 있는 경우 관리자에게 문의하세요.');
+            Toast.error('주소 검색을 통해 정확한 위치 좌표를 설정해주세요.\n네이버 API 인증 문제가 있는 경우 관리자에게 문의하세요.');
             return false;
         }
     } else {
         const onlineLink = document.getElementById('online_link').value.trim();
         
         if (!onlineLink) {
-            alert('온라인 행사는 접속 링크를 입력해주세요.');
+            Toast.error('온라인 행사는 접속 링크를 입력해주세요.');
             return false;
         }
     }
@@ -1726,7 +1726,7 @@ setTimeout(() => {
                 for (let i = 20; i < images.length; i++) {
                     images[i].remove();
                 }
-                alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+                Toast.error('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
             }
             // 이미지 카운터 업데이트 (약간의 지연을 두어 DOM 변경 완료 후 실행)
             setTimeout(window.updateImageCounter, 100);

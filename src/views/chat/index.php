@@ -1891,7 +1891,7 @@ function openChatRoom(roomId, retryCount = 0) {
     // 무한 루프 방지: 최대 3번까지만 재시도
     if (retryCount >= 3) {
         console.error('❌ 최대 재시도 횟수 초과. 채팅방 열기를 포기합니다:', roomId);
-        alert('채팅방을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
+        Toast.error('채팅방을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
         return;
     }
 
@@ -1918,7 +1918,7 @@ function openChatRoom(roomId, retryCount = 0) {
                 openChatRoom(roomId, retryCount + 1);
             } else {
                 console.error('❌ Firebase에도 채팅방이 존재하지 않음');
-                alert('채팅방을 찾을 수 없습니다.');
+                Toast.error('채팅방을 찾을 수 없습니다.');
             }
         });
         return;
@@ -2295,7 +2295,7 @@ function renderSingleMessage(messageId, messageData) {
  */
 function sendMessage() {
     if (!activeRoomId) {
-        alert('채팅방을 선택해주세요.');
+        Toast.info('채팅방을 선택해주세요.');
         return;
     }
     
@@ -2356,7 +2356,7 @@ function sendMessage() {
         })
         .catch((error) => {
             console.error('❌ 메시지 전송 실패:', error);
-            alert('메시지 전송에 실패했습니다.');
+            Toast.error('메시지 전송에 실패했습니다.');
             sendBtn.disabled = false;
         });
 }
@@ -2408,7 +2408,7 @@ function performUserSearch() {
     const query = document.getElementById('userSearchInput').value.trim();
     
     if (query.length < 2) {
-        alert('정확한 닉네임을 2글자 이상 입력해주세요.');
+        Toast.error('정확한 닉네임을 2글자 이상 입력해주세요.');
         return;
     }
     
@@ -2521,7 +2521,7 @@ function startChatWithUser(user) {
 
     // 탈퇴한 회원과는 채팅 시작 불가 (추가 안전성 검사)
     if (user.is_deleted || user.status === 'deleted') {
-        alert('탈퇴한 회원과는 채팅을 시작할 수 없습니다.');
+        Toast.error('탈퇴한 회원과는 채팅을 시작할 수 없습니다.');
         return;
     }
 
@@ -2638,7 +2638,7 @@ function createPrivateChatRoom(user) {
         })
         .catch((error) => {
             console.error('❌ 채팅방 생성 실패:', error);
-            alert('채팅방 생성에 실패했습니다.');
+            Toast.error('채팅방 생성에 실패했습니다.');
         });
 }
 
@@ -2815,7 +2815,7 @@ function showChatOptionsMenu(event) {
  */
 function visitPartnerProfile() {
     if (!currentPartnerUserId) {
-        alert('프로필 정보를 찾을 수 없습니다.');
+        Toast.error('프로필 정보를 찾을 수 없습니다.');
         return;
     }
 
@@ -2823,7 +2823,7 @@ function visitPartnerProfile() {
     if (users[currentPartnerUserId]) {
         // 탈퇴한 회원인지 확인
         if (users[currentPartnerUserId].is_deleted || users[currentPartnerUserId].status === 'deleted') {
-            alert('탈퇴한 회원의 프로필은 볼 수 없습니다.');
+            Toast.error('탈퇴한 회원의 프로필은 볼 수 없습니다.');
             return;
         }
 
@@ -2831,7 +2831,7 @@ function visitPartnerProfile() {
             const profileUrl = `/profile/${encodeURIComponent(users[currentPartnerUserId].nickname)}`;
             window.open(profileUrl, '_blank');
         } else {
-            alert('프로필 페이지를 찾을 수 없습니다.');
+            Toast.error('프로필 페이지를 찾을 수 없습니다.');
         }
     } else {
         // 사용자 정보가 없으면 로드 후 이동
@@ -2839,7 +2839,7 @@ function visitPartnerProfile() {
             if (users[currentPartnerUserId]) {
                 // 탈퇴한 회원인지 확인
                 if (users[currentPartnerUserId].is_deleted || users[currentPartnerUserId].status === 'deleted') {
-                    alert('탈퇴한 회원의 프로필은 볼 수 없습니다.');
+                    Toast.error('탈퇴한 회원의 프로필은 볼 수 없습니다.');
                     return;
                 }
 
@@ -2847,13 +2847,13 @@ function visitPartnerProfile() {
                     const profileUrl = `/profile/${encodeURIComponent(users[currentPartnerUserId].nickname)}`;
                     window.open(profileUrl, '_blank');
                 } else {
-                    alert('프로필 페이지를 찾을 수 없습니다.');
+                    Toast.error('프로필 페이지를 찾을 수 없습니다.');
                 }
             } else {
-                alert('프로필 페이지를 찾을 수 없습니다.');
+                Toast.error('프로필 페이지를 찾을 수 없습니다.');
             }
         }).catch(() => {
-            alert('프로필 정보를 불러오는 중 오류가 발생했습니다.');
+            Toast.error('프로필 정보를 불러오는 중 오류가 발생했습니다.');
         });
     }
 }
@@ -2944,15 +2944,15 @@ function leaveChatRoom() {
                     `;
                 }
                 
-                alert('채팅방을 나갔습니다.');
+                Toast.success('채팅방을 나갔습니다.');
             })
             .catch((error) => {
                 console.error('❌ 채팅방 나가기 실패:', error);
-                alert('채팅방 나가기에 실패했습니다.');
+                Toast.error('채팅방 나가기에 실패했습니다.');
             });
         } catch (error) {
             console.error('❌ 채팅방 나가기 오류:', error);
-            alert('오류가 발생했습니다.');
+            Toast.error('오류가 발생했습니다.');
         }
     }
 }
@@ -3115,7 +3115,7 @@ function handleUrlHash() {
                 setTimeout(tryOpenRoom, 1000);
             } else {
                 console.error('❌ 최대 시도 횟수 초과. 채팅방을 찾을 수 없습니다:', roomId);
-                alert('채팅방을 찾을 수 없습니다. 채팅방 목록을 확인해주세요.');
+                Toast.error('채팅방을 찾을 수 없습니다. 채팅방 목록을 확인해주세요.');
                 history.replaceState(null, null, '/chat');
             }
         };
@@ -3160,19 +3160,19 @@ function handleUrlHash() {
                                     history.replaceState(null, null, '/chat');
                                 } else {
                                     console.error('🔗 사용자 정보를 찾을 수 없습니다.');
-                                    alert('사용자 정보를 찾을 수 없습니다.');
+                                    Toast.error('사용자 정보를 찾을 수 없습니다.');
                                     history.replaceState(null, null, '/chat');
                                 }
                             })
                             .catch(error => {
                                 console.error('🔗 사용자 정보 조회 실패:', error);
-                                alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+                                Toast.error('사용자 정보를 불러오는 중 오류가 발생했습니다.');
                                 history.replaceState(null, null, '/chat');
                             });
                     }
                 }).catch(error => {
                     console.error('🔗 사용자 정보 로드 실패:', error);
-                    alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+                    Toast.error('사용자 정보를 불러오는 중 오류가 발생했습니다.');
                     history.replaceState(null, null, '/chat');
                 });
             }
@@ -3192,7 +3192,7 @@ function handleUrlHash() {
                 setTimeout(waitForChatRoomsLoad, 500);
             } else {
                 console.error('❌ 채팅방 목록 로드 대기 시간 초과');
-                alert('채팅방 목록을 불러오는 중 시간이 초과되었습니다. 페이지를 새로고침해주세요.');
+                Toast.error('채팅방 목록을 불러오는 중 시간이 초과되었습니다. 페이지를 새로고침해주세요.');
                 history.replaceState(null, null, '/chat');
             }
         };

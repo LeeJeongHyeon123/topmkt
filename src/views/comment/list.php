@@ -751,7 +751,7 @@ function normalizeText(text) {
 // 폼 제출 전 글자수 검증 함수
 function validateCharacterLimit(content, maxLength = 2000) {
     if (content.length > maxLength) {
-        alert(`댓글은 최대 ${maxLength.toLocaleString()}자까지 입력 가능합니다. (현재: ${content.length.toLocaleString()}자)`);
+        Toast.warning(`댓글은 최대 ${maxLength.toLocaleString()}자까지 입력 가능합니다. (현재: ${content.length.toLocaleString()}자)`);
         return false;
     }
     return true;
@@ -764,7 +764,7 @@ function submitComment(event) {
     const rawContent = document.getElementById('comment-content').value;
     const content = normalizeText(rawContent);
     if (!content) {
-        alert('댓글 내용을 입력해주세요.');
+        Toast.error('댓글 내용을 입력해주세요.');
         return;
     }
     
@@ -810,12 +810,12 @@ function submitComment(event) {
                                (data.data && data.data.message) || 
                                '댓글 작성에 실패했습니다.';
             console.error('댓글 작성 실패:', errorMessage);
-            alert(errorMessage);
+            Toast.error(errorMessage);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('댓글 작성 중 오류가 발생했습니다.');
+        Toast.error('댓글 작성 중 오류가 발생했습니다.');
     })
     .finally(() => {
         submitBtn.disabled = false;
@@ -845,7 +845,7 @@ function submitReply(parentId) {
     const content = normalizeText(rawContent);
     
     if (!content) {
-        alert('답글 내용을 입력해주세요.');
+        Toast.error('답글 내용을 입력해주세요.');
         return;
     }
     
@@ -890,12 +890,12 @@ function submitReply(parentId) {
                                (data.data && data.data.message) || 
                                '답글 작성에 실패했습니다.';
             console.error('답글 작성 실패:', errorMessage);
-            alert(errorMessage);
+            Toast.error(errorMessage);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('답글 작성 중 오류가 발생했습니다.');
+        Toast.error('답글 작성 중 오류가 발생했습니다.');
     })
     .finally(() => {
         submitBtn.disabled = false;
@@ -938,7 +938,7 @@ function showInlineEditForm(commentId) {
     const contentDiv = document.getElementById('comment-content-' + commentId);
     
     if (!commentItem || !contentDiv) {
-        alert('댓글을 찾을 수 없습니다.');
+        Toast.error('댓글을 찾을 수 없습니다.');
         return;
     }
     
@@ -1007,19 +1007,19 @@ function updateComment(commentId) {
     const textarea = document.getElementById(`edit-content-${commentId}`);
     
     if (!textarea) {
-        alert('편집 폼을 찾을 수 없습니다.');
+        Toast.error('편집 폼을 찾을 수 없습니다.');
         return;
     }
     
     const content = normalizeText(textarea.value);
     
     if (!content) {
-        alert('댓글 내용을 입력해주세요.');
+        Toast.error('댓글 내용을 입력해주세요.');
         return;
     }
     
     if (content.length < 2) {
-        alert('댓글은 2자 이상 입력해주세요.');
+        Toast.error('댓글은 2자 이상 입력해주세요.');
         return;
     }
     
@@ -1065,12 +1065,12 @@ function updateComment(commentId) {
                                (data.data && data.data.message) || 
                                '댓글 수정에 실패했습니다.';
             console.error('댓글 수정 실패:', errorMessage);
-            alert(errorMessage);
+            Toast.error(errorMessage);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('댓글 수정 중 오류가 발생했습니다.');
+        Toast.error('댓글 수정 중 오류가 발생했습니다.');
     })
     .finally(() => {
         // 버튼 상태 복원
@@ -1114,19 +1114,19 @@ function deleteComment(commentId) {
                                (data.data && data.data.message) || 
                                '댓글 삭제에 실패했습니다.';
             console.error('댓글 삭제 실패:', errorMessage);
-            alert(errorMessage);
+            Toast.error(errorMessage);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('댓글 삭제 중 오류가 발생했습니다.');
+        Toast.error('댓글 삭제 중 오류가 발생했습니다.');
     });
 }
 
 // 댓글 작성자와 채팅 시작
 function startChatWithCommentAuthor(authorId, authorName) {
     if (!authorId) {
-        alert('댓글 작성자 정보를 찾을 수 없습니다.');
+        Toast.error('댓글 작성자 정보를 찾을 수 없습니다.');
         return;
     }
     

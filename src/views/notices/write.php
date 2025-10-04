@@ -569,20 +569,20 @@ function quillImageHandler() {
         // 🚀 v3.27.0: 공통 업로드 설정 사용
         // 파일 크기 검증
         if (!window.validateFileSize(file.size)) {
-            alert(window.getFileSizeErrorMessage());
+            Toast.error(window.getFileSizeErrorMessage());
             return;
         }
 
         // 파일 확장자 검증
         if (!window.validateImageExtension(file.name)) {
-            alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
+            Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return;
         }
         
         // 이미지 개수 제한 검사 (20개)
         const currentImages = document.getElementById('editor-container').querySelectorAll('img').length;
         if (currentImages >= 20) {
-            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+            Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
             return;
         }
         
@@ -623,7 +623,7 @@ function uploadImageToQuill(file) {
             // 이미지 카운터 업데이트
             updateImageCounter();
         } else {
-            alert('이미지 업로드 실패: ' + data.message);
+            Toast.error('이미지 업로드 실패: ' + data.message);
             console.error('❌ Quill 이미지 업로드 실패:', data.message);
         }
     })
@@ -631,7 +631,7 @@ function uploadImageToQuill(file) {
         // 로딩 텍스트 제거
         quill.deleteText(range.index, '이미지 업로드 중...'.length);
         
-        alert('이미지 업로드 중 오류가 발생했습니다.');
+        Toast.error('이미지 업로드 중 오류가 발생했습니다.');
         console.error('❌ Quill 이미지 업로드 오류:', error);
     });
 }
@@ -708,7 +708,7 @@ function initializeEditor() {
             for (let i = 20; i < images.length; i++) {
                 images[i].remove();
             }
-            alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+            Toast.error('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
         }
         
         // 이미지 카운터 업데이트 (약간의 지연으로 DOM 업데이트 후 실행)
@@ -790,7 +790,7 @@ function handleImageFiles(files) {
     const currentImageCount = document.querySelectorAll('.uploaded-image').length;
 
     if (currentImageCount + files.length > maxImages) {
-        alert(`최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`);
+        Toast.error(`최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`);
         return;
     }
 
@@ -798,13 +798,13 @@ function handleImageFiles(files) {
         // 🚀 v3.27.0: 공통 업로드 설정 사용
         // 파일 크기 검증
         if (!window.validateFileSize(file.size)) {
-            alert(`${file.name}: ${window.getFileSizeErrorMessage()}`);
+            Toast.error(`${file.name}: ${window.getFileSizeErrorMessage()}`);
             return;
         }
 
         // 파일 확장자 검증
         if (!window.validateImageExtension(file.name)) {
-            alert(`${file.name}: JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.`);
+            Toast.error(`${file.name}: JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.`);
             return;
         }
 
@@ -847,13 +847,13 @@ function uploadImage(file) {
             });
             updateImageCount();
         } else {
-            alert('이미지 업로드 실패: ' + (data.message || '알 수 없는 오류'));
+            Toast.error('이미지 업로드 실패: ' + (data.message || '알 수 없는 오류'));
         }
     })
     .catch(error => {
         progressEl.style.display = 'none';
         console.error('업로드 오류:', error);
-        alert('이미지 업로드 중 오류가 발생했습니다.');
+        Toast.error('이미지 업로드 중 오류가 발생했습니다.');
     });
 }
 
@@ -932,7 +932,7 @@ function validateForm() {
 // 폼 제출
 function submitForm() {
     if (!validateForm()) {
-        alert('입력 내용을 확인해주세요.');
+        Toast.error('입력 내용을 확인해주세요.');
         return;
     }
     
@@ -970,7 +970,7 @@ function submitForm() {
             // 폼 제출 성공 상태로 설정
             isFormSubmitted = true;
             
-            alert(<?= $isEdit ? "'공지사항이 성공적으로 수정되었습니다.'" : "'공지사항이 성공적으로 작성되었습니다.'" ?>);
+            Toast.success(<?= $isEdit ? '공지사항이 성공적으로 수정되었습니다.' : '공지사항이 성공적으로 작성되었습니다.' ?>);
             window.location.href = '/notices/' + data.data.id;
         } else {
             throw new Error(data.message || '저장 중 오류가 발생했습니다.');
@@ -978,7 +978,7 @@ function submitForm() {
     })
     .catch(error => {
         console.error('제출 오류:', error);
-        alert('저장 중 오류가 발생했습니다: ' + error.message);
+        Toast.error('저장 중 오류가 발생했습니다: ' + error.message);
     })
     .finally(() => {
         // 버튼 복원
@@ -1007,7 +1007,7 @@ function deleteNotice(noticeId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('공지사항이 삭제되었습니다.');
+            Toast.success('공지사항이 삭제되었습니다.');
             window.location.href = '/notices';
         } else {
             throw new Error(data.message || '삭제 중 오류가 발생했습니다.');
@@ -1015,7 +1015,7 @@ function deleteNotice(noticeId) {
     })
     .catch(error => {
         console.error('삭제 오류:', error);
-        alert('삭제 중 오류가 발생했습니다: ' + error.message);
+        Toast.error('삭제 중 오류가 발생했습니다: ' + error.message);
     });
 }
 
