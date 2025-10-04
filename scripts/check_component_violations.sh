@@ -158,10 +158,63 @@ if [ ! -z "$GRADIENT_INLINE" ]; then
 fi
 
 ##############################################
-# 5. 컴포넌트 import 누락 감지
+# 5. 글자 수 카운터 직접 코딩 감지 (v3.29.0)
 ##############################################
 
-echo "${BLUE}[5/5]${NC} 컴포넌트 import 누락 감지 중..."
+echo "${BLUE}[5/6]${NC} 글자 수 카운터 직접 코딩 감지 중..."
+echo ""
+
+# updateCharCounter, updateCharacterCount 함수 직접 정의 감지 (CharacterCounter 클래스 제외, 백업/테스트 파일 제외)
+# Quill 전용 (user/edit.php, community/write.php), 폼 검증 통합 (lectures/create.php)은 예외 처리
+CHAR_COUNTER_FUNCTIONS=$(grep -rn 'function updateCharCounter\|function updateCharacterCount' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "char-counter.js.php" | \
+    grep -v "user/edit.php" | \
+    grep -v "community/write.php:.*updateContentCharCounter" | \
+    grep -v "lectures/create.php" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$CHAR_COUNTER_FUNCTIONS" ]; then
+    echo "${RED}❌ 글자 수 카운터 함수 직접 정의 발견:${NC}"
+    echo "$CHAR_COUNTER_FUNCTIONS" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: CharacterCounter 클래스 사용${NC}"
+    echo "   new CharacterCounter(inputElement, counterElement, maxLength, options)"
+    echo "   (Quill 전용/폼검증 통합은 예외)"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# .length, .textContent 직접 사용하는 수동 카운터 패턴 감지 (단, 합법적인 경우 제외)
+MANUAL_COUNTER=$(grep -rn 'textContent.*\.length\|\.length.*textContent' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "char-counter.js.php" | \
+    grep -v "user/edit.php" | \
+    grep -v "community/write.php" | \
+    grep -v "lectures/create.php" | \
+    grep -v "imageCounter" | \
+    grep -v "Image" | \
+    grep -v "length}개" | \
+    grep -v "총.*length" | \
+    grep -vE "${EXCLUDE_PATTERN}" | \
+    head -5)  # 처음 5개만 표시 (너무 많을 수 있음)
+
+if [ ! -z "$MANUAL_COUNTER" ]; then
+    echo "${YELLOW}⚠️  수동 글자 수 카운터 패턴 발견 (확인 필요):${NC}"
+    echo "$MANUAL_COUNTER" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 확인: CharacterCounter 클래스로 교체 가능한지 검토${NC}"
+    echo ""
+    # 경고만 하고 차단하지는 않음 (false positive 가능)
+fi
+
+##############################################
+# 6. 컴포넌트 import 누락 감지
+##############################################
+
+echo "${BLUE}[6/6]${NC} 컴포넌트 import 누락 감지 중..."
 echo ""
 
 # renderButton 사용하지만 Button.php import 안한 파일 (백업/테스트 파일 제외)
