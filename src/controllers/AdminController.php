@@ -229,16 +229,42 @@ class AdminController {
      * 기업인증 대기 목록 페이지
      */
     public function corporatePending() {
+        require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
         // 대기 중인 기업인증 목록 조회
         $pendingApplications = $this->getPendingCorporateApplications();
-        
+
+        // 암호화된 데이터 복호화
+        foreach ($pendingApplications as &$app) {
+            if (!empty($app['phone'])) {
+                $app['phone'] = SecurityHelper::isEncrypted($app['phone'])
+                    ? SecurityHelper::decrypt($app['phone'])
+                    : $app['phone'];
+            }
+            if (!empty($app['email'])) {
+                $app['email'] = SecurityHelper::isEncrypted($app['email'])
+                    ? SecurityHelper::decrypt($app['email'])
+                    : $app['email'];
+            }
+            if (!empty($app['business_number'])) {
+                $app['business_number'] = SecurityHelper::isEncrypted($app['business_number'])
+                    ? SecurityHelper::decrypt($app['business_number'])
+                    : $app['business_number'];
+            }
+            if (!empty($app['representative_phone'])) {
+                $app['representative_phone'] = SecurityHelper::isEncrypted($app['representative_phone'])
+                    ? SecurityHelper::decrypt($app['representative_phone'])
+                    : $app['representative_phone'];
+            }
+        }
+
         // 헤더 데이터
         $headerData = [
             'title' => '기업인증 대기 목록 - 관리자',
             'description' => '승인 대기 중인 기업인증 신청 목록',
             'pageSection' => 'admin-corporate-pending'
         ];
-        
+
         // 뷰 렌더링
         $this->renderView('admin/corporate/pending', ['applications' => $pendingApplications], $headerData);
     }
@@ -247,16 +273,42 @@ class AdminController {
      * 기업회원 목록 페이지
      */
     public function corporateList() {
+        require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
         // 전체 기업회원 목록 조회
         $corporateMembers = $this->getCorporateMembers();
-        
+
+        // 암호화된 데이터 복호화
+        foreach ($corporateMembers as &$member) {
+            if (!empty($member['phone'])) {
+                $member['phone'] = SecurityHelper::isEncrypted($member['phone'])
+                    ? SecurityHelper::decrypt($member['phone'])
+                    : $member['phone'];
+            }
+            if (!empty($member['email'])) {
+                $member['email'] = SecurityHelper::isEncrypted($member['email'])
+                    ? SecurityHelper::decrypt($member['email'])
+                    : $member['email'];
+            }
+            if (!empty($member['business_number'])) {
+                $member['business_number'] = SecurityHelper::isEncrypted($member['business_number'])
+                    ? SecurityHelper::decrypt($member['business_number'])
+                    : $member['business_number'];
+            }
+            if (!empty($member['representative_phone'])) {
+                $member['representative_phone'] = SecurityHelper::isEncrypted($member['representative_phone'])
+                    ? SecurityHelper::decrypt($member['representative_phone'])
+                    : $member['representative_phone'];
+            }
+        }
+
         // 헤더 데이터
         $headerData = [
             'title' => '기업회원 목록 - 관리자',
             'description' => '승인된 기업회원 목록 및 관리',
             'pageSection' => 'admin-corporate-list'
         ];
-        
+
         // 뷰 렌더링
         $this->renderView('admin/corporate/list', ['members' => $corporateMembers], $headerData);
     }
@@ -401,21 +453,45 @@ class AdminController {
             header('HTTP/1.1 405 Method Not Allowed');
             exit;
         }
-        
+
         $applicationId = $_POST['application_id'] ?? null;
-        
+
         if (!$applicationId) {
             echo json_encode(['error' => '신청 ID가 필요합니다.']);
             exit;
         }
-        
+
         try {
+            require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
             $applicationDetail = $this->getApplicationDetail($applicationId);
             if (!$applicationDetail) {
                 echo json_encode(['error' => '신청 정보를 찾을 수 없습니다.']);
                 exit;
             }
-            
+
+            // 암호화된 데이터 복호화
+            if (!empty($applicationDetail['phone'])) {
+                $applicationDetail['phone'] = SecurityHelper::isEncrypted($applicationDetail['phone'])
+                    ? SecurityHelper::decrypt($applicationDetail['phone'])
+                    : $applicationDetail['phone'];
+            }
+            if (!empty($applicationDetail['email'])) {
+                $applicationDetail['email'] = SecurityHelper::isEncrypted($applicationDetail['email'])
+                    ? SecurityHelper::decrypt($applicationDetail['email'])
+                    : $applicationDetail['email'];
+            }
+            if (!empty($applicationDetail['business_number'])) {
+                $applicationDetail['business_number'] = SecurityHelper::isEncrypted($applicationDetail['business_number'])
+                    ? SecurityHelper::decrypt($applicationDetail['business_number'])
+                    : $applicationDetail['business_number'];
+            }
+            if (!empty($applicationDetail['representative_phone'])) {
+                $applicationDetail['representative_phone'] = SecurityHelper::isEncrypted($applicationDetail['representative_phone'])
+                    ? SecurityHelper::decrypt($applicationDetail['representative_phone'])
+                    : $applicationDetail['representative_phone'];
+            }
+
             echo json_encode(['success' => true, 'data' => $applicationDetail]);
         } catch (Exception $e) {
             echo json_encode(['error' => $e->getMessage()]);
@@ -509,15 +585,23 @@ class AdminController {
     private function sendApprovalNotification($userId, $action, $adminNotes, $companyName) {
         try {
             require_once SRC_PATH . '/helpers/SmsHelper.php';
-            
+            require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
             // 사용자 정보 조회
             $user = $this->db->fetch("SELECT phone, nickname FROM users WHERE id = ?", [$userId]);
-            
+
             if (!$user) {
                 error_log("SMS 발송 실패: 사용자를 찾을 수 없음 (ID: {$userId})");
                 return false;
             }
-            
+
+            // 전화번호 복호화
+            if (!empty($user['phone'])) {
+                $user['phone'] = SecurityHelper::isEncrypted($user['phone'])
+                    ? SecurityHelper::decrypt($user['phone'])
+                    : $user['phone'];
+            }
+
             if (!$user['phone']) {
                 error_log("SMS 발송 실패: 휴대폰 번호가 없음 (사용자: {$user['nickname']})");
                 return false;
@@ -724,11 +808,23 @@ class AdminController {
     private function sendStatusChangeNotification($userId, $newStatus, $companyName) {
         try {
             require_once SRC_PATH . '/helpers/SmsHelper.php';
-            
+            require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
             // 사용자 정보 조회
             $user = $this->db->fetch("SELECT phone, nickname FROM users WHERE id = ?", [$userId]);
-            
-            if (!$user || !$user['phone']) {
+
+            if (!$user) {
+                return false;
+            }
+
+            // 전화번호 복호화
+            if (!empty($user['phone'])) {
+                $user['phone'] = SecurityHelper::isEncrypted($user['phone'])
+                    ? SecurityHelper::decrypt($user['phone'])
+                    : $user['phone'];
+            }
+
+            if (!$user['phone']) {
                 return false;
             }
             
@@ -1350,6 +1446,30 @@ class AdminController {
                 $user['login_attempts'] = 0;
             }
             
+            // 암호화된 데이터 복호화
+            require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
+            if (!empty($user['phone'])) {
+                $user['phone'] = SecurityHelper::isEncrypted($user['phone'])
+                    ? SecurityHelper::decrypt($user['phone'])
+                    : $user['phone'];
+            }
+            if (!empty($user['email'])) {
+                $user['email'] = SecurityHelper::isEncrypted($user['email'])
+                    ? SecurityHelper::decrypt($user['email'])
+                    : $user['email'];
+            }
+            if (!empty($user['business_number'])) {
+                $user['business_number'] = SecurityHelper::isEncrypted($user['business_number'])
+                    ? SecurityHelper::decrypt($user['business_number'])
+                    : $user['business_number'];
+            }
+            if (!empty($user['representative_phone'])) {
+                $user['representative_phone'] = SecurityHelper::isEncrypted($user['representative_phone'])
+                    ? SecurityHelper::decrypt($user['representative_phone'])
+                    : $user['representative_phone'];
+            }
+
             // 성공 응답 로깅
             if (class_exists('WebLogger')) {
                 WebLogger::info('사용자 상세 정보 조회 성공', [
@@ -1360,7 +1480,7 @@ class AdminController {
                 ]);
                 WebLogger::controllerEnd('AdminController', 'getUserDetail', microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']);
             }
-            
+
             echo json_encode([
                 'success' => true,
                 'data' => $user
@@ -1398,21 +1518,34 @@ class AdminController {
     private function sendUserStatusNotification($user, $status, $reason) {
         try {
             require_once SRC_PATH . '/helpers/SmsHelper.php';
-            
+            require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
+            // 전화번호 복호화
+            $phone = $user['phone'];
+            if (!empty($phone)) {
+                $phone = SecurityHelper::isEncrypted($phone)
+                    ? SecurityHelper::decrypt($phone)
+                    : $phone;
+            }
+
+            if (!$phone) {
+                return false;
+            }
+
             $statusMessages = [
                 'active' => '계정이 활성화되었습니다.',
                 'inactive' => '계정이 비활성화되었습니다.',
                 'suspended' => '계정이 일시정지되었습니다.'
             ];
-            
+
             $message = "[탑마케팅] {$statusMessages[$status]}";
             if (!empty($reason)) {
                 $message .= " 사유: {$reason}";
             }
             $message .= " 문의: 1577-9794";
-            
+
             $smsHelper = new SmsHelper();
-            return $smsHelper->send($user['phone'], $message);
+            return $smsHelper->send($phone, $message);
             
         } catch (Exception $e) {
             error_log('사용자 상태 변경 SMS 발송 오류: ' . $e->getMessage());
@@ -1426,17 +1559,30 @@ class AdminController {
     private function sendAdminNotificationSms($user, $message, $type) {
         try {
             require_once SRC_PATH . '/helpers/SmsHelper.php';
-            
+            require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
+            // 전화번호 복호화
+            $phone = $user['phone'];
+            if (!empty($phone)) {
+                $phone = SecurityHelper::isEncrypted($phone)
+                    ? SecurityHelper::decrypt($phone)
+                    : $phone;
+            }
+
+            if (!$phone) {
+                return false;
+            }
+
             $typePrefix = [
                 'info' => '[알림]',
                 'warning' => '[주의]',
                 'important' => '[중요]'
             ];
-            
+
             $smsMessage = "[탑마케팅] {$typePrefix[$type]} {$message}";
-            
+
             $smsHelper = new SmsHelper();
-            return $smsHelper->send($user['phone'], $smsMessage);
+            return $smsHelper->send($phone, $smsMessage);
             
         } catch (Exception $e) {
             error_log('관리자 알림 SMS 발송 오류: ' . $e->getMessage());
