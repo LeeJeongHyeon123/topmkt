@@ -885,38 +885,7 @@ let quill;
 let cropper;
 let croppedImageBlob = null;
 
-// 전역 알림 메시지 표시 함수
-function showAlert(message, type = 'info') {
-    const alertContainer = document.getElementById('alert-container');
-    if (!alertContainer) return;
-    
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    
-    const icon = type === 'success' ? 'check-circle' : 
-                 type === 'error' ? 'exclamation-circle' : 
-                 'info-circle';
-    
-    alert.innerHTML = `
-        <i class="fas fa-${icon}"></i>
-        <span>${message}</span>
-    `;
-    
-    alertContainer.appendChild(alert);
-    
-    // 5초 후 자동 제거
-    setTimeout(() => {
-        alert.style.opacity = '0';
-        setTimeout(() => {
-            if (alert.parentNode) {
-                alert.parentNode.removeChild(alert);
-            }
-        }, 300);
-    }, 5000);
-    
-    // 스크롤을 알림으로 이동
-    alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
+// 🚀 v3.30.0: showAlert 함수 제거 (Toast 클래스로 대체됨)
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('profile-form');
@@ -969,14 +938,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (file) {
                 // 파일 크기 체크 (공통 설정 사용: 30MB)
                 if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-                    showAlert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.', 'error');
+                    Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
                     return;
                 }
                 
                 // 이미지 개수 제한 검사 (20개)
                 const currentImages = quill.container.querySelectorAll('img').length;
                 if (currentImages >= 20) {
-                    showAlert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`, 'error');
+                    Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
                     return;
                 }
                 
@@ -1013,7 +982,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let i = 20; i < images.length; i++) {
                 images[i].remove();
             }
-            showAlert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.', 'warning');
+            Toast.warning('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
         }
         
         // 이미지 카운터 업데이트
@@ -1083,7 +1052,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (file) {
             // 파일 크기 검증 (공통 설정 사용: 30MB)
             if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-                showAlert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.', 'error');
+                Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
                 e.target.value = '';
                 return;
             }
@@ -1091,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 파일 형식 검증
             const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!allowedTypes.includes(file.type)) {
-                showAlert('지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WebP만 허용됩니다.', 'error');
+                Toast.error('지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WebP만 허용됩니다.');
                 e.target.value = '';
                 return;
             }
@@ -1112,19 +1081,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const nicknameInput = document.getElementById('nickname');
         
         if (!nicknameInput.value.trim()) {
-            showAlert('닉네임은 필수 입력 항목입니다.', 'error');
+            Toast.error('닉네임은 필수 입력 항목입니다.');
             nicknameInput.focus();
             return;
         }
         
         if (!emailInput.value.trim()) {
-            showAlert('이메일은 필수 입력 항목입니다.', 'error');
+            Toast.error('이메일은 필수 입력 항목입니다.');
             emailInput.focus();
             return;
         }
         
         if (!emailInput.checkValidity()) {
-            showAlert('유효한 이메일 주소를 입력해주세요.', 'error');
+            Toast.error('유효한 이메일 주소를 입력해주세요.');
             emailInput.focus();
             return;
         }
@@ -1132,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 자기소개 글자수 검증 (순수 텍스트 기준)
         const bioText = quill.getText();
         if (bioText.length - 1 > 10000) { // Quill은 마지막에 \n을 추가하므로 -1
-            showAlert('자기소개는 10,000자 이하로 입력해주세요. (현재: ' + (bioText.length - 1) + '자)', 'error');
+            Toast.error('자기소개는 10,000자 이하로 입력해주세요. (현재: ' + (bioText.length - 1) + '자)');
             return;
         }
         
@@ -1168,9 +1137,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('📋 서버 응답 데이터:', data);
             if (data.error) {
-                showAlert(data.error, 'error');
+                Toast.error(data.error);
             } else {
-                showAlert(data.message || '프로필이 성공적으로 업데이트되었습니다.', 'success');
+                Toast.success(data.message || '프로필이 성공적으로 업데이트되었습니다.');
                 
                 // 이미지가 포함된 경우 바로 프로필 페이지로 이동
                 setTimeout(() => {
@@ -1180,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            showAlert('프로필 업데이트 중 오류가 발생했습니다.', 'error');
+            Toast.error('프로필 업데이트 중 오류가 발생했습니다.');
         })
         .finally(() => {
             // 버튼 상태 복원
@@ -1211,9 +1180,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('📋 서버 응답 데이터:', data);
             if (data.error) {
-                showAlert('이미지 업로드 실패: ' + data.error, 'error');
+                Toast.error('이미지 업로드 실패: ' + data.error);
             } else {
-                showAlert('프로필 이미지가 성공적으로 업데이트되었습니다.', 'success');
+                Toast.success('프로필 이미지가 성공적으로 업데이트되었습니다.');
                 
                 // 2초 후 프로필 페이지로 이동
                 setTimeout(() => {
@@ -1223,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('❌ Image upload error:', error);
-            showAlert('이미지 업로드 중 오류가 발생했습니다.', 'error');
+            Toast.error('이미지 업로드 중 오류가 발생했습니다.');
         });
     }
     
@@ -1317,7 +1286,7 @@ function applyCrop() {
         // 모달 닫기
         closeCropModal();
         
-        showAlert('이미지가 선택되었습니다. 저장하기를 클릭하여 업로드하세요.', 'info');
+        Toast.info('이미지가 선택되었습니다. 저장하기를 클릭하여 업로드하세요.');
     }, 'image/jpeg', 0.9);
 }
 

@@ -1111,14 +1111,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!isValidPhoneFormat(phone)) {
             console.warn('❌ 잘못된 휴대폰 번호 형식:', phone);
-            showMessage('010으로 시작하는 올바른 휴대폰 번호를 입력해주세요.', 'error');
+            Toast.error('010으로 시작하는 올바른 휴대폰 번호를 입력해주세요.');
             return;
         }
 
         // 010 번호 추가 검증
         if (!phone.startsWith('010-')) {
             console.warn('❌ 010으로 시작하지 않는 번호:', phone);
-            showMessage('010으로 시작하는 휴대폰 번호만 사용할 수 있습니다.', 'error');
+            Toast.error('010으로 시작하는 휴대폰 번호만 사용할 수 있습니다.');
             return;
         }
 
@@ -1130,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             await sendVerificationCode(phone, recaptchaToken);
         } catch (error) {
             console.error('❌ 인증번호 발송 중 오류:', error);
-            showMessage('보안 검증에 실패했습니다. 새로고침 후 다시 시도해주세요.', 'error');
+            Toast.error('보안 검증에 실패했습니다. 새로고침 후 다시 시도해주세요.');
         }
     });
 
@@ -1145,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (code.length !== 4) {
             console.warn('❌ 잘못된 인증번호 길이:', code.length);
-            showMessage('4자리 인증번호를 입력해주세요.', 'error');
+            Toast.error('4자리 인증번호를 입력해주세요.');
             return;
         }
 
@@ -1670,7 +1670,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.ctrlKey && e.key === 'v') {
             e.preventDefault();
             console.log('🚫 비밀번호 확인 붙여넣기 차단');
-            showMessage('보안을 위해 비밀번호 확인 필드에는 붙여넣기가 제한됩니다. 직접 입력해주세요.', 'info');
+            Toast.info('보안을 위해 비밀번호 확인 필드에는 붙여넣기가 제한됩니다. 직접 입력해주세요.');
             return false;
         }
         // Ctrl+C (복사) 허용 - 브라우저 password 타입 보안 우회
@@ -1695,7 +1695,7 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordConfirmInput.addEventListener('paste', function(e) {
         e.preventDefault();
         console.log('🚫 비밀번호 확인 우클릭 붙여넣기 차단');
-        showMessage('보안을 위해 비밀번호 확인 필드에는 붙여넣기가 제한됩니다. 직접 입력해주세요.', 'info');
+        Toast.info('보안을 위해 비밀번호 확인 필드에는 붙여넣기가 제한됩니다. 직접 입력해주세요.');
         return false;
     });
 
@@ -1857,7 +1857,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 1000);
                 }
                 
-                showMessage('인증번호가 발송되었습니다.', 'success');
+                Toast.success('인증번호가 발송되었습니다.');
                 showVerificationGroup();
                 startTimer(180); // 3분 = 180초
             } else {
@@ -1868,7 +1868,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.TopMarketingLoading.hide();
                 }
                 
-                showMessage(data.message || '인증번호 발송에 실패했습니다.', 'error');
+                Toast.error(data.message || '인증번호 발송에 실패했습니다.');
                 sendVerificationBtn.disabled = false;
                 sendVerificationBtn.innerHTML = '인증번호 발송';
             }
@@ -1880,7 +1880,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.TopMarketingLoading.hide();
             }
             
-            showMessage('인증번호 발송 중 오류가 발생했습니다.', 'error');
+            Toast.error('인증번호 발송 중 오류가 발생했습니다.');
             sendVerificationBtn.disabled = false;
             sendVerificationBtn.innerHTML = '인증번호 발송';
         }
@@ -1915,18 +1915,18 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data.success) {
                 console.log('✅ 휴대폰 인증 성공');
-                showMessage('휴대폰 인증이 완료되었습니다.', 'success');
+                Toast.success('휴대폰 인증이 완료되었습니다.');
                 completeVerification();
             } else {
                 console.error('❌ 인증 실패:', data.message);
-                showMessage(data.message || '인증번호가 일치하지 않습니다.', 'error');
+                Toast.error(data.message || '인증번호가 일치하지 않습니다.');
                 verifyCodeBtn.disabled = false;
                 verifyCodeBtn.innerHTML = '확인';
             }
         })
         .catch(error => {
             console.error('❌ 인증 확인 AJAX 오류:', error);
-            showMessage('인증 확인 중 오류가 발생했습니다.', 'error');
+            Toast.error('인증 확인 중 오류가 발생했습니다.');
             verifyCodeBtn.disabled = false;
             verifyCodeBtn.innerHTML = '확인';
         });
@@ -2023,7 +2023,7 @@ document.addEventListener('DOMContentLoaded', function() {
         verifyCodeBtn.disabled = true;
         verifyCodeBtn.innerHTML = '시간 만료';
         
-        showMessage('인증 시간이 만료되었습니다. 다시 인증번호를 요청해주세요.', 'error');
+        Toast.error('인증 시간이 만료되었습니다. 다시 인증번호를 요청해주세요.');
         
         // 인증번호 입력 필드 비활성화
         verificationCodeInput.disabled = true;
@@ -2096,31 +2096,7 @@ document.addEventListener('DOMContentLoaded', function() {
         verifyCodeBtn.disabled = shouldDisable;
     }
 
-    // 메시지 표시
-    function showMessage(message, type) {
-        console.log('💬 메시지 표시:', type, message);
-        
-        // 기존 메시지 제거
-        const existingAlert = document.querySelector('.alert-message');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-        
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert-message alert-${type}`;
-        alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
-        `;
-        
-        const form = document.querySelector('.auth-form');
-        form.insertBefore(alertDiv, form.firstChild);
-        
-        // 3초 후 자동 제거
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 3000);
-    }
+    // 🚀 v3.30.0: showMessage 함수 제거 (Toast 클래스로 대체됨)
 
     // 폼 제출 시 최종 검증 및 reCAPTCHA 토큰 생성
     signupForm.addEventListener('submit', async function(e) {
@@ -2130,7 +2106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🔍 최종 폼 유효성 검사');
         if (!validateForm()) {
             console.error('❌ 폼 유효성 검사 실패');
-            showMessage('모든 필드를 올바르게 입력하고 휴대폰 인증을 완료해주세요.', 'error');
+            Toast.error('모든 필드를 올바르게 입력하고 휴대폰 인증을 완료해주세요.');
             alert('⚠️ 디버깅: 폼 유효성 검사 실패\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
             return;
         }
@@ -2198,7 +2174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.TopMarketingLoading.hide();
             }
             
-            showMessage('보안 검증에 실패했습니다. 새로고침 후 다시 시도해주세요.', 'error');
+            Toast.error('보안 검증에 실패했습니다. 새로고침 후 다시 시도해주세요.');
             alert('⚠️ 디버깅: reCAPTCHA 토큰 생성 실패\n\n' + error.message + '\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
         }
     });

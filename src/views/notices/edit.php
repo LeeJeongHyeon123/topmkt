@@ -513,14 +513,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalAfterUpload = existingImageCount + files.length;
         
         if (totalAfterUpload > 20) {
-            showMessage('error', `총 이미지 개수가 20개를 초과합니다. 현재 ${existingImageCount}개 + 추가 ${files.length}개 = ${totalAfterUpload}개`);
+            Toast.error(`총 이미지 개수가 20개를 초과합니다. 현재 ${existingImageCount}개 + 추가 ${files.length}개 = ${totalAfterUpload}개`);
             return;
         }
         
         // 파일 크기 검증
         for (let file of files) {
             if (!validateFileSize(file.size)) {
-                showMessage('error', `파일 ${file.name}이 너무 큽니다. 최대 <?= UploadConfig::MAX_FILE_SIZE_MB ?>MB까지 가능합니다.`);
+                Toast.error(`파일 ${file.name}이 너무 큽니다. 최대 <?= UploadConfig::MAX_FILE_SIZE_MB ?>MB까지 가능합니다.`);
                 return;
             }
         }
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (files.length > 0) {
-            showMessage('success', `${files.length}개의 새 이미지가 선택되었습니다.`);
+            Toast.success(`${files.length}개의 새 이미지가 선택되었습니다.`);
         }
     }
     
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 파일 입력 초기화 (복잡한 파일 배열 조작 대신)
         fileInput.value = '';
         document.getElementById('newUploadedImages').innerHTML = '';
-        showMessage('success', '이미지가 제거되었습니다. 필요하면 다시 선택해주세요.');
+        Toast.success('이미지가 제거되었습니다. 필요하면 다시 선택해주세요.');
     };
     
     // 기존 이미지 제거
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (imageItem) {
             imageItem.style.display = 'none';
             removedImages.push(imageId);
-            showMessage('success', '이미지가 제거 목록에 추가되었습니다. 수정하기를 클릭하면 완전히 제거됩니다.');
+            Toast.success('이미지가 제거 목록에 추가되었습니다. 수정하기를 클릭하면 완전히 제거됩니다.');
         }
     };
     
@@ -608,22 +608,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const trimmedContent = quill ? quill.getText().trim() : contentValue.trim();
         
         if (!trimmedTitle) {
-            showMessage('error', '제목을 입력해주세요.');
+            Toast.error('제목을 입력해주세요.');
             return;
         }
         
         if (!trimmedContent) {
-            showMessage('error', '내용을 입력해주세요.');
+            Toast.error('내용을 입력해주세요.');
             return;
         }
         
         if (trimmedTitle.length > 200) {
-            showMessage('error', '제목은 200자를 초과할 수 없습니다.');
+            Toast.error('제목은 200자를 초과할 수 없습니다.');
             return;
         }
         
         if (trimmedContent.length > 10000) {
-            showMessage('error', `내용은 10,000자를 초과할 수 없습니다. (현재: ${trimmedContent.length}자)`);
+            Toast.error(`내용은 10,000자를 초과할 수 없습니다. (현재: ${trimmedContent.length}자)`);
             return;
         }
         
@@ -653,30 +653,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             
             if (result.success) {
-                showMessage('success', '공지사항이 성공적으로 수정되었습니다.');
+                Toast.success('공지사항이 성공적으로 수정되었습니다.');
                 setTimeout(() => {
                     window.location.href = '/notices/' + result.notice_id;
                 }, 1500);
             } else {
-                showMessage('error', result.message || '수정 중 오류가 발생했습니다.');
+                Toast.error(result.message || '수정 중 오류가 발생했습니다.');
             }
         } catch (error) {
             console.error('수정 오류:', error);
-            showMessage('error', '네트워크 오류가 발생했습니다.');
+            Toast.error('네트워크 오류가 발생했습니다.');
         } finally {
             submitBtn.classList.remove('loading');
             submitBtn.disabled = false;
         }
     });
-    
-    function showMessage(type, message) {
-        messageArea.innerHTML = `
-            <div class="${type === 'error' ? 'error-message' : 'success-message'}">
-                ${message}
-            </div>
-        `;
-        messageArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+
+    // 🚀 v3.30.0: showMessage 함수 제거 (Toast 클래스로 대체됨)
 });
 
 // 🚀 Ultra Think v3.13.0: Quill 커스텀 이미지 핸들러 (MediaController 연동) + 20개 제한

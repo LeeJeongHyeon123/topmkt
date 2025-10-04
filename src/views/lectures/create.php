@@ -1519,7 +1519,7 @@ function removeExistingImage(imageIndex, imageElement) {
         updateImageIndexes();
     } else {
         console.error('currentImageData가 배열이 아닙니다:', currentImageData);
-        showAlert('이미지 삭제 중 오류가 발생했습니다.', 'error');
+        Toast.error('이미지 삭제 중 오류가 발생했습니다.');
     }
 }
 
@@ -1559,18 +1559,18 @@ function updateImageListOnServer(updatedImageData) {
     })
     .then(data => {
         if (data.success) {
-            showAlert('이미지가 삭제되었습니다.', 'success');
+            Toast.success('이미지가 삭제되었습니다.');
         } else {
-            showAlert(data.message || '이미지 삭제 중 오류가 발생했습니다.', 'error');
+            Toast.error(data.message || '이미지 삭제 중 오류가 발생했습니다.');
             console.error('서버 오류:', data);
         }
     })
     .catch(error => {
         console.error('이미지 업데이트 오류:', error);
         if (error.message.includes('JSON')) {
-            showAlert('서버 응답 오류입니다. 페이지를 새로고침하고 다시 시도해주세요.', 'error');
+            Toast.error('서버 응답 오류입니다. 페이지를 새로고침하고 다시 시도해주세요.');
         } else {
-            showAlert(error.message || '이미지 업데이트 중 오류가 발생했습니다.', 'error');
+            Toast.error(error.message || '이미지 업데이트 중 오류가 발생했습니다.');
         }
     });
 }
@@ -1596,31 +1596,7 @@ function updateImageIndexes() {
     });
 }
 
-// 알림 표시 함수 (전역 함수로 먼저 정의)
-function showAlert(message, type = 'info') {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type}`;
-    
-    // 타입별 스타일 설정
-    const styles = {
-        'info': 'background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460;',
-        'success': 'background: #d4edda; border: 1px solid #c3e6cb; color: #155724;',
-        'error': 'background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;',
-        'warning': 'background: #fff3cd; border: 1px solid #ffeaa7; color: #856404;'
-    };
-    
-    alertDiv.style.cssText = `position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; min-width: 250px; max-width: 400px; ${styles[type] || styles.info}`;
-    alertDiv.textContent = message;
-    
-    document.body.appendChild(alertDiv);
-    
-    // 3초 후 자동 제거
-    setTimeout(() => {
-        if (alertDiv && alertDiv.parentNode) {
-            alertDiv.parentNode.removeChild(alertDiv);
-        }
-    }, 3000);
-}
+// 🚀 v3.30.0: showAlert 함수 제거 (Toast 클래스로 대체됨)
 
 // 이미지 업로드 플레이스홀더 업데이트 함수 (전역 함수로 먼저 정의)
 function updateImageUploadPlaceholder() {
@@ -3070,7 +3046,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const responseData = data.data || data;
                 
                 // 성공 메시지 표시
-                showSuccessMessage(responseData.message || data.message);
+                Toast.success(responseData.message || data.message);
                 hasUnsavedChanges = false;
                 
                 // 강의 등록 성공 - 리다이렉트
@@ -3091,7 +3067,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.errors && Array.isArray(data.errors)) {
                     showFieldErrors(data.errors);
                 } else {
-                    showErrorMessage(data.message || '강의 등록 중 오류가 발생했습니다.');
+                    Toast.error(data.message || '강의 등록 중 오류가 발생했습니다.');
                 }
             }
         })
@@ -3101,11 +3077,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 네트워크 오류 타입별 처리
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                showErrorMessage('네트워크 연결을 확인해주세요.');
+                Toast.error('네트워크 연결을 확인해주세요.');
             } else if (error.message.includes('서버 오류')) {
-                showErrorMessage('서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                Toast.error('서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
             } else {
-                showErrorMessage(error.message || '강의 등록 중 예상치 못한 오류가 발생했습니다.');
+                Toast.error(error.message || '강의 등록 중 예상치 못한 오류가 발생했습니다.');
             }
         });
     });
@@ -3207,7 +3183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 성공 메시지 표시
-    function showSuccessMessage(message) {
+    function Toast.success(message) {
         // 기존 메시지 제거
         const existingMsg = document.querySelector('.success-notification');
         if (existingMsg) existingMsg.remove();
@@ -3275,7 +3251,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // 에러 메시지 표시
-    function showErrorMessage(message) {
+    function Toast.error(message) {
         // 기존 메시지 제거
         const existingMsg = document.querySelector('.error-notification');
         if (existingMsg) existingMsg.remove();
@@ -3305,7 +3281,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 에러 메시지 표시
         errors.forEach(error => {
-            showErrorMessage(error);
+            Toast.error(error);
         });
     }
     
@@ -3473,7 +3449,7 @@ document.addEventListener('DOMContentLoaded', function() {
             form.addEventListener('submit', function(e) {
                 if (!validateRegistrationDeadline()) {
                     e.preventDefault();
-                    showAlert('등록 마감일시를 올바르게 설정해주세요.', 'error');
+                    Toast.error('등록 마감일시를 올바르게 설정해주세요.');
                     deadlineInput.focus();
                 }
             });

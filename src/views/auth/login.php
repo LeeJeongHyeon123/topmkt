@@ -388,16 +388,18 @@ document.addEventListener('DOMContentLoaded', function() {
     loginForm.addEventListener('submit', function(e) {
         const phone = phoneInput.value.trim();
         const password = passwordInput.value.trim();
-        
+
         if (!phone || !password) {
             e.preventDefault();
-            showMessage('휴대폰 번호와 비밀번호를 모두 입력해주세요.', 'error');
+            // 🚀 v3.30.0: Toast 알림 시스템 사용
+            Toast.error('휴대폰 번호와 비밀번호를 모두 입력해주세요.');
             return;
         }
-        
+
         if (!isValidPhoneFormat(phone)) {
             e.preventDefault();
-            showMessage('010으로 시작하는 올바른 휴대폰 번호를 입력해주세요.', 'error');
+            // 🚀 v3.30.0: Toast 알림 시스템 사용
+            Toast.error('010으로 시작하는 올바른 휴대폰 번호를 입력해주세요.');
             return;
         }
     });
@@ -408,29 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return pattern.test(phone);
     }
 
-    // 메시지 표시
-    function showMessage(message, type) {
-        // 기존 메시지 제거
-        const existingAlert = document.querySelector('.alert-message');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-        
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-message`;
-        alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
-        `;
-        
-        const form = document.querySelector('.auth-form');
-        form.insertBefore(alertDiv, form.firstChild);
-        
-        // 3초 후 자동 제거
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 3000);
-    }
+    // 🚀 v3.30.0: showMessage 함수 제거 (Toast 클래스로 대체됨)
 
     // 개발용 테스트 계정 자동 입력
     window.fillTestAccount = function() {

@@ -477,5 +477,8 @@
 <!-- 🚀 v3.29.0: 통합 글자 수 카운터 시스템 -->
 <?php require_once __DIR__ . '/../includes/char-counter.js.php'; ?>
 
+<!-- 🚀 v3.30.0: 통합 Toast 알림 시스템 -->
+<?php require_once __DIR__ . '/../includes/toast.js.php'; ?>
+
 </body>
 </html> 

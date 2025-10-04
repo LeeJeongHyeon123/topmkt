@@ -161,7 +161,7 @@ fi
 # 5. 글자 수 카운터 직접 코딩 감지 (v3.29.0)
 ##############################################
 
-echo "${BLUE}[5/6]${NC} 글자 수 카운터 직접 코딩 감지 중..."
+echo "${BLUE}[5/7]${NC} 글자 수 카운터 직접 코딩 감지 중..."
 echo ""
 
 # updateCharCounter, updateCharacterCount 함수 직접 정의 감지 (CharacterCounter 클래스 제외, 백업/테스트 파일 제외)
@@ -214,7 +214,7 @@ fi
 # 6. 컴포넌트 import 누락 감지
 ##############################################
 
-echo "${BLUE}[6/6]${NC} 컴포넌트 import 누락 감지 중..."
+echo "${BLUE}[6/7]${NC} 컴포넌트 import 누락 감지 중..."
 echo ""
 
 # renderButton 사용하지만 Button.php import 안한 파일 (백업/테스트 파일 제외)
@@ -254,6 +254,35 @@ if [ ! -z "$MISSING_MODAL_IMPORT" ]; then
     echo "${YELLOW}💡 해결: 파일 상단에 추가${NC}"
     echo "   <?php require_once SRC_PATH . '/components/ui/Modal.php'; ?>"
     echo "   <script src=\"/assets/js/modal.js\"></script>"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+##############################################
+# 7. Toast 알림 직접 코딩 감지 (v3.30.0)
+##############################################
+
+echo "${BLUE}[7/7]${NC} Toast 알림 직접 코딩 감지 중..."
+echo ""
+
+# showMessage, showAlert, showSuccessMessage, showErrorMessage 함수 직접 정의 감지
+# toast.js.php는 제외, 백업/테스트 파일 제외
+TOAST_FUNCTIONS=$(grep -rn 'function showMessage\|function showAlert\|function showSuccessMessage\|function showErrorMessage' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "toast.js.php" | \
+    grep -v "v3.30.0.*제거" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$TOAST_FUNCTIONS" ]; then
+    echo "${RED}❌ Toast 메시지 함수 직접 정의 발견:${NC}"
+    echo "$TOAST_FUNCTIONS" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: Toast 클래스 사용${NC}"
+    echo "   Toast.success('메시지')"
+    echo "   Toast.error('메시지')"
+    echo "   Toast.warning('메시지')"
+    echo "   Toast.info('메시지')"
     echo ""
     VIOLATIONS_FOUND=1
 fi

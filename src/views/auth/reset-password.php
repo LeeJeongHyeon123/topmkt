@@ -540,17 +540,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 유효성 검사
         if (!verificationCodeInput.value || verificationCodeInput.value.length !== 6) {
-            showAlert('6자리 인증 코드를 입력해주세요.', 'error');
+            Toast.error('6자리 인증 코드를 입력해주세요.');
             return;
         }
         
         if (!newPasswordInput.value || newPasswordInput.value.length < 8) {
-            showAlert('비밀번호는 8자 이상이어야 합니다.', 'error');
+            Toast.error('비밀번호는 8자 이상이어야 합니다.');
             return;
         }
         
         if (newPasswordInput.value !== confirmPasswordInput.value) {
-            showAlert('비밀번호가 일치하지 않습니다.', 'error');
+            Toast.error('비밀번호가 일치하지 않습니다.');
             return;
         }
         
@@ -573,17 +573,17 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showAlert(data.message || '비밀번호가 성공적으로 변경되었습니다.', 'success');
+                Toast.success(data.message || '비밀번호가 성공적으로 변경되었습니다.');
                 setTimeout(() => {
                     window.location.href = '/auth/login';
                 }, 2000);
             } else {
-                showAlert(data.error || '오류가 발생했습니다.', 'error');
+                Toast.error(data.error || '오류가 발생했습니다.');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showAlert('네트워크 오류가 발생했습니다.', 'error');
+            Toast.error('네트워크 오류가 발생했습니다.');
         })
         .finally(() => {
             // 버튼 상태 복원
@@ -592,33 +592,8 @@ document.addEventListener('DOMContentLoaded', function() {
             btnLoading.style.display = 'none';
         });
     });
-    
-    // 알림 표시 함수
-    function showAlert(message, type) {
-        // 기존 알림 제거
-        const existingAlert = document.querySelector('.alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-        
-        // 새 알림 생성
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type}`;
-        alert.innerHTML = `
-            <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
-            <span>${message}</span>
-        `;
-        
-        // 폼 위에 삽입
-        form.parentNode.insertBefore(alert, form);
-        
-        // 3초 후 자동 제거 (성공 메시지는 더 오래 표시)
-        setTimeout(() => {
-            if (alert.parentNode) {
-                alert.remove();
-            }
-        }, type === 'success' ? 3000 : 5000);
-    }
+
+    // 🚀 v3.30.0: showAlert 함수 제거 (Toast 클래스로 대체됨)
 });
 
 // 비밀번호 토글 함수
