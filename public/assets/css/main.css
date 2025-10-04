@@ -6380,16 +6380,17 @@ body {
     white-space: nowrap;
 }
 
-/* 취소 버튼 - 명확하게 보이도록 개선 */
+/* 취소 버튼 - 명확하게 보이도록 개선 (!important로 우선순위 강제) */
 .modal-confirm-cancel {
-    background: #6b7280;
-    color: #ffffff;
-    border: 2px solid #6b7280;
+    background: #6b7280 !important;
+    color: #ffffff !important;
+    border: 2px solid #6b7280 !important;
 }
 
 .modal-confirm-cancel:hover {
-    background: #4b5563;
-    border-color: #4b5563;
+    background: #4b5563 !important;
+    border-color: #4b5563 !important;
+    color: #ffffff !important;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
 }
