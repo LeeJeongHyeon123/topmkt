@@ -1,3 +1,8 @@
+<?php
+// 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Pagination.php';
+?>
+
 <style>
 /* 댓글 섹션 스타일 */
 .comments-section {
@@ -652,121 +657,75 @@ $commentCount = count($comments);
     <?php endif; ?>
 </div>
 
-<!-- 페이지네이션 -->
-<?php if (isset($totalPages) && $totalPages > 1): ?>
-<div class="comments-pagination">
-    <style>
-    .comments-pagination {
-        padding: 20px 30px;
-        border-top: 1px solid #e2e8f0;
-        background: #f8fafc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .pagination-btn {
-        background: white;
-        border: 1px solid #d1d5db;
-        color: #374151;
-        padding: 8px 12px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        min-width: 40px;
-        text-align: center;
-        display: inline-block;
-    }
-    
-    .pagination-btn:hover {
-        background: #f3f4f6;
-        border-color: #9ca3af;
-        text-decoration: none;
-        color: #374151;
-    }
-    
-    .pagination-btn.active {
-        background: #667eea;
-        border-color: #667eea;
-        color: white;
-    }
-    
-    .pagination-btn.active:hover {
-        background: #5a67d8;
-        border-color: #5a67d8;
-        color: white;
-    }
-    
-    .pagination-btn:disabled {
-        background: #f9fafb;
-        color: #9ca3af;
-        border-color: #e5e7eb;
-        cursor: not-allowed;
-    }
-    
-    .pagination-info {
-        color: #64748b;
-        font-size: 14px;
-        margin: 0 15px;
-    }
-    </style>
-    
-    <?php 
-    // 현재 URL에서 comment_page 파라미터 제외
-    $currentUrl = strtok($_SERVER['REQUEST_URI'], '?');
-    $queryParams = $_GET;
-    unset($queryParams['comment_page']);
-    $baseUrl = $currentUrl . (!empty($queryParams) ? '?' . http_build_query($queryParams) . '&' : '?');
-    
-    // 페이지 범위 계산
-    $startPage = max(1, $currentPage - 2);
-    $endPage = min($totalPages, $currentPage + 2);
-    ?>
-    
-    <!-- 이전 페이지 -->
-    <?php if ($currentPage > 1): ?>
-        <a href="<?= $baseUrl ?>comment_page=<?= $currentPage - 1 ?>#comments-section" class="pagination-btn">‹ 이전</a>
-    <?php else: ?>
-        <span class="pagination-btn" style="opacity: 0.5; pointer-events: none;">‹ 이전</span>
-    <?php endif; ?>
-    
-    <!-- 첫 페이지 -->
-    <?php if ($startPage > 1): ?>
-        <a href="<?= $baseUrl ?>comment_page=1#comments-section" class="pagination-btn">1</a>
-        <?php if ($startPage > 2): ?>
-            <span class="pagination-btn" style="border: none; background: none; color: #9ca3af;">...</span>
-        <?php endif; ?>
-    <?php endif; ?>
-    
-    <!-- 페이지 번호들 -->
-    <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-        <?php if ($i == $currentPage): ?>
-            <span class="pagination-btn active"><?= $i ?></span>
-        <?php else: ?>
-            <a href="<?= $baseUrl ?>comment_page=<?= $i ?>#comments-section" class="pagination-btn"><?= $i ?></a>
-        <?php endif; ?>
-    <?php endfor; ?>
-    
-    <!-- 마지막 페이지 -->
-    <?php if ($endPage < $totalPages): ?>
-        <?php if ($endPage < $totalPages - 1): ?>
-            <span class="pagination-btn" style="border: none; background: none; color: #9ca3af;">...</span>
-        <?php endif; ?>
-        <a href="<?= $baseUrl ?>comment_page=<?= $totalPages ?>#comments-section" class="pagination-btn"><?= $totalPages ?></a>
-    <?php endif; ?>
-    
-    <!-- 다음 페이지 -->
-    <?php if ($currentPage < $totalPages): ?>
-        <a href="<?= $baseUrl ?>comment_page=<?= $currentPage + 1 ?>#comments-section" class="pagination-btn">다음 ›</a>
-    <?php else: ?>
-        <span class="pagination-btn" style="opacity: 0.5; pointer-events: none;">다음 ›</span>
-    <?php endif; ?>
-    
-</div>
-<?php endif; ?>
+<!-- 페이지네이션 (Pagination 컴포넌트 사용) -->
+<style>
+.comments-pagination {
+    padding: 20px 30px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-btn {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    text-align: center;
+    display: inline-block;
+}
+
+.pagination-btn:hover:not(.disabled):not(.active) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    text-decoration: none;
+    color: #374151;
+}
+
+.pagination-btn.active {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+.pagination-btn.active:hover {
+    background: #5a67d8;
+    border-color: #5a67d8;
+    color: white;
+}
+
+.pagination-btn.disabled {
+    background: #f9fafb;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+}
+</style>
+
+<?php
+// Pagination 컴포넌트 호출
+if (isset($totalPages) && $totalPages > 1) {
+    echo renderPagination($currentPage, $totalPages, [
+        'pageParam' => 'comment_page',
+        'anchor' => '#comments-section',
+        'containerClass' => 'comments-pagination',
+        'linkClass' => 'pagination-btn',
+        'prevText' => '‹ 이전',
+        'nextText' => '다음 ›'
+    ]);
+}
+?>
 
 <script>
 // 전역 변수

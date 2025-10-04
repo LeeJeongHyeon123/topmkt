@@ -8,6 +8,9 @@ require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/helpers/SearchHelper.php';
 require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
+
+// 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Pagination.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -1066,73 +1069,17 @@ body {
             <?php endforeach; ?>
         </div>
         
-        <!-- 페이지네이션 -->
-        <?php 
-        // 페이지네이션 링크 생성 함수
-        function buildPaginationUrl($page, $search = null, $filter = 'all') {
-            $params = ['page' => $page];
-            if (!empty($search)) {
-                $params['search'] = $search;
-            }
-            if ($filter && $filter !== 'all') {
-                $params['filter'] = $filter;
-            }
-            return '?' . http_build_query($params);
+        <!-- 페이지네이션 (Pagination 컴포넌트 사용) -->
+        <?php
+        if ($totalPages > 1) {
+            echo renderPagination($currentPage, $totalPages, [
+                'pageParam' => 'page',
+                'preserveParams' => ['search', 'filter'],
+                'containerClass' => 'pagination',
+                'linkClass' => 'page-link'
+            ]);
         }
         ?>
-        <?php if ($totalPages > 1): ?>
-            <div class="pagination">
-                <!-- 이전 페이지 -->
-                <?php if ($hasPrevPage): ?>
-                    <a href="<?= buildPaginationUrl($currentPage - 1, $search, $filter) ?>" 
-                       class="page-link">
-                        ← 이전
-                    </a>
-                <?php else: ?>
-                    <span class="page-link disabled">← 이전</span>
-                <?php endif; ?>
-                
-                <!-- 페이지 번호들 -->
-                <?php
-                $startPage = max(1, $currentPage - 2);
-                $endPage = min($totalPages, $currentPage + 2);
-                
-                if ($startPage > 1): ?>
-                    <a href="<?= buildPaginationUrl(1, $search, $filter) ?>" 
-                       class="page-link">1</a>
-                    <?php if ($startPage > 2): ?>
-                        <span class="page-link disabled">...</span>
-                    <?php endif; ?>
-                <?php endif; ?>
-                
-                <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-                    <a href="<?= buildPaginationUrl($i, $search, $filter) ?>" 
-                       class="page-link <?= $i === $currentPage ? 'active' : '' ?>">
-                        <?= $i ?>
-                    </a>
-                <?php endfor; ?>
-                
-                <?php if ($endPage < $totalPages): ?>
-                    <?php if ($endPage < $totalPages - 1): ?>
-                        <span class="page-link disabled">...</span>
-                    <?php endif; ?>
-                    <?php if ($totalPages > 0): ?>
-                        <a href="<?= buildPaginationUrl($totalPages, $search, $filter) ?>" 
-                           class="page-link"><?= number_format($totalPages) ?></a>
-                    <?php endif; ?>
-                <?php endif; ?>
-                
-                <!-- 다음 페이지 -->
-                <?php if ($hasNextPage): ?>
-                    <a href="<?= buildPaginationUrl($currentPage + 1, $search, $filter) ?>" 
-                       class="page-link">
-                        다음 →
-                    </a>
-                <?php else: ?>
-                    <span class="page-link disabled">다음 →</span>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
         
     <?php else: ?>
         <!-- 빈 상태 -->

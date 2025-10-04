@@ -2,6 +2,9 @@
 /**
  * 강의별 신청자 관리 페이지
  */
+
+// 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Pagination.php';
 ?>
 
 <style>
@@ -591,32 +594,19 @@
                 </table>
             </div>
             
-            <!-- 페이징 -->
-            <?php if ($totalPages > 1): ?>
-                <div class="pagination">
-                    <?php if ($page > 1): ?>
-                        <a href="?page=<?= $page - 1 ?>&status=<?= urlencode($statusFilter) ?>&search=<?= urlencode($searchQuery) ?>">
-                            ⬅️ 이전
-                        </a>
-                    <?php endif; ?>
-                    
-                    <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
-                        <?php if ($i === $page): ?>
-                            <span class="current"><?= $i ?></span>
-                        <?php else: ?>
-                            <a href="?page=<?= $i ?>&status=<?= urlencode($statusFilter) ?>&search=<?= urlencode($searchQuery) ?>">
-                                <?= $i ?>
-                            </a>
-                        <?php endif; ?>
-                    <?php endfor; ?>
-                    
-                    <?php if ($page < $totalPages): ?>
-                        <a href="?page=<?= $page + 1 ?>&status=<?= urlencode($statusFilter) ?>&search=<?= urlencode($searchQuery) ?>">
-                            다음 ➡️
-                        </a>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+            <!-- 페이징 (Pagination 컴포넌트 사용) -->
+            <?php
+            if ($totalPages > 1) {
+                echo renderPagination($page, $totalPages, [
+                    'pageParam' => 'page',
+                    'preserveParams' => ['status', 'search'],
+                    'containerClass' => 'pagination',
+                    'activeClass' => 'current',
+                    'prevText' => '⬅️ 이전',
+                    'nextText' => '다음 ➡️'
+                ]);
+            }
+            ?>
         <?php endif; ?>
     </div>
 </div>
