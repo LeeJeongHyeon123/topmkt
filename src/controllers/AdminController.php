@@ -824,21 +824,29 @@ class AdminController {
             $limit = max(1, min(100, intval($_GET['limit'] ?? 20)));
             
             require_once SRC_PATH . '/models/User.php';
+            require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
             $userModel = new User();
             $result = $userModel->getFilteredUsers($filters, $page, $limit);
-            
-            // 민감한 정보 마스킹
+
+            // 암호화된 데이터 복호화 및 민감한 정보 처리
             foreach ($result['users'] as &$user) {
-                // 전화번호 마스킹 (010-1234-**** 형태)
+                // 전화번호 복호화
                 if (!empty($user['phone'])) {
-                    $user['phone_masked'] = preg_replace('/(\d{3}-\d{4})-\d{4}/', '$1-****', $user['phone']);
+                    $decryptedPhone = SecurityHelper::isEncrypted($user['phone'])
+                        ? SecurityHelper::decrypt($user['phone'])
+                        : $user['phone'];
+                    $user['phone'] = $decryptedPhone;
                 }
-                
-                // 이메일 마스킹 (user@ex*****.com 형태)
+
+                // 이메일 복호화
                 if (!empty($user['email'])) {
-                    $user['email_masked'] = preg_replace('/(.{2}).+(@.{2}).+(\..+)/', '$1***$2***$3', $user['email']);
+                    $decryptedEmail = SecurityHelper::isEncrypted($user['email'])
+                        ? SecurityHelper::decrypt($user['email'])
+                        : $user['email'];
+                    $user['email'] = $decryptedEmail;
                 }
-                
+
                 // 불필요한 민감 정보 제거
                 unset($user['password_hash'], $user['remember_token']);
             }
