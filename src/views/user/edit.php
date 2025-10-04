@@ -1108,9 +1108,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Quill 내용을 textarea에 동기화 (HTML로 저장)
         bioTextarea.value = quill.root.innerHTML;
         
-        // 버튼 비활성화 및 로딩 상태
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 저장 중...';
+        // 🚀 v3.31.0: Loading 클래스 사용
+        Loading.button(saveBtn, true, { text: '저장 중...' });
         form.classList.add('loading');
         
         // FormData 생성
@@ -1153,8 +1152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .finally(() => {
             // 버튼 상태 복원
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fas fa-save"></i> 저장하기';
+            Loading.button(saveBtn, false);
             form.classList.remove('loading');
         });
     });
@@ -1484,11 +1482,9 @@ function confirmDeleteAccount() {
         return;
     }
 
-    // 로딩 표시
+    // 🚀 v3.31.0: Loading 클래스 사용
     const deleteBtn = document.querySelector('#delete-account-modal .btn-danger');
-    const originalText = deleteBtn.innerHTML;
-    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리 중...';
-    deleteBtn.disabled = true;
+    Loading.button(deleteBtn, true, { text: '처리 중...' });
 
     // API 호출
     fetch('/api/user/delete-account', {
@@ -1517,8 +1513,7 @@ function confirmDeleteAccount() {
             window.location.href = '/auth/login';
         } else {
             alert(message);
-            deleteBtn.innerHTML = originalText;
-            deleteBtn.disabled = false;
+            Loading.button(deleteBtn, false);
 
             // 비밀번호 오류인 경우 필드 초기화
             if (message && message.includes('비밀번호')) {
@@ -1530,8 +1525,7 @@ function confirmDeleteAccount() {
     .catch(error => {
         console.error('회원탈퇴 오류:', error);
         alert('회원탈퇴 처리 중 오류가 발생했습니다.');
-        deleteBtn.innerHTML = originalText;
-        deleteBtn.disabled = false;
+        Loading.button(deleteBtn, false);
     });
 }
 </script>

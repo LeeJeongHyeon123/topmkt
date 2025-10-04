@@ -940,8 +940,8 @@ function submitForm() {
     const originalText = submitBtn.innerHTML;
     
     // 버튼 비활성화 및 로딩 표시
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 저장 중...';
+    // 🚀 v3.31.0: Loading 클래스 사용
+    Loading.button(submitBtn, true, { text: '저장 중...' });
     
     // 에디터 내용을 히든 필드에 설정
     document.getElementById('content').value = quill.root.innerHTML;
@@ -982,8 +982,7 @@ function submitForm() {
     })
     .finally(() => {
         // 버튼 복원
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
+        Loading.button(submitBtn, false);
     });
 }
 

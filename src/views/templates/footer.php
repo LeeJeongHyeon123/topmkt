@@ -480,5 +480,8 @@
 <!-- 🚀 v3.30.0: 통합 Toast 알림 시스템 -->
 <?php require_once __DIR__ . '/../includes/toast.js.php'; ?>
 
+<!-- 🚀 v3.31.0: 통합 Loading 인디케이터 시스템 -->
+<?php require_once __DIR__ . '/../includes/loading.js.php'; ?>
+
 </body>
 </html> 

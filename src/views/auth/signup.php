@@ -1802,8 +1802,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        sendVerificationBtn.disabled = true;
-        sendVerificationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 발송 중...';
+        // 🚀 v3.31.0: Loading 클래스 사용
+        Loading.button(sendVerificationBtn, true, { text: '발송 중...' });
 
         try {
             console.log('🌐 AJAX 요청 시작 - /auth/send-verification');
@@ -1869,8 +1869,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 Toast.error(data.message || '인증번호 발송에 실패했습니다.');
-                sendVerificationBtn.disabled = false;
-                sendVerificationBtn.innerHTML = '인증번호 발송';
+                Loading.button(sendVerificationBtn, false);
             }
         } catch (error) {
             console.error('❌ AJAX 요청 오류:', error);
@@ -1881,8 +1880,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             Toast.error('인증번호 발송 중 오류가 발생했습니다.');
-            sendVerificationBtn.disabled = false;
-            sendVerificationBtn.innerHTML = '인증번호 발송';
+            Loading.button(sendVerificationBtn, false);
         }
     }
 
@@ -1892,8 +1890,8 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('📱 인증 번호:', phone);
         console.log('🔢 입력 코드:', code);
         
-        verifyCodeBtn.disabled = true;
-        verifyCodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 확인 중...';
+        // 🚀 v3.31.0: Loading 클래스 사용
+        Loading.button(verifyCodeBtn, true, { text: '확인 중...' });
 
         const requestData = { phone: phone, code: code };
         console.log('📤 인증 확인 요청 데이터:', requestData);
@@ -1920,15 +1918,13 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 console.error('❌ 인증 실패:', data.message);
                 Toast.error(data.message || '인증번호가 일치하지 않습니다.');
-                verifyCodeBtn.disabled = false;
-                verifyCodeBtn.innerHTML = '확인';
+                Loading.button(verifyCodeBtn, false);
             }
         })
         .catch(error => {
             console.error('❌ 인증 확인 AJAX 오류:', error);
             Toast.error('인증 확인 중 오류가 발생했습니다.');
-            verifyCodeBtn.disabled = false;
-            verifyCodeBtn.innerHTML = '확인';
+            Loading.button(verifyCodeBtn, false);
         });
     }
 
@@ -1938,7 +1934,7 @@ document.addEventListener('DOMContentLoaded', function() {
         verificationGroup.style.display = 'block';
         verificationCodeInput.focus();
         sendVerificationBtn.innerHTML = '재발송';
-        sendVerificationBtn.disabled = false;
+        Loading.button(sendVerificationBtn, false);
     }
 
     // 타이머 시작
@@ -2030,8 +2026,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 재발송 버튼 활성화
         setTimeout(() => {
-            sendVerificationBtn.disabled = false;
-            sendVerificationBtn.innerHTML = '재발송';
+            Loading.button(sendVerificationBtn, false);
             console.log('🔄 재발송 버튼 활성화');
         }, 1000);
     }

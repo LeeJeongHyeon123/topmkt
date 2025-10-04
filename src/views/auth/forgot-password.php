@@ -1408,7 +1408,8 @@ class MultiStepPasswordResetManager {
             return;
         }
         
-        this.setLoading(this.step1Button, true);
+        // 🚀 v3.31.0: Loading 클래스 사용
+        Loading.button(this.step1Button, true, { text: '처리 중...' });
         
         try {
             const formData = new FormData(this.step1Form);
@@ -1437,7 +1438,7 @@ class MultiStepPasswordResetManager {
             console.error('Step 1 Error:', error);
             this.showAlert('네트워크 오류가 발생했습니다.', 'error');
         } finally {
-            this.setLoading(this.step1Button, false);
+            Loading.button(this.step1Button, false);
         }
     }
 
@@ -1451,7 +1452,8 @@ class MultiStepPasswordResetManager {
             return;
         }
         
-        this.setLoading(this.step2Button, true);
+        // 🚀 v3.31.0: Loading 클래스 사용
+        Loading.button(this.step2Button, true, { text: '인증 중...' });
         
         try {
             const response = await fetch('/auth/verify-reset-code', {
@@ -1482,7 +1484,7 @@ class MultiStepPasswordResetManager {
             console.error('Step 2 Error:', error);
             this.showAlert('네트워크 오류가 발생했습니다.', 'error');
         } finally {
-            this.setLoading(this.step2Button, false);
+            Loading.button(this.step2Button, false);
         }
     }
 
@@ -1503,7 +1505,8 @@ class MultiStepPasswordResetManager {
             return;
         }
         
-        this.setLoading(this.step3Button, true);
+        // 🚀 v3.31.0: Loading 클래스 사용
+        Loading.button(this.step3Button, true, { text: '저장 중...' });
         
         try {
             const formData = new FormData(this.step3Form);
@@ -1527,7 +1530,7 @@ class MultiStepPasswordResetManager {
             console.error('Step 3 Error:', error);
             this.showAlert('네트워크 오류가 발생했습니다.', 'error');
         } finally {
-            this.setLoading(this.step3Button, false);
+            Loading.button(this.step3Button, false);
         }
     }
 
@@ -1632,17 +1635,9 @@ class MultiStepPasswordResetManager {
         return cleaned.replace(/(\d{3})(\d{3,4})(\d{1,4})/, '$1-****-$3');
     }
 
-    setLoading(button, loading) {
-        if (!button) return;
-        
-        if (loading) {
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리 중...';
-        } else {
-            button.disabled = false;
-            button.innerHTML = button.getAttribute('data-original-text') || button.textContent;
-        }
-    }
+    // 🚀 v3.31.0: setLoading 메서드 제거 (Loading 클래스로 대체됨)
+    // 기존: this.setLoading(button, true/false)
+    // 현재: Loading.button(button, true/false, { text: '...' })
 
     showAlert(message, type = 'info', duration = 5000) {
         if (!this.alertZone) return;

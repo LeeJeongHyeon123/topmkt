@@ -262,7 +262,7 @@ fi
 # 7. Toast 알림 직접 코딩 감지 (v3.30.0)
 ##############################################
 
-echo "${BLUE}[7/7]${NC} Toast 알림 직접 코딩 감지 중..."
+echo "${BLUE}[7/8]${NC} Toast 알림 직접 코딩 감지 중..."
 echo ""
 
 # showMessage, showAlert, showSuccessMessage, showErrorMessage 함수 직접 정의 감지
@@ -283,6 +283,56 @@ if [ ! -z "$TOAST_FUNCTIONS" ]; then
     echo "   Toast.error('메시지')"
     echo "   Toast.warning('메시지')"
     echo "   Toast.info('메시지')"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+##############################################
+# 8. Loading 인디케이터 직접 코딩 감지 (v3.31.0)
+##############################################
+
+echo "${BLUE}[8/8]${NC} Loading 인디케이터 직접 코딩 감지 중..."
+echo ""
+
+# setLoading, showLoading, hideLoading 함수 직접 정의 감지
+# loading.js.php는 제외, 백업/테스트 파일 제외
+# lectures/create.php, community/write.php의 기존 함수는 예외 (오버레이 관리 포함)
+LOADING_FUNCTIONS=$(grep -rn 'function setLoading\|function showLoading\|function hideLoading' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "loading.js.php" | \
+    grep -v "v3.31.0.*제거" | \
+    grep -v "lectures/create.php" | \
+    grep -v "community/write.php" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$LOADING_FUNCTIONS" ]; then
+    echo "${RED}❌ Loading 함수 직접 정의 발견:${NC}"
+    echo "$LOADING_FUNCTIONS" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: Loading 클래스 사용${NC}"
+    echo "   Loading.button(buttonElement, true, { text: '처리 중...' })"
+    echo "   Loading.button(buttonElement, false)"
+    echo "   Loading.buttons([btn1, btn2], true)"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# 버튼 innerHTML에 fa-spinner 직접 작성 감지 (Loading 클래스 사용 안한 경우)
+BUTTON_SPINNER=$(grep -rn '\.innerHTML.*fa-spinner fa-spin' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "loading.js.php" | \
+    grep -v "v3.31.0" | \
+    grep -v "Loading.button" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$BUTTON_SPINNER" ]; then
+    echo "${RED}❌ 버튼 로딩 innerHTML 직접 작성 발견:${NC}"
+    echo "$BUTTON_SPINNER" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: Loading 클래스 사용${NC}"
+    echo "   Loading.button(buttonElement, true, { text: '처리 중...' })"
     echo ""
     VIOLATIONS_FOUND=1
 fi

@@ -1053,9 +1053,8 @@ function initializeForm() {
             return;
         }
         
-        // 제출
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 등록 중...';
+        // 🚀 v3.31.0: Loading 클래스 사용
+        Loading.button(submitBtn, true, { text: '등록 중...' });
         
         // AJAX로 FormData 전송
         fetch(form.action, {
@@ -1075,15 +1074,13 @@ function initializeForm() {
                 // 오류 응답 처리
                 console.error('Form submission error:', data);
                 alert('등록 중 오류가 발생했습니다.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '등록하기';
+                Loading.button(submitBtn, false);
             }
         })
         .catch(error => {
             console.error('Form submission error:', error);
             alert('등록 중 오류가 발생했습니다.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '등록하기';
+            Loading.button(submitBtn, false);
         });
     });
 }
