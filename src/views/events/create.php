@@ -1418,17 +1418,17 @@ function initializeImageUpload() {
 
 // 더 이상 필요하지 않은 업로드 함수들은 제거
 
-// 이미지 파일 검증
+// 🚀 v3.27.0: 이미지 파일 검증 (공통 업로드 설정 사용)
 function validateImageFile(file) {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    // 파일 확장자 검증
+    if (!window.validateImageExtension(file.name)) {
         alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
         return false;
     }
-    
-    // 파일 크기 검증 (공통 설정 사용: 30MB)
-    if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-        alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+
+    // 파일 크기 검증
+    if (!window.validateFileSize(file.size)) {
+        alert(window.getFileSizeErrorMessage());
         return false;
     }
     

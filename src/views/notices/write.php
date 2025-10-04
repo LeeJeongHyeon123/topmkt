@@ -530,6 +530,9 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
+<!-- 🚀 v3.27.0: 공통 업로드 설정 -->
+<?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
+
 <script>
 // 공지사항 작성 페이지 JavaScript
 let quill;
@@ -562,17 +565,17 @@ function quillImageHandler() {
     input.addEventListener('change', function() {
         const file = input.files[0];
         if (!file) return;
-        
-        // 파일 크기 검증 (30MB)
-        if (file.size > 30 * 1024 * 1024) {
-            alert('파일 크기는 30MB를 초과할 수 없습니다.');
+
+        // 🚀 v3.27.0: 공통 업로드 설정 사용
+        // 파일 크기 검증
+        if (!window.validateFileSize(file.size)) {
+            alert(window.getFileSizeErrorMessage());
             return;
         }
-        
-        // 파일 형식 검증
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('허용되지 않는 파일 형식입니다. (jpg, jpeg, png, gif, webp만 가능)');
+
+        // 파일 확장자 검증
+        if (!window.validateImageExtension(file.name)) {
+            alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return;
         }
         
@@ -783,18 +786,26 @@ function setupImageUpload() {
 // 이미지 파일 처리
 function handleImageFiles(files) {
     const currentImageCount = document.querySelectorAll('.uploaded-image').length;
-    
+
     if (currentImageCount + files.length > maxImages) {
         alert(`최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`);
         return;
     }
-    
+
     files.forEach(file => {
-        if (file.size > maxFileSize) {
-            alert(`${file.name}은(는) 파일 크기가 너무 큽니다. (최대: ${Math.round(maxFileSize / (1024 * 1024))}MB)`);
+        // 🚀 v3.27.0: 공통 업로드 설정 사용
+        // 파일 크기 검증
+        if (!window.validateFileSize(file.size)) {
+            alert(`${file.name}: ${window.getFileSizeErrorMessage()}`);
             return;
         }
-        
+
+        // 파일 확장자 검증
+        if (!window.validateImageExtension(file.name)) {
+            alert(`${file.name}: JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.`);
+            return;
+        }
+
         uploadImage(file);
     });
 }

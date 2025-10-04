@@ -463,6 +463,9 @@ if (!isset($notice) || !$notice) {
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
+<!-- 🚀 v3.27.0: 공통 업로드 설정 -->
+<?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
+
 <script>
 // 편집 폼 JavaScript
 let quill; // Quill 에디터 인스턴스
@@ -852,19 +855,11 @@ function initializeQuillEditor() {
     console.log('✅ Quill 에디터 초기화 완료 (이미지 제한 시스템 포함)');
 }
 
-// 파일 크기 검증 함수
-window.validateFileSize = function(fileSize) {
-    const maxSize = <?= UploadConfig::MAX_FILE_SIZE ?>;
-    return fileSize > 0 && fileSize <= maxSize;
-};
+// 🚀 v3.27.0: 공통 업로드 설정 사용 (upload-config.js.php에서 제공)
+// - window.validateFileSize()
+// - window.formatFileSize()
+// - window.getFileSizeErrorMessage()
+// - window.validateImageExtension()
 
-window.formatFileSize = function(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-console.log('✅ 파일 검증 함수 로드 완료 - 최대 파일 크기: <?= UploadConfig::MAX_FILE_SIZE_MB ?>MB');
+console.log('✅ 공통 업로드 설정 로드 완료 - 최대 파일 크기: ' + window.TOPMKT_UPLOAD_CONFIG.maxFileSizeMB + 'MB');
 </script>

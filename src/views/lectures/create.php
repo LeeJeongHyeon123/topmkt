@@ -1199,9 +1199,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        <input type="file" id="instructor_image_0" name="instructors[0][image]" 
+                        <input type="file" id="instructor_image_0" name="instructors[0][image]"
                                style="display: none" accept="image/*" onchange="handleInstructorImage(0, this)">
-                        <div class="form-help">JPG, PNG, GIF, WebP 파일을 업로드하세요 (최대 2MB)</div>
+                        <div class="form-help">JPG, PNG, GIF, WebP 파일을 업로드하세요 (최대 30MB)</div>
                     </div>
 
                     <div class="form-grid">
@@ -1894,9 +1894,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <input type="file" id="instructor_image_${instructorCount}" name="instructors[${instructorCount}][image]" 
+                <input type="file" id="instructor_image_${instructorCount}" name="instructors[${instructorCount}][image]"
                        style="display: none" accept="image/*" onchange="handleInstructorImage(${instructorCount}, this)">
-                <div class="form-help">JPG, PNG, GIF, WebP 파일을 업로드하세요 (최대 2MB)</div>
+                <div class="form-help">JPG, PNG, GIF, WebP 파일을 업로드하세요 (최대 30MB)</div>
             </div>
             <div class="form-grid">
                 <div class="form-group">
@@ -3806,9 +3806,9 @@ function createAdditionalInstructorField(container, index) {
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <input type="file" id="instructor_image_${index}" name="instructors[${index}][image]" 
+            <input type="file" id="instructor_image_${index}" name="instructors[${index}][image]"
                    style="display: none" accept="image/*" onchange="handleInstructorImage(${index}, this)">
-            <div class="form-help">JPG, PNG, GIF, WebP 파일을 업로드하세요 (최대 2MB)</div>
+            <div class="form-help">JPG, PNG, GIF, WebP 파일을 업로드하세요 (최대 30MB)</div>
         </div>
 
         <div class="form-grid">

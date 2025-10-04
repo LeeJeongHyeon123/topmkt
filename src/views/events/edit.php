@@ -639,6 +639,9 @@ if (!isset($_SESSION['csrf_token'])) {
 <!-- Quill.js 에디터 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 
+<!-- 🚀 v3.27.0: 공통 업로드 설정 -->
+<?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
+
 <script>
 // Quill 에디터 초기화
 const quill = new Quill('#description-editor', {
@@ -687,10 +690,17 @@ function quillImageHandler() {
     input.onchange = async () => {
         const file = input.files[0];
         if (!file) return;
-        
-        // 파일 크기 검증 (30MB)
-        if (file.size > 30 * 1024 * 1024) {
-            alert('이미지 크기는 30MB를 초과할 수 없습니다.');
+
+        // 🚀 v3.27.0: 공통 업로드 설정 사용
+        // 파일 크기 검증
+        if (!window.validateFileSize(file.size)) {
+            alert(window.getFileSizeErrorMessage());
+            return;
+        }
+
+        // 파일 확장자 검증
+        if (!window.validateImageExtension(file.name)) {
+            alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return;
         }
         
