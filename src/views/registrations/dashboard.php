@@ -861,12 +861,12 @@ function applyDateFilter() {
     const endDate = endDatePicker.selectedDates[0];
 
     if (!startDate || !endDate) {
-        alert('시작일과 종료일을 모두 선택해주세요.');
+        Toast.info('시작일과 종료일을 모두 선택해주세요.');
         return;
     }
 
     if (startDate > endDate) {
-        alert('시작일이 종료일보다 늦을 수 없습니다.');
+        Toast.error('시작일이 종료일보다 늦을 수 없습니다.');
         return;
     }
 

@@ -832,7 +832,7 @@ document.addEventListener("click", function(e) {
 
 // 사용자 편집
 function editUser(userId) {
-    alert(`사용자 ID ${userId} 편집 (준비 중)`);
+    Toast.info(`사용자 ID ${userId} 편집 (준비 중)`);
 }
 
 // 데이터 내보내기

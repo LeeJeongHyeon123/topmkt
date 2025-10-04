@@ -916,13 +916,13 @@ document.getElementById("processForm").addEventListener("submit", async function
         const result = await response.json();
         
         if (result.success) {
-            alert(result.message + "\\n\\nSMS 알림이 발송되었습니다.");
+            Toast.success(result.message + "\n\nSMS 알림이 발송되었습니다.");
             location.reload();
         } else {
-            alert("오류: " + result.error);
+            Toast.error("오류: " + result.error);
         }
     } catch (error) {
-        alert("처리 중 오류가 발생했습니다: " + error.message);
+        Toast.error("처리 중 오류가 발생했습니다: " + error.message);
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;

@@ -2000,7 +2000,7 @@ function showDayEvents(date, day, events) {
         
     } catch (error) {
         console.error('일정 모달 표시 오류:', error);
-        alert('일정을 불러오는 중 오류가 발생했습니다.');
+        Toast.error('일정을 불러오는 중 오류가 발생했습니다.');
     }
 }
 

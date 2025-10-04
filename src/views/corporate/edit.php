@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let field of requiredFields) {
             const element = document.getElementById(field.id);
             if (!element.value.trim()) {
-                alert(field.name + '을(를) 입력해주세요.');
+                Toast.error(field.name + '을(를) 입력해주세요.');
                 element.focus();
                 return false;
             }
@@ -472,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const phoneRegex = /^010-\d{4}-\d{4}$/;
         const phone = document.getElementById('representative_phone').value;
         if (!phoneRegex.test(phone)) {
-            alert('올바른 휴대폰 번호 형식을 입력해주세요. (예: 010-1234-5678)');
+            Toast.error('올바른 휴대폰 번호 형식을 입력해주세요. (예: 010-1234-5678)');
             document.getElementById('representative_phone').focus();
             return false;
         }

@@ -915,7 +915,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 검색어 유효성 검사
                 const searchTerm = this.value.trim();
                 if (searchTerm.length > 0 && searchTerm.length < 2) {
-                    alert('검색어는 2자 이상 입력해주세요.');
+                    Toast.error('검색어는 2자 이상 입력해주세요.');
                     return;
                 }
                 

@@ -895,13 +895,13 @@ document.getElementById("statusForm").addEventListener("submit", async function(
         const result = await response.json();
         
         if (result.success) {
-            alert(result.message);
+            Toast.success(result.message);
             location.reload();
         } else {
-            alert("오류: " + result.error);
+            Toast.error("오류: " + result.error);
         }
     } catch (error) {
-        alert("처리 중 오류가 발생했습니다: " + error.message);
+        Toast.error("처리 중 오류가 발생했습니다: " + error.message);
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;

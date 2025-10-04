@@ -982,7 +982,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 세션에서 디버깅 정보 확인
     <?php if (isset($_SESSION['debug_info'])): ?>
     console.error('🚨 서버 디버깅 정보:', <?= json_encode($_SESSION['debug_info']) ?>);
-    alert('🚨 디버깅 정보\n\n<?= addslashes($_SESSION['debug_info']) ?>\n\n콘솔 로그도 확인하세요.');
+    Toast.error('🚨 디버깅 정보\n\n<?= addslashes($_SESSION["debug_info"]) ?>\n\n콘솔 로그도 확인하세요.');
     <?php unset($_SESSION['debug_info']); ?>
     <?php endif; ?>
     
@@ -2102,7 +2102,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!validateForm()) {
             console.error('❌ 폼 유효성 검사 실패');
             Toast.error('모든 필드를 올바르게 입력하고 휴대폰 인증을 완료해주세요.');
-            alert('⚠️ 디버깅: 폼 유효성 검사 실패\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
+            Toast.error('⚠️ 디버깅: 폼 유효성 검사 실패\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
             return;
         }
 
@@ -2170,7 +2170,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             Toast.error('보안 검증에 실패했습니다. 새로고침 후 다시 시도해주세요.');
-            alert('⚠️ 디버깅: reCAPTCHA 토큰 생성 실패\n\n' + error.message + '\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
+            Toast.error('⚠️ 디버깅: reCAPTCHA 토큰 생성 실패\n\n' + error.message + '\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
         }
     });
 
