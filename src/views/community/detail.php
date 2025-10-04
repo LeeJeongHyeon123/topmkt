@@ -19,6 +19,10 @@ if (class_exists('WebLogger')) {
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
+
+// 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Button.php';
+
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -549,16 +553,26 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
             <!-- 액션 버튼들 -->
             <div class="post-actions">
                 <?php if ($isLoggedIn): ?>
-                    <button class="btn btn-primary <?= $isLiked ? 'liked' : '' ?>" id="likeBtn">
-                        <?= $isLiked ? '❤️' : '🤍' ?> 좋아요 <?= $post['like_count'] ?>
-                    </button>
-                    <button class="btn btn-success" id="shareBtn">
-                        📤 공유
-                    </button>
+                    <?= renderButton(
+                        ($isLiked ? '❤️' : '🤍') . ' 좋아요 ' . $post['like_count'],
+                        'primary',
+                        'md',
+                        [
+                            'id' => 'likeBtn',
+                            'class' => $isLiked ? 'liked' : ''
+                        ]
+                    ) ?>
+                    <?= renderButton('📤 공유', 'success', 'md', [
+                        'id' => 'shareBtn'
+                    ]) ?>
                     <?php if (!$isOwner && isset($post['user_id']) && $post['user_id']): ?>
-                        <button class="btn btn-info" id="chatBtn" data-author-id="<?= htmlspecialchars($post['user_id']) ?>" data-author-name="<?= htmlspecialchars($authorName) ?>">
-                            💬 채팅하기
-                        </button>
+                        <?= renderButton('💬 채팅하기', 'info', 'md', [
+                            'id' => 'chatBtn',
+                            'attributes' => [
+                                'data-author-id' => htmlspecialchars($post['user_id']),
+                                'data-author-name' => htmlspecialchars($authorName)
+                            ]
+                        ]) ?>
                     <?php endif; ?>
                 <?php endif; ?>
                 
@@ -566,9 +580,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                     <a href="/community/posts/<?= $post['id'] ?>/edit" class="btn btn-warning">
                         ✏️ 수정
                     </a>
-                    <button class="btn btn-danger" id="deleteBtn">
-                        🗑️ 삭제
-                    </button>
+                    <?= renderButton('🗑️ 삭제', 'danger', 'md', [
+                        'id' => 'deleteBtn'
+                    ]) ?>
                 <?php endif; ?>
                 
                 <a href="<?= htmlspecialchars($listUrl) ?>" class="btn btn-secondary">
@@ -606,9 +620,11 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 </div>
 
 <!-- 목록으로 돌아가기 플로팅 버튼 -->
-<button class="back-to-list" id="backToListBtn" title="목록으로 돌아가기">
-    📋
-</button>
+<?= renderButton('📋', 'secondary', 'md', [
+    'id' => 'backToListBtn',
+    'class' => 'back-to-list',
+    'ariaLabel' => '목록으로 돌아가기'
+]) ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

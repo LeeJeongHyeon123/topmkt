@@ -7,6 +7,11 @@
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
+
+// 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Button.php';
+require_once SRC_PATH . '/components/ui/Modal.php';
+
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
@@ -1650,12 +1655,13 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     <div class="event-hero">
         <div class="event-admin-actions">
             <?php if ($canEdit): ?>
-                <button class="btn btn-edit" data-event-id="<?= $event['id'] ?>">
-                    ✏️ 수정
-                </button>
-                <button class="btn btn-danger" onclick="confirmDeleteEvent(<?= $event['id'] ?>)">
-                    🗑️ 삭제
-                </button>
+                <?= renderButton('✏️ 수정', 'secondary', 'md', [
+                    'class' => 'btn-edit',
+                    'attributes' => ['data-event-id' => $event['id']]
+                ]) ?>
+                <?= renderButton('🗑️ 삭제', 'danger', 'md', [
+                    'onclick' => 'confirmDeleteEvent(' . $event['id'] . ')'
+                ]) ?>
             <?php endif; ?>
         </div>
         <div class="event-hero-content">
@@ -1738,9 +1744,10 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
             </div>
             
             <div class="event-share-actions">
-                <button class="btn-share" onclick="shareEventContent()">
-                    🔗 공유하기
-                </button>
+                <?= renderButton('🔗 공유하기', 'secondary', 'md', [
+                    'class' => 'btn-share',
+                    'onclick' => 'shareEventContent()'
+                ]) ?>
             </div>
         </div>
     </div>
@@ -2034,12 +2041,18 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                             </div>
                         </div>
                         
-                        <button id="event-register-btn" class="register-btn" onclick="registerEvent()">
-                            참가 신청하기
-                        </button>
-                        <button id="event-cancel-btn" class="register-btn" onclick="cancelEventRegistration()" style="display: none !important; background: #dc3545;">
-                            신청 취소
-                        </button>
+                        <?= renderButton('참가 신청하기', 'primary', 'lg', [
+                            'id' => 'event-register-btn',
+                            'class' => 'register-btn',
+                            'onclick' => 'registerEvent()',
+                            'fullWidth' => true
+                        ]) ?>
+                        <?= renderButton('신청 취소', 'danger', 'lg', [
+                            'id' => 'event-cancel-btn',
+                            'class' => 'register-btn',
+                            'onclick' => 'cancelEventRegistration()',
+                            'attributes' => ['style' => 'display: none !important;']
+                        ]) ?>
                     <?php endif; ?>
                 <?php else: ?>
                     <?php if ($isDeadlinePassed): ?>
@@ -2101,9 +2114,11 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                             <small style="color: #94a3b8;">참가 문의는 주최자에게 별도 연락하세요</small>
                         </div>
                     <?php else: ?>
-                        <button class="register-btn" onclick="redirectToLogin()">
-                            로그인 후 신청하기
-                        </button>
+                        <?= renderButton('로그인 후 신청하기', 'primary', 'lg', [
+                            'class' => 'register-btn',
+                            'onclick' => 'redirectToLogin()',
+                            'fullWidth' => true
+                        ]) ?>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
@@ -2351,9 +2366,12 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                                 <i class="fas fa-user"></i> 프로필 방문
                             </a>
                             <?php if ($isLoggedIn && $event['user_id'] != $currentUserId): ?>
-                                <button onclick="startChatWithAuthor(<?= $event['user_id'] ?>, '<?= addslashes(htmlspecialchars($authorName)) ?>')" class="btn-chat-author" title="채팅하기">
-                                    <i class="fas fa-comment"></i>
-                                </button>
+                                <?= renderButton('', 'primary', 'md', [
+                                    'class' => 'btn-chat-author',
+                                    'onclick' => 'startChatWithAuthor(' . $event['user_id'] . ', \'' . addslashes(htmlspecialchars($authorName)) . '\')',
+                                    'icon' => 'fas fa-comment',
+                                    'ariaLabel' => '채팅하기'
+                                ]) ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>

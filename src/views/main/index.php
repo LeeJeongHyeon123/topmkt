@@ -1,3 +1,8 @@
+        <?php
+        // 컴포넌트 로드
+        require_once SRC_PATH . '/components/ui/Button.php';
+        ?>
+
         <!-- 성공/에러 메시지 표시 -->
         <?php if (isset($_SESSION['success'])): ?>
             <div class="success-message">
@@ -5,9 +10,12 @@
                     <div class="message-content">
                         <i class="fas fa-check-circle"></i>
                         <span><?= htmlspecialchars($_SESSION['success']) ?></span>
-                        <button class="close-message" onclick="this.parentElement.parentElement.remove()">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <?= renderButton('', 'secondary', 'sm', [
+                            'class' => 'close-message',
+                            'onclick' => 'this.parentElement.parentElement.remove()',
+                            'icon' => 'fas fa-times',
+                            'ariaLabel' => '닫기'
+                        ]) ?>
                     </div>
                 </div>
             </div>
