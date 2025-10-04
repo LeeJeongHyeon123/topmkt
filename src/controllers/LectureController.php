@@ -1365,50 +1365,50 @@ class LectureController {
                     user_id, title, description, instructor_name, instructor_info,
                     start_date, end_date, start_time, end_time, timezone,
                     location_type, venue_name, venue_address, venue_latitude, venue_longitude, online_link,
-                    max_participants, registration_fee, registration_deadline, category, content_type, 
+                    max_participants, registration_fee, registration_deadline, category, content_type,
                     instructors_json, lecture_images, requirements, prerequisites, what_to_bring, additional_info, benefits, youtube_video,
                     status, created_at
                 ) VALUES (
-                    :user_id, :title, :description, :instructor_name, :instructor_info,
-                    :start_date, :end_date, :start_time, :end_time, :timezone,
-                    :location_type, :venue_name, :venue_address, :venue_latitude, :venue_longitude, :online_link,
-                    :max_participants, :registration_fee, :registration_deadline, :category, :content_type,
-                    :instructors_json, :lecture_images, :requirements, :prerequisites, :what_to_bring, :additional_info, :benefits, :youtube_video,
-                    :status, NOW()
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, NOW()
                 )
             ";
-            
+
             $params = [
-                ':user_id' => $userId,
-                ':title' => $data['title'],
-                ':description' => $data['description'],
-                ':instructor_name' => $data['instructor_name'],
-                ':instructor_info' => $data['instructor_info'] ?? null,
-                ':start_date' => $data['start_date'],
-                ':end_date' => $data['end_date'],
-                ':start_time' => $data['start_time'],
-                ':end_time' => $data['end_time'],
-                ':timezone' => $data['timezone'] ?? 'Asia/Seoul',
-                ':location_type' => $data['location_type'] ?? 'offline',
-                ':venue_name' => $data['venue_name'] ?? null,
-                ':venue_address' => $data['venue_address'] ?? null,
-                ':venue_latitude' => !empty($data['venue_latitude']) ? floatval($data['venue_latitude']) : null,
-                ':venue_longitude' => !empty($data['venue_longitude']) ? floatval($data['venue_longitude']) : null,
-                ':online_link' => $data['online_link'] ?? null,
-                ':max_participants' => empty($data['max_participants']) ? null : intval($data['max_participants']),
-                ':registration_fee' => intval($data['registration_fee'] ?? 0),
-                ':registration_deadline' => $data['registration_deadline'] ?? null,
-                ':category' => $data['category'] ?? 'seminar',
-                ':content_type' => $data['content_type'] ?? 'lecture',
-                ':instructors_json' => $data['instructors_json'] ?? null,
-                ':lecture_images' => $data['lecture_images'] ?? null,
-                ':requirements' => $data['requirements'] ?? null,
-                ':prerequisites' => $data['prerequisites'] ?? null,
-                ':what_to_bring' => $data['what_to_bring'] ?? null,
-                ':additional_info' => $data['additional_info'] ?? null,
-                ':benefits' => $data['benefits'] ?? null,
-                ':youtube_video' => $data['youtube_video'] ?? null,
-                ':status' => $data['status'] ?? 'draft'
+                $userId,
+                $data['title'],
+                $data['description'],
+                $data['instructor_name'],
+                $data['instructor_info'] ?? null,
+                $data['start_date'],
+                $data['end_date'],
+                $data['start_time'],
+                $data['end_time'],
+                $data['timezone'] ?? 'Asia/Seoul',
+                $data['location_type'] ?? 'offline',
+                $data['venue_name'] ?? null,
+                $data['venue_address'] ?? null,
+                !empty($data['venue_latitude']) ? floatval($data['venue_latitude']) : null,
+                !empty($data['venue_longitude']) ? floatval($data['venue_longitude']) : null,
+                $data['online_link'] ?? null,
+                empty($data['max_participants']) ? null : intval($data['max_participants']),
+                intval($data['registration_fee'] ?? 0),
+                $data['registration_deadline'] ?? null,
+                $data['category'] ?? 'seminar',
+                $data['content_type'] ?? 'lecture',
+                $data['instructors_json'] ?? null,
+                $data['lecture_images'] ?? null,
+                $data['requirements'] ?? null,
+                $data['prerequisites'] ?? null,
+                $data['what_to_bring'] ?? null,
+                $data['additional_info'] ?? null,
+                $data['benefits'] ?? null,
+                $data['youtube_video'] ?? null,
+                $data['status'] ?? 'draft'
             ];
             
             error_log("=== createLecture 메서드 시작 ===");
@@ -2357,7 +2357,15 @@ class LectureController {
                 header('Location: /corp/info');
                 exit;
             }
-            
+
+            // 지난 일정 수정 차단 (삭제는 허용)
+            $today = date('Y-m-d');
+            if ($lecture['start_date'] < $today) {
+                $_SESSION['error_message'] = '지난 일정은 수정할 수 없습니다. 삭제만 가능합니다.';
+                header('Location: /lectures/' . $lectureId);
+                exit;
+            }
+
             // 강의 이미지 조회
             $lectureImages = $this->getLectureImages($lectureId);
             $lecture['images'] = $lectureImages;
@@ -2444,6 +2452,108 @@ class LectureController {
     }
     
     /**
+     * 강의 수정 가능 여부 체크 (AJAX API)
+     */
+    public function checkEditable($lectureId) {
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            if (class_exists('WebLogger')) {
+                WebLogger::info('강의 수정 가능 여부 체크 API 호출', ['lecture_id' => $lectureId]);
+            }
+
+            // 로그인 확인
+            AuthMiddleware::apiAuthenticate();
+            $currentUserId = AuthMiddleware::getCurrentUserId();
+
+            // 강의 정보 조회
+            $lecture = $this->getLectureById($lectureId, false);
+            if (!$lecture) {
+                http_response_code(404);
+                echo json_encode([
+                    'success' => false,
+                    'message' => '존재하지 않는 강의입니다.',
+                    'code' => 'LECTURE_NOT_FOUND'
+                ]);
+                return;
+            }
+
+            // 수정 권한 확인
+            if (!$this->canEditLecture($lecture)) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => '수정 권한이 없습니다.',
+                    'code' => 'PERMISSION_DENIED'
+                ]);
+                return;
+            }
+
+            // 지난 일정 체크 (기업 권한 체크보다 우선)
+            $today = date('Y-m-d');
+            $isPastLecture = $lecture['start_date'] < $today;
+
+            if ($isPastLecture) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => '지난 일정은 수정할 수 없습니다. 삭제만 가능합니다.',
+                    'code' => 'PAST_LECTURE',
+                    'data' => [
+                        'lecture_id' => $lectureId,
+                        'start_date' => $lecture['start_date'],
+                        'today' => $today,
+                        'is_past' => true
+                    ]
+                ]);
+                return;
+            }
+
+            // 기업회원 권한 확인
+            require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+            $permission = CorporateMiddleware::checkLectureEventPermission();
+
+            if (!$permission['hasPermission']) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => $permission['message'],
+                    'code' => 'CORPORATE_PERMISSION_DENIED'
+                ]);
+                return;
+            }
+
+            // 수정 가능
+            echo json_encode([
+                'success' => true,
+                'message' => '수정 가능합니다.',
+                'code' => 'EDITABLE',
+                'data' => [
+                    'lecture_id' => $lectureId,
+                    'start_date' => $lecture['start_date'],
+                    'today' => $today,
+                    'is_past' => false,
+                    'edit_url' => "/lectures/{$lectureId}/edit"
+                ]
+            ]);
+
+        } catch (Exception $e) {
+            if (class_exists('WebLogger')) {
+                WebLogger::error('강의 수정 가능 여부 체크 오류', [
+                    'lecture_id' => $lectureId,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => '서버 오류가 발생했습니다.',
+                'code' => 'SERVER_ERROR'
+            ]);
+        }
+    }
+
+    /**
      * 강의 정보 업데이트 처리
      */
     public function update($id) {
@@ -2498,7 +2608,20 @@ class LectureController {
                 ResponseHelper::error($permission['message'], 403);
                 return;
             }
-            
+
+            // 지난 일정 수정 차단 (삭제는 허용)
+            $today = date('Y-m-d');
+            if ($lecture['start_date'] < $today) {
+                WebLogger::warning('Past lecture edit attempt blocked', [
+                    'lecture_id' => $lectureId,
+                    'current_user_id' => $currentUserId,
+                    'lecture_start_date' => $lecture['start_date'],
+                    'today' => $today
+                ]);
+                ResponseHelper::error('지난 일정은 수정할 수 없습니다. 삭제만 가능합니다.', 403);
+                return;
+            }
+
             // CSRF 토큰 검증
             if (!$this->validateCsrfToken()) {
                 WebLogger::warning('CSRF token validation failed', [

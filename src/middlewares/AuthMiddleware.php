@@ -100,12 +100,16 @@ class AuthMiddleware {
             $db = Database::getInstance();
             
             $result = $db->fetch("
-                SELECT profile_image_thumb 
-                FROM users 
+                SELECT profile_image, profile_image_thumb, profile_image_profile
+                FROM users
                 WHERE id = ? AND status = 'active'
             ", [$currentUserId]);
-            
-            $profileImage = $result ? $result['profile_image_thumb'] : null;
+
+            // 프로필 이미지 우선순위: profile_image -> profile_image_thumb -> profile_image_profile
+            $profileImage = null;
+            if ($result) {
+                $profileImage = $result['profile_image'] ?? $result['profile_image_thumb'] ?? $result['profile_image_profile'] ?? null;
+            }
             
             // 세션에 저장하여 다음 요청에서 재사용
             if ($profileImage) {

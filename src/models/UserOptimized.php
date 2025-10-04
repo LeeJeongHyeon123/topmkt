@@ -17,65 +17,126 @@ class UserOptimized {
      * 대용량 데이터 사용자를 위한 성능 최적화
      */
     public function getOptimizedProfileDataWithCache($userId) {
-        $cacheKey = "profile_data_" . $userId;
-        $cacheFile = ROOT_PATH . '/cache/profile_' . $userId . '.json';
-        
-        // 캐시 디렉토리가 없으면 생성
-        if (!is_dir(ROOT_PATH . '/cache')) {
-            mkdir(ROOT_PATH . '/cache', 0755, true);
-        }
-        
-        // 캐시 파일이 있고 10분 미만이면 사용
-        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 600) {
-            $cachedData = json_decode(file_get_contents($cacheFile), true);
-            if ($cachedData) {
-                error_log("Profile cache hit for user $userId");
-                return $cachedData;
+        try {
+            // ROOT_PATH가 정의되지 않은 경우 안전한 기본값 사용
+            if (!defined('ROOT_PATH')) {
+                define('ROOT_PATH', '/var/www/html/topmkt');
             }
+
+            $cacheKey = "profile_data_" . $userId;
+            $cacheFile = ROOT_PATH . '/cache/profile_' . $userId . '.json';
+
+            // 캐시 디렉토리가 없으면 생성
+            if (!is_dir(ROOT_PATH . '/cache')) {
+                mkdir(ROOT_PATH . '/cache', 0755, true);
+            }
+
+            // 캐시 파일이 있고 10분 미만이면 사용
+            if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 600) {
+                $cachedData = json_decode(file_get_contents($cacheFile), true);
+                if ($cachedData) {
+                    error_log("Profile cache hit for user $userId");
+                    return $cachedData;
+                }
+            }
+
+            // 캐시 미스 또는 만료된 경우 새로 계산
+            error_log("Profile cache miss for user $userId, calculating fresh data...");
+            $profileData = $this->calculateProfileDataOptimized($userId);
+
+            if (!$profileData) {
+                error_log("Profile data calculation failed for user $userId");
+                return null;
+            }
+
+            // 캐시 저장
+            $cacheResult = file_put_contents($cacheFile, json_encode($profileData));
+            if ($cacheResult !== false) {
+                error_log("Profile cache saved successfully for user $userId");
+            } else {
+                error_log("Profile cache save failed for user $userId");
+            }
+
+            return $profileData;
+
+        } catch (Exception $e) {
+            error_log("UserOptimized::getOptimizedProfileDataWithCache Exception for user $userId: " . $e->getMessage());
+            error_log("Exception file: " . $e->getFile() . ":" . $e->getLine());
+            throw $e; // 예외를 다시 던져서 상위에서 처리하도록 함
         }
-        
-        // 캐시 미스 또는 만료된 경우 새로 계산
-        $profileData = $this->calculateProfileDataOptimized($userId);
-        
-        // 캐시 저장
-        file_put_contents($cacheFile, json_encode($profileData));
-        error_log("Profile cache saved for user $userId");
-        
-        return $profileData;
     }
     
     /**
      * 최적화된 프로필 데이터 계산
      */
     private function calculateProfileDataOptimized($userId) {
-        $startTime = microtime(true);
-        
-        // 1. 기본 사용자 정보 조회
-        $sql = "SELECT * FROM users WHERE id = ? AND status = 'active'";
-        $user = $this->db->fetch($sql, [$userId]);
-        
-        if (!$user) {
-            return null;
+        try {
+            $startTime = microtime(true);
+            error_log("Starting profile calculation for user $userId");
+
+            // 1. 기본 사용자 정보 조회
+            $sql = "SELECT * FROM users WHERE id = ? AND status = 'active'";
+            $user = $this->db->fetch($sql, [$userId]);
+
+            if (!$user) {
+                error_log("User $userId not found or not active");
+                return null;
+            }
+            error_log("User basic data retrieved for user $userId");
+
+            // 2. 통계 정보를 개별 쿼리로 최적화
+            try {
+                $user['stats'] = $this->getOptimizedStats($userId);
+                error_log("Stats retrieved for user $userId");
+            } catch (Exception $e) {
+                error_log("Stats retrieval failed for user $userId: " . $e->getMessage());
+                // 통계 실패시 기본값 사용
+                $user['stats'] = [
+                    'post_count' => 0,
+                    'comment_count' => 0,
+                    'like_count' => 0,
+                    'join_days' => 0
+                ];
+            }
+
+            // 3. 최근 게시글 조회 - 인덱스 최적화
+            try {
+                $user['recent_posts'] = $this->getRecentPostsOptimized($userId);
+                error_log("Recent posts retrieved for user $userId");
+            } catch (Exception $e) {
+                error_log("Recent posts retrieval failed for user $userId: " . $e->getMessage());
+                $user['recent_posts'] = [];
+            }
+
+            // 4. 최근 댓글 조회 - 인덱스 최적화
+            try {
+                $user['recent_comments'] = $this->getRecentCommentsOptimized($userId);
+                error_log("Recent comments retrieved for user $userId");
+            } catch (Exception $e) {
+                error_log("Recent comments retrieval failed for user $userId: " . $e->getMessage());
+                $user['recent_comments'] = [];
+            }
+
+            // JSON 데이터 파싱
+            if (!empty($user['social_links'])) {
+                try {
+                    $user['social_links'] = json_decode($user['social_links'], true);
+                } catch (Exception $e) {
+                    error_log("Social links JSON parsing failed for user $userId: " . $e->getMessage());
+                    $user['social_links'] = null;
+                }
+            }
+
+            $totalTime = (microtime(true) - $startTime) * 1000;
+            error_log("Profile calculation completed for user $userId in {$totalTime}ms");
+
+            return $user;
+
+        } catch (Exception $e) {
+            error_log("calculateProfileDataOptimized Exception for user $userId: " . $e->getMessage());
+            error_log("Exception file: " . $e->getFile() . ":" . $e->getLine());
+            throw $e;
         }
-        
-        // 2. 통계 정보를 개별 쿼리로 최적화
-        $user['stats'] = $this->getOptimizedStats($userId);
-        
-        // 3. 최근 게시글 조회 - 인덱스 최적화
-        $user['recent_posts'] = $this->getRecentPostsOptimized($userId);
-        
-        // 4. 최근 댓글 조회 - 인덱스 최적화
-        $user['recent_comments'] = $this->getRecentCommentsOptimized($userId);
-        
-        // JSON 데이터 파싱
-        if ($user['social_links']) {
-            $user['social_links'] = json_decode($user['social_links'], true);
-        }
-        
-        $totalTime = (microtime(true) - $startTime) * 1000;
-        error_log("Profile calculation time: {$totalTime}ms for user $userId");
-        
-        return $user;
     }
     
     /**

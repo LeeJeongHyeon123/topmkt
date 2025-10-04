@@ -4,6 +4,12 @@
  */
 ?>
 
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
 <style>
 /* 대시보드 전용 스타일 */
 .dashboard-container {
@@ -367,12 +373,112 @@
     background: white;
     color: #2d3748;
     transition: border-color 0.2s ease;
+    cursor: pointer;
 }
 
 .date-input:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* Flatpickr 커스터마이징 */
+.flatpickr-calendar {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.flatpickr-calendar .flatpickr-months {
+    background: #667eea !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 15px 20px !important;
+}
+
+.flatpickr-calendar .flatpickr-month {
+    color: white !important;
+}
+
+.flatpickr-calendar .flatpickr-prev-month,
+.flatpickr-calendar .flatpickr-next-month {
+    fill: white !important;
+}
+
+.flatpickr-calendar .flatpickr-current-month {
+    color: white !important;
+}
+
+.flatpickr-calendar .flatpickr-weekday {
+    color: #718096 !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+}
+
+.flatpickr-calendar .flatpickr-day {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+}
+
+.flatpickr-calendar .flatpickr-day:hover {
+    background: #667eea !important;
+    color: white !important;
+}
+
+.flatpickr-calendar .flatpickr-day.selected {
+    background: #667eea !important;
+    border-color: #667eea !important;
+}
+
+.flatpickr-calendar .flatpickr-day.today {
+    background: #48bb78 !important;
+    color: white !important;
+    border-color: #48bb78 !important;
+}
+
+/* 커스텀 버튼 스타일 */
+.flatpickr-custom-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 0 0 12px 12px;
+}
+
+.flatpickr-today-btn {
+    background: #48bb78;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.flatpickr-today-btn:hover {
+    background: #38a169;
+    transform: translateY(-1px);
+}
+
+.flatpickr-apply-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.flatpickr-apply-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
 }
 
 .btn-sm {
@@ -584,7 +690,7 @@
     <div class="section">
         <div class="section-header">
             <h2 class="section-title">
-                <?= ($contentType ?? 'lecture') === 'event' ? '🎉 최근 행사 목록 (1개월)' : '🎯 최근 강의 목록 (1개월)' ?>
+                <?= ($contentType ?? 'lecture') === 'event' ? '🎉 최근 행사 목록' : '🎯 최근 강의 목록' ?>
             </h2>
             <div class="date-filter-container">
                 <div class="date-filter">
@@ -746,25 +852,28 @@
 </div>
 
 <script>
+// Flatpickr 인스턴스를 저장할 변수
+let startDatePicker, endDatePicker;
+
 // 날짜 필터 기능
 function applyDateFilter() {
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    
+    const startDate = startDatePicker.selectedDates[0];
+    const endDate = endDatePicker.selectedDates[0];
+
     if (!startDate || !endDate) {
         alert('시작일과 종료일을 모두 선택해주세요.');
         return;
     }
-    
-    if (new Date(startDate) > new Date(endDate)) {
+
+    if (startDate > endDate) {
         alert('시작일이 종료일보다 늦을 수 없습니다.');
         return;
     }
-    
+
     // 현재 URL에 날짜 파라미터 추가
     const url = new URL(window.location.href);
-    url.searchParams.set('start_date', startDate);
-    url.searchParams.set('end_date', endDate);
+    url.searchParams.set('start_date', startDatePicker.formatDate(startDate, 'Y-m-d'));
+    url.searchParams.set('end_date', endDatePicker.formatDate(endDate, 'Y-m-d'));
     window.location.href = url.toString();
 }
 
@@ -784,30 +893,89 @@ function switchContentType(type) {
     window.location.href = url.toString();
 }
 
-// 페이지 로드 시 URL 파라미터로부터 날짜 값 설정
+// 커스텀 버튼 생성 함수
+function createCustomButtons(picker) {
+    return {
+        onReady: function() {
+            // 기존 버튼들 숨기기/제거
+            const clearButton = picker.calendarContainer.querySelector('.flatpickr-clear');
+            if (clearButton) {
+                clearButton.style.display = 'none';
+            }
+
+            // 커스텀 버튼 컨테이너 생성
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'flatpickr-custom-buttons';
+
+            // 오늘 버튼 (왼쪽에 위치 - 기존 삭제 버튼 자리)
+            const todayBtn = document.createElement('button');
+            todayBtn.className = 'flatpickr-today-btn';
+            todayBtn.textContent = '오늘';
+            todayBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                picker.setDate(new Date());
+            });
+
+            // 적용 버튼 (오른쪽에 위치 - 기존 오늘 버튼 자리)
+            const applyBtn = document.createElement('button');
+            applyBtn.className = 'flatpickr-apply-btn';
+            applyBtn.textContent = '적용';
+            applyBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                picker.close();
+            });
+
+            buttonContainer.appendChild(todayBtn);
+            buttonContainer.appendChild(applyBtn);
+            picker.calendarContainer.appendChild(buttonContainer);
+        }
+    };
+}
+
+// 페이지 로드 시 Flatpickr 초기화
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const startDate = urlParams.get('start_date');
     const endDate = urlParams.get('end_date');
     const contentType = urlParams.get('type') || 'lecture';
-    
-    // 날짜 필터 값 설정
-    if (startDate) {
-        document.getElementById('startDate').value = startDate;
-    }
-    if (endDate) {
-        document.getElementById('endDate').value = endDate;
-    }
-    
-    // 기본값: 최근 1개월
-    if (!startDate && !endDate) {
-        const today = new Date();
-        const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-        
-        document.getElementById('startDate').value = oneMonthAgo.toISOString().split('T')[0];
-        document.getElementById('endDate').value = today.toISOString().split('T')[0];
-    }
-});
 
-// 모든 강의를 한 번에 로드하므로 무한 스크롤 불필요
+    // 기본값: 최근 1개월
+    const today = new Date();
+    const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+    // 시작일 Flatpickr 초기화
+    startDatePicker = flatpickr('#startDate', {
+        locale: 'ko',
+        dateFormat: 'Y-m-d',
+        defaultDate: startDate || oneMonthAgo,
+        onReady: function() {
+            const buttons = createCustomButtons(this);
+            buttons.onReady.call(this);
+        },
+        onChange: function(selectedDates, dateStr) {
+            // 종료일의 최소값을 시작일로 설정
+            if (endDatePicker) {
+                endDatePicker.set('minDate', dateStr);
+            }
+        }
+    });
+
+    // 종료일 Flatpickr 초기화
+    endDatePicker = flatpickr('#endDate', {
+        locale: 'ko',
+        dateFormat: 'Y-m-d',
+        defaultDate: endDate || today,
+        minDate: startDate || oneMonthAgo,
+        onReady: function() {
+            const buttons = createCustomButtons(this);
+            buttons.onReady.call(this);
+        },
+        onChange: function(selectedDates, dateStr) {
+            // 시작일의 최대값을 종료일로 설정
+            if (startDatePicker) {
+                startDatePicker.set('maxDate', dateStr);
+            }
+        }
+    });
+});
 </script>

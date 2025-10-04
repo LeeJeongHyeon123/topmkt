@@ -542,42 +542,87 @@ $pageLoadTime = round((microtime(true) - $pageLoadStart) * 1000, 2);
     
     .board-controls {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
         gap: 16px;
         margin-bottom: 24px;
     }
-    
-    .search-form {
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
-    }
-    
-    .search-input {
+
+    .search-wrapper {
         width: 100%;
-        max-width: none;
-        font-size: 16px;
-        padding: 14px 16px;
-        margin: 0;
+    }
+
+    .search-form {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .search-filter {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 80px;
+        height: 44px;
+        padding: 10px 12px;
         box-sizing: border-box;
+    }
+
+    .search-input {
+        flex: 1 1 200px;
+        min-width: 200px;
+        height: 44px;
+        padding: 10px 14px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    .search-btn {
+        flex: 0 0 auto;
+        width: 44px;
+        height: 44px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    /* 액션 버튼들 컨테이너 */
+    .board-controls > :not(.search-wrapper) {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
     }
     
     .btn {
         justify-content: center;
-        font-size: 16px;
-        padding: 12px 16px;
+        font-size: 14px;
+        padding: 10px 16px;
         min-height: 44px;
-        width: auto;
+        width: fit-content;
+        max-width: none;
         display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
     }
-    
+
     .btn-write {
         justify-content: center;
         font-size: 14px;
-        padding: 10px 14px;
-        min-height: 42px;
-        width: auto;
+        padding: 12px 16px;
+        min-height: 44px;
+        width: fit-content;
+        max-width: none;
         display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        box-sizing: border-box;
     }
     
     .search-performance,
@@ -746,8 +791,10 @@ body {
     
     .search-input {
         font-size: 16px; /* iOS 줌 방지 */
-        padding: 16px;
-        min-height: 52px;
+        padding: 10px 14px;
+        min-height: 44px;
+        height: 44px;
+        box-sizing: border-box;
     }
     
     .btn {
@@ -1098,8 +1145,8 @@ body {
                 <h3>
                     <?php if (!empty($search)): ?>
                         "<?= htmlspecialchars($search) ?>" 검색 결과가 없습니다
-                    <?php elseif (isset($page) && $page > 50000): ?>
-                        접근할 수 없는 페이지입니다
+                    <?php elseif (isset($page) && isset($totalPages) && $page > $totalPages): ?>
+                        접근할 수 없는 페이지입니다 (최대 <?= number_format($totalPages) ?>페이지)
                     <?php else: ?>
                         첫 번째 게시글을 작성해보세요!
                     <?php endif; ?>
@@ -1110,8 +1157,8 @@ body {
                         • 검색어의 철자를 확인해보세요<br>
                         • 더 간단한 키워드로 다시 검색해보세요<br>
                         • 관련된 다른 단어로 검색해보세요
-                    <?php elseif (isset($page) && $page > 50000): ?>
-                        요청하신 페이지 번호가 지원 범위를 초과합니다.<br>
+                    <?php elseif (isset($page) && isset($totalPages) && $page > $totalPages): ?>
+                        요청하신 페이지 번호가 지원 범위를 초과합니다. (최대 <?= number_format($totalPages) ?>페이지)<br>
                         <a href="/community" style="color: #667eea;">커뮤니티 메인으로 이동</a>
                     <?php else: ?>
                         탑마케팅 커뮤니티의 첫 번째 이야기를 시작해보세요.

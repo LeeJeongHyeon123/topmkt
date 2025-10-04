@@ -15,59 +15,526 @@ $monthNames = [
     1 => '1월', 2 => '2월', 3 => '3월', 4 => '4월', 5 => '5월', 6 => '6월',
     7 => '7월', 8 => '8월', 9 => '9월', 10 => '10월', 11 => '11월', 12 => '12월'
 ];
+
+// 🔥 CRITICAL: 캐시 무효화를 위한 타임스탬프 (헤더 수정 후 강제 업데이트)
+$cache_buster = time() + rand(1000, 9999) + 999999;
 ?>
 
+<!-- 🔥 ULTIMATE CACHE KILLER: 개발 중 모든 캐시 완전 차단 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="cache-version" content="dev-<?php echo microtime(true); ?>">
+<!-- 🔥 추가 캐시 무효화 헤더들 -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="robots" content="noindex, nofollow">
+<meta name="cache-control" content="private, no-cache, no-store, proxy-revalidate, no-transform">
+<meta name="Last-Modified" content="<?php echo gmdate('D, d M Y H:i:s') . ' GMT'; ?>">
+<meta name="ETag" content="<?php echo md5(microtime(true)); ?>">
+
+<!-- 🎨 공통 CSS 파일 -->
+<link rel="stylesheet" href="/assets/css/events-common.css?v=<?php echo time(); ?>">
+
 <style>
-/* 행사 일정 페이지 스타일 - 파란색 테마 유지 */
+/* 🌟 ULTRA THINK 모드 - 간단하고 깔끔한 레이아웃 v4.0 */
+/* 📅 행사 일정 페이지 - 파란색 테마 유지 */
+
+/* 🏗️ 메인 컨테이너 - 강의 일정과 완전 동일 */
 .events-container {
     max-width: 1600px;
     margin: 0 auto;
-    padding: 30px 15px 20px 15px;
+    padding: 30px 20px 20px 20px;
     min-height: calc(100vh - 200px);
-    overflow-x: auto;
 }
 
-.events-header {
-    background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
-    color: white;
-    padding: 40px 20px;
-    text-align: center;
-    margin-top: 60px;
-    margin-bottom: 30px;
+/* 📱 레이아웃 구조 - 강의 일정과 완전 동일한 단순 구조 */
+/* 💬 레이아웃 그리드는 events-common.css에서 관리됨 */
+
+/* 화면 크기별 캘린더 너비 제한 - 강의 일정과 동일 */
+@media (min-width: 1441px) {
+    /* Grid 시스템에서 자동 조정 */
+}
+
+    .calendar-view {
+        max-width: 100% !important;
+        width: 100% !important;
+        /* min-width 완전 제거 - 완전 유연한 크기 */
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1440px) {
+    /* Grid 시스템에서 자동 조정 */
+}
+
+    .calendar-view {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: auto !important; /* 7개 컬럼을 더 작은 공간에 맞춤 */
+    }
+
+    /* 캘린더 내부 요소들도 제한 */
+    .events-layout .calendar-view,
+    .events-main .calendar-view,
+    div.calendar-view {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: auto !important;
+    }
+}
+
+/* 1024px 이하에서 세로 배치 - 강의 일정과 동일 */
+@media (max-width: 1024px) {
+    .events-layout {
+        grid-template-columns: 1fr;
+        max-width: none;
+        gap: 30px !important;
+        padding-right: 0 !important;
+    }
+
+    .events-sidebar {
+        order: 2;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        overflow: hidden;
+        margin-top: 30px !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+    }
+
+    .events-main {
+        order: 1;
+    }
+}
+
+
+
+
+/* 메인 콘텐츠 - Grid 1fr로 자동 크기 조정 */
+.events-main {
+    /* Grid 1fr로 자동 크기 조정되므로 별도 제한 불필요 */
+    overflow: hidden;
+}
+
+/* 캘린더 뷰 너비 제한 - 강의 일정과 동일 */
+.calendar-view {
+    background: white;
     border-radius: 12px;
-    max-width: 1600px;
-    margin-left: auto;
-    margin-right: auto;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
-.events-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    font-weight: 700;
+/* Grid 내에서 캘린더 추가 제한 */
+.events-layout .calendar-view {
+    max-width: 100%;
+    width: 100%;
 }
 
-.events-header p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin: 0;
+/* 사이드바 스타일 - 강의 일정과 동일 */
+.events-sidebar {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    height: fit-content;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
+
+/* 📅 캘린더 뷰 - 완전 중앙 정렬 (중복 제거됨) */
+
+/* 📋 목록 뷰 */
+.list-view {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 🎛️ 캘린더 컨트롤 (월 네비게이션) */
 .calendar-controls {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 20px;
     margin-bottom: 20px;
     flex-wrap: wrap;
-    gap: 15px;
-    max-width: 1600px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
+/* 📊 사이드바 - 반응형 개선 */
+html body .events-container .events-layout .events-sidebar,
+body .events-container .events-layout .events-sidebar,
+.events-container .events-layout .events-sidebar,
+.events-layout .events-sidebar,
+.events-sidebar {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    height: fit-content !important;
+    width: 300px !important;
+    min-width: 300px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    margin-right: 20px !important;
+}
+
+/* 🔥 작은 화면에서 사이드바 강제 캘린더와 동일한 너비 */
+@media (max-width: 1024px) {
+    html body .events-container .events-layout .events-sidebar,
+    body .events-container .events-layout .events-sidebar,
+    .events-container .events-layout .events-sidebar,
+    .events-layout .events-sidebar,
+    .events-sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-top: 30px !important;
+        flex: none !important;
+        flex-grow: 0 !important;
+        flex-shrink: 0 !important;
+        flex-basis: 100% !important;
+    }
+
+    /* 캘린더도 동일한 너비로 강제 설정 */
+    .events-main,
+    .calendar-view {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}
+
+/* 큰 화면에서 사이드바 고정 */
+@media (min-width: 1440px) {
+    .events-sidebar {
+        max-width: 300px !important;
+        width: 300px !important;
+        margin-right: 20px !important;
+    }
+}
+
+/* 중간 화면에서 사이드바 고정 */
+@media (min-width: 1200px) and (max-width: 1439px) {
+    .events-sidebar {
+        max-width: 280px !important;
+        width: 280px !important;
+        margin-right: 25px !important;
+    }
+}
+
+/* 작은 화면에서 사이드바 전체 너비 */
+@media (max-width: 1199px) {
+    .events-sidebar {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        margin-top: 30px !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+    }
+}
+
+.sidebar-section {
+    margin-bottom: 30px;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #4299e1;
+}
+
+.today-events, .upcoming-events {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar-event-item {
+    display: block;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.sidebar-event-item:hover {
+    background: #ebf8ff;
+    border-color: #4299e1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.15);
+}
+
+.sidebar-event-title {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    font-size: 0.9rem;
+}
+
+.sidebar-event-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: #4a5568;
+}
+
+.sidebar-event-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.empty-sidebar {
+    text-align: center;
+    color: #9ca3af;
+    padding: 20px;
+    font-style: italic;
+}
+
+
+/* 📱 모바일 반응형 최적화 */
+@media (max-width: 768px) {
+    .events-container {
+        padding: 15px;
+    }
+
+    .events-layout {
+        gap: 15px;
+    }
+
+    .calendar-view,
+    .list-view {
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .calendar-controls {
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+}
+
+/* 📱 소형 모바일 반응형 */
+@media (max-width: 480px) {
+    .events-container {
+        padding: 10px;
+    }
+
+    .events-layout {
+        gap: 10px;
+    }
+
+    .calendar-view,
+    .list-view {
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    .month-navigation {
+        gap: 10px;
+    }
+}
+
+/* 📅 캘린더 테이블 스타일 */
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.day-header {
+    padding: 8px 2px;
+    text-align: center;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+    border-right: none;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.day-header:last-child {
+    border-right: none;
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+    min-height: 120px;
+    padding: 4px;
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+    position: relative;
+    box-sizing: border-box;
+    font-size: 0.8rem;
+}
+
+.calendar-day:last-child {
+    border-right: none;
+}
+
+.calendar-day.other-month {
+    background: #f8fafc;
+    color: #a0aec0;
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #2d3748;
+}
+
+.other-month .day-number {
+    color: #a0aec0;
+}
+
+.event-item {
+    background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
+    color: white;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.event-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 6px rgba(74, 144, 226, 0.4);
+}
+
+.event-time {
+    font-weight: 600;
+    display: block;
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+.event-title {
+    font-weight: 500;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.75rem;
+}
+
+/* 🎯 뷰 전환 로직 - URL 파라미터 기반 */
+body[data-view="calendar"] .list-view {
+    display: none;
+}
+
+body[data-view="list"] .calendar-view {
+    display: none;
+}
+
+body[data-view="calendar"] .calendar-view {
+    display: block;
+}
+    }
+
+/* 🎆 이벤트 헤더 - 강의 일정과 동일한 스타일 적용 (강력한 우선순위) */
+body .events-container .events-header,
+html body div.events-container div.events-header,
+html body .events-header,
+.events-container .events-header,
+div.events-container div.events-header,
+.events-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background-color: #667eea !important;
+    color: white !important;
+    padding: 40px 20px !important;
+    text-align: center !important;
+    margin-top: 60px !important;
+    margin-bottom: 30px !important;
+    border-radius: 12px !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+    width: auto !important;
+    box-sizing: border-box !important;
+}
+
+body .events-container .events-header h1,
+html body .events-header h1,
+.events-container .events-header h1,
+.events-header h1 {
+    font-size: 2.5rem !important;
+    margin-bottom: 10px !important;
+    font-weight: 700 !important;
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+body .events-container .events-header p,
+html body .events-header p,
+.events-container .events-header p,
+.events-header p {
+    font-size: 1.1rem !important;
+    opacity: 0.9 !important;
+    margin: 0 !important;
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+/* 📅 월 네비게이션 - 완전 중앙 정렬 */
 .month-navigation {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 20px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .month-nav-btn {
@@ -156,48 +623,33 @@ $monthNames = [
     text-decoration: none !important;
 }
 
-/* 캘린더 스타일 */
-.calendar-view {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    overflow-x: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    min-width: 980px;
-}
+/* 캘린더 스타일 - 중복 제거됨 */
 
-.calendar-header {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-}
+/* 중복 제거됨 - 첫 번째 정의 사용 */
 
-.day-header {
-    padding: 18px 12px;
-    text-align: center;
-    font-weight: 700;
-    color: #4a5568;
-    border-right: 1px solid #e2e8f0;
-    font-size: 1rem;
-}
+/* 중복 제거됨 - 첫 번째 정의 사용 */
 
 .day-header:last-child {
     border-right: none;
 }
 
 .calendar-body {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    /* 🚨 FORCE DISPLAY - 모든 상황에서 표시 보장 */
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
+/* 🚨 CALENDAR DAY - 반응형 폭 적용 */
 .calendar-day {
-    min-height: 140px;
-    min-width: 140px;
+    min-height: 120px;
+    width: 100% !important; /* 🔥 Grid 1fr 활용 */
+    box-sizing: border-box !important;
+    padding: 6px !important; /* 패딩 축소로 공간 절약 */
     border-right: 1px solid #e2e8f0;
     border-bottom: 1px solid #e2e8f0;
-    padding: 8px;
     background: white;
     position: relative;
     overflow: hidden;
@@ -287,26 +739,7 @@ $monthNames = [
     font-size: 0.7rem;
 }
 
-/* 사이드바 */
-.events-layout {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 20px;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-
-.events-sidebar {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    height: fit-content;
-    max-width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-}
+/* 중복 사이드바 CSS 제거됨 - 위에서 이미 정의됨 */
 
 .sidebar-section {
     margin-bottom: 30px;
@@ -592,109 +1025,26 @@ $monthNames = [
     line-height: 1.2;      
 }
 
-/* 모바일 반응형 */
-@media (max-width: 1024px) {
-    .events-layout {
-        grid-template-columns: 1fr;
-        max-width: none;
-    }
-    
-    .events-sidebar {
-        order: -1;
-        max-width: 100%;
-        overflow: hidden;
-    }
-    
-    .calendar-view {
-        min-width: 800px;
-    }
-    
-    /* 목록형 뷰 모바일 최적화 */
-    .list-view {
-        max-width: calc(100vw - 40px) !important;
-        width: calc(100vw - 40px) !important;
-        overflow: hidden;
-        margin-left: 20px !important;
-        margin-right: 20px !important;
-        box-sizing: border-box;
-    }
-    
-    .event-list-item {
-        max-width: 100% !important;
-        width: 100% !important;
-        padding: 15px !important;
-        box-sizing: border-box;
-        overflow: hidden;
-    }
-    
-    .event-list-header {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 10px;
-    }
-    
-    .event-list-meta {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 8px !important;
-        font-size: 0.8rem !important;
-    }
-    
-    .event-list-description {
-        max-width: 100% !important;
-        width: 100% !important;
-        box-sizing: border-box;
-        overflow: hidden;
-        word-wrap: break-word;
-    }
-    
-    /* 카드형 디자인 모바일 최적화 */
-    .event-list-item {
-        margin-bottom: 12px !important;
-        padding: 15px !important;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
-    }
-    
-    .event-list-item:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
-    }
-}
-    
-    .events-header,
-    .calendar-controls {
-        max-width: none;
-    }
-}
 
+/* 📱 모바일 반응형 */
 @media (max-width: 768px) {
-    .events-container {
-        padding: 15px 0 10px 0;
-        overflow-x: hidden;
-    }
-    
-    .events-header {
-        padding: 20px 10px;
-        margin-top: 30px; /* 개선: 적절한 간격으로 조정 */
-        margin-left: 0;
-        margin-right: 0;
-    }
-    
     .events-header h1 {
         font-size: 1.6rem;
     }
-    
+
     .events-header p {
         font-size: 0.9rem;
     }
-    
-    /* 캘린더 컨트롤 모바일 최적화 */
+
     .calendar-controls {
         flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        margin: 10px 0;
-        padding: 0 5px;
+        gap: 10px;
     }
+
+    .month-navigation {
+        gap: 15px;
+    }
+}
     
     .month-navigation {
         justify-content: center;
@@ -737,11 +1087,13 @@ $monthNames = [
     
     /* 사이드바 모바일 최적화 */
     .events-sidebar {
-        max-width: calc(100vw - 40px) !important;
-        width: calc(100vw - 40px) !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
         overflow: hidden;
-        margin-left: 20px !important;
-        margin-right: 20px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-top: 30px !important;
         box-sizing: border-box;
         padding: 15px !important;
     }
@@ -754,36 +1106,41 @@ $monthNames = [
         font-size: 1rem;
     }
     
-    /* 달력 모바일 최적화 */
+    /* 🚨 EMERGENCY FIX: 달력 모바일 최적화 */
     .calendar-view {
-        min-width: unset !important;
-        width: calc(100vw - 40px) !important;
-        max-width: calc(100vw - 40px) !important;
-        overflow-x: auto;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
         border-radius: 8px;
-        margin-left: 20px !important;
-        margin-right: 20px !important;
+        margin: 0 auto !important;
         box-sizing: border-box;
+        background: white !important;
+        border: 1px solid #e2e8f0 !important;
+        position: relative !important;
+        z-index: 1 !important;
     }
     
     .calendar-header,
     .calendar-body {
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr) !important;
         min-width: unset !important;
-        width: 100%;
+        width: 100% !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     .day-header {
-        min-width: calc((100vw - 80px) / 7) !important;
-        max-width: calc((100vw - 80px) / 7) !important;
-        padding: 12px 6px;
-        font-size: 0.85rem;
+        padding: 8px 2px;
+        font-size: 0.8rem;
         box-sizing: border-box;
     }
-    
+
     .calendar-day {
         min-height: 100px;
-        min-width: calc((100vw - 80px) / 7) !important;
-        max-width: calc((100vw - 80px) / 7) !important;
         padding: 4px;
         box-sizing: border-box;
     }
@@ -849,15 +1206,16 @@ $monthNames = [
 /* 매우 작은 화면 (모바일 세로) */
 @media (max-width: 480px) {
     .events-container {
-        padding: 10px 0;
-        overflow-x: hidden;
+        padding: 10px 5px;
     }
     
     .events-header {
         padding: 15px 8px;
         margin-top: 30px; /* 개선: 작은 화면에서 적절한 간격 */
-        margin-left: 0;
-        margin-right: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     
     .events-header h1 {
@@ -903,10 +1261,12 @@ $monthNames = [
     
     /* 사이드바 더 컴팩트하게 */
     .events-sidebar {
-        max-width: calc(100vw - 32px) !important;
-        width: calc(100vw - 32px) !important;
-        margin-left: 16px !important;
-        margin-right: 16px !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-top: 30px !important;
         padding: 12px !important;
         box-sizing: border-box;
     }
@@ -939,38 +1299,6 @@ $monthNames = [
         margin-top: 4px !important; 
     }
     
-    /* 달력 더 컴팩트하게 */
-    .calendar-view {
-        min-width: unset !important;
-        width: calc(100vw - 32px) !important;
-        max-width: calc(100vw - 32px) !important;
-        overflow-x: auto;
-        margin-left: 16px !important;
-        margin-right: 16px !important;
-        box-sizing: border-box;
-    }
-    
-    .calendar-header,
-    .calendar-body {
-        min-width: unset !important;
-        width: 100%;
-    }
-    
-    .day-header {
-        min-width: calc((100vw - 64px) / 7) !important;
-        max-width: calc((100vw - 64px) / 7) !important;
-        padding: 8px 4px;
-        font-size: 0.75rem;
-        box-sizing: border-box;
-    }
-    
-    .calendar-day {
-        min-height: 80px;
-        min-width: calc((100vw - 64px) / 7) !important;
-        max-width: calc((100vw - 64px) / 7) !important;
-        padding: 2px;
-        box-sizing: border-box;
-    }
     
     .event-item {
         font-size: 0.6rem;
@@ -992,34 +1320,6 @@ $monthNames = [
     }
 }
 
-/* 캘린더 스크롤 힌트 - 스크롤이 필요한 경우에만 표시 */
-@media (max-width: 768px) {
-    .calendar-view {
-        position: relative;
-    }
-    
-    /* 700px 이상의 최소 너비를 가진 달력에만 스크롤 힌트 표시 */
-    .calendar-view[style*="min-width: 700px"]::after {
-        content: '← 좌우로 스크롤하세요 →';
-        position: absolute;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        opacity: 1;
-        pointer-events: none;
-        animation: scrollHint 3s ease-in-out infinite;
-    }
-}
-
-@keyframes scrollHint {
-    0%, 70%, 100% { opacity: 0; }
-    10%, 60% { opacity: 1; }
-}
 
 /* 일정 상세 모달 */
 .day-events-modal {
@@ -1321,66 +1621,121 @@ body {
     
     /* 행사 아이템 색상은 파란색 시스템 유지 - 다크모드에서도 */
 }
+
+/* 🚀 ULTRA THINK 해결책: 완전 개선된 반응형 시스템 */
+
+/* 캐시 무효화를 위한 CSS 버전 */
+.events-layout {
+    --css-version: 20250922-v6-ultimate-sidebar-width-fix;
+}
+
+/* 추가 안정성 강화 */
+@media (min-width: 1200px) and (max-width: 1439px) {
+    .events-container {
+        padding: 30px 25px !important;
+        max-width: calc(100vw - 50px) !important;
+    }
+
+    .events-layout {
+        padding-right: 25px !important;
+    }
+
+    .events-main {
+        min-width: auto !important;
+        max-width: calc(100vw - 360px) !important;
+    }
+}
+
+/* 작은 화면에서 스크롤 방지 및 강제 세로 배치 */
+@media (max-width: 1199px) {
+    .events-container {
+        overflow-x: visible !important;
+        max-width: 100vw !important;
+        padding: 20px 15px !important;
+    }
+
+    .events-main, .events-sidebar {
+        overflow-x: visible !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .events-sidebar {
+        padding: 20px !important;
+    }
+
+    .calendar-view {
+        overflow: hidden !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 🔥 핵심 수정: 768px에서 강제 1컬럼 Grid */
+    .events-layout {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto !important;
+        gap: 20px !important;
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .events-sidebar {
+        margin-top: 30px !important;
+        margin-bottom: 0 !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .events-main {
+        display: block !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+/* 모바일 최적화 강화 */
+@media (max-width: 768px) {
+    .events-container {
+        padding: 15px 10px !important;
+    }
+
+    .sidebar-title {
+        font-size: 16px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .sidebar-event-item {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+
+    .calendar-day {
+        min-height: 80px !important;
+        font-size: 11px !important;
+        padding: 4px !important;
+    }
+
+    .event-item {
+        font-size: 9px !important;
+        padding: 2px 3px !important;
+        margin: 1px 0 !important;
+    }
+}
 </style>
 
 <div class="events-container">
-    <!-- 헤더 섹션 -->
-    <div class="events-header">
-        <h1>🎉 행사 일정</h1>
-        <p>다양한 마케팅 행사와 네트워킹 행사에 참여하세요</p>
-    </div>
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/EventsHeader.php'; ?>
     
-    <!-- 캘린더 컨트롤 영역 -->
-    <div class="calendar-controls">
-        <!-- 월 네비게이션 -->
-        <div class="month-navigation">
-            <a href="?year=<?= $prev_month['year'] ?>&month=<?= $prev_month['month'] ?>&view=<?= $view ?>" class="month-nav-btn">
-                ← 이전달
-            </a>
-            <div class="current-month">
-                <?= $year ?>년 <?= $monthNames[$month] ?>
-            </div>
-            <a href="?year=<?= $next_month['year'] ?>&month=<?= $next_month['month'] ?>&view=<?= $view ?>" class="month-nav-btn">
-                다음달 →
-            </a>
-        </div>
-        
-        <!-- 뷰 전환 및 액션 -->
-        <div class="view-controls">
-            <div class="view-toggle">
-                <a href="?year=<?= $year ?>&month=<?= $month ?>&view=calendar" 
-                   class="view-btn <?= $view === 'calendar' ? 'active' : '' ?>">
-                    📅 캘린더
-                </a>
-                <a href="?year=<?= $year ?>&month=<?= $month ?>&view=list" 
-                   class="view-btn <?= $view === 'list' ? 'active' : '' ?>">
-                    📋 목록
-                </a>
-            </div>
-            
-            <?php if ($isLoggedIn): ?>
-                <?php 
-                // 기업회원 권한 확인
-                require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
-                $permission = CorporateMiddleware::checkLectureEventPermission();
-                
-                if ($permission['hasPermission']): ?>
-                    <a href="/events/create" class="btn-create">
-                        ➕ 행사 등록
-                    </a>
-                <?php else: ?>
-                    <a href="/corp/info" class="btn-create" style="background: #a0aec0;" 
-                       title="<?= htmlspecialchars($permission['message']) ?>">
-                        📝 행사 일정 등록
-                    </a>
-                <?php endif; ?>
-            <?php else: ?>
-                <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn-create">
-                    🔑 로그인 후 등록
-                </a>
-            <?php endif; ?>
-        </div>
-    </div>
+    <!-- 캘린더 컨트롤 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/EventsControls.php'; ?>
     
     <div class="events-layout">
         <!-- 메인 콘텐츠 -->
@@ -1496,52 +1851,7 @@ body {
         </div>
         
         <!-- 사이드바 -->
-        <div class="events-sidebar">
-            <!-- 오늘의 행사 -->
-            <div class="sidebar-section">
-                <h3 class="sidebar-title">🚀 오늘의 행사</h3>
-                <?php if (!empty($todayEvents)): ?>
-                    <div class="today-events">
-                        <?php foreach ($todayEvents as $event): ?>
-                            <a href="/events/detail?id=<?= $event['id'] ?>" class="sidebar-event-item">
-                                <div class="sidebar-event-title"><?= htmlspecialchars($event['title']) ?></div>
-                                <div class="sidebar-event-meta">
-                                    <span>🕒 <?= date('H:i', strtotime($event['start_time'])) ?></span>
-                                    <span>👨‍🏫 <?= htmlspecialchars($event['organizer_name']) ?></span>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="empty-sidebar">
-                        오늘 예정된 행사가 없습니다.
-                    </div>
-                <?php endif; ?>
-            </div>
-            
-            <!-- 다가오는 행사 -->
-            <div class="sidebar-section">
-                <h3 class="sidebar-title">📋 다가오는 행사</h3>
-                <?php if (!empty($upcomingEvents)): ?>
-                    <div class="upcoming-events">
-                        <?php foreach ($upcomingEvents as $event): ?>
-                            <a href="/events/detail?id=<?= $event['id'] ?>" class="sidebar-event-item">
-                                <div class="sidebar-event-title"><?= htmlspecialchars($event['title']) ?></div>
-                                <div class="sidebar-event-meta">
-                                    <span>📅 <?= date('m/d', strtotime($event['start_date'])) ?></span>
-                                    <span>🕒 <?= date('H:i', strtotime($event['start_time'])) ?></span>
-                                    <span>👨‍🏫 <?= htmlspecialchars($event['organizer_name']) ?></span>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="empty-sidebar">
-                        예정된 행사가 없습니다.
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
+        <?php include_once SRC_PATH . '/components/EventsSidebar.php'; ?>
     </div>
 </div>
 
@@ -1560,26 +1870,20 @@ body {
 </div>
 
 <script>
+// 🌟 ULTRA THINK 모드 - 간단한 JavaScript v4.0
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🎉 행사 일정 페이지 로드 완료');
     console.log('📊 이번 달 행사 수:', <?= count($events ?? []) ?>);
     console.log('📄 현재 뷰:', '<?= $view ?>');
-    
-    // 디바이스 감지는 header.php에서 자동으로 처리됩니다.
-    console.log(`📐 현재 디바이스: ${window.DeviceDetection?.utils?.getDeviceType() || 'unknown'}, 뷰: <?= $view ?>`);
-    
-    // 캘린더 행사 아이템 호버 효과
-    const eventItems = document.querySelectorAll('.event-item');
-    eventItems.forEach(item => {
-        item.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.05)';
-        });
-        
-        item.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1.02)';
-        });
-    });
-    
+
+    // ✅ CSS로 완전 해결됨 - JavaScript 강제 수정 불필요
+
+    // 🎯 뷰 전환 설정
+    document.body.setAttribute('data-view', '<?= $view ?>');
+    console.log('🔧 뷰 설정 완료:', '<?= $view ?>');
+
+    // Grid 레이아웃은 CSS에서 자동 처리됨
+
     // 행사 일정 관련 전역 객체 정의
     if (typeof window.events === 'undefined') {
         window.events = {
@@ -1592,7 +1896,7 @@ document.addEventListener('DOMContentLoaded', function() {
             upcomingCount: <?= json_encode(count($upcomingEvents ?? [])) ?>
         };
     }
-    
+
     // 키보드 네비게이션
     document.addEventListener('keydown', function(e) {
         // 좌우 화살표로 월 네비게이션
@@ -1603,7 +1907,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             window.location.href = '?year=<?= $next_month['year'] ?>&month=<?= $next_month['month'] ?>&view=<?= $view ?>';
         }
-        
+
         // 'c'키로 캘린더 뷰, 'l'키로 리스트 뷰
         if (e.key === 'c' && !e.target.matches('input, textarea')) {
             e.preventDefault();
@@ -1611,19 +1915,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (e.key === 'l' && !e.target.matches('input, textarea')) {
             e.preventDefault();
             window.location.href = '?year=<?= $year ?>&month=<?= $month ?>&view=list';
-        }
-    });
-    
-    // 전역 오류 핸들러
-    window.addEventListener('error', function(event) {
-        if (event.filename && event.filename.includes('events')) {
-            console.warn('🎉 행사 일정 페이지 JavaScript 오류 감지:', {
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno
-            });
-            event.preventDefault();
         }
     });
 });

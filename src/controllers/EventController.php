@@ -199,15 +199,20 @@ class EventController extends LectureController {
                 FROM lectures l
                 LEFT JOIN users u ON l.user_id = u.id
                 WHERE l.id = ? AND l.content_type = 'event' AND l.status = 'published'";
-        
+
         $event = $this->db->fetch($sql, [$eventId]);
-        
+
         if ($event) {
             // 행사 이미지 추가
             $event['images'] = $this->getEventImages($eventId);
-            
+
             // 다중 강사 정보 추가 (lecture_instructors 테이블에서)
             $event['instructors'] = $this->getEventInstructors($eventId);
+
+            // 현재 신청인원 수 계산 (승인된 신청과 대기 중인 신청)
+            $registrationCountSql = "SELECT COUNT(*) as count FROM event_registrations WHERE event_id = ? AND status IN ('approved', 'pending')";
+            $registrationResult = $this->db->fetch($registrationCountSql, [$eventId]);
+            $event['current_registration_count'] = $registrationResult ? intval($registrationResult['count']) : 0;
         }
         
         return $event;
@@ -229,15 +234,20 @@ class EventController extends LectureController {
                 FROM lectures l
                 LEFT JOIN users u ON l.user_id = u.id
                 WHERE l.id = ? AND l.content_type = 'event'";
-        
+
         $event = $this->db->fetch($sql, [$eventId]);
-        
+
         if ($event) {
             // 행사 이미지 추가
             $event['images'] = $this->getEventImages($eventId);
-            
+
             // 다중 강사 정보 추가 (lecture_instructors 테이블에서)
             $event['instructors'] = $this->getEventInstructors($eventId);
+
+            // 현재 신청인원 수 계산 (승인된 신청과 대기 중인 신청)
+            $registrationCountSql = "SELECT COUNT(*) as count FROM event_registrations WHERE event_id = ? AND status IN ('approved', 'pending')";
+            $registrationResult = $this->db->fetch($registrationCountSql, [$eventId]);
+            $event['current_registration_count'] = $registrationResult ? intval($registrationResult['count']) : 0;
         }
         
         return $event;
@@ -1902,16 +1912,35 @@ class EventController extends LectureController {
      */
     public function edit($eventId) {
         try {
+            if (class_exists('WebLogger')) {
+                WebLogger::controllerStart('EventController', 'edit');
+                WebLogger::info('행사 수정 페이지 접근', ['event_id' => $eventId]);
+            }
+
             // 로그인 확인
             $currentUser = $this->getCurrentUser();
+            if (class_exists('WebLogger')) {
+                WebLogger::info('사용자 인증 확인', ['user_id' => $currentUser ? $currentUser['id'] : null]);
+            }
             if (!$currentUser) {
                 header('Location: /auth/login?return_to=' . urlencode($_SERVER['REQUEST_URI']));
                 exit;
             }
-            
+
             // 이벤트 정보 조회
             $event = $this->getEventById($eventId);
+            if (class_exists('WebLogger')) {
+                WebLogger::info('이벤트 조회 결과', [
+                    'event_found' => $event ? true : false,
+                    'event_title' => $event ? $event['title'] : null,
+                    'event_start_date' => $event ? $event['start_date'] : null
+                ]);
+            }
+
             if (!$event) {
+                if (class_exists('WebLogger')) {
+                    WebLogger::warning('존재하지 않는 이벤트 접근', ['event_id' => $eventId]);
+                }
                 $this->showErrorPage("존재하지 않는 행사입니다.", 404);
                 return;
             }
@@ -1919,10 +1948,54 @@ class EventController extends LectureController {
             // 수정 권한 확인
             $userRole = AuthMiddleware::getUserRole();
             $canEdit = ($userRole === 'ROLE_ADMIN') || ($event['user_id'] == $currentUser['id']);
-            
+
             if (!$canEdit) {
                 $this->showErrorPage("수정 권한이 없습니다.", 403);
                 return;
+            }
+
+            // 지난 일정 수정 차단 (삭제는 허용)
+            $today = date('Y-m-d');
+            $isPastEvent = $event['start_date'] < $today;
+
+            if (class_exists('WebLogger')) {
+                WebLogger::info('날짜 기반 수정 권한 검사', [
+                    'today' => $today,
+                    'event_start_date' => $event['start_date'],
+                    'is_past_event' => $isPastEvent
+                ]);
+            }
+
+            if ($isPastEvent) {
+                if (class_exists('WebLogger')) {
+                    WebLogger::warning('지난 일정 수정 시도 차단', [
+                        'event_id' => $eventId,
+                        'user_id' => $currentUser['id'],
+                        'event_start_date' => $event['start_date'],
+                        'today' => $today
+                    ]);
+                }
+
+                // 간단한 HTML 직접 출력 (오류 템플릿 우회)
+                http_response_code(403);
+                echo '<!DOCTYPE html>';
+                echo '<html><head><meta charset="utf-8"><title>접근 제한</title></head><body>';
+                echo '<div style="max-width: 600px; margin: 100px auto; padding: 40px; text-align: center; font-family: Arial, sans-serif;">';
+                echo '<h1 style="color: #e53e3e; margin-bottom: 20px;">⚠️ 접근 제한</h1>';
+                echo '<h2 style="color: #333; margin-bottom: 30px;">지난 일정은 수정할 수 없습니다</h2>';
+                echo '<p style="color: #666; font-size: 16px; line-height: 1.5;">삭제만 가능합니다.</p>';
+                echo '<div style="margin-top: 30px;">';
+                echo '<a href="/events" style="background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">행사 목록으로</a>';
+                echo '</div>';
+                echo '<div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">';
+                echo '<p style="color: #666; font-size: 14px; margin: 0;"><strong>디버깅 정보:</strong></p>';
+                echo '<p style="color: #666; font-size: 14px; margin: 5px 0;">이벤트 ID: ' . htmlspecialchars($eventId) . '</p>';
+                echo '<p style="color: #666; font-size: 14px; margin: 5px 0;">시작일: ' . htmlspecialchars($event['start_date']) . '</p>';
+                echo '<p style="color: #666; font-size: 14px; margin: 5px 0;">오늘: ' . htmlspecialchars($today) . '</p>';
+                echo '</div>';
+                echo '</div>';
+                echo '</body></html>';
+                exit;
             }
             
             // 이벤트 강사 정보 조회
@@ -1944,11 +2017,113 @@ class EventController extends LectureController {
             $this->render('events/edit', $data);
             
         } catch (Exception $e) {
-            error_log("EventController::edit 오류: " . $e->getMessage());
+            if (class_exists('WebLogger')) {
+                WebLogger::exception($e, [
+                    'controller' => 'EventController',
+                    'action' => 'edit',
+                    'event_id' => $eventId,
+                    'user_id' => isset($currentUser) ? $currentUser['id'] : null
+                ]);
+            }
             $this->showErrorPage("행사 수정 페이지를 불러오는 중 오류가 발생했습니다.");
         }
     }
     
+    /**
+     * 이벤트 수정 가능 여부 체크 (AJAX API)
+     */
+    public function checkEditable($eventId) {
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            // 로그인 확인
+            $currentUser = $this->getCurrentUser();
+            if (!$currentUser) {
+                http_response_code(401);
+                echo json_encode([
+                    'success' => false,
+                    'message' => '로그인이 필요합니다.',
+                    'code' => 'LOGIN_REQUIRED'
+                ]);
+                return;
+            }
+
+            // 이벤트 정보 조회
+            $event = $this->getEventById($eventId);
+            if (!$event) {
+                http_response_code(404);
+                echo json_encode([
+                    'success' => false,
+                    'message' => '존재하지 않는 행사입니다.',
+                    'code' => 'EVENT_NOT_FOUND'
+                ]);
+                return;
+            }
+
+            // 수정 권한 확인
+            $userRole = AuthMiddleware::getUserRole();
+            $canEdit = ($userRole === 'ROLE_ADMIN') || ($event['user_id'] == $currentUser['id']);
+
+            if (!$canEdit) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => '수정 권한이 없습니다.',
+                    'code' => 'PERMISSION_DENIED'
+                ]);
+                return;
+            }
+
+            // 지난 일정 체크
+            $today = date('Y-m-d');
+            $isPastEvent = $event['start_date'] < $today;
+
+            if ($isPastEvent) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => '지난 일정은 수정할 수 없습니다. 삭제만 가능합니다.',
+                    'code' => 'PAST_EVENT',
+                    'data' => [
+                        'event_id' => $eventId,
+                        'start_date' => $event['start_date'],
+                        'today' => $today,
+                        'is_past' => true
+                    ]
+                ]);
+                return;
+            }
+
+            // 수정 가능
+            echo json_encode([
+                'success' => true,
+                'message' => '수정 가능합니다.',
+                'code' => 'EDITABLE',
+                'data' => [
+                    'event_id' => $eventId,
+                    'start_date' => $event['start_date'],
+                    'today' => $today,
+                    'is_past' => false,
+                    'edit_url' => "/events/{$eventId}/edit"
+                ]
+            ]);
+
+        } catch (Exception $e) {
+            if (class_exists('WebLogger')) {
+                WebLogger::error('이벤트 수정 가능 여부 체크 오류', [
+                    'event_id' => $eventId,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => '서버 오류가 발생했습니다.',
+                'code' => 'SERVER_ERROR'
+            ]);
+        }
+    }
+
     /**
      * 이벤트 업데이트 처리
      */
@@ -1976,9 +2151,16 @@ class EventController extends LectureController {
             // 수정 권한 확인
             $userRole = AuthMiddleware::getUserRole();
             $canEdit = ($userRole === 'ROLE_ADMIN') || ($event['user_id'] == $currentUser['id']);
-            
+
             if (!$canEdit) {
                 ResponseHelper::json(['success' => false, 'message' => '수정 권한이 없습니다.'], 403);
+                return;
+            }
+
+            // 지난 일정 수정 차단 (삭제는 허용)
+            $today = date('Y-m-d');
+            if ($event['start_date'] < $today) {
+                ResponseHelper::json(['success' => false, 'message' => '지난 일정은 수정할 수 없습니다. 삭제만 가능합니다.'], 403);
                 return;
             }
             
@@ -2728,7 +2910,7 @@ class EventController extends LectureController {
             $userQuery = "SELECT role FROM users WHERE id = ?";
             $user = $this->db->fetch($userQuery, [$organizerId]);
             
-            if (!$user || $user['role'] !== 'ROLE_CORP') {
+            if (!$user || $user['role'] !== 'ROLE_CORPORATE') {
                 // 기업 회원이 아니면 알림 불필요
                 return;
             }

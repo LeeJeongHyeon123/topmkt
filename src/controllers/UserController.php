@@ -124,6 +124,9 @@ class UserController {
             
         } catch (Exception $e) {
             error_log('프로필 조회 오류: ' . $e->getMessage());
+            error_log('오류 파일: ' . $e->getFile() . ':' . $e->getLine());
+            error_log('스택 추적: ' . $e->getTraceAsString());
+
             header('HTTP/1.1 500 Internal Server Error');
             echo '프로필을 불러오는 중 오류가 발생했습니다.';
         }
@@ -754,26 +757,117 @@ class UserController {
         try {
             // User 모델의 메서드 사용
             $user = $this->userModel->getProfileImageInfo($userId);
-            
+
             if (!$user) {
                 ResponseHelper::json(['error' => 'User not found'], 404);
                 return;
             }
-            
-            // 원본 이미지 우선순위로 반환
-            $originalImage = $user['profile_image_original'] ?? $user['profile_image_profile'] ?? null;
-            
+
+            // 탈퇴한 회원 처리
+            $isDeleted = (isset($user['status']) && $user['status'] === 'deleted');
+
+            // 프로필 이미지 우선순위로 반환 (profile_image -> profile_image_original -> profile_image_profile)
+            $profileImage = $user['profile_image'] ?? $user['profile_image_original'] ?? $user['profile_image_profile'] ?? null;
+            $originalImage = $user['profile_image_original'] ?? null;
+
             ResponseHelper::json([
                 'user_id' => $user['id'],
                 'nickname' => $user['nickname'],
+                'status' => $user['status'] ?? 'active',
+                'is_deleted' => $isDeleted,
                 'original_image' => $originalImage,
-                'profile_image' => $user['profile_image_profile'],
+                'profile_image' => $profileImage,
                 'thumb_image' => $user['profile_image_thumb']
             ]);
-            
+
         } catch (Exception $e) {
             error_log('프로필 이미지 API 오류: ' . $e->getMessage());
             ResponseHelper::json(['error' => 'Internal server error'], 500);
+        }
+    }
+
+    /**
+     * 회원 탈퇴 처리
+     * POST /api/user/delete-account
+     */
+    public function deleteAccount() {
+        // 디버깅 로그 추가
+        error_log("=== 회원탈퇴 API 호출 시작 ===");
+
+        // 로그인 확인
+        if (!AuthMiddleware::isLoggedIn()) {
+            error_log("❌ 회원탈퇴 실패: 로그인 필요");
+            ResponseHelper::json(['message' => '로그인이 필요합니다.'], 401);
+            return;
+        }
+
+        // 현재 사용자 ID 가져오기
+        $userId = AuthMiddleware::getCurrentUserId();
+        error_log("✅ 현재 사용자 ID: " . $userId);
+
+        // POST 데이터 확인
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            error_log("❌ 회원탈퇴 실패: 잘못된 요청 방식 - " . $_SERVER['REQUEST_METHOD']);
+            ResponseHelper::json(['message' => '잘못된 요청입니다.'], 405);
+            return;
+        }
+
+        // JSON 데이터 파싱
+        $rawInput = file_get_contents('php://input');
+        error_log("📋 Raw Input: " . $rawInput);
+
+        $data = json_decode($rawInput, true);
+        error_log("📋 Parsed Data: " . print_r($data, true));
+
+        // 필수 필드 검증
+        if (!isset($data['password']) || empty($data['password'])) {
+            error_log("❌ 회원탈퇴 실패: 비밀번호 누락");
+            ResponseHelper::json(['message' => '비밀번호를 입력해주세요.'], 400);
+            return;
+        }
+
+        // CSRF 토큰 검증
+        error_log("🔒 CSRF 토큰 검증 - 요청: " . ($data['csrf_token'] ?? 'null') . ", 세션: " . ($_SESSION['csrf_token'] ?? 'null'));
+        if (!isset($data['csrf_token']) || $data['csrf_token'] !== $_SESSION['csrf_token']) {
+            error_log("❌ 회원탈퇴 실패: CSRF 토큰 불일치");
+            ResponseHelper::json(['message' => '보안 검증에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.'], 403);
+            return;
+        }
+
+        try {
+            // 회원 탈퇴 처리
+            $result = $this->userModel->deleteAccount(
+                $userId,
+                $data['password'],
+                isset($data['reason']) ? $data['reason'] : null
+            );
+
+            if ($result['success']) {
+                // 세션 종료
+                session_destroy();
+
+                // 쿠키 삭제
+                if (isset($_COOKIE[session_name()])) {
+                    setcookie(session_name(), '', time() - 3600, '/');
+                }
+
+                ResponseHelper::json([
+                    'success' => true,
+                    'message' => $result['message']
+                ], 200);
+            } else {
+                ResponseHelper::json([
+                    'success' => false,
+                    'message' => $result['message']
+                ], 400);
+            }
+
+        } catch (Exception $e) {
+            error_log('회원 탈퇴 처리 오류: ' . $e->getMessage());
+            ResponseHelper::json([
+                'success' => false,
+                'message' => '회원 탈퇴 처리 중 오류가 발생했습니다.'
+            ], 500);
         }
     }
 }

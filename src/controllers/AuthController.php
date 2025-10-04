@@ -92,18 +92,12 @@ class AuthController {
         try {
             // 사용자 인증
             $user = $this->userModel->login($phone, $password);
-            
-            if (!$user) {
-                http_response_code(401);
-                echo json_encode(['success' => false, 'message' => '휴대폰 번호 또는 비밀번호가 일치하지 않습니다.']);
-                return;
-            }
-            
-            // JWT 기반 로그인 세션 생성  
+
+            // JWT 기반 로그인 세션 생성
             $tokens = $this->createJWTSession($user, $input['remember'] ?? false);
-            
+
             echo json_encode([
-                'success' => true, 
+                'success' => true,
                 'message' => $user['nickname'] . '님, 환영합니다!',
                 'user' => [
                     'id' => $user['id'],
@@ -117,10 +111,24 @@ class AuthController {
                     'has_refresh_token' => isset($_COOKIE['refresh_token'])
                 ]
             ]);
-            
+
         } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            // 로그인 실패 원인에 따라 HTTP 상태 코드 구분
+            $message = $e->getMessage();
+
+            if (strpos($message, '등록되지 않은') !== false) {
+                http_response_code(404);
+            } elseif (strpos($message, '계정이 잠겨있습니다') !== false) {
+                http_response_code(423); // Locked
+            } elseif (strpos($message, '비밀번호가 일치하지 않습니다') !== false) {
+                http_response_code(401);
+            } elseif (strpos($message, '정지되었습니다') !== false || strpos($message, '비활성화') !== false) {
+                http_response_code(403); // Forbidden
+            } else {
+                http_response_code(400);
+            }
+
+            echo json_encode(['success' => false, 'message' => $message]);
         }
     }
     
@@ -158,19 +166,12 @@ class AuthController {
         try {
             // 사용자 인증
             $user = $this->userModel->login($phone, $password);
-            
-            if (!$user) {
-                $_SESSION['error'] = '휴대폰 번호 또는 비밀번호가 일치하지 않습니다.';
-                $redirectUrl = !empty($redirect) ? '/auth/login?redirect=' . urlencode($redirect) : '/auth/login';
-                header('Location: ' . $redirectUrl);
-                return;
-            }
-            
+
             // JWT 기반 로그인 세션 생성
             $this->createJWTSession($user, $remember);
-            
+
             $_SESSION['success'] = $user['nickname'] . '님, 환영합니다!';
-            
+
             // 리다이렉트 URL이 있으면 해당 페이지로, 없으면 메인 페이지로
             if (!empty($redirect) && $this->isValidRedirectUrl($redirect)) {
                 header('Location: ' . $redirect);
@@ -178,7 +179,7 @@ class AuthController {
                 header('Location: /');
             }
             exit;
-            
+
         } catch (Exception $e) {
             $_SESSION['error'] = $e->getMessage();
             $redirectUrl = !empty($redirect) ? '/auth/login?redirect=' . urlencode($redirect) : '/auth/login';

@@ -24,7 +24,7 @@ class RegistrationDashboardController extends BaseController
         
         $userRole = AuthMiddleware::getUserRole();
         // 관리자이거나 기업 회원이거나 일반 사용자(강의 생성자)라면 접근 허용
-        if ($userRole !== 'ROLE_CORP' && $userRole !== 'ROLE_ADMIN' && $userRole !== 'ROLE_USER') {
+        if ($userRole !== 'ROLE_CORPORATE' && $userRole !== 'ROLE_ADMIN' && $userRole !== 'ROLE_USER') {
             header('HTTP/1.1 403 Forbidden');
             include SRC_PATH . '/views/errors/403.php';
             exit;
@@ -38,9 +38,9 @@ class RegistrationDashboardController extends BaseController
             $endDate = $_GET['end_date'] ?? null;
             $contentType = $_GET['type'] ?? 'lecture'; // 새로운 파라미터: lecture | event
             
-            // 기본값: 최근 1개월
+            // 기본값: 최근 1년
             if (!$startDate || !$endDate) {
-                $startDate = date('Y-m-d', strtotime('-1 month'));
+                $startDate = date('Y-m-d', strtotime('-1 year'));
                 $endDate = date('Y-m-d');
             }
             
@@ -170,7 +170,8 @@ class RegistrationDashboardController extends BaseController
                 l.id, l.title, l.description, l.start_date, l.start_time, l.end_date, l.end_time,
                 l.max_participants, l.current_participants, l.auto_approval,
                 l.registration_start_date, l.registration_end_date, l.allow_waiting_list,
-                l.content_type, l.user_id as organizer_id, u.nickname as organizer_name
+                l.content_type, l.user_id as organizer_id,
+                CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as organizer_name
             FROM lectures l
             JOIN users u ON l.user_id = u.id
             WHERE l.id = ? AND l.status = 'published'

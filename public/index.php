@@ -139,6 +139,15 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/events/') !== false && strpos($_SERVER
     error_log("Time: " . date('Y-m-d H:i:s'));
 }
 
+// 회원탈퇴 API 디버깅
+if (strpos($_SERVER['REQUEST_URI'], '/api/user/delete-account') !== false) {
+    error_log("=== 회원탈퇴 API 요청 추적 ===");
+    error_log("URI: " . $_SERVER['REQUEST_URI']);
+    error_log("METHOD: " . $_SERVER['REQUEST_METHOD']);
+    error_log("Time: " . date('Y-m-d H:i:s'));
+    error_log("Raw Input: " . file_get_contents('php://input'));
+}
+
 // forgot-password 라우터 디버깅
 if (strpos($_SERVER['REQUEST_URI'], '/auth/forgot-password') !== false) {
     error_log("=== 라우터 생성 전 ===");

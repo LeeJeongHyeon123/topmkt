@@ -3,6 +3,9 @@
  * 관리자 > 기업인증 대기 목록 페이지 - 새 템플릿 구조 적용
  */
 
+// SecurityHelper 클래스 로드
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
 // CSRF 토큰 생성
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -544,7 +547,7 @@ $content = '
                         
                         return '
                             <tr data-company-name="' . htmlspecialchars($app['company_name']) . '" 
-                                data-business-number="' . htmlspecialchars($app['business_number']) . '"
+                                data-business-number="' . htmlspecialchars(SecurityHelper::isEncrypted($app['business_number'] ?? '') ? SecurityHelper::decrypt($app['business_number']) : ($app['business_number'] ?? '')) . '"
                                 data-nickname="' . htmlspecialchars($app['nickname']) . '"
                                 data-is-overseas="' . ($app['is_overseas'] ? '1' : '0') . '"
                                 data-created-at="' . $app['created_at'] . '"
@@ -553,7 +556,7 @@ $content = '
                                     <div class="company-info">
                                         <div class="company-name">' . htmlspecialchars($app['company_name']) . '</div>
                                         <div class="company-details">
-                                            사업자번호: ' . htmlspecialchars($app['business_number']) . '<br>
+                                            사업자번호: ' . htmlspecialchars(SecurityHelper::isEncrypted($app['business_number'] ?? '') ? SecurityHelper::decrypt($app['business_number']) : ($app['business_number'] ?? '')) . '<br>
                                             대표자: ' . htmlspecialchars($app['representative_name']) . 
                                             ($app['is_overseas'] ? ' <span style="color: #667eea; font-weight: 500;"> (해외기업)</span>' : '') . '
                                         </div>
@@ -637,6 +640,28 @@ $content = '
 </div>
 
 <script>
+// 암호화된 데이터인지 확인하고 복호화가 필요한 경우 처리
+function decryptIfNeeded(data) {
+    if (!data || typeof data !== "string") return data;
+
+    // Base64로 인코딩된 긴 문자열인지 확인 (암호화된 데이터의 특징)
+    if (data.length > 50 && isBase64(data)) {
+        // 암호화된 데이터로 판단되면 "암호화됨" 표시
+        return "[암호화된 데이터]";
+    }
+
+    return data;
+}
+
+// Base64 문자열인지 확인
+function isBase64(str) {
+    try {
+        return btoa(atob(str)) === str;
+    } catch (err) {
+        return false;
+    }
+}
+
 // 전역 변수
 let originalApplicationsData = [];
 
@@ -802,9 +827,9 @@ function renderApplicationDetail(data) {
                 <h4 style="color: #1a202c; margin-bottom: 15px;">🏢 기업 정보</h4>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div><strong>기업명:</strong> ${data.company_name}</div>
-                    <div><strong>사업자번호:</strong> ${data.business_number}</div>
+                    <div><strong>사업자번호:</strong> ${decryptIfNeeded(data.business_number)}</div>
                     <div><strong>대표자:</strong> ${data.representative_name}</div>
-                    <div><strong>대표자 연락처:</strong> ${data.representative_phone}</div>
+                    <div><strong>대표자 연락처:</strong> ${decryptIfNeeded(data.representative_phone)}</div>
                     <div style="grid-column: span 2;"><strong>기업 주소:</strong> ${data.company_address}</div>
                     <div><strong>기업 유형:</strong> ${data.is_overseas ? "해외 기업" : "국내 기업"}</div>
                 </div>

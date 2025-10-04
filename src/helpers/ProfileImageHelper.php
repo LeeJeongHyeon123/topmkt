@@ -50,12 +50,12 @@ class ProfileImageHelper {
         // 요청된 사이즈의 필드명 생성
         $sizeField = "profile_image_{$size}";
         
-        // 우선순위에 따른 이미지 반환
+        // 우선순위에 따른 이미지 반환 (profile_image를 최우선으로)
         $candidates = [
+            $user['profile_image'] ?? null, // 기본 프로필 이미지 (최우선)
             $user[$sizeField] ?? null,
             $user['profile_image_profile'] ?? null,
             $user['profile_image_original'] ?? null,
-            $user['profile_image'] ?? null, // 기존 호환성
             self::DEFAULT_AVATAR
         ];
         

@@ -58,7 +58,7 @@ $monthNames = [
 
 .calendar-controls {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 20px;
     flex-wrap: wrap;
@@ -206,7 +206,9 @@ $monthNames = [
     overflow-x: auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
-    min-width: 980px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .calendar-header {
@@ -236,13 +238,13 @@ $monthNames = [
 
 .calendar-day {
     min-height: 140px;
-    min-width: 140px;
     border-right: 1px solid #e2e8f0;
     border-bottom: 1px solid #e2e8f0;
     padding: 8px;
     background: white;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .calendar-day:nth-child(7n) {
@@ -657,7 +659,11 @@ $monthNames = [
     }
     
     .calendar-view {
-        min-width: 800px;
+        width: 100%;
+        max-width: 100%;
+        min-width: unset;
+        box-sizing: border-box;
+        margin: 0 auto;
     }
     
     /* 목록형 뷰 모바일 최적화 */

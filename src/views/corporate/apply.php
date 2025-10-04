@@ -2,6 +2,9 @@
 /**
  * 기업 인증 신청 페이지
  */
+
+// SecurityHelper 클래스 로드
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
 ?>
 
 <style>
@@ -425,7 +428,7 @@
                            id="business_number" 
                            name="business_number" 
                            class="form-input" 
-                           value="<?= htmlspecialchars($existingData['business_number'] ?? '') ?>"
+                           value="<?= htmlspecialchars(SecurityHelper::isEncrypted($existingData['business_number'] ?? '') ? SecurityHelper::decrypt($existingData['business_number']) : ($existingData['business_number'] ?? '')) ?>"
                            placeholder="123-45-67890" 
                            required maxlength="100">
                     <div class="form-help">하이픈(-)을 포함하여 입력해주세요.</div>
@@ -474,7 +477,7 @@
                            id="representative_phone" 
                            name="representative_phone" 
                            class="form-input" 
-                           value="<?= htmlspecialchars($existingData['representative_phone'] ?? '') ?>"
+                           value="<?= htmlspecialchars(SecurityHelper::isEncrypted($existingData['representative_phone'] ?? '') ? SecurityHelper::decrypt($existingData['representative_phone']) : ($existingData['representative_phone'] ?? '')) ?>"
                            placeholder="010-1234-5678" 
                            required maxlength="13">
                     <div class="form-help">연락 가능한 대표자의 휴대폰 번호를 입력해주세요.</div>

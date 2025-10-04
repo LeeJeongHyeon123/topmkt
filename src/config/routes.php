@@ -93,7 +93,10 @@ class Router {
             
             // 사용자 프로필 이미지 API
             'GET:/api/users/{id}/profile-image' => ['UserController', 'getProfileImage'],
-            
+
+            // 회원 탈퇴 API
+            'POST:/api/user/delete-account' => ['UserController', 'deleteAccount'],
+
             // Geocoding API (제거됨 - 클라이언트 사이드로 변경)
             
             // 강의 일정 라우트
@@ -114,6 +117,9 @@ class Router {
             'GET:/api/lectures/{id}/registration-status' => ['RegistrationController', 'getRegistrationStatus'],
             'POST:/api/lectures/{id}/registration' => ['RegistrationController', 'createRegistration'],
             'DELETE:/api/lectures/{id}/registration' => ['RegistrationController', 'cancelRegistration'],
+
+            // 강의 수정 가능 여부 체크 API
+            'GET:/api/lectures/{id}/check-editable' => ['LectureController', 'checkEditable'],
             'GET:/api/lectures/{id}/previous-registration' => ['RegistrationController', 'getPreviousRegistration'],
             
             // 기업 신청 관리 대시보드 라우트
@@ -137,6 +143,9 @@ class Router {
             'POST:/api/events/{id}/registration' => ['EventController', 'registerEvent'],
             'DELETE:/api/events/{id}/registration' => ['EventController', 'cancelEventRegistration'],
             'GET:/api/events/{id}/previous-registration' => ['EventController', 'getPreviousRegistration'],
+
+            // 수정 가능 여부 체크 API
+            'GET:/api/events/{id}/check-editable' => ['EventController', 'checkEditable'],
             
             // 신청 대기 알림 API
             'GET:/api/registrations/pending-count' => ['RegistrationNotificationController', 'getPendingCount'],

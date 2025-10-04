@@ -3,6 +3,9 @@
  * 관리자 > 기업회원 목록 페이지 - 새 템플릿 구조 적용
  */
 
+// SecurityHelper 클래스 로드
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
 // 페이지 정보 설정
 $page_title = '기업회원 목록';
 $page_description = '승인된 기업회원 목록 및 관리';
@@ -613,7 +616,7 @@ $content = '
                             
                             return '
                                 <tr data-company-name="' . htmlspecialchars($member['company_name']) . '" 
-                                    data-business-number="' . htmlspecialchars($member['business_number']) . '"
+                                    data-business-number="' . htmlspecialchars(SecurityHelper::isEncrypted($member['business_number'] ?? '') ? SecurityHelper::decrypt($member['business_number']) : ($member['business_number'] ?? '')) . '"
                                     data-nickname="' . htmlspecialchars($member['nickname']) . '"
                                     data-status="' . $member['status'] . '"
                                     data-is-overseas="' . ($member['is_overseas'] ? '1' : '0') . '"
@@ -622,7 +625,7 @@ $content = '
                                         <div class="company-info">
                                             <div class="company-name">' . htmlspecialchars($member['company_name']) . '</div>
                                             <div class="company-details">
-                                                사업자번호: ' . htmlspecialchars($member['business_number']) . '<br>
+                                                사업자번호: ' . htmlspecialchars(SecurityHelper::isEncrypted($member['business_number'] ?? '') ? SecurityHelper::decrypt($member['business_number']) : ($member['business_number'] ?? '')) . '<br>
                                                 대표자: ' . htmlspecialchars($member['representative_name']) . 
                                                 ($member['is_overseas'] ? ' <span style="color: #667eea; font-weight: 500;"> (해외기업)</span>' : '') . '
                                             </div>

@@ -12,23 +12,24 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 <!-- 브라우저 확장 프로그램 에러 억제 -->
 <script src="/assets/js/error-suppressor.js"></script>
 
-<style>
-/* 채팅 페이지 전용 스타일 */
+<style data-timestamp="<?php echo time(); ?>">
+/* 채팅 페이지 전용 스타일 - 캐시 무효화: <?php echo date('Y-m-d H:i:s'); ?> */
 .chat-container {
-    max-width: 1400px;
+    max-width: min(1400px, 100vw - 40px); /* 🔥 뷰포트 너비 고려한 제한 */
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px; /* 🔥 원래 패딩 복원 - 사이드바 크기 문제 방지 */
     height: calc(100vh - 120px);
     background: #f8fafc;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box; /* 🔥 패딩 포함 박스 계산 */
 }
 
 .chat-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 40px;
+    padding: 40px 20px; /* 🔥 chat-layout과 일관된 좌우 여백 (20px) */
     text-align: center;
     border-radius: 12px;
     flex-shrink: 0;
@@ -50,11 +51,14 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 
 .chat-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: minmax(280px, 320px) 1fr; /* 🔥 유연한 사이드바 너비 */
     gap: 20px;
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    padding: 0 20px; /* 🔥 chat-container와 일관된 좌우 여백 */
+    max-width: 100%; /* 🔥 최대 너비 제한 */
+    box-sizing: border-box; /* 🔥 패딩 포함 박스 계산 */
 }
 
 /* 사이드바 (채팅방 목록) */
@@ -65,6 +69,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     border: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
+    min-width: 0; /* 🔥 flex 아이템 최소 너비 제한 */
+    overflow: hidden; /* 🔥 내부 컨텐츠 오버플로 방지 */
+    box-sizing: border-box; /* 🔥 패딩/보더 포함 계산 */
 }
 
 .sidebar-header {
@@ -82,30 +89,36 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 }
 
 .new-chat-btn {
-    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 10px 16px; /* 개선: 터치 타겟 확대 */
-    font-size: 14px; /* 개선: 0.8rem -> 14px (세련된 버튼) */
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-height: 44px; /* 개선: 터치 타겟 최소 높이 */
-    min-width: 44px;  /* 개선: 터치 타겟 최소 너비 */
+    transition: all 0.3s ease;
+    min-height: 44px;
+    min-width: 44px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px; /* 아이콘과 텍스트 사이 간격 추가 */
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    white-space: nowrap;
 }
 
 .new-chat-btn:hover {
-    background: #5a67d8;
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
 }
 
 .chat-rooms-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden; /* 🔥 PC 사이즈에서 가로 스크롤 제거 */
     padding: 10px;
 }
 
@@ -115,7 +128,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 4px;
-    position: relative;
+    position: relative; /* 시간 절대 위치의 기준점 */
     z-index: 10;
     pointer-events: auto;
     background: #fff;
@@ -168,14 +181,40 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     min-width: 0;
 }
 
+.room-header {
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    margin-bottom: 2px;
+    width: 100%; /* 전체 너비 사용 보장 */
+    min-width: 0; /* flex 아이템 최소 너비 제한 해제 */
+    height: 20px; /* 고정 높이로 일관성 확보 */
+}
+
 .room-name {
     font-weight: 600;
     color: #2d3748;
     font-size: 15px; /* 개선: 0.9rem -> 15px (적절한 방 이름 크기) */
-    margin-bottom: 2px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: calc(100% - 80px); /* 🔥 FIX: time 영역(70px) + 여백(10px) = 80px 정확한 계산 */
+    min-width: 100px; /* 🔥 FIX: 텍스트 가시성을 위한 최소 너비 보장 (0px에서 100px로 변경) */
+}
+
+.room-time {
+    position: absolute; /* 절대 위치로 우측 끝 고정 */
+    right: 10px; /* 사이드바 우측 끝에서 10px 여백 확보 */
+    top: 10px; /* room-header와 완벽한 수직 정렬 */
+    font-size: 11px;
+    color: #718096;
+    font-weight: 500;
+    white-space: nowrap; /* 시간은 줄바꿈 금지 */
+    text-align: right;
+    width: 70px; /* 🔥 FIX: 고정 너비로 일관된 텍스트 잘림 보장 */
+    height: 20px; /* room-header와 동일한 높이 */
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: flex-end; /* 우측 정렬 */
 }
 
 .room-last-message {
@@ -184,6 +223,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: calc(100% - 80px); /* 🔥 FIX: time 영역(70px) + 여백(10px) = 80px 일관된 계산 */
 }
 
 .room-meta {
@@ -192,12 +232,10 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     align-items: flex-end;
     gap: 4px;
     flex-shrink: 0;
+    text-align: right; /* 🔥 모든 내부 텍스트 우측 정렬 강제 */
 }
 
-.room-time {
-    font-size: 11px; /* 개선: 0.7rem -> 11px (시간 정보 적절한 크기) */
-    color: #a0aec0;
-}
+/* room-time 스타일은 위의 .room-time 섹션에서 정의됨 */
 
 .unread-badge {
     background: #e53e3e;
@@ -279,6 +317,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 
 .chat-partner-info {
     flex: 1;
+    min-height: 40px !important; /* 🔥 부모 요소 최소 높이 보장 */
+    min-width: 100px !important; /* 🔥 부모 요소 최소 너비 보장 */
+    display: block !important; /* 🔥 블록 요소 강제 */
 }
 
 .chat-partner-name {
@@ -286,6 +327,14 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     color: #2d3748;
     font-size: 0.9rem;
     margin-bottom: 2px;
+    min-height: 20px !important; /* 🔥 최소 높이 보장 */
+    min-width: 50px !important; /* 🔥 최소 너비 보장 */
+    display: block !important; /* 🔥 블록 요소 강제 */
+    visibility: visible !important; /* 🔥 가시성 강제 */
+    opacity: 1 !important; /* 🔥 투명도 강제 */
+    line-height: 1.2 !important; /* 🔥 줄 높이 설정 */
+    white-space: nowrap !important; /* 🔥 텍스트 줄바꿈 방지 */
+    overflow: visible !important; /* 🔥 오버플로우 표시 */
 }
 
 
@@ -671,18 +720,50 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     color: currentColor;
 }
 
+/* 🖥️ 작은 데스크톱 화면 최적화 (900px ~ 1200px) */
+@media (max-width: 1200px) and (min-width: 900px) {
+    .chat-container {
+        max-width: calc(100vw - 20px); /* 🔥 여백 최소화 */
+        padding: 15px; /* 🔥 패딩 감소 */
+    }
+
+    .chat-layout {
+        grid-template-columns: minmax(260px, 300px) 1fr; /* 🔥 사이드바 더 작게 */
+        gap: 15px; /* 🔥 간격 감소 */
+    }
+}
+
+/* 💻 작은 화면 추가 최적화 (769px ~ 900px) */
+@media (max-width: 900px) and (min-width: 769px) {
+    .chat-container {
+        max-width: 100vw; /* 🔥 전체 너비 사용 */
+        padding: 10px; /* 🔥 패딩 최소화 */
+    }
+
+    .chat-layout {
+        grid-template-columns: minmax(240px, 280px) 1fr; /* 🔥 사이드바 더 작게 */
+        gap: 10px; /* 🔥 간격 최소화 */
+        padding: 0 10px; /* 🔥 좌우 여백 최소화 */
+    }
+
+    .chat-header {
+        padding: 30px 10px; /* 🔥 헤더 패딩도 최소화 */
+    }
+}
+
 /* 📱 모바일 반응형 최적화 (v3.11.7) */
 /* 터치 타겟 44px+ 유지하되 세련된 UI */
 @media (max-width: 768px) {
     .chat-container {
         padding: 8px; /* 개선: 10px -> 8px (컴팩트) */
         height: calc(100vh - 80px);
+        max-width: 100vw; /* 🔥 모바일에서 완전한 뷰포트 사용 */
     }
     
     .chat-header {
-        padding: 25px 15px; /* 개선: 30px 20px -> 25px 15px */
-        margin-top: 15px; /* 개선: 20px -> 15px */
-        margin-bottom: 15px; /* 개선: 20px -> 15px */
+        padding: 25px 8px; /* 🔥 chat-layout 모바일과 일관된 좌우 여백 (8px) */
+        margin-top: 50px; /* 추가 수정: 더 큰 간격으로 확실히 분리 */
+        margin-bottom: 20px; /* 수정: 하단 간격도 적절히 조정 */
     }
     
     .chat-header h1 {
@@ -697,10 +778,26 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         grid-template-columns: 1fr;
         flex: 1;
         min-height: 0;
+        padding: 0 8px; /* 🔥 모바일에서도 좌우 여백 유지 (chat-container와 동일한 8px) */
     }
-    
+
+    /* 모바일에서 기본적으로 채팅방 목록을 먼저 표시 */
     .chat-sidebar {
+        display: flex; /* 기본으로 표시 */
+    }
+
+    /* 모바일에서 채팅창은 기본적으로 숨김 (채팅방 선택 시에만 표시) */
+    .chat-main {
         display: none;
+    }
+
+    /* 채팅방 선택 시 사이드바 숨기고 채팅창 표시 */
+    .chat-layout.chat-active .chat-sidebar {
+        display: none;
+    }
+
+    .chat-layout.chat-active .chat-main {
+        display: flex;
     }
     
     .chat-sidebar.mobile-show {
@@ -723,9 +820,10 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     }
     
     .new-chat-btn {
-        padding: 10px 14px; /* 개선: 모바일 컴팩트 */
-        font-size: 13px; /* 개선: 모바일 최적화 */
+        padding: 10px 14px;
+        font-size: 13px;
         min-height: 44px;
+        gap: 6px; /* 모바일에서도 아이콘-텍스트 간격 유지 */
     }
     
     .chat-room-item {
@@ -741,14 +839,22 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     
     .room-name {
         font-size: 14px; /* 개선: 15px -> 14px (모바일 최적화) */
+        max-width: calc(100% - 70px) !important; /* 🔥 FIX: time 영역(60px) + 여백(10px) = 70px 일관된 계산 */
+        min-width: 80px !important; /* 🔥 FIX: 모바일에서도 텍스트 가시성 보장 */
     }
-    
+
     .room-last-message {
         font-size: 12px; /* 개선: 13px -> 12px */
+        max-width: calc(100% - 70px) !important; /* 🔥 FIX: time 영역(60px) + 여백(10px) = 70px 일관된 계산 */
     }
-    
+
     .room-time {
         font-size: 10px; /* 개선: 11px -> 10px */
+        width: 60px; /* 🔥 FIX: 모바일에서 고정 너비로 일관된 텍스트 잘림 보장 */
+    }
+
+    .room-header {
+        gap: 8px; /* 모바일에서 간격 줄임 */
     }
     
     .message-bubble {
@@ -784,9 +890,9 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     }
     
     .chat-header {
-        padding: 20px 12px;
-        margin-top: 10px;
-        margin-bottom: 12px;
+        padding: 20px 5px; /* 🔥 chat-layout 소형 모바일과 일관된 좌우 여백 (5px) */
+        margin-top: 40px;
+        margin-bottom: 18px;
     }
     
     .chat-header h1 {
@@ -796,7 +902,11 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     .chat-header p {
         font-size: 13px;
     }
-    
+
+    .chat-layout {
+        padding: 0 5px; /* 🔥 소형 모바일에서도 좌우 여백 유지 (chat-container와 동일한 5px) */
+    }
+
     .sidebar-header {
         padding: 12px;
     }
@@ -809,6 +919,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         padding: 10px 12px;
         font-size: 12px;
         min-height: 44px;
+        gap: 5px; /* 작은 화면에서도 간격 유지 */
     }
     
     .chat-room-item {
@@ -824,14 +935,22 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     
     .room-name {
         font-size: 13px;
+        max-width: calc(100% - 60px) !important; /* 🔥 FIX: time 영역(50px) + 여백(10px) = 60px 일관된 계산 */
+        min-width: 60px !important; /* 🔥 FIX: 소형 모바일에서도 텍스트 가시성 보장 */
     }
-    
+
     .room-last-message {
         font-size: 11px;
+        max-width: calc(100% - 60px) !important; /* 🔥 FIX: time 영역(50px) + 여백(10px) = 60px 일관된 계산 */
     }
-    
+
     .room-time {
         font-size: 9px;
+        width: 50px; /* 🔥 FIX: 소형 모바일에서 고정 너비로 일관된 텍스트 잘림 보장 */
+    }
+
+    .room-header {
+        gap: 6px; /* 작은 모바일에서 간격 더 줄임 */
     }
     
     .message-bubble {
@@ -855,6 +974,112 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
         width: 96%;
         margin: 10px;
         padding: 16px;
+    }
+}
+
+/* 모바일 채팅방 목록 토글 버튼 스타일 */
+.mobile-chat-toggle {
+    display: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-height: 44px;
+    white-space: nowrap;
+}
+
+.mobile-chat-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.mobile-chat-toggle:active {
+    transform: translateY(0);
+}
+
+.mobile-chat-toggle i {
+    font-size: 16px;
+}
+
+/* 모바일 뒤로가기 버튼 스타일 */
+.mobile-back-btn {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.mobile-back-btn:hover {
+    background: #e2e8f0;
+    color: #475569;
+    transform: scale(1.05);
+}
+
+.mobile-back-btn:active {
+    transform: scale(0.95);
+}
+
+.mobile-back-btn i {
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    /* 모바일에서 토글 버튼 숨김 (이제 기본으로 채팅방 목록 표시) */
+    .mobile-chat-toggle {
+        display: none;
+    }
+
+    .chat-header-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .chat-header-text {
+        text-align: center;
+        flex: 1;
+    }
+
+    /* 사이드바 토글 상태 개선 */
+    .chat-sidebar.mobile-visible {
+        display: flex !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1000;
+        background: white;
+        padding-top: 20px;
+        border-radius: 0;
+    }
+
+    /* 사이드바 닫기 버튼 추가를 위한 헤더 수정 */
+    .chat-sidebar.mobile-visible .sidebar-header {
+        position: relative;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* 모바일에서 뒤로가기 버튼 표시 */
+    .mobile-back-btn {
+        display: flex !important;
     }
 }
 
@@ -904,8 +1129,17 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 <div class="chat-container">
     <!-- 채팅 헤더 -->
     <div class="chat-header">
-        <h1>💬 실시간 채팅</h1>
-        <p>다른 회원들과 실시간으로 소통하세요</p>
+        <div class="chat-header-content">
+            <div class="chat-header-text">
+                <h1>💬 실시간 채팅</h1>
+                <p>다른 회원들과 실시간으로 소통하세요</p>
+            </div>
+            <!-- 모바일 채팅방 목록 토글 버튼 -->
+            <button class="mobile-chat-toggle" onclick="toggleMobileChatSidebar()">
+                <i class="fas fa-bars"></i>
+                <span>채팅방</span>
+            </button>
+        </div>
     </div>
     
     <!-- 채팅 레이아웃 -->
@@ -945,6 +1179,10 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
             <div id="activeChatArea" style="display: none;">
                 <!-- 채팅 헤더 -->
                 <div class="chat-header-bar">
+                    <!-- 모바일 뒤로가기 버튼 -->
+                    <button class="mobile-back-btn" onclick="backToChatList()" style="display: none;">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
                     <div class="chat-partner-avatar" id="chatPartnerAvatar">
                         U
                     </div>
@@ -1402,8 +1640,9 @@ function renderChatRoomItem(roomId, roomData) {
         roomItem.addEventListener('mousedown', clickHandler);
         roomItem.addEventListener('touchstart', clickHandler, { passive: false });
         
-        roomsListContainer.appendChild(roomItem);
-        console.log(`✅ 채팅방 아이템 생성 및 클릭 이벤트 등록: ${roomId}`);
+        // 🔥 최신 메시지 순서로 삽입 위치 결정
+        insertChatRoomAtCorrectPosition(roomsListContainer, roomItem, roomData);
+        console.log(`✅ 채팅방 아이템 생성 및 클릭 이벤트 등록 (최신순 정렬): ${roomId}`);
         
         // 디버깅: 요소 클릭 가능 여부 확인
         console.log(`🔍 채팅방 ${roomId} 요소 상태:`, {
@@ -1451,24 +1690,50 @@ function renderChatRoomItem(roomId, roomData) {
     if (roomData.type === 'private' && roomData.participants) {
         const otherUserId = Object.keys(roomData.participants).find(id => id != currentUserId);
         if (otherUserId) {
-            // 사용자 정보가 이미 있으면 사용
-            if (users[otherUserId]) {
+            const otherParticipant = roomData.participants[otherUserId];
+
+            // 🔥 근본 원인 해결: 사용자 정보가 실제로 없는 경우에만 로드 (탈퇴한 회원 예외 처리)
+            const shouldRefreshProfile = !users[otherUserId] ||
+                                       (!users[otherUserId].nickname || !users[otherUserId].profile_image) &&
+                                       !(users[otherUserId] && (users[otherUserId].is_deleted || users[otherUserId].status === 'deleted'));
+
+            if (users[otherUserId] && !shouldRefreshProfile) {
+                // 기존 사용자 정보 사용
                 roomName = users[otherUserId].nickname || '사용자';
                 avatarText = roomName.substring(0, 1).toUpperCase();
                 partnerImage = users[otherUserId].profile_image || users[otherUserId].profile_image_thumb;
+                console.log(`📸 기존 프로필 사용: ${roomName}, 이미지: ${partnerImage ? '있음' : '없음'}`);
             } else {
-                // 사용자 정보가 없으면 비동기로 가져오기 (재귀 호출 방지)
-                if (!roomItem.dataset.loadingUser) {
+                // 🔥 실제로 필요한 정보가 없는 경우에만 로드 (근본 원인 해결)
+                // 탈퇴한 회원인 경우 추가 로드 방지
+                const isDeletedUser = users[otherUserId] && (users[otherUserId].is_deleted || users[otherUserId].status === 'deleted');
+                if (isDeletedUser) {
+                    console.log(`🚫 사용자 ${otherUserId}는 탈퇴한 회원으로 프로필 로드 스킵`);
+                }
+                if (!roomItem.dataset.loadingUser && shouldRefreshProfile && !isDeletedUser) {
                     roomItem.dataset.loadingUser = 'true';
+                    console.log(`🔄 사용자 ${otherUserId} 프로필 정보 로드 시작 (필수 정보 누락)`);
+
                     loadUserInfo(otherUserId).then(() => {
                         // 로딩 플래그 제거
                         delete roomItem.dataset.loadingUser;
-                        // 사용자 정보 로드 완료 후 채팅방 아이템 다시 렌더링
+                        console.log(`✅ 사용자 ${otherUserId} 프로필 정보 로드 완료:`, users[otherUserId]);
+                        // 새로운 정보로 채팅방 아이템 업데이트
                         renderChatRoomItem(roomId, roomData);
-                    }).catch(() => {
+                    }).catch((error) => {
+                        console.error(`❌ 사용자 ${otherUserId} 프로필 로드 실패:`, error);
                         delete roomItem.dataset.loadingUser;
                     });
                 }
+
+                // 임시로 기존 정보나 기본값 사용
+                if (users[otherUserId]) {
+                    roomName = users[otherUserId].nickname || '사용자';
+                    partnerImage = users[otherUserId].profile_image || users[otherUserId].profile_image_thumb;
+                } else {
+                    roomName = '사용자';
+                }
+                avatarText = roomName.substring(0, 1).toUpperCase();
             }
         }
     }
@@ -1494,54 +1759,163 @@ function renderChatRoomItem(roomId, roomData) {
                 `}
             </div>
             <div class="room-details">
-                <div class="room-name">${roomName}</div>
+                <div class="room-header">
+                    <div class="room-name">${roomName}</div>
+                    <div class="room-time" id="lastTime-${roomId}">
+                        ${roomData.lastMessageTime ? formatTime(roomData.lastMessageTime) : ''}
+                    </div>
+                </div>
                 <div class="room-last-message" id="lastMessage-${roomId}">
                     ${roomData.lastMessage || '메시지가 없습니다'}
                 </div>
             </div>
-            <div class="room-meta" id="roomMeta-${roomId}">
-                <div class="room-time" id="lastTime-${roomId}">
-                    ${roomData.lastMessageTime ? formatTime(roomData.lastMessageTime) : ''}
-                </div>
-            </div>
         </div>
     `;
-    
+
+    // 🔥 room-name 디버깅 로그 추가
+    setTimeout(() => {
+        console.log(`🔍 ===== room-name 디버깅 (${roomId}) =====`);
+        console.log(`📝 설정된 roomName: "${roomName}"`);
+
+        const roomNameElement = roomItem.querySelector('.room-name');
+        if (roomNameElement) {
+            console.log(`✅ room-name 요소 발견`);
+            console.log(`📝 실제 textContent: "${roomNameElement.textContent}"`);
+            console.log(`📝 innerHTML: "${roomNameElement.innerHTML}"`);
+
+            const style = window.getComputedStyle(roomNameElement);
+            const rect = roomNameElement.getBoundingClientRect();
+
+            console.log(`📊 CSS 스타일 상태:`);
+            console.log(`  - display: ${style.display}`);
+            console.log(`  - visibility: ${style.visibility}`);
+            console.log(`  - opacity: ${style.opacity}`);
+            console.log(`  - color: ${style.color}`);
+            console.log(`  - font-size: ${style.fontSize}`);
+            console.log(`  - max-width: ${style.maxWidth}`);
+            console.log(`  - width: ${style.width}`);
+            console.log(`  - height: ${style.height}`);
+            console.log(`  - overflow: ${style.overflow}`);
+            console.log(`  - white-space: ${style.whiteSpace}`);
+            console.log(`  - text-overflow: ${style.textOverflow}`);
+
+            console.log(`📏 요소 크기 및 위치:`);
+            console.log(`  - 크기: ${rect.width}px × ${rect.height}px`);
+            console.log(`  - 위치: (${Math.round(rect.x)}, ${Math.round(rect.y)})`);
+
+            const isVisible = rect.width > 0 && rect.height > 0 &&
+                             style.display !== 'none' &&
+                             style.visibility !== 'hidden' &&
+                             parseFloat(style.opacity) > 0;
+            console.log(`🎯 실제 표시 여부: ${isVisible ? '✅ 보임' : '❌ 안보임'}`);
+
+            // 🔥 디버깅 완료 - 강제 스타일 제거됨
+        } else {
+            console.log(`❌ room-name 요소를 찾을 수 없음!`);
+            console.log(`📋 roomItem.innerHTML:`, roomItem.innerHTML);
+        }
+        console.log(`🔍 ===== 디버깅 완료 =====`);
+    }, 100);
+
     // 마지막 메시지 업데이트
     updateLastMessage(roomId);
     
     // 읽지 않은 메시지 수 업데이트
     updateRoomUnreadCount(roomId);
+
+    // 🔥 기존 채팅방 업데이트 시에도 위치 재조정
+    repositionExistingChatRoom(roomId, roomData);
+}
+
+/**
+ * 🔥 채팅방을 최신 메시지 순서로 적절한 위치에 삽입
+ */
+function insertChatRoomAtCorrectPosition(container, roomItem, roomData) {
+    const currentTime = roomData.lastMessageTime || 0;
+    const existingItems = Array.from(container.querySelectorAll('.chat-room-item'));
+
+    // 로딩 메시지가 있다면 제거
+    const loadingElement = container.querySelector('.loading');
+    if (loadingElement) {
+        loadingElement.remove();
+    }
+
+    // 삽입할 위치 찾기 (최신 메시지가 위로 오도록)
+    let insertIndex = 0;
+    for (let i = 0; i < existingItems.length; i++) {
+        const existingRoomId = existingItems[i].getAttribute('data-room-id');
+        const existingRoomData = chatRooms[existingRoomId];
+        const existingTime = existingRoomData?.lastMessageTime || 0;
+
+        if (currentTime > existingTime) {
+            insertIndex = i;
+            break;
+        }
+        insertIndex = i + 1;
+    }
+
+    // 적절한 위치에 삽입
+    if (insertIndex >= existingItems.length) {
+        container.appendChild(roomItem);
+    } else {
+        container.insertBefore(roomItem, existingItems[insertIndex]);
+    }
+
+    console.log(`🔄 채팅방 정렬: ${roomItem.getAttribute('data-room-id')} -> 위치 ${insertIndex} (lastMessageTime: ${currentTime})`);
+}
+
+/**
+ * 🔥 기존 채팅방 위치 재조정 (메시지 업데이트 시)
+ */
+function repositionExistingChatRoom(roomId, roomData) {
+    const roomItem = document.querySelector(`[data-room-id="${roomId}"]`);
+    const container = document.getElementById('chatRoomsList');
+
+    if (!roomItem || !container) return;
+
+    // 현재 위치에서 제거
+    roomItem.remove();
+
+    // 새로운 위치에 삽입
+    insertChatRoomAtCorrectPosition(container, roomItem, roomData);
 }
 
 /**
  * 채팅방 열기
  */
-function openChatRoom(roomId) {
-    console.log(`💬 채팅방 열기: ${roomId}`);
+function openChatRoom(roomId, retryCount = 0) {
+    console.log(`💬 채팅방 열기: ${roomId} (시도 횟수: ${retryCount})`);
     console.log(`📊 현재 chatRooms 데이터:`, chatRooms);
     console.log(`🔍 요청된 채팅방 ID: ${roomId}`);
-    
+
+    // 무한 루프 방지: 최대 3번까지만 재시도
+    if (retryCount >= 3) {
+        console.error('❌ 최대 재시도 횟수 초과. 채팅방 열기를 포기합니다:', roomId);
+        alert('채팅방을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+
     activeRoomId = roomId;
     const roomData = chatRooms[roomId];
-    
+
     console.log(`📂 해당 채팅방 데이터:`, roomData);
-    
+
     if (!roomData) {
         console.error('❌ 채팅방 데이터를 찾을 수 없습니다:', roomId);
         console.error('📋 사용 가능한 채팅방 목록:', Object.keys(chatRooms));
-        
+
         // Firebase에서 직접 데이터 가져오기 시도
         console.log('🔄 Firebase에서 직접 채팅방 데이터 로드 시도...');
         const roomRef = database.ref(`chatRooms/${roomId}`);
         roomRef.once('value', function(snapshot) {
             const firebaseRoomData = snapshot.val();
             console.log('🔥 Firebase에서 가져온 데이터:', firebaseRoomData);
-            
+
             if (firebaseRoomData) {
                 console.log('✅ Firebase에 데이터가 존재함. 로컬 캐시 업데이트 중...');
                 chatRooms[roomId] = firebaseRoomData;
-                openChatRoom(roomId); // 재귀 호출로 다시 시도
+                // 재귀 호출 시 retryCount 증가
+                openChatRoom(roomId, retryCount + 1);
             } else {
                 console.error('❌ Firebase에도 채팅방이 존재하지 않음');
                 alert('채팅방을 찾을 수 없습니다.');
@@ -1592,6 +1966,15 @@ function openChatRoom(roomId) {
     
     // 읽음 상태 업데이트
     markRoomAsRead(roomId);
+
+    // 🔥 모바일에서 채팅방 선택 시 채팅창으로 전환
+    if (window.innerWidth <= 768) {
+        const chatLayout = document.querySelector('.chat-layout');
+        if (chatLayout) {
+            chatLayout.classList.add('chat-active');
+            console.log('📱 모바일: 채팅창 모드로 전환');
+        }
+    }
 }
 
 /**
@@ -1661,7 +2044,85 @@ function updateChatHeader(roomData) {
         document.getElementById('visitProfileBtn').style.display = 'none';
     }
     
+    // 🔍 닉네임 설정 디버깅 시작
+    console.log("🔍 ===== 채팅방 닉네임 디버깅 시작 =====");
+
+    // 1. 기본 정보 확인
+    console.log("📍 1. 기본 정보");
+    console.log("현재 활성 채팅방 ID:", activeRoomId);
+    console.log("현재 사용자 ID:", currentUserId);
+    console.log("대화 상대 사용자 ID:", currentPartnerUserId);
+    console.log("설정하려는 닉네임:", partnerName);
+
+    // 2. HTML 요소 상태 확인 (설정 전)
+    console.log("\n📍 2. HTML 요소 상태 (설정 전)");
+    const nameElement = document.getElementById('chatPartnerName');
+    if (nameElement) {
+        console.log("요소 존재:", true);
+        console.log("설정 전 텍스트 내용:", `"${nameElement.textContent}"`);
+        console.log("innerHTML:", nameElement.innerHTML);
+        console.log("부모 요소:", nameElement.parentElement);
+
+        // CSS 스타일 확인
+        const rect = nameElement.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(nameElement);
+        console.log("요소 크기:", `${rect.width}px × ${rect.height}px`);
+        console.log("요소 위치:", `(${Math.round(rect.x)}, ${Math.round(rect.y)})`);
+        console.log("display:", computedStyle.display);
+        console.log("visibility:", computedStyle.visibility);
+        console.log("opacity:", computedStyle.opacity);
+        console.log("color:", computedStyle.color);
+        console.log("font-size:", computedStyle.fontSize);
+        console.log("font-weight:", computedStyle.fontWeight);
+    } else {
+        console.log("❌ chatPartnerName 요소를 찾을 수 없음!");
+    }
+
+    // 3. 사용자 정보 확인
+    console.log("\n📍 3. 사용자 정보 상태");
+    console.log("전체 users 객체:", users);
+    if (currentPartnerUserId) {
+        console.log(`상대방(${currentPartnerUserId}) 정보:`, users[currentPartnerUserId]);
+        if (users[currentPartnerUserId]) {
+            console.log("상대방 닉네임:", users[currentPartnerUserId].nickname);
+            console.log("상대방 프로필 이미지:", users[currentPartnerUserId].profile_image);
+        }
+    }
+
+    // 4. 채팅방 데이터 확인
+    console.log("\n📍 4. 채팅방 데이터");
+    if (activeRoomId && chatRooms[activeRoomId]) {
+        console.log("현재 채팅방 데이터:", chatRooms[activeRoomId]);
+        const participantIds = Object.keys(chatRooms[activeRoomId].participants || {});
+        console.log("참여자 ID들:", participantIds);
+        const otherUserId = participantIds.find(id => id != currentUserId);
+        console.log("계산된 상대방 ID:", otherUserId);
+    }
+
+    // 5. 실제 DOM 설정
+    console.log("\n📍 5. DOM 텍스트 설정 실행");
     document.getElementById('chatPartnerName').textContent = partnerName;
+
+    // 6. 설정 후 상태 확인
+    console.log("\n📍 6. 설정 후 상태 확인");
+    const afterSetText = document.getElementById('chatPartnerName').textContent;
+    console.log("설정 후 텍스트 내용:", `"${afterSetText}"`);
+    console.log("설정 성공 여부:", afterSetText === partnerName);
+
+    // 7. 0.5초 후 다시 확인 (다른 코드에 의한 덮어쓰기 감지)
+    setTimeout(() => {
+        console.log("\n📍 7. 0.5초 후 재확인");
+        const delayedText = document.getElementById('chatPartnerName').textContent;
+        console.log("0.5초 후 텍스트:", `"${delayedText}"`);
+        if (delayedText !== partnerName) {
+            console.log("⚠️ 다른 코드에 의해 텍스트가 변경됨!");
+            console.log("원래 설정값:", partnerName);
+            console.log("현재 값:", delayedText);
+        } else {
+            console.log("✅ 텍스트가 정상적으로 유지됨");
+        }
+        console.log("🔍 ===== 디버깅 완료 =====");
+    }, 500);
     
     // 프로필 이미지 설정
     const avatarElement = document.getElementById('chatPartnerAvatar');
@@ -1860,15 +2321,37 @@ function sendMessage() {
     
     newMessageRef.set(messageData)
         .then(() => {
+            // 🔥 메시지 전송 시 비활성 참여자의 userRooms 복구
+            const currentRoom = chatRooms[activeRoomId];
+            if (currentRoom && currentRoom.participants) {
+                Object.keys(currentRoom.participants).forEach(participantId => {
+                    const participant = currentRoom.participants[participantId];
+
+                    // 비활성 상태인 참여자가 있다면 userRooms에 다시 추가
+                    if (participant.status === 'inactive' && participantId !== currentUserId) {
+                        console.log(`🔄 비활성 참여자 ${participantId}의 채팅방 목록 복구 중...`);
+
+                        database.ref(`userRooms/${participantId}/${activeRoomId}`).set({
+                            joinedAt: participant.joinedAt || firebase.database.ServerValue.TIMESTAMP,
+                            lastReadTime: Date.now()
+                        }).then(() => {
+                            console.log(`✅ 참여자 ${participantId}의 채팅방 목록 복구 완료`);
+                        }).catch((error) => {
+                            console.error(`❌ 참여자 ${participantId}의 채팅방 목록 복구 실패:`, error);
+                        });
+                    }
+                });
+            }
+
             // 채팅방의 마지막 메시지 업데이트
             updateRoomLastMessage(activeRoomId, text);
-            
+
             // 입력창 초기화
             input.value = '';
             input.style.height = 'auto';
             sendBtn.disabled = false;
             input.focus();
-            
+
             console.log('✅ 메시지 전송 완료');
         })
         .catch((error) => {
@@ -1953,10 +2436,10 @@ function searchUsers(query = null) {
     chatFetch(`/chat/search-users?q=${encodeURIComponent(query)}`)
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+            if (data.status === 'success') {
                 renderUsersList(data.data);
             } else {
-                usersList.innerHTML = `<div style="text-align: center; padding: 20px; color: #e53e3e;">${data.message}</div>`;
+                usersList.innerHTML = `<div style="text-align: center; padding: 20px; color: #e53e3e;">${data.message || '검색에 실패했습니다.'}</div>`;
             }
         })
         .catch(error => {
@@ -1970,7 +2453,7 @@ function searchUsers(query = null) {
  */
 function renderUsersList(usersList) {
     const container = document.getElementById('usersList');
-    
+
     if (!usersList || usersList.length === 0) {
         container.innerHTML = '<div style="text-align: center; padding: 20px; color: #718096;">검색 결과가 없습니다.</div>';
         return;
@@ -2035,32 +2518,63 @@ function renderUsersList(usersList) {
  */
 function startChatWithUser(user) {
     console.log('💬 채팅 시작:', user);
-    
+
+    // 탈퇴한 회원과는 채팅 시작 불가 (추가 안전성 검사)
+    if (user.is_deleted || user.status === 'deleted') {
+        alert('탈퇴한 회원과는 채팅을 시작할 수 없습니다.');
+        return;
+    }
+
     // 기존 채팅방이 있는지 확인
     const existingRoomId = findExistingPrivateRoom(user.id);
-    
+
     if (existingRoomId) {
         // 기존 채팅방 열기
         openChatRoom(existingRoomId);
         closeNewChatModal();
         return;
     }
-    
+
     // 새 채팅방 생성
     createPrivateChatRoom(user);
 }
 
 /**
- * 기존 1:1 채팅방 찾기
+ * 기존 1:1 채팅방 찾기 (비활성 참여자 포함)
  */
 function findExistingPrivateRoom(userId) {
     for (const roomId in chatRooms) {
         const room = chatRooms[roomId];
         if (room.type === 'private' && room.participants) {
             const participantIds = Object.keys(room.participants);
-            if (participantIds.length === 2 && 
-                participantIds.includes(currentUserId.toString()) && 
+            if (participantIds.length === 2 &&
+                participantIds.includes(currentUserId.toString()) &&
                 participantIds.includes(userId.toString())) {
+
+                console.log(`🔍 기존 채팅방 발견: ${roomId}`);
+                console.log(`📋 참여자 정보:`, room.participants);
+
+                // 🔥 비활성 참여자가 있어도 기존 채팅방으로 인식
+                // 나간 사용자의 상태를 다시 활성화
+                const myParticipant = room.participants[currentUserId];
+                const otherParticipant = room.participants[userId];
+
+                if (myParticipant && myParticipant.status === 'inactive') {
+                    console.log(`🔄 내 참여자 상태 재활성화 중...`);
+                    database.ref(`chatRooms/${roomId}/participants/${currentUserId}`).update({
+                        status: 'active',
+                        rejoinedAt: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+
+                if (otherParticipant && otherParticipant.status === 'inactive') {
+                    console.log(`🔄 상대방 참여자 상태 재활성화 중...`);
+                    database.ref(`chatRooms/${roomId}/participants/${userId}`).update({
+                        status: 'active',
+                        rejoinedAt: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+
                 return roomId;
             }
         }
@@ -2080,11 +2594,13 @@ function createPrivateChatRoom(user) {
         participants: {
             [currentUserId]: {
                 joinedAt: firebase.database.ServerValue.TIMESTAMP,
-                role: 'member'
+                role: 'member',
+                status: 'active' // 🔥 기본 상태를 활성으로 설정
             },
             [user.id]: {
                 joinedAt: firebase.database.ServerValue.TIMESTAMP,
-                role: 'member'
+                role: 'member',
+                status: 'active' // 🔥 기본 상태를 활성으로 설정
             }
         },
         lastMessage: '',
@@ -2159,39 +2675,41 @@ function updateLastMessage(roomId) {
 }
 
 /**
- * 시간 포맷팅 (메시지 시간용)
+ * 시간 포맷팅 (채팅방 목록용 - 간소화된 표시)
  */
 function formatTime(timestamp) {
     if (!timestamp) return '';
-    
+
     const date = new Date(timestamp);
     const now = new Date();
-    
+
     // 오늘인지 확인 (년, 월, 일이 모두 같은지)
     const isToday = date.getFullYear() === now.getFullYear() &&
                    date.getMonth() === now.getMonth() &&
                    date.getDate() === now.getDate();
-    
+
     if (isToday) {
-        // 오늘이면 시간만 표시
-        return date.toLocaleTimeString('ko-KR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+        // 오늘이면 시:분만 표시
+        return date.toLocaleTimeString('ko-KR', {
+            hour: '2-digit',
+            minute: '2-digit'
         });
+    }
+
+    // 같은 년도 확인
+    const isSameYear = date.getFullYear() === now.getFullYear();
+
+    if (isSameYear) {
+        // 같은 년도면 x월 x일 표시
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        return `${month}월 ${day}일`;
     } else {
-        // 오늘이 아니면 년월일 시분초 요일 모두 표시
+        // 다른 년도면 년.월.일 표시
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        
-        // 요일 구하기
-        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-        const weekday = weekdays[date.getDay()];
-        
-        return `${year}.${month}.${day}(${weekday}) ${hours}:${minutes}:${seconds}`;
+        return `${year}.${month}.${day}`;
     }
 }
 
@@ -2300,17 +2818,37 @@ function visitPartnerProfile() {
         alert('프로필 정보를 찾을 수 없습니다.');
         return;
     }
-    
+
     // 사용자 정보가 있으면 닉네임으로 프로필 페이지 이동
-    if (users[currentPartnerUserId] && users[currentPartnerUserId].nickname) {
-        const profileUrl = `/profile/${encodeURIComponent(users[currentPartnerUserId].nickname)}`;
-        window.open(profileUrl, '_blank');
+    if (users[currentPartnerUserId]) {
+        // 탈퇴한 회원인지 확인
+        if (users[currentPartnerUserId].is_deleted || users[currentPartnerUserId].status === 'deleted') {
+            alert('탈퇴한 회원의 프로필은 볼 수 없습니다.');
+            return;
+        }
+
+        if (users[currentPartnerUserId].nickname) {
+            const profileUrl = `/profile/${encodeURIComponent(users[currentPartnerUserId].nickname)}`;
+            window.open(profileUrl, '_blank');
+        } else {
+            alert('프로필 페이지를 찾을 수 없습니다.');
+        }
     } else {
         // 사용자 정보가 없으면 로드 후 이동
         loadUserInfo(currentPartnerUserId).then(() => {
-            if (users[currentPartnerUserId] && users[currentPartnerUserId].nickname) {
-                const profileUrl = `/profile/${encodeURIComponent(users[currentPartnerUserId].nickname)}`;
-                window.open(profileUrl, '_blank');
+            if (users[currentPartnerUserId]) {
+                // 탈퇴한 회원인지 확인
+                if (users[currentPartnerUserId].is_deleted || users[currentPartnerUserId].status === 'deleted') {
+                    alert('탈퇴한 회원의 프로필은 볼 수 없습니다.');
+                    return;
+                }
+
+                if (users[currentPartnerUserId].nickname) {
+                    const profileUrl = `/profile/${encodeURIComponent(users[currentPartnerUserId].nickname)}`;
+                    window.open(profileUrl, '_blank');
+                } else {
+                    alert('프로필 페이지를 찾을 수 없습니다.');
+                }
             } else {
                 alert('프로필 페이지를 찾을 수 없습니다.');
             }
@@ -2352,20 +2890,24 @@ function closeChatRoom() {
 function leaveChatRoom() {
     const menu = document.querySelector('.chat-options-menu');
     if (menu) menu.remove();
-    
+
     if (!activeRoomId) return;
-    
-    if (confirm('채팅방을 나가시겠습니까? 나간 후에는 다시 초대받아야 참여할 수 있습니다.')) {
+
+    if (confirm('채팅방을 나가시겠습니까? 메시지를 보내면 대화가 다시 활성화됩니다.')) {
         try {
             console.log(`🚪 채팅방 나가기 시작: 사용자 ${currentUserId}, 채팅방 ${activeRoomId}`);
-            
-            // Firebase에서 사용자 참여 정보 제거
+
+            // 🔥 새로운 방식: 참여자 정보를 삭제하는 대신 비활성화 상태로 변경
             const userRoomRef = database.ref(`userRooms/${currentUserId}/${activeRoomId}`);
             const participantRef = database.ref(`chatRooms/${activeRoomId}/participants/${currentUserId}`);
-            
+
             Promise.all([
-                userRoomRef.remove(),
-                participantRef.remove()
+                userRoomRef.remove(), // 사용자 채팅방 목록에서는 제거
+                participantRef.update({
+                    status: 'inactive',
+                    leftAt: firebase.database.ServerValue.TIMESTAMP,
+                    // 기존 정보는 보존 (joinedAt, role 등)
+                })
             ])
             .then(() => {
                 console.log('✅ 채팅방을 나갔습니다.');
@@ -2512,22 +3054,29 @@ async function loadUserInfo(userId) {
         
         if (data.user_id) {
             const imageData = data.data || data;
+
+            // 탈퇴한 회원 처리
+            const isDeleted = imageData.is_deleted || imageData.status === 'deleted';
+
             users[userId] = {
                 id: imageData.user_id,
-                nickname: imageData.nickname,
-                profile_image: imageData.original_image
+                nickname: imageData.nickname || '사용자',
+                profile_image: isDeleted ? null : imageData.original_image,
+                is_deleted: isDeleted,
+                status: imageData.status
             };
-            
+
             console.log('✅ 사용자 정보 로드됨:', users[userId]);
         } else {
             console.warn(`⚠️ API 응답에 user_id가 없음:`, data);
             console.warn(`🔍 전체 응답 구조:`, response_data);
-            
+
             // 폴백: 기본 사용자 정보 생성하여 무한 루프 방지
             users[userId] = {
                 id: userId,
                 nickname: '사용자',
-                profile_image: null
+                profile_image: null,
+                is_deleted: false
             };
             console.warn(`🔄 기본 사용자 정보로 폴백 처리됨:`, users[userId]);
         }
@@ -2551,17 +3100,26 @@ function handleUrlHash() {
         console.log(`🔗 URL 해시로 채팅방 열기 요청: ${roomId}`);
         
         // 채팅방 목록이 로드될 때까지 대기 후 해당 방 열기
+        let tryCount = 0;
+        const maxTries = 10; // 최대 10번 시도 (10초)
         const tryOpenRoom = () => {
+            tryCount++;
+            console.log(`🔄 채팅방 열기 시도 중... (${tryCount}/${maxTries})`);
+
             if (chatRooms[roomId]) {
                 openChatRoom(roomId);
                 // 해시 제거
                 history.replaceState(null, null, '/chat');
-            } else {
-                // 1초 후 재시도 (최대 10초)
+            } else if (tryCount < maxTries) {
+                // 1초 후 재시도 (최대 10번)
                 setTimeout(tryOpenRoom, 1000);
+            } else {
+                console.error('❌ 최대 시도 횟수 초과. 채팅방을 찾을 수 없습니다:', roomId);
+                alert('채팅방을 찾을 수 없습니다. 채팅방 목록을 확인해주세요.');
+                history.replaceState(null, null, '/chat');
             }
         };
-        
+
         setTimeout(tryOpenRoom, 2000); // 2초 후 첫 시도
     } else if (hash && hash.startsWith('#user-')) {
         const userId = hash.substring(6); // #user- 제거
@@ -2621,18 +3179,154 @@ function handleUrlHash() {
         };
         
         // 채팅방 목록이 로드될 때까지 대기
+        let waitCount = 0;
+        const maxWaits = 20; // 최대 20번 대기 (10초)
         const waitForChatRoomsLoad = () => {
+            waitCount++;
+            console.log(`⏳ 채팅방 목록 로드 대기 중... (${waitCount}/${maxWaits})`);
+
             // 채팅방 목록이 로드되었는지 확인 (빈 객체도 로드된 것으로 간주)
             if (typeof chatRooms === 'object') {
                 tryStartChatWithUser();
-            } else {
+            } else if (waitCount < maxWaits) {
                 setTimeout(waitForChatRoomsLoad, 500);
+            } else {
+                console.error('❌ 채팅방 목록 로드 대기 시간 초과');
+                alert('채팅방 목록을 불러오는 중 시간이 초과되었습니다. 페이지를 새로고침해주세요.');
+                history.replaceState(null, null, '/chat');
             }
         };
-        
+
         setTimeout(waitForChatRoomsLoad, 1000); // 1초 후 시작
     }
 }
 
 // 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
+
+/**
+ * 모바일 채팅방 사이드바 토글 함수
+ */
+function toggleMobileChatSidebar() {
+    const sidebar = document.querySelector('.chat-sidebar');
+    const overlay = document.getElementById('mobile-sidebar-overlay');
+
+    if (!sidebar) {
+        console.error('채팅 사이드바를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 사이드바가 현재 보이는 상태인지 확인
+    const isVisible = sidebar.classList.contains('mobile-visible');
+
+    if (isVisible) {
+        // 사이드바 숨기기
+        sidebar.classList.remove('mobile-visible');
+        document.body.classList.remove('modal-open');
+
+        // 오버레이 제거
+        if (overlay) {
+            overlay.remove();
+        }
+    } else {
+        // 사이드바 표시
+        sidebar.classList.add('mobile-visible');
+        document.body.classList.add('modal-open');
+
+        // 오버레이 생성 (백그라운드 클릭으로 닫기 위함)
+        const newOverlay = document.createElement('div');
+        newOverlay.id = 'mobile-sidebar-overlay';
+        newOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            display: none;
+        `;
+        document.body.appendChild(newOverlay);
+
+        // 사이드바 헤더에 닫기 버튼 추가
+        const sidebarHeader = sidebar.querySelector('.sidebar-header');
+        if (sidebarHeader && !sidebarHeader.querySelector('.mobile-close-btn')) {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'mobile-close-btn';
+            closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 50%;
+                right: 15px;
+                transform: translateY(-50%);
+                background: #e53e3e;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            `;
+            closeBtn.onclick = toggleMobileChatSidebar;
+            sidebarHeader.appendChild(closeBtn);
+        }
+
+        // ESC 키로 닫기
+        const handleEscKey = (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('mobile-visible')) {
+                toggleMobileChatSidebar();
+                document.removeEventListener('keydown', handleEscKey);
+            }
+        };
+        document.addEventListener('keydown', handleEscKey);
+    }
+
+    console.log('📱 모바일 사이드바 토글:', !isVisible ? '열림' : '닫힘');
+}
+
+/**
+ * 모바일 사이드바 외부 클릭 시 닫기
+ */
+document.addEventListener('click', function(e) {
+    const sidebar = document.querySelector('.chat-sidebar');
+    const toggleBtn = document.querySelector('.mobile-chat-toggle');
+
+    if (sidebar && sidebar.classList.contains('mobile-visible') &&
+        !sidebar.contains(e.target) &&
+        !toggleBtn.contains(e.target)) {
+        toggleMobileChatSidebar();
+    }
+});
+
+/**
+ * 모바일에서 채팅방 목록으로 돌아가기
+ */
+function backToChatList() {
+    console.log('📱 채팅방 목록으로 돌아가기');
+
+    // 모바일에서만 동작
+    if (window.innerWidth <= 768) {
+        const chatLayout = document.querySelector('.chat-layout');
+        if (chatLayout) {
+            chatLayout.classList.remove('chat-active');
+            console.log('📱 모바일: 채팅방 목록 모드로 전환');
+        }
+
+        // 활성 채팅방 해제
+        activeRoomId = null;
+        currentPartnerUserId = null;
+
+        // 모든 채팅방 아이템에서 active 클래스 제거
+        document.querySelectorAll('.chat-room-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        console.log('✅ 채팅방 목록으로 성공적으로 돌아감');
+    }
+}
+
 </script>

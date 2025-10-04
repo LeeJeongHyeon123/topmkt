@@ -663,7 +663,6 @@ body {
                     <option value="all" <?= ($filter ?? 'all') === 'all' ? 'selected' : '' ?>>전체</option>
                     <option value="title" <?= ($filter ?? '') === 'title' ? 'selected' : '' ?>>제목만</option>
                     <option value="content" <?= ($filter ?? '') === 'content' ? 'selected' : '' ?>>내용만</option>
-                    <option value="company" <?= ($filter ?? '') === 'company' ? 'selected' : '' ?>>기업명만</option>
                 </select>
                 
                 <input type="text" 

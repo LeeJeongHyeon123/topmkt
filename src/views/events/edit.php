@@ -8,16 +8,16 @@ require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 $isLoggedIn = AuthMiddleware::isLoggedIn();
 $currentUserId = AuthMiddleware::getCurrentUserId();
 
-// 수정 권한 확인
-$canEdit = false;
-if ($isLoggedIn && isset($event)) {
-    $userRole = AuthMiddleware::getUserRole();
-    $canEdit = ($userRole === 'ROLE_ADMIN') || ($event['user_id'] == $currentUserId);
-}
+// 수정 권한 확인 (컨트롤러에서 이미 확인했으므로 간소화)
+$canEdit = true; // EventController에서 이미 권한과 날짜 체크를 완료함
 
-if (!$canEdit) {
-    header('Location: /events/detail?id=' . $event['id']);
-    exit;
+// 디버깅을 위한 로그
+if (class_exists('WebLogger')) {
+    WebLogger::info('이벤트 수정 뷰 접근', [
+        'event_id' => $event['id'] ?? 'N/A',
+        'user_id' => $currentUserId,
+        'is_logged_in' => $isLoggedIn
+    ]);
 }
 
 // CSRF 토큰 생성

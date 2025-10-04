@@ -981,12 +981,12 @@ function renderUsersTable(data) {
                                 </div>
                                 <div class="user-details">
                                     <div class="user-name">${escapeHtml(user.nickname || "이름 없음")}</div>
-                                    <div class="user-email">${escapeHtml(user.email || "이메일 없음")}</div>
+                                    <div class="user-email">${escapeHtml(decryptIfNeeded(user.email) || "이메일 없음")}</div>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <div class="user-phone">${formatPhone(user.phone)}</div>
+                            <div class="user-phone">${formatPhone(decryptIfNeeded(user.phone))}</div>
                             <div style="font-size: 11px; color: #718096;">
                                 ${user.phone_verified ? "📱 인증됨" : "📱 미인증"}
                             </div>
@@ -1257,8 +1257,8 @@ async function viewUserDetail(userId) {
                         <h4>기본 정보</h4>
                         <p><strong>ID:</strong> ${user.id}</p>
                         <p><strong>닉네임:</strong> ${escapeHtml(user.nickname || "없음")}</p>
-                        <p><strong>이메일:</strong> ${escapeHtml(user.email || "없음")}</p>
-                        <p><strong>전화번호:</strong> ${formatPhone(user.phone)}</p>
+                        <p><strong>이메일:</strong> ${escapeHtml(decryptIfNeeded(user.email) || "없음")}</p>
+                        <p><strong>전화번호:</strong> ${formatPhone(decryptIfNeeded(user.phone))}</p>
                         <p><strong>상태:</strong> ${getStatusText(user.status)}</p>
                         <p><strong>권한:</strong> ${getRoleText(user.role)}</p>
                     </div>
@@ -1466,6 +1466,28 @@ function escapeHtml(text) {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
+}
+
+// 암호화된 데이터인지 확인하고 복호화가 필요한 경우 처리
+function decryptIfNeeded(data) {
+    if (!data || typeof data !== "string") return data;
+
+    // Base64로 인코딩된 긴 문자열인지 확인 (암호화된 데이터의 특징)
+    if (data.length > 50 && isBase64(data)) {
+        // 암호화된 데이터로 판단되면 "암호화됨" 표시
+        return "[암호화된 데이터]";
+    }
+
+    return data;
+}
+
+// Base64 문자열인지 확인
+function isBase64(str) {
+    try {
+        return btoa(atob(str)) === str;
+    } catch (err) {
+        return false;
+    }
 }
 
 function formatNumber(number) {

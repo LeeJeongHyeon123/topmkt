@@ -49,7 +49,7 @@ class NoticeController {
             // 쿼리 파라미터 가져오기
             $page = max(1, intval($_GET['page'] ?? 1));
             $search = trim($_GET['search'] ?? '');
-            $filter = $_GET['filter'] ?? 'all'; // all, title, content, company
+            $filter = $_GET['filter'] ?? 'all'; // all, title, content
             $companyName = isset($_GET['company']) ? trim($_GET['company']) : null;
             $pageSize = 20; // 기본 페이지 크기
             

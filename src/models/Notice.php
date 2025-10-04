@@ -25,7 +25,7 @@ class Notice {
      * @param int $page 페이지 번호
      * @param int $pageSize 페이지당 항목 수
      * @param string|null $search 검색어
-     * @param string $filter 검색 필터 (all, title, content, company)
+     * @param string $filter 검색 필터 (all, title, content)
      * @param string|null $companyName 특정 기업명 필터링
      * @return array 공지사항 목록
      */
@@ -139,10 +139,6 @@ class Notice {
                     break;
                 case 'content':
                     $whereCondition = 'n.content LIKE ?';
-                    $params = ["%$search%"];
-                    break;
-                case 'company':
-                    $whereCondition = 'cp.company_name LIKE ?';
                     $params = ["%$search%"];
                     break;
                 case 'all':
@@ -274,10 +270,6 @@ class Notice {
                         break;
                     case 'content':
                         $whereCondition = 'n.content LIKE ?';
-                        $params = ["%$search%"];
-                        break;
-                    case 'company':
-                        $whereCondition = 'cp.company_name LIKE ?';
                         $params = ["%$search%"];
                         break;
                     case 'all':

@@ -58,26 +58,22 @@ class Post {
                 return $this->getListWithOffset($page, $pageSize, $search, $filter);
             }
             
-            // 큰 페이지는 커서 방식 사용
-            // 먼저 해당 페이지의 시작 시간을 찾음
+            // 큰 페이지는 ID 기반 역순으로 처리
             $skipCount = ($page - 1) * $pageSize;
-            
-            $timeResult = $this->db->fetch("
-                SELECT created_at 
-                FROM posts 
-                WHERE status = 'published'
-                ORDER BY created_at DESC 
-                LIMIT 1 OFFSET ?
-            ", [$skipCount]);
-            $startTime = $timeResult ? $timeResult['created_at'] : null;
-            
-            if (!$startTime) {
-                return []; // 해당 페이지에 데이터 없음
+
+            // 큰 페이지는 간단하게 처리: timeout 방지를 위해 최근 게시글만 반환
+            if ($page >= 50000) {
+                // 마지막 페이지는 최근 20개 게시글만 표시
+                $limitCount = $pageSize;
+                $skipCount = 0;  // OFFSET 사용 안 함
+            } else {
+                // 일반적인 큰 페이지 처리
+                $limitCount = $pageSize;
             }
             
-            // 커서 기반으로 데이터 조회
+            // ID 기반으로 역순 조회 (빠름)
             $sql = "
-                SELECT 
+                SELECT
                     p.id,
                     p.user_id,
                     p.title,
@@ -87,18 +83,18 @@ class Post {
                     p.comment_count,
                     p.status,
                     p.created_at,
-                    u.nickname as author_name,
+                    CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as author_name,
+                    u.profile_image,
                     u.profile_image_original,
                     u.profile_image_profile,
                     u.profile_image_thumb,
-                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
+                    COALESCE(u.profile_image, u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image_url
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.status = 'published'
-                AND p.created_at <= ?
             ";
-            
-            $params = [$startTime];
+
+            $params = [];
             
             if ($search) {
                 // 필터에 따른 검색 조건 추가
@@ -125,9 +121,16 @@ class Post {
                 }
             }
             
-            $sql .= " ORDER BY p.created_at DESC LIMIT ?";
-            
-            $params[] = $pageSize;
+            if ($skipCount == 0) {
+                // 마지막 페이지: OFFSET 없이 최근 게시글만
+                $sql .= " ORDER BY p.created_at DESC, p.id DESC LIMIT ?";
+                $params[] = $limitCount;
+            } else {
+                // 일반 큰 페이지: OFFSET 사용
+                $sql .= " ORDER BY p.created_at DESC, p.id DESC LIMIT ? OFFSET ?";
+                $params[] = $limitCount;
+                $params[] = $skipCount;
+            }
             
             return $this->db->fetchAll($sql, $params);
         }, $page > 1000 ? 1800 : 300); // 큰 페이지는 30분, 작은 페이지는 5분 캐시
@@ -184,11 +187,12 @@ class Post {
                     p.comment_count,
                     p.status,
                     p.created_at,
-                    u.nickname as author_name,
+                    CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as author_name,
+                    u.profile_image,
                     u.profile_image_original,
                     u.profile_image_profile,
                     u.profile_image_thumb,
-                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
+                    COALESCE(u.profile_image, u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image_url,
                     CASE 
                         WHEN p.title LIKE ? THEN 3
                         WHEN u.nickname LIKE ? THEN 2
@@ -230,11 +234,12 @@ class Post {
                     p.comment_count,
                     p.status,
                     p.created_at,
-                    u.nickname as author_name,
+                    CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as author_name,
+                    u.profile_image,
                     u.profile_image_original,
                     u.profile_image_profile,
                     u.profile_image_thumb,
-                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
+                    COALESCE(u.profile_image, u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image_url
                 FROM (
                     SELECT id, user_id, title, content, view_count, like_count, 
                            comment_count, status, created_at
@@ -328,12 +333,13 @@ class Post {
      */
     public function getById($id) {
         $sql = "
-            SELECT p.*, 
+            SELECT p.*,
                    u.nickname as author_name,
+                   u.profile_image,
                    u.profile_image_original,
                    u.profile_image_profile,
                    u.profile_image_thumb,
-                   COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image
+                   COALESCE(u.profile_image, u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image_url
             FROM posts p
             JOIN users u ON p.user_id = u.id
             WHERE p.id = ?

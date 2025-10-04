@@ -214,7 +214,7 @@ class User {
         }
 
         if ($user['status'] === 'deleted') {
-            throw new Exception('삭제된 계정입니다.');
+            throw new Exception('탈퇴한 계정입니다. 회원가입 후 이용해주세요.');
         }
 
         // 계정 잠금 확인
@@ -701,17 +701,20 @@ class User {
     
     /**
      * 사용자 프로필 이미지 정보 조회 (API용)
+     * 탈퇴한 회원도 포함하여 채팅 메시지 표시를 위해 처리
      */
     public function getProfileImageInfo($userId) {
-        $sql = "SELECT 
+        $sql = "SELECT
                     id,
-                    nickname,
-                    profile_image_original,
-                    profile_image_profile,
-                    profile_image_thumb
-                FROM users 
-                WHERE id = ? AND status != 'deleted'";
-        
+                    CASE WHEN status = 'deleted' THEN '탈퇴한 회원' ELSE nickname END as nickname,
+                    status,
+                    CASE WHEN status = 'deleted' THEN NULL ELSE profile_image END as profile_image,
+                    CASE WHEN status = 'deleted' THEN NULL ELSE profile_image_original END as profile_image_original,
+                    CASE WHEN status = 'deleted' THEN NULL ELSE profile_image_profile END as profile_image_profile,
+                    CASE WHEN status = 'deleted' THEN NULL ELSE profile_image_thumb END as profile_image_thumb
+                FROM users
+                WHERE id = ?";
+
         return $this->db->fetch($sql, [$userId]);
     }
     
@@ -1020,11 +1023,154 @@ class User {
         // 권한별 통계
         $roleStats = $this->db->fetchAll("SELECT role, COUNT(*) as count FROM users WHERE status != 'deleted' GROUP BY role");
         $stats['by_role'] = array_column($roleStats, 'count', 'role');
-        
+
         // 기업 상태별 통계
         $corpStats = $this->db->fetchAll("SELECT corp_status, COUNT(*) as count FROM users WHERE status != 'deleted' GROUP BY corp_status");
         $stats['by_corp_status'] = array_column($corpStats, 'count', 'corp_status');
-        
+
         return $stats;
+    }
+
+    /**
+     * 회원 탈퇴 처리 (Soft Delete)
+     *
+     * @param int $userId 사용자 ID
+     * @param string $password 현재 비밀번호 (보안 확인용)
+     * @param string $reason 탈퇴 사유 (선택적)
+     * @return array 처리 결과
+     */
+    public function deleteAccount($userId, $password, $reason = null) {
+        try {
+            error_log("=== User::deleteAccount 시작 ===");
+            error_log("User ID: " . $userId);
+            error_log("입력된 비밀번호: " . $password);
+
+            // 1. 사용자 정보 조회
+            $user = $this->findById($userId);
+            if (!$user) {
+                error_log("❌ 사용자를 찾을 수 없음");
+                return ['success' => false, 'message' => '사용자를 찾을 수 없습니다.'];
+            }
+
+            error_log("✅ 사용자 조회 성공: " . $user['nickname']);
+            error_log("저장된 비밀번호 해시: " . $user['password_hash']);
+
+            // 2. 비밀번호 검증
+            $passwordCheck = password_verify($password, $user['password_hash']);
+            error_log("비밀번호 검증 결과: " . ($passwordCheck ? 'TRUE' : 'FALSE'));
+
+            if (!$passwordCheck) {
+                error_log("❌ 비밀번호 검증 실패");
+                return ['success' => false, 'message' => '비밀번호가 올바르지 않습니다.'];
+            }
+
+            error_log("✅ 비밀번호 검증 성공");
+
+            // 3. 권한 체크 - 마지막 관리자는 탈퇴 불가
+            if ($user['role'] === 'ROLE_ADMIN') {
+                $adminCountSql = "SELECT COUNT(*) as count FROM users
+                                 WHERE role = 'ROLE_ADMIN' AND status = 'active' AND id != ?";
+                $adminCount = $this->db->fetch($adminCountSql, [$userId]);
+                if ($adminCount['count'] == 0) {
+                    return ['success' => false, 'message' => '마지막 관리자는 탈퇴할 수 없습니다.'];
+                }
+            }
+
+            // 4. 기업회원 체크 - 진행 중인 강의가 있는지 확인
+            if ($user['role'] === 'ROLE_CORP' || $user['role'] === 'ROLE_CORPORATE') {
+                $activeLectureSql = "SELECT COUNT(*) as count FROM lectures
+                                     WHERE user_id = ? AND status = 'published'
+                                     AND end_date >= CURDATE()";
+                $activeLectures = $this->db->fetch($activeLectureSql, [$userId]);
+
+                if ($activeLectures['count'] > 0) {
+                    return ['success' => false, 'message' => '진행 중인 강의가 있어 탈퇴할 수 없습니다.'];
+                }
+            }
+
+            // 5. 트랜잭션 시작
+            $this->db->query("START TRANSACTION");
+
+            try {
+                // 6. 개인정보 익명화 및 상태 변경
+                $randomNum = rand(1000, 9999);
+                $updateSql = "UPDATE users SET
+                             status = 'deleted',
+                             nickname = CONCAT('탈퇴회원_', id),
+                             email = CONCAT('deleted_', id, '@deleted.com'),
+                             phone = CONCAT('010-0000-', ?),
+                             bio = NULL,
+                             birth_date = NULL,
+                             gender = NULL,
+                             profile_image_original = NULL,
+                             profile_image_profile = NULL,
+                             profile_image_thumb = NULL,
+                             website_url = NULL,
+                             social_links = NULL,
+                             remember_token = NULL,
+                             remember_expires = NULL,
+                             deleted_at = NOW(),
+                             deletion_reason = ?
+                             WHERE id = ?";
+
+                $this->db->execute($updateSql, [$randomNum, $reason, $userId]);
+
+                // 7. 관련 세션 삭제
+                $deleteSessionSql = "DELETE FROM user_sessions WHERE user_id = ?";
+                $this->db->execute($deleteSessionSql, [$userId]);
+
+                // 8. 게시글/댓글 작성자 표시 변경 (데이터는 유지)
+                // posts와 comments 테이블의 user_id는 유지하되, 표시할 때 "탈퇴한 회원"으로 표시
+
+                // 9. 사용자 활동 로그 기록
+                $logSql = "INSERT INTO user_logs (user_id, action, description, ip_address, user_agent, extra_data, created_at)
+                          VALUES (?, 'ACCOUNT_DELETE', ?, ?, ?, ?, NOW())";
+
+                $extraData = json_encode([
+                    'reason' => $reason,
+                    'post_count' => $this->db->fetch("SELECT COUNT(*) as cnt FROM posts WHERE user_id = ?", [$userId])['cnt'],
+                    'comment_count' => $this->db->fetch("SELECT COUNT(*) as cnt FROM comments WHERE user_id = ?", [$userId])['cnt']
+                ], JSON_UNESCAPED_UNICODE);
+
+                $this->db->execute($logSql, [
+                    $userId,
+                    '회원 탈퇴 처리 완료',
+                    $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+                    $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown',
+                    $extraData
+                ]);
+
+                // 10. 트랜잭션 커밋
+                $this->db->query("COMMIT");
+
+                // WebLogger 로깅
+                if (class_exists('WebLogger')) {
+                    WebLogger::info('회원 탈퇴 완료', [
+                        'user_id' => $userId,
+                        'nickname' => $user['nickname'],
+                        'reason' => $reason
+                    ]);
+                }
+
+                return ['success' => true, 'message' => '회원 탈퇴가 완료되었습니다.'];
+
+            } catch (Exception $e) {
+                // 트랜잭션 롤백
+                $this->db->query("ROLLBACK");
+                throw $e;
+            }
+
+        } catch (Exception $e) {
+            error_log("User::deleteAccount 오류: " . $e->getMessage());
+
+            if (class_exists('WebLogger')) {
+                WebLogger::error('회원 탈퇴 실패', [
+                    'user_id' => $userId,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            return ['success' => false, 'message' => '회원 탈퇴 처리 중 오류가 발생했습니다.'];
+        }
     }
 } 

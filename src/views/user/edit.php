@@ -492,6 +492,42 @@ if (!isset($_SESSION['csrf_token'])) {
     border-color: #667eea;
 }
 
+/* 날짜 입력 필드 스타일 */
+.date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-input {
+    padding-right: 45px !important;
+    cursor: pointer;
+}
+
+.date-icon {
+    position: absolute;
+    right: 15px;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s ease;
+    pointer-events: none;
+}
+
+.date-input:hover + .date-icon,
+.date-input:focus + .date-icon {
+    color: #667eea;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 45px;
+    height: 100%;
+    cursor: pointer;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .edit-container {
@@ -639,7 +675,7 @@ if (!isset($_SESSION['csrf_token'])) {
                        id="email" 
                        name="email" 
                        class="form-input"
-                       value="<?= htmlspecialchars($user['email'] ?? '') ?>"
+                       value="<?= htmlspecialchars(SecurityHelper::isEncrypted($user['email'] ?? '') ? SecurityHelper::decrypt($user['email']) : ($user['email'] ?? '')) ?>"
                        required
                        maxlength="100">
                 <div class="form-help">계정 복구 및 중요한 알림을 받기 위해 사용됩니다 (필수)</div>
@@ -669,11 +705,15 @@ if (!isset($_SESSION['csrf_token'])) {
             
             <div class="form-group">
                 <label for="birth_date" class="form-label">생년월일</label>
-                <input type="date" 
-                       id="birth_date" 
-                       name="birth_date" 
-                       class="form-input"
-                       value="<?= $user['birth_date'] ?? '' ?>">
+                <div class="date-input-wrapper">
+                    <input type="date"
+                           id="birth_date"
+                           name="birth_date"
+                           class="form-input date-input"
+                           value="<?= SecurityHelper::isEncrypted($user['birth_date'] ?? '') ? SecurityHelper::decrypt($user['birth_date']) : ($user['birth_date'] ?? '') ?>"
+                           placeholder="YYYY-MM-DD">
+                    <i class="fas fa-calendar-alt date-icon" onclick="openDatePicker()"></i>
+                </div>
                 <div class="form-help">나이 표시에 사용됩니다 (선택사항)</div>
             </div>
             
@@ -692,7 +732,7 @@ if (!isset($_SESSION['csrf_token'])) {
                        id="phone" 
                        name="phone" 
                        class="form-input"
-                       value="<?= htmlspecialchars($user['phone'] ?? '') ?>"
+                       value="<?= htmlspecialchars(SecurityHelper::isEncrypted($user['phone'] ?? '') ? SecurityHelper::decrypt($user['phone']) : ($user['phone'] ?? '')) ?>"
                        placeholder="010-1234-5678"
                        readonly>
                 <div class="form-help">등록된 연락처입니다 (읽기 전용)</div>
@@ -800,6 +840,9 @@ if (!isset($_SESSION['csrf_token'])) {
         
         <!-- 버튼 그룹 -->
         <div class="button-group">
+            <button type="button" class="btn btn-danger" id="delete-account-btn">
+                <i class="fas fa-user-times"></i> 회원탈퇴
+            </button>
             <a href="/profile" class="btn btn-secondary">
                 <i class="fas fa-times"></i> 취소
             </a>
@@ -1288,4 +1331,236 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script>
+// 날짜 입력 필드 개선
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('birth_date');
+    const dateWrapper = document.querySelector('.date-input-wrapper');
+
+    // 날짜 입력 필드나 래퍼 클릭 시 달력 열기
+    if (dateInput && dateWrapper) {
+        // 전체 래퍼 클릭 시 달력 열기
+        dateWrapper.addEventListener('click', function(e) {
+            // 입력 필드 자체가 클릭된 경우는 제외 (중복 방지)
+            if (e.target !== dateInput) {
+                dateInput.focus();
+                dateInput.click();
+            }
+        });
+
+        // 입력 필드 클릭 시에도 확실히 달력이 열리도록
+        dateInput.addEventListener('click', function(e) {
+            // showPicker가 지원되는 브라우저에서 강제로 달력 열기
+            if (this.showPicker) {
+                try {
+                    this.showPicker();
+                } catch (error) {
+                    // showPicker가 실패할 경우 기본 동작
+                    console.log('showPicker failed, using default behavior');
+                }
+            }
+        });
+
+        // 포커스 시에도 달력이 열리도록
+        dateInput.addEventListener('focus', function(e) {
+            if (this.showPicker) {
+                try {
+                    // 약간의 지연을 주어 포커스가 완전히 설정된 후 달력 열기
+                    setTimeout(() => {
+                        this.showPicker();
+                    }, 50);
+                } catch (error) {
+                    console.log('showPicker on focus failed');
+                }
+            }
+        });
+    }
+});
+
+// 별도 함수로도 제공 (아이콘 클릭용)
+function openDatePicker() {
+    const dateInput = document.getElementById('birth_date');
+    if (dateInput) {
+        dateInput.focus();
+        if (dateInput.showPicker) {
+            try {
+                dateInput.showPicker();
+            } catch (error) {
+                console.log('openDatePicker failed, using focus');
+            }
+        }
+    }
+}
+
+// 회원탈퇴 기능
+document.getElementById('delete-account-btn').addEventListener('click', function() {
+    // 1차 확인 - 경고 메시지
+    const warningMessage = `
+<div style="text-align: left; line-height: 1.8;">
+    <h4 style="color: #dc3545; margin-bottom: 15px;">⚠️ 회원탈퇴 주의사항</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>탈퇴 시 모든 개인정보가 <strong>삭제되며 복구할 수 없습니다</strong>.</li>
+        <li>작성한 게시글과 댓글은 유지되나 <strong>"탈퇴한 회원"</strong>으로 표시됩니다.</li>
+        <li>진행 중인 강의나 행사가 있으면 탈퇴할 수 없습니다.</li>
+        <li>30일 이내 고객센터를 통해 복구 신청이 가능하나, <strong>개인정보는 복구되지 않습니다</strong>.</li>
+    </ul>
+    <br>
+    <p style="margin: 0;">정말 회원탈퇴를 진행하시겠습니까?</p>
+</div>`;
+
+    if (!confirm('회원탈퇴를 진행하시겠습니까?\n\n탈퇴 시 모든 개인정보가 삭제되며 복구할 수 없습니다.')) {
+        return;
+    }
+
+    // 2차 확인 - 비밀번호 입력
+    const modalHtml = `
+        <div id="delete-account-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;">
+            <div style="
+                background: white;
+                padding: 30px;
+                border-radius: 12px;
+                max-width: 500px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;">
+
+                <h3 style="margin: 0 0 20px 0; color: #dc3545;">
+                    <i class="fas fa-exclamation-triangle"></i> 회원탈퇴 확인
+                </h3>
+
+                <div style="margin-bottom: 20px;">
+                    ${warningMessage}
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label for="delete-password" style="display: block; margin-bottom: 5px; font-weight: 600;">
+                        보안을 위해 비밀번호를 입력해주세요:
+                    </label>
+                    <input type="password" id="delete-password" class="form-control"
+                           placeholder="현재 비밀번호 입력"
+                           style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label for="delete-reason" style="display: block; margin-bottom: 5px; font-weight: 600;">
+                        탈퇴 사유 (선택):
+                    </label>
+                    <textarea id="delete-reason" class="form-control" rows="3"
+                              placeholder="탈퇴 사유를 입력해주세요 (선택사항)"
+                              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary"
+                            style="padding: 10px 20px;">
+                        <i class="fas fa-times"></i> 취소
+                    </button>
+                    <button type="button" onclick="confirmDeleteAccount()" class="btn btn-danger"
+                            style="padding: 10px 20px;">
+                        <i class="fas fa-user-times"></i> 회원탈퇴
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 모달 추가
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // 비밀번호 입력 필드에 포커스
+    setTimeout(() => {
+        document.getElementById('delete-password').focus();
+    }, 100);
+});
+
+// 모달 닫기
+function closeDeleteModal() {
+    const modal = document.getElementById('delete-account-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeDeleteModal();
+    }
+});
+
+// 회원탈퇴 확인
+function confirmDeleteAccount() {
+    const password = document.getElementById('delete-password').value;
+    const reason = document.getElementById('delete-reason').value;
+
+    if (!password) {
+        alert('비밀번호를 입력해주세요.');
+        document.getElementById('delete-password').focus();
+        return;
+    }
+
+    // 3차 최종 확인
+    if (!confirm('정말로 탈퇴하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
+        return;
+    }
+
+    // 로딩 표시
+    const deleteBtn = document.querySelector('#delete-account-modal .btn-danger');
+    const originalText = deleteBtn.innerHTML;
+    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리 중...';
+    deleteBtn.disabled = true;
+
+    // API 호출
+    fetch('/api/user/delete-account', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            password: password,
+            reason: reason,
+            csrf_token: '<?php echo $_SESSION['csrf_token']; ?>'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('서버 응답:', data); // 디버깅용
+
+        // ResponseHelper 응답 구조에 맞게 수정
+        const result = data.data || data;
+        const isSuccess = result.success || data.status === 'success';
+        const message = result.message || data.message || '회원탈퇴 처리에 실패했습니다.';
+
+        if (isSuccess) {
+            alert('회원탈퇴가 완료되었습니다.\n\n그동안 이용해주셔서 감사합니다.');
+            // 로그인 페이지로 이동
+            window.location.href = '/auth/login';
+        } else {
+            alert(message);
+            deleteBtn.innerHTML = originalText;
+            deleteBtn.disabled = false;
+
+            // 비밀번호 오류인 경우 필드 초기화
+            if (message && message.includes('비밀번호')) {
+                document.getElementById('delete-password').value = '';
+                document.getElementById('delete-password').focus();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('회원탈퇴 오류:', error);
+        alert('회원탈퇴 처리 중 오류가 발생했습니다.');
+        deleteBtn.innerHTML = originalText;
+        deleteBtn.disabled = false;
+    });
+}
 </script>

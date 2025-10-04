@@ -247,6 +247,35 @@
     text-decoration: underline;
 }
 
+/* 삭제된 댓글 플레이스홀더 스타일 */
+.comment-item.deleted-placeholder {
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+.comment-card.deleted-comment {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.comment-content.deleted-content {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.deleted-text {
+    color: #6c757d;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 .reply-form {
     margin-top: 15px;
     padding: 15px;
@@ -366,16 +395,23 @@
  * 댓글 목록 표시 템플릿
  */
 
-// 댓글 렌더링 함수
-function renderComment($comment, $currentUserId = null, $depth = 0, $parentAuthor = null) {
+// 댓글 렌더링 함수 (삭제된 댓글 표시 지원)
+function renderComment($comment, $currentUserId = null, $depth = 0, $parentAuthor = null, $parentStatus = null) {
     $isOwner = $currentUserId && $comment['user_id'] == $currentUserId;
     $isReply = $depth > 0;
+
+    // 삭제된 부모 댓글에 대한 답글인지 확인
+    $isReplyToDeleted = $isReply && $parentStatus === 'deleted';
     ?>
     <div class="comment-item <?= $isReply ? 'reply' : '' ?>" id="comment-<?= $comment['id'] ?>" data-comment-id="<?= $comment['id'] ?>" data-depth="<?= $depth ?>">
         <div class="comment-card">
-            <?php if ($isReply && $parentAuthor): ?>
+            <?php if ($isReply): ?>
                 <div class="reply-to-info">
-                    📌 <?= htmlspecialchars($parentAuthor) ?>님에게 답글
+                    <?php if ($isReplyToDeleted): ?>
+                        📌 삭제된 댓글에 대한 답글
+                    <?php else: ?>
+                        📌 <?= htmlspecialchars($parentAuthor) ?>님에게 답글
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
             <div class="comment-header">
@@ -465,30 +501,59 @@ function renderComment($comment, $currentUserId = null, $depth = 0, $parentAutho
     <?php
 }
 
-// 댓글 트리를 구성하는 함수 (최신순 정렬 고려)
+// 댓글 트리를 구성하는 함수 (올바른 삭제된 댓글 처리)
 function buildCommentTree($comments) {
     $tree = [];
     $lookup = [];
-    
+    $orphanedReplies = [];
+
     // 1단계: 모든 댓글을 ID로 인덱싱
     foreach ($comments as $comment) {
         $comment['replies'] = [];
         $lookup[$comment['id']] = $comment;
     }
-    
-    // 2단계: 트리 구성
+
+    // 2단계: 트리 구성 및 orphaned replies 식별
     foreach ($comments as $comment) {
         if ($comment['parent_id'] === null) {
-            // 최상위 댓글 - 최신순으로 이미 정렬됨
+            // 최상위 댓글
             $tree[] = $lookup[$comment['id']];
         } else {
             // 대댓글
             if (isset($lookup[$comment['parent_id']])) {
+                // 부모 댓글이 존재하는 경우
                 $lookup[$comment['parent_id']]['replies'][] = $comment;
+            } else {
+                // 부모 댓글이 삭제된 경우 - orphaned reply 그룹핑
+                $parentId = $comment['parent_id'];
+                if (!isset($orphanedReplies[$parentId])) {
+                    $orphanedReplies[$parentId] = [];
+                }
+                $orphanedReplies[$parentId][] = $comment;
             }
         }
     }
-    
+
+    // 3단계: orphaned replies가 있는 경우에만 삭제된 댓글 플레이스홀더 생성
+    foreach ($orphanedReplies as $parentId => $replies) {
+        if (!empty($replies)) {
+            // 답글이 있는 삭제된 댓글만 플레이스홀더 생성
+            $deletedPlaceholder = [
+                'id' => 'deleted_' . $parentId,
+                'parent_id' => null,
+                'content' => '삭제된 댓글입니다.',
+                'author_name' => '[삭제된 사용자]',
+                'user_id' => null,
+                'created_at' => $replies[0]['created_at'], // 첫 번째 답글 시간 기준
+                'updated_at' => $replies[0]['created_at'],
+                'status' => 'deleted',
+                'is_deleted_placeholder' => true,
+                'replies' => $replies
+            ];
+            $tree[] = $deletedPlaceholder;
+        }
+    }
+
     // 각 댓글의 replies를 시간순으로 정렬 (답글은 오래된 것부터)
     foreach ($tree as &$parentComment) {
         if (!empty($parentComment['replies'])) {
@@ -497,7 +562,7 @@ function buildCommentTree($comments) {
             });
         }
     }
-    
+
     return $tree;
 }
 
@@ -557,12 +622,30 @@ $commentCount = count($comments);
         </div>
     <?php else: ?>
         <?php foreach ($commentTree as $comment): ?>
-            <?php renderComment($comment, $currentUserId, 0); ?>
-            
+            <?php
+            // 삭제된 댓글 플레이스홀더인지 확인
+            $isDeletedPlaceholder = isset($comment['is_deleted_placeholder']) && $comment['is_deleted_placeholder'];
+
+            if ($isDeletedPlaceholder): ?>
+                <!-- 삭제된 댓글 플레이스홀더 -->
+                <div class="comment-item deleted-placeholder" id="comment-<?= $comment['id'] ?>">
+                    <div class="comment-card deleted-comment">
+                        <div class="comment-content deleted-content">
+                            <span class="deleted-text">🗑️ 삭제된 댓글입니다.</span>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <?php renderComment($comment, $currentUserId, 0); ?>
+            <?php endif; ?>
+
             <!-- 대댓글 렌더링 -->
             <?php if (!empty($comment['replies'])): ?>
                 <?php foreach ($comment['replies'] as $reply): ?>
-                    <?php renderComment($reply, $currentUserId, 1, $comment['author_name']); ?>
+                    <?php
+                    $parentStatus = $isDeletedPlaceholder ? 'deleted' : ($comment['status'] ?? 'active');
+                    renderComment($reply, $currentUserId, 1, $comment['author_name'], $parentStatus);
+                    ?>
                 <?php endforeach; ?>
             <?php endif; ?>
         <?php endforeach; ?>

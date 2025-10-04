@@ -154,11 +154,16 @@ function setupRoomMessageListener(roomId, lastReadTime) {
             // 상대방 정보 가져오기
             getRoomPartnerInfo(roomId, roomData)
                 .then(partnerInfo => {
-                    showChatNotification(partnerInfo.name, lastMessage, roomId);
+                    showChatNotification(
+                        partnerInfo.name,
+                        lastMessage,
+                        roomId,
+                        partnerInfo.profileThumb || partnerInfo.profileImage
+                    );
                     updateUnreadCount();
                 })
                 .catch(error => {
-                    showChatNotification('알 수 없음', lastMessage, roomId);
+                    showChatNotification('알 수 없음', lastMessage, roomId, null);
                     updateUnreadCount();
                 });
         }
@@ -187,17 +192,27 @@ function removeRoomMessageListener(roomId) {
  */
 async function getRoomPartnerInfo(roomId, roomData) {
     if (!roomData.participants) {
-        return { name: '알 수 없음', userId: null };
+        return {
+            name: '알 수 없음',
+            userId: null,
+            profileImage: null,
+            profileThumb: null
+        };
     }
-    
+
     // 1:1 채팅인 경우 상대방 찾기
     const participantIds = Object.keys(roomData.participants);
     const partnerId = participantIds.find(id => id != ChatNotifications.currentUserId);
-    
+
     if (!partnerId) {
-        return { name: '알 수 없음', userId: null };
+        return {
+            name: '알 수 없음',
+            userId: null,
+            profileImage: null,
+            profileThumb: null
+        };
     }
-    
+
     try {
         // 상대방 정보 API 호출 - 원본 fetch 사용 (로딩 표시 안 함)
         const fetchFn = window.originalFetch || fetch;
@@ -208,73 +223,125 @@ async function getRoomPartnerInfo(roomId, roomData) {
             }
         });
         const result = await response.json();
-        
+
         // ResponseHelper 구조에 맞게 데이터 추출
         const data = result.data || result;
-        
+
         // 디버깅용 로그 (개발 시에만)
         if (!data.nickname) {
             console.warn('채팅 알림: 닉네임을 찾을 수 없음', { result, data, partnerId });
         }
-        
+
         return {
             name: data.nickname || '알 수 없음',
-            userId: partnerId
+            userId: partnerId,
+            profileImage: data.profile_image || data.original_image || null,
+            profileThumb: data.thumb_image || data.profile_image || null
         };
     } catch (error) {
         console.warn('채팅 알림: API 호출 실패', error, partnerId);
-        return { name: '알 수 없음', userId: partnerId };
+        return {
+            name: '알 수 없음',
+            userId: partnerId,
+            profileImage: null,
+            profileThumb: null
+        };
     }
 }
 
 /**
- * 채팅 알림 표시
+ * 채팅 알림 표시 (프로필 이미지 포함)
  */
-function showChatNotification(senderName, message, roomId) {
+function showChatNotification(senderName, message, roomId, profileImageUrl = null) {
+    console.log('🔔 채팅 알림 표시 시도:', { senderName, message, roomId, profileImageUrl });
+
     // 기존 채팅 알림 제거
     const existingAlert = document.querySelector('.alert.chat-notification');
     if (existingAlert) {
         existingAlert.remove();
     }
-    
-    // 메시지 내용 정리 (최대 50자)
-    const cleanMessage = message ? message.substring(0, 50) + (message.length > 50 ? '...' : '') : '새 메시지';
-    
-    // 알림 HTML 생성
+
+    // 메시지 내용 정리 (최대 70자)
+    const cleanMessage = message ? message.substring(0, 70) + (message.length > 70 ? '...' : '') : '새 메시지';
+
+    // 프로필 이미지 HTML 생성
+    const profileImageHtml = profileImageUrl
+        ? `<img src="${escapeHtml(profileImageUrl)}" alt="${escapeHtml(senderName)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`
+        : `<i class="fas fa-user"></i>`;
+
+    // 현재 시간 생성 (옵션)
+    const currentTime = new Date().toLocaleTimeString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    // 알림 HTML 생성 - 프로필 이미지 포함된 새로운 디자인
     const alertHtml = `
-        <div class="alert alert-info chat-notification" style="cursor: pointer;" onclick="handleChatNotificationClick('${roomId}')">
-            <div class="alert-icon">
-                <i class="fas fa-envelope"></i>
-            </div>
+        <div class="alert chat-notification" style="cursor: pointer;" onclick="handleChatNotificationClick('${roomId}')">
             <div class="alert-content">
-                <div>
-                    <strong>${escapeHtml(senderName)}</strong><br>
-                    <span style="font-size: 0.9em; opacity: 0.9;">${escapeHtml(cleanMessage)}</span>
+                <div class="chat-profile-image">
+                    ${profileImageHtml}
                 </div>
-                <button class="alert-close" onclick="event.stopPropagation(); this.parentElement.parentElement.remove()">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="alert-text">
+                    <strong>${escapeHtml(senderName)}</strong>
+                    <span>${escapeHtml(cleanMessage)}</span>
+                    <small class="chat-time">${currentTime}</small>
+                </div>
             </div>
+            <button class="alert-close" onclick="event.stopPropagation(); this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
     `;
-    
+
     // 알림을 body에 추가
     const alertElement = document.createElement('div');
     alertElement.innerHTML = alertHtml;
-    document.body.appendChild(alertElement.firstElementChild);
-    
-    // 5초 후 자동 제거
+    const notification = alertElement.firstElementChild;
+    document.body.appendChild(notification);
+
+    console.log('✅ 채팅 알림 DOM에 추가됨:', notification);
+
+    // 7초 후 자동 제거 (프로필 이미지 있으니 조금 더 길게)
     setTimeout(() => {
         const alert = document.querySelector('.alert.chat-notification');
         if (alert) {
             alert.style.opacity = '0';
             setTimeout(() => {
                 alert.remove();
+                console.log('🗑️ 채팅 알림 자동 제거됨');
             }, 300);
         }
-    }, 5000);
-    
+    }, 7000);
+
 }
+
+/**
+ * 테스트용 채팅 알림 함수 (개발용)
+ */
+function testChatNotification() {
+    // 프로필 이미지가 있는 경우 테스트
+    showChatNotification(
+        '테스트 사용자',
+        '이것은 테스트 메시지입니다. 알림이 제대로 표시되는지 확인하기 위한 긴 메시지입니다.',
+        'test-room-123',
+        '/assets/uploads/profiles/default-avatar.png'
+    );
+}
+
+// 프로필 이미지 없는 경우 테스트
+function testChatNotificationNoImage() {
+    showChatNotification(
+        '익명 사용자',
+        '프로필 이미지가 없는 경우의 테스트 메시지입니다.',
+        'test-room-456',
+        null
+    );
+}
+
+// 전역에서 테스트 함수 사용 가능하도록 노출
+window.testChatNotification = testChatNotification;
+window.testChatNotificationNoImage = testChatNotificationNoImage;
 
 /**
  * 채팅 알림 클릭 처리

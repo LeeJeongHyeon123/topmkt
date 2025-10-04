@@ -426,5 +426,52 @@
         echo LazyLoadHelper::getScript();
     }
     ?>
+    
+    <!-- 앱 푸시 토큰 연동 스크립트 -->
+    <script>
+      // 앱-웹 통신 브리지
+    (function() {
+        // 앱에서 푸시 토큰 받기
+        window.addEventListener('message', function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'FCM_TOKEN') {
+                    console.log('📱 앱에서 받은 푸시 토큰:', data.token);
+                    
+                    // 로컬 스토리지에 저장
+                    localStorage.setItem('app_push_token', data.token);
+                    
+                    // 서버에 토큰 저장 (API 준비되면 주석 해제)
+                    /*
+                    fetch('/api/save-push-token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            token: data.token,
+                            platform: 'mobile'
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => console.log('✅ 토큰 저장 성공:', result))
+                    .catch(err => console.error('❌ 토큰 저장 실패:', err));
+                    */
+                }
+            } catch (e) {
+                console.error('메시지 파싱 실패:', e);
+            }
+        });
+
+        // 앱에 푸시 토큰 요청
+        if (window.ReactNativeWebView) {
+            console.log('🔗 React Native WebView 감지됨');
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'REQUEST_PUSH_TOKEN'
+            }));
+        }
+    })();
+    </script>
 </body>
 </html> 

@@ -3,6 +3,9 @@
  * 기업 인증 신청 현황 페이지
  */
 
+// SecurityHelper 클래스 로드
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
+
 $status = $applicationStatus['status'];
 $profile = $applicationStatus['profile'];
 ?>
@@ -403,7 +406,7 @@ $profile = $applicationStatus['profile'];
                 </div>
                 <div class="info-item">
                     <div class="info-label">사업자등록번호</div>
-                    <div class="info-value"><?= htmlspecialchars($profile['business_number']) ?></div>
+                    <div class="info-value"><?= htmlspecialchars(SecurityHelper::isEncrypted($profile['business_number'] ?? '') ? SecurityHelper::decrypt($profile['business_number']) : ($profile['business_number'] ?? '')) ?></div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">대표자명</div>
@@ -411,7 +414,7 @@ $profile = $applicationStatus['profile'];
                 </div>
                 <div class="info-item">
                     <div class="info-label">대표자 연락처</div>
-                    <div class="info-value"><?= htmlspecialchars($profile['representative_phone']) ?></div>
+                    <div class="info-value"><?= htmlspecialchars(SecurityHelper::isEncrypted($profile['representative_phone'] ?? '') ? SecurityHelper::decrypt($profile['representative_phone']) : ($profile['representative_phone'] ?? '')) ?></div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">회사 주소</div>

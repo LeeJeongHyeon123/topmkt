@@ -36,12 +36,28 @@ if (!empty($user['social_links'])) {
     }
 }
 
-// 나이 계산
+// 나이 계산 (암호화된 데이터 안전 처리)
 $age = null;
 if (!empty($user['birth_date'])) {
-    $birthDate = new DateTime($user['birth_date']);
-    $today = new DateTime();
-    $age = $today->diff($birthDate)->y;
+    try {
+        // birth_date가 암호화되어 있을 수 있으므로 안전하게 처리
+        $birthDateStr = $user['birth_date'];
+
+        // 암호화된 데이터인지 확인 (base64 형태의 긴 문자열)
+        if (strlen($birthDateStr) > 50 || base64_encode(base64_decode($birthDateStr, true)) === $birthDateStr) {
+            // 암호화된 데이터로 보임 - 나이 계산 건너뛰기
+            $age = null;
+        } else {
+            // 일반 날짜 형태 - 정상 처리
+            $birthDate = new DateTime($birthDateStr);
+            $today = new DateTime();
+            $age = $today->diff($birthDate)->y;
+        }
+    } catch (Exception $e) {
+        // 날짜 파싱 오류시 null로 설정
+        $age = null;
+        error_log("Birth date parsing error: " . $e->getMessage());
+    }
 }
 
 // 가입일 포맷
@@ -674,6 +690,30 @@ if (!empty($user['last_login'])) {
     padding: 20px;
 }
 
+/* 댓글 답글 인디케이터 스타일 */
+.reply-indicator,
+.deleted-parent-indicator {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.reply-indicator {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1e40af;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.deleted-parent-indicator {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    font-style: italic;
+}
+
 /* 이미지 모달 */
 .image-modal {
     display: none;
@@ -887,7 +927,7 @@ if (!empty($user['last_login'])) {
     <div class="profile-header-section">
         <div class="profile-main-info">
             <div class="profile-image-container">
-                <?php 
+                <?php
                 // $user는 이미 정의되어 있으므로 그대로 사용
                 $size = ProfileImageHelper::SIZE_PROFILE;
                 $mode = 'direct';
@@ -985,6 +1025,19 @@ if (!empty($user['last_login'])) {
                                     <a href="/community/posts/<?= $comment['post_id'] ?>#comment-<?= $comment['id'] ?>">
                                         <?= htmlspecialchars($comment['post_title']) ?>
                                     </a>에 댓글
+                                    <?php
+                                    // 삭제된 부모 댓글에 대한 답글인지 확인
+                                    $isReplyToDeleted = !empty($comment['parent_id']) && ($comment['parent_status'] ?? '') === 'deleted';
+                                    ?>
+                                    <?php if ($isReplyToDeleted): ?>
+                                        <span class="deleted-parent-indicator">
+                                            🗑️ (삭제된 댓글에 대한 답글)
+                                        </span>
+                                    <?php elseif (!empty($comment['parent_id'])): ?>
+                                        <span class="reply-indicator">
+                                            💬 (<?= htmlspecialchars($comment['parent_author_name'] ?? '사용자') ?>님에게 답글)
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="activity-meta">
                                     <span>📅 <?= date('Y-m-d H:i', strtotime($comment['created_at'])) ?></span>

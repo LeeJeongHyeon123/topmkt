@@ -72,23 +72,22 @@ class ChatController {
      */
     public function getRooms() {
         if (!AuthMiddleware::isLoggedIn()) {
-            ResponseHelper::json(['success' => false, 'message' => '로그인이 필요합니다.'], 401);
+            ResponseHelper::json(null, 401, '로그인이 필요합니다.');
             return;
         }
-        
+
         try {
             $currentUserId = AuthMiddleware::getCurrentUserId();
-            
+
             // Firebase에서 사용자가 참여한 채팅방 목록을 가져오는 것은
             // 프론트엔드에서 Firebase SDK를 통해 직접 처리
             ResponseHelper::json([
-                'success' => true,
                 'user_id' => $currentUserId
             ]);
-            
+
         } catch (Exception $e) {
             error_log("ChatController::getRooms 오류: " . $e->getMessage());
-            ResponseHelper::json(['success' => false, 'message' => '서버 오류가 발생했습니다.'], 500);
+            ResponseHelper::json(null, 500, '서버 오류가 발생했습니다.');
         }
     }
     
@@ -97,55 +96,51 @@ class ChatController {
      */
     public function createRoom() {
         if (!AuthMiddleware::isLoggedIn()) {
-            ResponseHelper::json(['success' => false, 'message' => '로그인이 필요합니다.'], 401);
+            ResponseHelper::json(null, 401, '로그인이 필요합니다.');
             return;
         }
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ResponseHelper::json(['success' => false, 'message' => '잘못된 요청입니다.'], 400);
+            ResponseHelper::json(null, 400, '잘못된 요청입니다.');
             return;
         }
-        
+
         try {
             $currentUserId = AuthMiddleware::getCurrentUserId();
             $data = json_decode(file_get_contents('php://input'), true);
-            
+
             // 유효성 검사
             if (empty($data['type'])) {
-                ResponseHelper::json(['success' => false, 'message' => '채팅방 타입을 선택해주세요.'], 400);
+                ResponseHelper::json(null, 400, '채팅방 타입을 선택해주세요.');
                 return;
             }
-            
+
             $type = $data['type']; // 'private', 'group'
             $targetUserId = $data['target_user_id'] ?? null;
             $roomName = $data['room_name'] ?? null;
-            
+
             if ($type === 'private' && !$targetUserId) {
-                ResponseHelper::json(['success' => false, 'message' => '대화 상대를 선택해주세요.'], 400);
+                ResponseHelper::json(null, 400, '대화 상대를 선택해주세요.');
                 return;
             }
-            
+
             if ($type === 'group' && empty($roomName)) {
-                ResponseHelper::json(['success' => false, 'message' => '채팅방 이름을 입력해주세요.'], 400);
+                ResponseHelper::json(null, 400, '채팅방 이름을 입력해주세요.');
                 return;
             }
-            
+
             // Firebase에서 채팅방 생성은 프론트엔드에서 처리
             // 여기서는 성공 응답만 반환
             ResponseHelper::json([
-                'success' => true,
-                'message' => '채팅방 생성 준비 완료',
-                'data' => [
-                    'creator_id' => $currentUserId,
-                    'type' => $type,
-                    'target_user_id' => $targetUserId,
-                    'room_name' => $roomName
-                ]
-            ]);
-            
+                'creator_id' => $currentUserId,
+                'type' => $type,
+                'target_user_id' => $targetUserId,
+                'room_name' => $roomName
+            ], 200, '채팅방 생성 준비 완료');
+
         } catch (Exception $e) {
             error_log("ChatController::createRoom 오류: " . $e->getMessage());
-            ResponseHelper::json(['success' => false, 'message' => '서버 오류가 발생했습니다.'], 500);
+            ResponseHelper::json(null, 500, '서버 오류가 발생했습니다.');
         }
     }
     
@@ -154,18 +149,18 @@ class ChatController {
      */
     public function searchUsers() {
         if (!AuthMiddleware::isLoggedIn()) {
-            ResponseHelper::json(['success' => false, 'message' => '로그인이 필요합니다.'], 401);
+            ResponseHelper::json(null, 401, '로그인이 필요합니다.');
             return;
         }
-        
+
         try {
             $currentUserId = AuthMiddleware::getCurrentUserId();
             $query = $_GET['q'] ?? '';
-            
+
             error_log("채팅 사용자 검색: query={$query}, currentUserId={$currentUserId}");
-            
+
             if (strlen($query) < 2) {
-                ResponseHelper::json(['success' => false, 'message' => '검색어를 2글자 이상 입력해주세요.'], 400);
+                ResponseHelper::json(null, 400, '검색어를 2글자 이상 입력해주세요.');
                 return;
             }
             
@@ -174,14 +169,11 @@ class ChatController {
             
             error_log("검색 결과: " . json_encode($users));
             
-            ResponseHelper::json([
-                'success' => true,
-                'data' => $users
-            ]);
+            ResponseHelper::json($users);
             
         } catch (Exception $e) {
             error_log("ChatController::searchUsers 오류: " . $e->getMessage());
-            ResponseHelper::json(['success' => false, 'message' => '서버 오류가 발생했습니다.'], 500);
+            ResponseHelper::json(null, 500, '서버 오류가 발생했습니다.');
         }
     }
     

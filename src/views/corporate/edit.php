@@ -2,6 +2,9 @@
 /**
  * 기업 정보 수정 페이지
  */
+
+// SecurityHelper 클래스 로드
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
 ?>
 
 <style>
@@ -313,7 +316,7 @@
                            id="business_number" 
                            name="business_number" 
                            class="form-input readonly-field" 
-                           value="<?= htmlspecialchars($profile['business_number']) ?>"
+                           value="<?= htmlspecialchars(SecurityHelper::isEncrypted($profile['business_number'] ?? '') ? SecurityHelper::decrypt($profile['business_number']) : ($profile['business_number'] ?? '')) ?>"
                            readonly>
                     <div class="readonly-notice">
                         사업자등록번호는 수정할 수 없습니다. 변경이 필요한 경우 새로 신청해주세요.
@@ -356,7 +359,7 @@
                            id="representative_phone" 
                            name="representative_phone" 
                            class="form-input" 
-                           value="<?= htmlspecialchars($profile['representative_phone']) ?>"
+                           value="<?= htmlspecialchars(SecurityHelper::isEncrypted($profile['representative_phone'] ?? '') ? SecurityHelper::decrypt($profile['representative_phone']) : ($profile['representative_phone'] ?? '')) ?>"
                            placeholder="010-1234-5678" 
                            required maxlength="20">
                     <div class="form-help">연락 가능한 대표자의 휴대폰 번호를 입력해주세요.</div>

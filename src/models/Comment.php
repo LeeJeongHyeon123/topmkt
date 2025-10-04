@@ -25,12 +25,16 @@ class Comment {
      */
     public function getByPostId($postId, $page = 1, $limit = 20) {
         $offset = ($page - 1) * $limit;
-        
+
+        // 삭제된 부모 댓글도 포함하여 조회 (답글의 맥락 보존을 위해)
         $comments = $this->db->fetchAll("
-            SELECT c.*, 
-                   u.nickname as author_name, 
+            SELECT c.*,
+                   CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as author_name,
                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
-                   p_u.nickname as parent_author_name
+                   p_c.id as parent_comment_id,
+                   p_c.status as parent_status,
+                   p_c.content as parent_content,
+                   CASE WHEN p_u.status = 'deleted' THEN '탈퇴한 회원' ELSE p_u.nickname END as parent_author_name
             FROM comments c
             JOIN users u ON c.user_id = u.id
             LEFT JOIN comments p_c ON c.parent_id = p_c.id
@@ -57,10 +61,13 @@ class Comment {
      */
     public function getAllByPostId($postId) {
         $sql = "
-            SELECT c.*, 
-                   u.nickname as author_name, 
+            SELECT c.*,
+                   CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as author_name,
                    COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
-                   p_u.nickname as parent_author_name
+                   p_c.id as parent_comment_id,
+                   p_c.status as parent_status,
+                   p_c.content as parent_content,
+                   CASE WHEN p_u.status = 'deleted' THEN '탈퇴한 회원' ELSE p_u.nickname END as parent_author_name
             FROM comments c
             JOIN users u ON c.user_id = u.id
             LEFT JOIN comments p_c ON c.parent_id = p_c.id
@@ -68,14 +75,14 @@ class Comment {
             WHERE c.post_id = ? AND c.status = 'active'
             ORDER BY c.created_at DESC
         ";
-        
+
         $comments = $this->db->fetchAll($sql, [$postId]);
-        
+
         // 댓글 내용 정규화
         foreach ($comments as &$comment) {
             $comment['content'] = $this->normalizeContent($comment['content']);
         }
-        
+
         return $comments;
     }
     
@@ -192,7 +199,7 @@ class Comment {
      */
     public function getReplies($parentId) {
         $sql = "
-            SELECT c.*, u.nickname as author_name
+            SELECT c.*, CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as author_name
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.parent_id = ? AND c.status = 'active'
@@ -217,7 +224,7 @@ class Comment {
      */
     public function getById($id) {
         $sql = "
-            SELECT c.*, u.nickname as author_name
+            SELECT c.*, CASE WHEN u.status = 'deleted' THEN '탈퇴한 회원' ELSE u.nickname END as author_name
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.id = ? AND c.status = 'active'

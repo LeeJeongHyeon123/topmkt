@@ -31,7 +31,7 @@ class RegistrationNotificationController {
             $userRole = AuthMiddleware::getUserRole();
             
             // 기업 유저만 알림 표시
-            if ($userRole !== 'ROLE_CORP') {
+            if ($userRole !== 'ROLE_CORPORATE') {
                 return ResponseHelper::json(['count' => 0], 200, '일반 사용자는 알림 대상이 아닙니다.');
             }
             
