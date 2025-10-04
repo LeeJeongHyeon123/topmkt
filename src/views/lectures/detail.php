@@ -3862,9 +3862,7 @@ async function cancelRegistration() {
             Toast.success('✅ 신청이 취소되었습니다.');
             checkRegistrationStatus(); // 상태 새로고침
         } else {
-            Toast.error('❌ 신청 취소에 실패했습니다.
-
-' + (data.message || '알 수 없는 오류'));
+            Toast.error('❌ 신청 취소에 실패했습니다.\n\n' + (data.message || '알 수 없는 오류'));
         }
     } catch (error) {
         console.error('신청 취소 오류:', error);
@@ -4105,7 +4103,7 @@ document.getElementById('registrationModal').addEventListener('click', function(
 });
 
 // 모달 닫기 확인 함수
-function confirmCloseRegistrationModal() {
+async function confirmCloseRegistrationModal() {
     // 폼에 입력된 내용이 있는지 확인
     const form = document.getElementById('registrationForm');
     if (!form) {
