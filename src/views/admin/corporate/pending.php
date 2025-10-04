@@ -9,6 +9,9 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 // Button 컴포넌트 로드
 require_once SRC_PATH . '/components/ui/Button.php';
 
+// Modal 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Modal.php';
+
 // CSRF 토큰 생성
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -603,7 +606,7 @@ $content = '
     <div class="modal-content">
         <div class="modal-header">
             <h3 class="modal-title" id="modalTitle">기업인증 처리</h3>
-            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <button class="modal-close" onclick="closeProcessModal()">&times;</button>
         </div>
         <form id="processForm">
             <input type="hidden" id="applicationId" name="application_id">
@@ -622,8 +625,8 @@ $content = '
             </div>
             
             <div class="modal-actions">
-                <button type="button" class="btn-cancel" onclick="closeModal()">취소</button>
-                <?= renderButton('처리', 'primary', 'md', ['buttonType' => 'submit', 'id' => 'submitBtn']) ?>
+                <button type="button" class="btn-cancel" onclick="closeProcessModal()">취소</button>
+                ' . renderButton('처리', 'primary', 'md', ['buttonType' => 'submit', 'id' => 'submitBtn']) . '
             </div>
         </form>
     </div>
@@ -634,7 +637,7 @@ $content = '
     <div class="modal-content" style="max-width: 800px;">
         <div class="modal-header">
             <h3 class="modal-title">기업인증 신청 상세보기</h3>
-            <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            <button class="modal-close" onclick="closeApplicationDetailModal()">&times;</button>
         </div>
         <div id="detailContent">
             <!-- 상세 내용이 AJAX로 로드됩니다 -->
@@ -776,12 +779,6 @@ function processApplication(applicationId, action) {
     adminNotes.focus();
 }
 
-function closeModal() {
-    const modal = document.getElementById("processModal");
-    modal.style.display = "none";
-    document.getElementById("processForm").reset();
-}
-
 // 상세보기 모달
 async function viewApplication(applicationId) {
     const modal = document.getElementById("detailModal");
@@ -810,11 +807,6 @@ async function viewApplication(applicationId) {
     } catch (error) {
         content.innerHTML = \'<div style="text-align: center; padding: 40px; color: #e53e3e;">상세 정보를 불러오는 중 오류가 발생했습니다.</div>\';
     }
-}
-
-function closeDetailModal() {
-    const modal = document.getElementById("detailModal");
-    modal.style.display = "none";
 }
 
 // 상세보기 모달 내용 렌더링
@@ -896,7 +888,7 @@ function renderApplicationDetail(data) {
     
     html += `
             <div style="margin-top: 20px; text-align: right;">
-                <button onclick="closeDetailModal()" style="padding: 10px 20px; background: #e2e8f0; color: #4a5568; border: none; border-radius: 6px; cursor: pointer;">닫기</button>
+                <button onclick="closeApplicationDetailModal()" style="padding: 10px 20px; background: #e2e8f0; color: #4a5568; border: none; border-radius: 6px; cursor: pointer;">닫기</button>
             </div>
         </div>
     `;
@@ -934,21 +926,23 @@ document.getElementById("processForm").addEventListener("submit", async function
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
-        closeModal();
+        closeProcessModal();
     }
 });
 
-// 모달 외부 클릭 시 닫기
-window.onclick = function(event) {
-    const processModal = document.getElementById("processModal");
-    const detailModal = document.getElementById("detailModal");
-    
-    if (event.target === processModal) {
-        closeModal();
-    }
-    if (event.target === detailModal) {
-        closeDetailModal();
-    }
+// 모달 외부 클릭은 modal.js에서 자동 처리됨
+</script>
+
+<script src="/assets/js/modal.js"></script>
+<script>
+// Modal.js 통합 - 래퍼 함수 정의
+function closeProcessModal() {
+    closeModal("processModal");
+    document.getElementById("processForm").reset();
+}
+
+function closeApplicationDetailModal() {
+    closeModal("detailModal");
 }
 </script>
 ';

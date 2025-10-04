@@ -715,97 +715,88 @@ $content = '
             </div>
         </div>
     </div>
-
-    <!-- 사용자 상세 모달 -->
-    <?= renderModal(
-        'user-detail-modal',
-        '회원 상세 정보',
-        '<div id="user-detail-content"><!-- 상세 정보가 여기에 로드됩니다 --></div>',
-        [
-            'footerButtons' => [
-                ['text' => '닫기', 'type' => 'secondary', 'onclick' => 'closeModal("user-detail-modal")']
-            ]
-        ]
-    ) ?>
-
-    <!-- 상태 변경 모달 -->
-    <div class="modal" id="status-change-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">회원 상태 변경</h3>
-                <button class="modal-close" onclick="closeModal(\'status-change-modal\')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">새로운 상태</label>
-                    <select class="form-control" id="new-status">
-                        <option value="active">활성</option>
-                        <option value="inactive">비활성</option>
-                        <option value="suspended">정지</option>
-                        <option value="pending">대기</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">변경 사유</label>
-                    <textarea class="form-control" id="status-reason" rows="3" placeholder="상태 변경 사유를 입력하세요..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal(\'status-change-modal\')">취소</button>
-                <button class="btn btn-primary" onclick="updateUserStatus()">변경</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 권한 변경 모달 -->
-    <div class="modal" id="role-change-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">회원 권한 변경</h3>
-                <button class="modal-close" onclick="closeModal(\'role-change-modal\')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">새로운 권한</label>
-                    <select class="form-control" id="new-role">
-                        <option value="ROLE_USER">일반 회원</option>
-                        <option value="ROLE_CORP">기업 회원</option>
-                        <option value="ROLE_MODERATOR">운영자</option>
-                        <option value="ROLE_ADMIN">관리자</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">변경 사유</label>
-                    <textarea class="form-control" id="role-reason" rows="3" placeholder="권한 변경 사유를 입력하세요..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal(\'role-change-modal\')">취소</button>
-                <button class="btn btn-primary" onclick="updateUserRole()">변경</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 알림 발송 모달 -->
-    <div class="modal" id="notify-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">회원 알림 발송</h3>
-                <button class="modal-close" onclick="closeModal(\'notify-modal\')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">알림 메시지</label>
-                    <textarea class="form-control" id="notify-message" rows="4" placeholder="발송할 메시지를 입력하세요..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal(\'notify-modal\')">취소</button>
-                <button class="btn btn-primary" onclick="sendNotification()">발송</button>
-            </div>
-        </div>
-    </div>
 ';
+
+// 모달들 추가
+$content .= renderModal(
+    'user-detail-modal',
+    '회원 상세 정보',
+    '<div id="user-detail-content"><!-- 상세 정보가 여기에 로드됩니다 --></div>',
+    [
+        'footerButtons' => [
+            ['text' => '닫기', 'type' => 'secondary', 'onclick' => 'closeModal("user-detail-modal")']
+        ]
+    ]
+);
+
+$content .= renderModal(
+    'status-change-modal',
+    '회원 상태 변경',
+    '
+    <div class="form-group">
+        <label class="form-label">새로운 상태</label>
+        <select class="form-control" id="new-status">
+            <option value="active">활성</option>
+            <option value="inactive">비활성</option>
+            <option value="suspended">정지</option>
+            <option value="pending">대기</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="form-label">변경 사유</label>
+        <textarea class="form-control" id="status-reason" rows="3" placeholder="상태 변경 사유를 입력하세요..."></textarea>
+    </div>
+    ',
+    [
+        'footerButtons' => [
+            ['text' => '취소', 'type' => 'secondary', 'onclick' => 'closeModal("status-change-modal")'],
+            ['text' => '변경', 'type' => 'primary', 'onclick' => 'updateUserStatus()']
+        ]
+    ]
+);
+
+$content .= renderModal(
+    'role-change-modal',
+    '회원 권한 변경',
+    '
+    <div class="form-group">
+        <label class="form-label">새로운 권한</label>
+        <select class="form-control" id="new-role">
+            <option value="ROLE_USER">일반 회원</option>
+            <option value="ROLE_CORP">기업 회원</option>
+            <option value="ROLE_MODERATOR">운영자</option>
+            <option value="ROLE_ADMIN">관리자</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="form-label">변경 사유</label>
+        <textarea class="form-control" id="role-reason" rows="3" placeholder="권한 변경 사유를 입력하세요..."></textarea>
+    </div>
+    ',
+    [
+        'footerButtons' => [
+            ['text' => '취소', 'type' => 'secondary', 'onclick' => 'closeModal("role-change-modal")'],
+            ['text' => '변경', 'type' => 'primary', 'onclick' => 'updateUserRole()']
+        ]
+    ]
+);
+
+$content .= renderModal(
+    'notify-modal',
+    '회원 알림 발송',
+    '
+    <div class="form-group">
+        <label class="form-label">알림 메시지</label>
+        <textarea class="form-control" id="notify-message" rows="4" placeholder="발송할 메시지를 입력하세요..."></textarea>
+    </div>
+    ',
+    [
+        'footerButtons' => [
+            ['text' => '취소', 'type' => 'secondary', 'onclick' => 'closeModal("notify-modal")'],
+            ['text' => '발송', 'type' => 'primary', 'onclick' => 'sendNotification()']
+        ]
+    ]
+);
 
 // 페이지별 추가 스크립트
 $additional_scripts = '
@@ -1025,10 +1016,10 @@ function renderUsersTable(data) {
                                 <button class="action-btn btn-view" onclick="viewUserDetail(${user.id})" title="상세보기">
                                     👁️
                                 </button>
-                                <button class="action-btn btn-edit" onclick="openStatusChangeModal(${user.id}, '${user.status}')" title="상태변경">
+                                <button class="action-btn btn-edit" onclick="openStatusChangeModal(${user.id}, \"${user.status}\")" title="상태변경">
                                     ⚙️
                                 </button>
-                                <button class="action-btn btn-edit" onclick="openRoleChangeModal(${user.id}, '${user.role}')" title="권한변경">
+                                <button class="action-btn btn-edit" onclick="openRoleChangeModal(${user.id}, \"${user.role}\")" title="권한변경">
                                     🔑
                                 </button>
                                 <button class="action-btn btn-view" onclick="openNotifyModal(${user.id})" title="알림발송">
@@ -1452,7 +1443,7 @@ function refreshData() {
 const originalCloseModal = closeModal;
 window.closeModal = function(modalId) {
     originalCloseModal(modalId);
-    if (modalId === 'user-detail-modal' || modalId === 'status-change-modal' || modalId === 'role-change-modal') {
+    if (modalId === "user-detail-modal" || modalId === "status-change-modal" || modalId === "role-change-modal") {
         currentUserId = null;
     }
 };
