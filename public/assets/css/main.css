@@ -5714,3 +5714,120 @@ body {
         visibility: visible !important;
     }
 }
+
+/* ========================================
+   Button Component Styles (v3.23.0)
+   Added: 2025-10-04
+   ======================================== */
+
+/* 버튼 크기 (접근성 기준 준수) */
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 36px;
+    min-width: 36px;
+}
+
+.btn-md {
+    padding: 12px 24px;
+    font-size: 16px;
+    min-height: 44px;  /* WCAG 2.1 최소 터치 타겟 */
+    min-width: 44px;
+}
+
+.btn-lg {
+    padding: 16px 32px;
+    font-size: 18px;
+    min-height: 52px;
+    min-width: 52px;
+}
+
+/* 전체 너비 버튼 */
+.btn-full {
+    width: 100%;
+    display: block;
+}
+
+/* 버튼 타입 - Warning */
+.btn-warning {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* 버튼 타입 - Info */
+.btn-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 아웃라인 버튼 통합 스타일 */
+.btn-outline {
+    background: transparent;
+    border: 2px solid #667eea;
+    color: #667eea;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .btn-sm {
+        min-height: 36px;
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+    
+    .btn-md {
+        min-height: 48px;
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+    
+    .btn-lg {
+        min-height: 52px;
+        padding: 16px 24px;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-sm {
+        min-height: 36px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    .btn-md {
+        min-height: 48px;
+        padding: 12px 18px;
+        font-size: 16px;
+    }
+    
+    .btn-lg {
+        min-height: 52px;
+        padding: 16px 20px;
+        font-size: 18px;
+    }
+}

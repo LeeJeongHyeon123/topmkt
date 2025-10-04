@@ -1,11 +1,21 @@
 <?php
 /**
  * 탑마케팅 로그인 페이지
+ *
+ * 📦 사용 가능한 컴포넌트 목록
+ *
+ * UI 컴포넌트:
+ * - Button.php           : renderButton($text, $type, $size, $options)
+ * - Modal.php            : renderModal($id, $title, $content) (예정)
+ * - Alert.php            : showAlert($message, $type) (예정)
+ *
+ * 📖 자세한 사용법: /docs/23.컴포넌트_사용_가이드.md
  */
 $page_title = '로그인';
 $page_description = '탑마케팅에 로그인하여 네트워크 마케팅 커뮤니티에 참여하세요';
 $current_page = 'login';
 
+require_once SRC_PATH . '/components/ui/Button.php';
 require_once SRC_PATH . '/views/templates/header.php';
 ?>
 
@@ -111,10 +121,12 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <!-- 리다이렉트 URL -->
                     <input type="hidden" name="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? '') ?>">
 
-                    <button type="submit" class="btn btn-primary-gradient btn-large btn-full">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>로그인</span>
-                    </button>
+                    <?= renderButton('로그인', 'primary', 'lg', [
+                        'buttonType' => 'submit',
+                        'icon' => 'fas fa-sign-in-alt',
+                        'fullWidth' => true,
+                        'class' => 'btn-primary-gradient'
+                    ]) ?>
                 </form>
 
                 <!-- 회원가입 링크 -->
@@ -134,9 +146,9 @@ require_once SRC_PATH . '/views/templates/header.php';
                         <h4>🔧 개발자 테스트 계정</h4>
                         <p><strong>휴대폰:</strong> 010-0000-0000</p>
                         <p><strong>비밀번호:</strong> admin123!</p>
-                        <button type="button" class="btn btn-outline-secondary" onclick="fillTestAccount()">
-                            테스트 계정으로 자동 입력
-                        </button>
+                        <?= renderButton('테스트 계정으로 자동 입력', 'outline', 'md', [
+                            'onclick' => 'fillTestAccount()'
+                        ]) ?>
                     </div>
                 <?php endif; ?>
             </div>
