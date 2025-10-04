@@ -3875,7 +3875,7 @@ async function cancelRegistration() {
 /**
  * 강의 삭제 확인 및 실행
  */
-function confirmDeleteLecture(lectureId) {
+async function confirmDeleteLecture(lectureId) {
     if (!lectureId) {
         Toast.info('잘못된 강의 ID입니다.');
         return;
@@ -3968,9 +3968,7 @@ function confirmDeleteLecture(lectureId) {
             }
         } else {
             console.error('❌ 강의 삭제 실패:', data);
-            Toast.error('❌ 강의 삭제에 실패했습니다.
-
-오류: ' + message);
+            Toast.error('❌ 강의 삭제에 실패했습니다.\n\n오류: ' + message);
             // 버튼 복구
             deleteBtn.innerHTML = originalText;
             deleteBtn.disabled = false;
@@ -3981,11 +3979,7 @@ function confirmDeleteLecture(lectureId) {
         console.error('오류 객체:', error);
         console.error('오류 메시지:', error.message);
         console.error('오류 스택:', error.stack);
-        Toast.error('❌ 강의 삭제 중 오류가 발생했습니다.
-
-네트워크를 확인하고 다시 시도해주세요.
-
-오류: ' + error.message);
+        Toast.error('❌ 강의 삭제 중 오류가 발생했습니다.\n\n네트워크를 확인하고 다시 시도해주세요.\n\n오류: ' + error.message);
         // 버튼 복구
         deleteBtn.innerHTML = originalText;
         deleteBtn.disabled = false;
