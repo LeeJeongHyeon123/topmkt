@@ -737,13 +737,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('UI 업데이트 완료'); // 디버깅용
                 } else {
                     console.error('좋아요 API 오류:', data); // 디버깅용
-                    alert(data.message || '좋아요 처리 중 오류가 발생했습니다.');
+                    Toast.error(data.message || '좋아요 처리 중 오류가 발생했습니다.');
                     this.innerHTML = originalText;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+                Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 this.innerHTML = originalText;
             })
             .finally(() => {
@@ -766,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // 클립보드에 URL 복사
                 navigator.clipboard.writeText(window.location.href).then(function() {
-                    alert('게시글 링크가 클립보드에 복사되었습니다! 📋');
+                    Toast.success('게시글 링크가 클립보드에 복사되었습니다! 📋');
                 }).catch(function() {
                     // 클립보드 접근 실패 시 대체 방법
                     const textArea = document.createElement('textarea');
@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     textArea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
-                    alert('게시글 링크가 클립보드에 복사되었습니다! 📋');
+                    Toast.success('게시글 링크가 클립보드에 복사되었습니다! 📋');
                 });
             }
         });
@@ -810,14 +810,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.status === 'success') {
                     window.location.href = data.data?.redirectUrl || '/community';
                 } else {
-                    alert(data.message || '삭제 중 오류가 발생했습니다.');
+                    Toast.error(data.message || '삭제 중 오류가 발생했습니다.');
                     deleteBtn.disabled = false;
                     deleteBtn.innerHTML = '🗑️ 삭제';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+                Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 deleteBtn.disabled = false;
                 deleteBtn.innerHTML = '🗑️ 삭제';
             });
@@ -832,7 +832,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const authorName = this.getAttribute('data-author-name');
             
             if (!authorId) {
-                alert('작성자 정보를 찾을 수 없습니다.');
+                Toast.error('작성자 정보를 찾을 수 없습니다.');
                 return;
             }
             

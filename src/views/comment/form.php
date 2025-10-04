@@ -70,7 +70,7 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
     const content = textarea.value.trim();
     
     if (!content) {
-        alert('댓글 내용을 입력해주세요.');
+        Toast.error('댓글 내용을 입력해주세요.');
         return;
     }
     
@@ -106,12 +106,12 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
                 cancelReply();
             }
         } else {
-            alert(data.error || '댓글 작성에 실패했습니다.');
+            Toast.error(data.error || '댓글 작성에 실패했습니다.');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('댓글 작성 중 오류가 발생했습니다.');
+        Toast.error('댓글 작성 중 오류가 발생했습니다.');
     })
     .finally(() => {
         // 버튼 다시 활성화

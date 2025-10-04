@@ -792,21 +792,21 @@ document.getElementById('confirmStatusBtn').addEventListener('click', async func
         if (result.status === 'success') {
             // 메시지가 문자열인지 확인
             const message = typeof result.message === 'string' ? result.message : '처리가 완료되었습니다.';
-            alert('✅ ' + message);
+            Toast.success('✅ ' + message);
             location.reload(); // 페이지 새로고침
         } else {
             // 오류 메시지가 문자열인지 확인
             const message = typeof result.message === 'string' ? result.message : '처리 중 오류가 발생했습니다.';
-            alert('❌ ' + message);
+            Toast.error('❌ ' + message);
         }
         
     } catch (error) {
         console.error('상태 변경 오류:', error);
         // 네트워크 오류와 기타 오류를 구분
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            alert('❌ 네트워크 연결을 확인해주세요.');
+            Toast.error('❌ 네트워크 연결을 확인해주세요.');
         } else {
-            alert('❌ 처리 중 오류가 발생했습니다.');
+            Toast.error('❌ 처리 중 오류가 발생했습니다.');
         }
     } finally {
         button.textContent = originalText;

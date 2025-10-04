@@ -1472,7 +1472,7 @@ function confirmDeleteAccount() {
     const reason = document.getElementById('delete-reason').value;
 
     if (!password) {
-        alert('비밀번호를 입력해주세요.');
+        Toast.error('비밀번호를 입력해주세요.');
         document.getElementById('delete-password').focus();
         return;
     }
@@ -1508,11 +1508,11 @@ function confirmDeleteAccount() {
         const message = result.message || data.message || '회원탈퇴 처리에 실패했습니다.';
 
         if (isSuccess) {
-            alert('회원탈퇴가 완료되었습니다.\n\n그동안 이용해주셔서 감사합니다.');
+            Toast.warning('회원탈퇴가 완료되었습니다.\n\n그동안 이용해주셔서 감사합니다.');
             // 로그인 페이지로 이동
             window.location.href = '/auth/login';
         } else {
-            alert(message);
+            Toast.error(message);
             Loading.button(deleteBtn, false);
 
             // 비밀번호 오류인 경우 필드 초기화
@@ -1524,7 +1524,7 @@ function confirmDeleteAccount() {
     })
     .catch(error => {
         console.error('회원탈퇴 오류:', error);
-        alert('회원탈퇴 처리 중 오류가 발생했습니다.');
+        Toast.error('회원탈퇴 처리 중 오류가 발생했습니다.');
         Loading.button(deleteBtn, false);
     });
 }

@@ -679,7 +679,7 @@ function quillImageHandler() {
     // 현재 이미지 개수 확인
     const currentImages = quill.container.querySelectorAll('img').length;
     if (currentImages >= 20) {
-        alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+        Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
         return;
     }
     
@@ -694,20 +694,20 @@ function quillImageHandler() {
         // 🚀 v3.27.0: 공통 업로드 설정 사용
         // 파일 크기 검증
         if (!window.validateFileSize(file.size)) {
-            alert(window.getFileSizeErrorMessage());
+            Toast.error(window.getFileSizeErrorMessage());
             return;
         }
 
         // 파일 확장자 검증
         if (!window.validateImageExtension(file.name)) {
-            alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
+            Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return;
         }
         
         // 재차 이미지 개수 확인
         const currentImages = quill.container.querySelectorAll('img').length;
         if (currentImages >= 20) {
-            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+            Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
             return;
         }
         
@@ -771,7 +771,8 @@ function quillImageHandler() {
                 }
             }
             
-            alert('이미지 업로드 중 오류가 발생했습니다.\n상세: ' + error.message);
+            Toast.error('이미지 업로드 중 오류가 발생했습니다.
+상세: ' + error.message);
         }
     };
     
@@ -815,7 +816,7 @@ quill.on('text-change', function(delta, oldDelta, source) {
         for (let i = 20; i < images.length; i++) {
             images[i].remove();
         }
-        alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+        Toast.error('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
     }
     // 이미지 카운터 업데이트 (약간의 지연을 두어 DOM 변경 완료 후 실행)
     setTimeout(updateImageCounter, 100);
@@ -970,21 +971,21 @@ document.getElementById('eventEditForm').addEventListener('submit', function(e) 
     const description = quill.getText().trim();
     
     if (!title) {
-        alert('행사 제목을 입력해주세요.');
+        Toast.error('행사 제목을 입력해주세요.');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         return;
     }
     
     if (!description || description.length < 10) {
-        alert('행사 설명을 10자 이상 입력해주세요.');
+        Toast.error('행사 설명을 10자 이상 입력해주세요.');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         return;
     }
     
     if (description.length > 10000) {
-        alert(`행사 설명은 10,000자를 초과할 수 없습니다. (현재: ${description.length}자)`);
+        Toast.error(`행사 설명은 10,000자를 초과할 수 없습니다. (현재: ${description.length}자)`);
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         return;
@@ -1008,7 +1009,7 @@ document.getElementById('eventEditForm').addEventListener('submit', function(e) 
     })
     .catch(error => {
         console.error('오류:', error);
-        alert('행사 수정 중 오류가 발생했습니다.');
+        Toast.error('행사 수정 중 오류가 발생했습니다.');
         
         // 버튼 상태 복원
         submitBtn.textContent = originalText;

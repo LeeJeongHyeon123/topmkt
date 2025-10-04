@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 파일 크기 검증 (공통 설정 사용: 30MB)
         if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-            alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+            Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             fileInput.value = '';
             return;
         }
@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 파일 타입 검증
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
         if (!allowedTypes.includes(file.type)) {
-            alert('JPG, PNG, WebP, PDF 파일만 업로드 가능합니다.');
+            Toast.info('JPG, PNG, WebP, PDF 파일만 업로드 가능합니다.');
             fileInput.value = '';
             return;
         }
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('[CORP_APPLY] Fetch 오류:', error);
-            alert('신청 처리 중 오류가 발생했습니다. 다시 시도해주세요.\n오류: ' + error.message);
+            Toast.error('신청 처리 중 오류가 발생했습니다. 다시 시도해주세요.\n오류: ' + error.message);
             
             // 버튼 원상복구
             submitBtn.disabled = false;
@@ -752,7 +752,7 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let field of requiredFields) {
             const element = document.getElementById(field.id);
             if (!element.value.trim()) {
-                alert(field.name + '을(를) 입력해주세요.');
+                Toast.error(field.name + '을(를) 입력해주세요.');
                 element.focus();
                 return false;
             }
@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 파일 업로드 확인
         if (!fileInput.files[0]) {
-            alert('사업자등록증 파일을 업로드해주세요.');
+            Toast.success('사업자등록증 파일을 업로드해주세요.');
             return false;
         }
 
@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const phoneRegex = /^010-\d{4}-\d{4}$/;
         const phone = document.getElementById('representative_phone').value;
         if (!phoneRegex.test(phone)) {
-            alert('올바른 휴대폰 번호 형식을 입력해주세요. (예: 010-1234-5678)');
+            Toast.error('올바른 휴대폰 번호 형식을 입력해주세요. (예: 010-1234-5678)');
             document.getElementById('representative_phone').focus();
             return false;
         }

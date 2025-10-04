@@ -1268,7 +1268,7 @@ function shareContent() {
         }
     } catch (error) {
         console.error('공유 기능 오류:', error);
-        alert('공유 기능에 오류가 발생했습니다.');
+        Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
 
@@ -1277,7 +1277,7 @@ function fallbackShare(title, url) {
     // 클립보드에 URL 복사
     if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => {
-            alert('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
+            Toast.success('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
         }).catch(() => {
             showShareModal(title, url);
         });
@@ -1350,7 +1350,7 @@ function showShareModal(title, url) {
 function copyToClipboard(text) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('✅ 링크가 복사되었습니다!');
+            Toast.success('✅ 링크가 복사되었습니다!');
         });
     } else {
         // 폴백 방법
@@ -1360,7 +1360,7 @@ function copyToClipboard(text) {
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        alert('✅ 링크가 복사되었습니다!');
+        Toast.success('✅ 링크가 복사되었습니다!');
     }
 }
 

@@ -968,12 +968,12 @@ error_reporting(E_ALL);
                     // getUserDetail API는 data.data 형태로 사용자 정보를 반환
                     showEditUserModal(data.data);
                 } else {
-                    alert('사용자 정보를 불러올 수 없습니다: ' + (data.error || '알 수 없는 오류'));
+                    Toast.error('사용자 정보를 불러올 수 없습니다: ' + (data.error || '알 수 없는 오류'));
                 }
             })
             .catch(error => {
                 console.error('사용자 정보 조회 오류:', error);
-                alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+                Toast.error('사용자 정보를 불러오는 중 오류가 발생했습니다.');
             });
     }
     
@@ -1091,7 +1091,7 @@ error_reporting(E_ALL);
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('✅ ' + data.message);
+                Toast.success('✅ ' + data.message);
                 
                 // 변경 사항이 있다면 표시
                 if (data.changes && data.changes.length > 0) {
@@ -1105,12 +1105,12 @@ error_reporting(E_ALL);
                     loadUsers();
                 }
             } else {
-                alert('❌ 편집 실패: ' + data.error);
+                Toast.error('❌ 편집 실패: ' + data.error);
             }
         })
         .catch(error => {
             console.error('편집 요청 오류:', error);
-            alert('편집 중 오류가 발생했습니다.');
+            Toast.error('편집 중 오류가 발생했습니다.');
         })
         .finally(() => {
             // 버튼 상태 복원

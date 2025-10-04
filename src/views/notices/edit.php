@@ -679,7 +679,7 @@ function quillImageHandler() {
     // 현재 이미지 개수 확인 (20개 제한)
     const currentImages = quill.container.querySelectorAll('img').length;
     if (currentImages >= 20) {
-        alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+        Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
         return;
     }
     
@@ -692,21 +692,21 @@ function quillImageHandler() {
         
         // 파일 크기 검증 (30MB)
         if (file.size > 30 * 1024 * 1024) {
-            alert('파일 크기는 30MB를 초과할 수 없습니다.');
+            Toast.error('파일 크기는 30MB를 초과할 수 없습니다.');
             return;
         }
         
         // 파일 형식 검증
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            alert('허용되지 않는 파일 형식입니다. (jpg, jpeg, png, gif, webp만 가능)');
+            Toast.warning('허용되지 않는 파일 형식입니다. (jpg, jpeg, png, gif, webp만 가능)');
             return;
         }
         
         // 재차 이미지 개수 확인 (업로드 직전)
         const currentImages = quill.container.querySelectorAll('img').length;
         if (currentImages >= 20) {
-            alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+            Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
             return;
         }
         
@@ -747,7 +747,7 @@ function uploadImageToQuill(file) {
             
             console.log('✅ Quill 이미지 업로드 성공:', data.data.url);
         } else {
-            alert('이미지 업로드 실패: ' + data.message);
+            Toast.error('이미지 업로드 실패: ' + data.message);
             console.error('❌ Quill 이미지 업로드 실패:', data.message);
         }
     })
@@ -755,7 +755,7 @@ function uploadImageToQuill(file) {
         // 로딩 텍스트 제거
         quill.deleteText(range.index, '이미지 업로드 중...'.length);
         
-        alert('이미지 업로드 중 오류가 발생했습니다.');
+        Toast.error('이미지 업로드 중 오류가 발생했습니다.');
         console.error('❌ Quill 이미지 업로드 오류:', error);
     });
 }
@@ -835,7 +835,7 @@ function initializeQuillEditor() {
             for (let i = 20; i < images.length; i++) {
                 images[i].remove();
             }
-            alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+            Toast.error('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
         }
         
         // 이미지 카운터 업데이트 (약간의 지연을 두어 DOM 변경 완료 후 실행)

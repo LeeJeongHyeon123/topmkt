@@ -1334,12 +1334,12 @@ function viewMember(memberId) {
         if (data.success) {
             showMemberDetail(data.data);
         } else {
-            alert('상세 정보를 불러올 수 없습니다: ' + (data.error || '알 수 없는 오류'));
+            Toast.error('상세 정보를 불러올 수 없습니다: ' + (data.error || '알 수 없는 오류'));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+        Toast.error('상세 정보를 불러오는 중 오류가 발생했습니다.');
     });
 }
 
@@ -1569,12 +1569,12 @@ function manageMember(memberId) {
         if (data.success) {
             showManageModal(data.data);
         } else {
-            alert('기업 정보를 불러올 수 없습니다: ' + (data.error || '알 수 없는 오류'));
+            Toast.error('기업 정보를 불러올 수 없습니다: ' + (data.error || '알 수 없는 오류'));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('기업 정보를 불러오는 중 오류가 발생했습니다.');
+        Toast.error('기업 정보를 불러오는 중 오류가 발생했습니다.');
     });
 }
 
@@ -1641,7 +1641,7 @@ document.getElementById('statusForm').addEventListener('submit', function(e) {
     const reason = formData.get('reason');
     
     if (!newStatus) {
-        alert('새로운 상태를 선택해주세요.');
+        Toast.info('새로운 상태를 선택해주세요.');
         return;
     }
     
@@ -1667,7 +1667,7 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     const repPhone = this.representative_phone.value.trim();
     
     if (!repName || !repPhone) {
-        alert('대표자명과 연락처를 모두 입력해주세요.');
+        Toast.error('대표자명과 연락처를 모두 입력해주세요.');
         return;
     }
     
@@ -1685,17 +1685,17 @@ function submitManageForm(form, successMessage) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(successMessage);
+            Toast.success(successMessage);
             closeManageModal();
             // 페이지 새로고침하여 변경사항 반영
             location.reload();
         } else {
-            alert('오류가 발생했습니다: ' + (data.error || '알 수 없는 오류'));
+            Toast.error('오류가 발생했습니다: ' + (data.error || '알 수 없는 오류'));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('처리 중 오류가 발생했습니다.');
+        Toast.error('처리 중 오류가 발생했습니다.');
     });
 }
 </script>
