@@ -6376,17 +6376,22 @@ body {
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-align: center;
+    white-space: nowrap;
 }
 
-/* 취소 버튼 */
+/* 취소 버튼 - 명확하게 보이도록 개선 */
 .modal-confirm-cancel {
-    background: #e2e8f0;
-    color: #4a5568;
+    background: #6b7280;
+    color: #ffffff;
+    border: 2px solid #6b7280;
 }
 
 .modal-confirm-cancel:hover {
-    background: #cbd5e0;
+    background: #4b5563;
+    border-color: #4b5563;
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
 }
 
 /* 확인 버튼 (타입별) */
