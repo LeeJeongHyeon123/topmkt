@@ -109,6 +109,8 @@ function renderGradientHeader($options = []) {
         'border: 1px solid rgba(255, 255, 255, 0.1)',
         'position: relative',
         'overflow: hidden',
+        'margin-top: 60px',
+        'margin-bottom: 30px',
         $alignStyle
     ];
 
