@@ -42,9 +42,11 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 
 # 캐시 컨트롤 헤더
 <IfModule mod_headers.c>
-    # 정적 리소스 캐싱
+    # 정적 리소스 캐싱 (쿼리 파라미터 있으면 no-cache)
     <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|css|js|woff|woff2|ttf|otf)$">
-        Header set Cache-Control "public, max-age=2592000, immutable"
+        # 쿼리 파라미터가 있으면 캐시 안 함 (버전 관리용)
+        Header set Cache-Control "public, max-age=2592000, immutable" env=!QUERY_STRING
+        Header set Cache-Control "no-cache, must-revalidate" env=QUERY_STRING
     </FilesMatch>
     
     # HTML은 캐시하지 않음
