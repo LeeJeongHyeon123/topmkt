@@ -2532,13 +2532,16 @@ document.addEventListener('DOMContentLoaded', function() {
     startTimeInput.addEventListener('change', validateTimes);
     endTimeInput.addEventListener('change', validateTimes);
     
-    // 실시간 필드 검증
+    // 🚀 v3.29.0: 실시간 필드 검증 (폼 검증 통합 카운터)
+    // CharacterCounter 클래스 대신 폼 검증 로직과 통합된 커스텀 카운터 사용
+    // 이유: 각 필드별 상이한 최소/최대 글자 수 검증, showError/clearError 통합,
+    //       blur 이벤트 검증, 다양한 CSS 클래스 관리 등 복잡한 검증 로직 포함
     function addRealTimeValidation() {
         // 제목 검증
         const titleInput = document.getElementById('title');
         const titleCounter = document.getElementById('title-counter');
 
-        // 실시간 글자 수 업데이트 및 검증
+        // 실시간 글자 수 업데이트 및 검증 (제목: 5-100자)
         function updateTitleCounter() {
             const length = titleInput.value.trim().length;
             titleCounter.textContent = length;

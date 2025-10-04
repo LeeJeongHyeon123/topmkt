@@ -746,23 +746,7 @@ function normalizeText(text) {
         .trim();                 // Trim whitespace
 }
 
-// 글자수 카운터 업데이트 함수
-function updateCharacterCount(textarea, countElement, maxLength = 2000) {
-    const currentLength = textarea.value.length;
-    countElement.textContent = currentLength;
-    
-    // 글자수가 2000을 초과하거나 90% 이상일 때 색상 변경
-    if (currentLength > maxLength) {
-        countElement.style.color = '#dc2626'; // 빨간색
-        countElement.parentElement.style.fontWeight = 'bold';
-    } else if (currentLength > maxLength * 0.9) {
-        countElement.style.color = '#ea580c'; // 주황색
-        countElement.parentElement.style.fontWeight = 'normal';
-    } else {
-        countElement.style.color = '#64748b'; // 기본 회색
-        countElement.parentElement.style.fontWeight = 'normal';
-    }
-}
+// 🚀 v3.29.0: 글자수 카운터는 통합 CharacterCounter 클래스 사용 (footer.php에서 로드됨)
 
 // 폼 제출 전 글자수 검증 함수
 function validateCharacterLimit(content, maxLength = 2000) {
@@ -984,13 +968,12 @@ function showInlineEditForm(commentId) {
     const textarea = document.getElementById(`edit-content-${commentId}`);
     const countElement = document.getElementById(`edit-char-count-${commentId}`);
     textarea.focus();
-    
-    // 초기 글자수 설정
-    updateCharacterCount(textarea, countElement, 2000);
-    
-    // 실시간 글자수 카운터
-    textarea.addEventListener('input', function() {
-        updateCharacterCount(this, countElement, 2000);
+
+    // 🚀 v3.29.0: 통합 CharacterCounter 클래스 사용
+    new CharacterCounter(textarea, countElement, 2000, {
+        showMaxLength: false,
+        warningThreshold: 0.9,
+        errorThreshold: 1.0
     });
     
     // textarea 포커스 시 테두리 색상 변경
@@ -1156,32 +1139,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // 메인 댓글 textarea 글자수 카운터 설정
     const mainCommentTextarea = document.getElementById('comment-content');
     const mainCommentCountElement = document.getElementById('comment-char-count');
-    
+
+    // 🚀 v3.29.0: 통합 CharacterCounter 클래스 사용
     if (mainCommentTextarea && mainCommentCountElement) {
-        // 실시간 글자수 카운터 업데이트
-        mainCommentTextarea.addEventListener('input', function() {
-            updateCharacterCount(this, mainCommentCountElement, 2000);
+        new CharacterCounter(mainCommentTextarea, mainCommentCountElement, 2000, {
+            showMaxLength: false,
+            warningThreshold: 0.9,
+            errorThreshold: 1.0
         });
-        
-        // 페이지 로드시 초기 카운트 설정
-        updateCharacterCount(mainCommentTextarea, mainCommentCountElement, 2000);
     }
     
-    // 답글 textarea들에도 글자수 카운터 설정
+    // 🚀 v3.29.0: 답글 textarea들에 통합 CharacterCounter 클래스 사용
     function setupReplyCounters() {
         const replyTextareas = document.querySelectorAll('.reply-textarea');
         replyTextareas.forEach(function(textarea) {
             const replyForm = textarea.closest('.reply-form');
             const countElement = replyForm ? replyForm.querySelector('.reply-char-count') : null;
-            
+
             if (countElement) {
-                // 실시간 글자수 카운터 업데이트
-                textarea.addEventListener('input', function() {
-                    updateCharacterCount(this, countElement, 2000);
+                new CharacterCounter(textarea, countElement, 2000, {
+                    showMaxLength: false,
+                    warningThreshold: 0.9,
+                    errorThreshold: 1.0
                 });
-                
-                // 초기 카운트 설정
-                updateCharacterCount(textarea, countElement, 2000);
             }
         });
     }

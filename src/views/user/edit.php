@@ -1020,7 +1020,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateImageCounter, 100);
     });
     
-    // 자기소개 글자수 카운터
+    // 🚀 v3.29.0: 자기소개 글자수 카운터 (Quill 전용)
+    // Quill 에디터는 input 이벤트를 발생시키지 않고 text-change 이벤트를 사용하므로
+    // CharacterCounter 클래스 대신 Quill 전용 수동 카운터 사용
     function updateBioCounter(text) {
         const current = text ? text.length - 1 : quill.getText().length - 1; // Quill은 마지막에 \n을 추가하므로 -1
         const max = 2000;

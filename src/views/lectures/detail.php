@@ -4230,53 +4230,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// 글자 수 카운터 기능
+// 🚀 v3.29.0: 글자 수 카운터 기능 (통합 CharacterCounter 클래스 사용)
 function initCharacterCounters() {
-    // 참가 동기 글자 수 카운터
-    const motivationTextarea = document.getElementById('motivation');
-    const motivationCounter = document.getElementById('motivation-counter');
+    // 참가 동기 글자 수 카운터 (2000자, 90%부터 경고)
+    new CharacterCounter(
+        document.getElementById("motivation"),
+        document.getElementById("motivation-counter"),
+        2000,
+        { errorThreshold: 1.0, warningThreshold: 0.9 }
+    );
     
-    if (motivationTextarea && motivationCounter) {
-        // 초기 글자 수 설정
-        motivationCounter.textContent = motivationTextarea.value.length;
-        
-        // 실시간 글자 수 업데이트
-        motivationTextarea.addEventListener('input', function() {
-            const length = this.value.length;
-            motivationCounter.textContent = length;
-            
-            // 글자 수가 1800자를 넘으면 경고 색상
-            const counterDiv = motivationCounter.parentElement;
-            if (length >= 1800) {
-                counterDiv.style.color = length >= 2000 ? '#dc2626' : '#f59e0b';
-            } else {
-                counterDiv.style.color = '#6b7280';
-            }
-        });
-    }
-    
-    // 특별 요청사항 글자 수 카운터
-    const specialRequestsTextarea = document.getElementById('special_requests');
-    const specialRequestsCounter = document.getElementById('special-requests-counter');
-    
-    if (specialRequestsTextarea && specialRequestsCounter) {
-        // 초기 글자 수 설정
-        specialRequestsCounter.textContent = specialRequestsTextarea.value.length;
-        
-        // 실시간 글자 수 업데이트
-        specialRequestsTextarea.addEventListener('input', function() {
-            const length = this.value.length;
-            specialRequestsCounter.textContent = length;
-            
-            // 글자 수가 1800자를 넘으면 경고 색상
-            const counterDiv = specialRequestsCounter.parentElement;
-            if (length >= 1800) {
-                counterDiv.style.color = length >= 2000 ? '#dc2626' : '#f59e0b';
-            } else {
-                counterDiv.style.color = '#6b7280';
-            }
-        });
-    }
+    // 특별 요청사항 글자 수 카운터 (2000자, 90%부터 경고)
+    new CharacterCounter(
+        document.getElementById("special_requests"),
+        document.getElementById("special-requests-counter"),
+        2000,
+        { errorThreshold: 1.0, warningThreshold: 0.9 }
+    );
 }
 </script>
 

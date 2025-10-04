@@ -1108,22 +1108,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (contentTextarea.value.trim()) {
         quill.root.innerHTML = contentTextarea.value;
     }
-    
-    // 문자 수 카운터 업데이트 함수들
-    function updateCharCounter(input, counter, maxLength) {
-        const currentLength = input.value.length;
-        counter.textContent = `${currentLength.toLocaleString()} / ${maxLength.toLocaleString()}`;
-        
-        // 경고 및 오류 상태 표시
-        counter.className = 'char-counter';
-        if (currentLength > maxLength * 0.9) {
-            counter.classList.add('warning');
-        }
-        if (currentLength >= maxLength) {
-            counter.classList.add('error');
-        }
-    }
-    
+
+    // 🚀 v3.29.0: Quill 에디터 전용 글자 수 카운터 (Quill은 input 이벤트를 발생시키지 않아 수동 업데이트 필요)
     function updateContentCharCounter(currentLength) {
         const maxLength = 10000;
         contentCounter.textContent = `${currentLength.toLocaleString()} / ${maxLength.toLocaleString()}`;
@@ -1258,15 +1244,17 @@ document.addEventListener('DOMContentLoaded', function() {
             quill.focus();
         }, 100);
     }
-    
-    // 초기 문자 수 카운터 설정
-    updateCharCounter(titleInput, titleCounter, 200);
+
+    // 🚀 v3.29.0: 제목 글자 수 카운터 (통합 CharacterCounter 클래스 사용)
+    new CharacterCounter(
+        titleInput,
+        titleCounter,
+        200,
+        { useLocaleString: true, warningThreshold: 0.9, errorThreshold: 1.0 }
+    );
+
+    // 초기 내용 글자 수 카운터 설정 (Quill 에디터용)
     updateContentCharCounter(quill.getText().length);
-    
-    // 실시간 문자 수 업데이트 (제목만)
-    titleInput.addEventListener('input', function() {
-        updateCharCounter(this, titleCounter, 200);
-    });
     
     // 폼 제출 처리
     form.addEventListener('submit', function(e) {

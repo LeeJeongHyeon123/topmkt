@@ -727,14 +727,16 @@ function setupFormEvents() {
     const titleInput = document.getElementById('title');
     const submitBtn = document.getElementById('submitBtn');
     
-    // 제목 입력 이벤트
-    titleInput.addEventListener('input', function() {
-        updateCharCounter('titleCounter', this.value.length, 200);
-        validateForm();
-    });
-    
-    // 초기 글자수 카운터 설정
-    updateCharCounter('titleCounter', titleInput.value.length, 200);
+    // 🚀 v3.29.0: 제목 글자수 카운터 (통합 CharacterCounter 클래스 사용)
+    new CharacterCounter(
+        titleInput,
+        document.getElementById('titleCounter'),
+        200,
+        { warningThreshold: 0.8, errorThreshold: 0.9 }
+    );
+
+    // 제목 입력 이벤트 (유효성 검사)
+    titleInput.addEventListener('input', validateForm);
     
     // 폼 제출 이벤트
     form.addEventListener('submit', function(e) {
@@ -907,19 +909,7 @@ function updateImageCount() {
     }
 }
 
-// 글자수 카운터 업데이트
-function updateCharCounter(counterId, currentLength, maxLength) {
-    const counter = document.getElementById(counterId);
-    counter.textContent = `${currentLength} / ${maxLength}`;
-    
-    if (currentLength >= maxLength * 0.9) {
-        counter.className = 'char-counter error';
-    } else if (currentLength >= maxLength * 0.8) {
-        counter.className = 'char-counter warning';
-    } else {
-        counter.className = 'char-counter';
-    }
-}
+// 🚀 v3.29.0: 글자수 카운터 (통합 CharacterCounter 클래스 사용 - 아래에서 초기화)
 
 // 폼 유효성 검사
 function validateForm() {
