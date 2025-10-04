@@ -1678,14 +1678,14 @@ function handleInstructorImage(index, input) {
     // 파일 유효성 검사
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-        alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
+        Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
         input.value = '';
         return;
     }
     
     // 파일 크기 검증 (공통 설정 사용: 30MB)
     if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-        alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+        Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
         input.value = '';
         return;
     }
@@ -1836,7 +1836,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 강사 추가 버튼 이벤트
     document.getElementById('add-instructor-btn').addEventListener('click', function() {
         if (instructorCount >= maxInstructors) {
-            alert('최대 5명까지 강사를 추가할 수 있습니다.');
+            Toast.info('최대 5명까지 강사를 추가할 수 있습니다.');
             return;
         }
         
@@ -2184,7 +2184,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const totalImageCount = existingImageCount + lectureImages.length;
             
             if (totalImageCount + files.length > maxLectureImages) {
-                alert(`최대 ${maxLectureImages}장까지 업로드할 수 있습니다. (현재: ${totalImageCount}장)`);
+                Toast.error(`최대 ${maxLectureImages}장까지 업로드할 수 있습니다. (현재: ${totalImageCount}장)`);
                 return;
             }
             
@@ -2217,7 +2217,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const totalImageCount = existingImageCount + lectureImages.length;
             
             if (totalImageCount + files.length > maxLectureImages) {
-                alert(`최대 ${maxLectureImages}장까지 업로드할 수 있습니다. (현재: ${totalImageCount}장)`);
+                Toast.error(`최대 ${maxLectureImages}장까지 업로드할 수 있습니다. (현재: ${totalImageCount}장)`);
                 return;
             }
             
@@ -2232,13 +2232,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateLectureImageFile(file) {
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
+            Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return false;
         }
         
         // 파일 크기 검증 (공통 설정 사용: 30MB)
         if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-            alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+            Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             return false;
         }
         
@@ -2850,13 +2850,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // 파일 형식 검사
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            alert('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
+            Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return false;
         }
         
         // 파일 크기 검사 (공통 설정 사용: 30MB)
         if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-            alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+            Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             return false;
         }
         
@@ -3126,7 +3126,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (locationType.value === 'offline') {
                 const venueField = document.getElementById('venue_name');
                 if (venueField && !venueField.value.trim()) {
-                    alert('오프라인 진행 시 장소명은 필수입니다.');
+                    Toast.info('오프라인 진행 시 장소명은 필수입니다.');
                     venueField.focus();
                     isValid = false;
                 }
@@ -3135,7 +3135,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (locationType.value === 'online') {
                 const linkField = document.getElementById('online_link');
                 if (linkField && !linkField.value.trim()) {
-                    alert('온라인 진행 시 온라인 링크는 필수입니다.');
+                    Toast.info('온라인 진행 시 온라인 링크는 필수입니다.');
                     linkField.focus();
                     isValid = false;
                 }

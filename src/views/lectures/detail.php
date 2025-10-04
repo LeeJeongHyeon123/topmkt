@@ -2957,7 +2957,7 @@ document.addEventListener('keydown', function(e) {
 // 작성자와 채팅 시작
 function startChatWithAuthor(authorId, authorName) {
     if (!authorId) {
-        alert('작성자 정보를 찾을 수 없습니다.');
+        Toast.error('작성자 정보를 찾을 수 없습니다.');
         return;
     }
     
@@ -3009,7 +3009,7 @@ function shareContent() {
         }
     } catch (error) {
         console.error('공유 기능 오류:', error);
-        alert('공유 기능에 오류가 발생했습니다.');
+        Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
 
@@ -3020,7 +3020,7 @@ function fallbackShare(title, url) {
     // 클립보드에 URL 복사
     if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => {
-            alert('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
+            Toast.success('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
         }).catch(() => {
             showShareModal(title, url);
         });
@@ -3067,7 +3067,7 @@ function showShareModal(title, url) {
 function copyToClipboard(text) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('✅ 링크가 복사되었습니다!');
+            Toast.success('✅ 링크가 복사되었습니다!');
         });
     } else {
         // 폴백 방법
@@ -3077,7 +3077,7 @@ function copyToClipboard(text) {
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        alert('✅ 링크가 복사되었습니다!');
+        Toast.success('✅ 링크가 복사되었습니다!');
     }
 }
 
@@ -3494,7 +3494,7 @@ function showRegistrationModal() {
     const modal = document.getElementById('registrationModal');
     if (!modal) {
         console.error('❌ 신청 모달 요소를 찾을 수 없습니다');
-        alert('신청 모달을 로드할 수 없습니다. 페이지를 새로고침해주세요.');
+        Toast.error('신청 모달을 로드할 수 없습니다. 페이지를 새로고침해주세요.');
         return;
     }
     
@@ -3717,7 +3717,7 @@ async function submitRegistration() {
         const result = await response.json();
         
         if (result.status === 'success') {
-            alert('✅ ' + result.message);
+            Toast.success('✅ ' + result.message);
             closeRegistrationModal();
             checkRegistrationStatus(); // 상태 새로고침
         } else {
@@ -3727,7 +3727,7 @@ async function submitRegistration() {
         
     } catch (error) {
         console.error('신청 제출 오류:', error);
-        alert('❌ 신청 처리 중 오류가 발생했습니다.');
+        Toast.error('❌ 신청 처리 중 오류가 발생했습니다.');
     } finally {
         // 버튼 복구
         submitButton.innerHTML = originalText;
@@ -3859,14 +3859,16 @@ async function cancelRegistration() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            alert('✅ 신청이 취소되었습니다.');
+            Toast.success('✅ 신청이 취소되었습니다.');
             checkRegistrationStatus(); // 상태 새로고침
         } else {
-            alert('❌ 신청 취소에 실패했습니다.\n\n' + (data.message || '알 수 없는 오류'));
+            Toast.error('❌ 신청 취소에 실패했습니다.
+
+' + (data.message || '알 수 없는 오류'));
         }
     } catch (error) {
         console.error('신청 취소 오류:', error);
-        alert('❌ 신청 취소 중 오류가 발생했습니다.');
+        Toast.error('❌ 신청 취소 중 오류가 발생했습니다.');
     }
 }
 
@@ -3875,7 +3877,7 @@ async function cancelRegistration() {
  */
 function confirmDeleteLecture(lectureId) {
     if (!lectureId) {
-        alert('잘못된 강의 ID입니다.');
+        Toast.info('잘못된 강의 ID입니다.');
         return;
     }
 
@@ -3957,7 +3959,7 @@ function confirmDeleteLecture(lectureId) {
         
         if (isSuccess) {
             console.log('✅ 강의 삭제 성공');
-            alert('✅ 강의가 성공적으로 삭제되었습니다.');
+            Toast.success('✅ 강의가 성공적으로 삭제되었습니다.');
             // 이전 페이지로 돌아가기 (또는 강의 목록으로)
             if (document.referrer && document.referrer !== window.location.href) {
                 window.location.href = document.referrer;
@@ -3966,7 +3968,9 @@ function confirmDeleteLecture(lectureId) {
             }
         } else {
             console.error('❌ 강의 삭제 실패:', data);
-            alert('❌ 강의 삭제에 실패했습니다.\n\n오류: ' + message);
+            Toast.error('❌ 강의 삭제에 실패했습니다.
+
+오류: ' + message);
             // 버튼 복구
             deleteBtn.innerHTML = originalText;
             deleteBtn.disabled = false;
@@ -3977,7 +3981,11 @@ function confirmDeleteLecture(lectureId) {
         console.error('오류 객체:', error);
         console.error('오류 메시지:', error.message);
         console.error('오류 스택:', error.stack);
-        alert('❌ 강의 삭제 중 오류가 발생했습니다.\n\n네트워크를 확인하고 다시 시도해주세요.\n\n오류: ' + error.message);
+        Toast.error('❌ 강의 삭제 중 오류가 발생했습니다.
+
+네트워크를 확인하고 다시 시도해주세요.
+
+오류: ' + error.message);
         // 버튼 복구
         deleteBtn.innerHTML = originalText;
         deleteBtn.disabled = false;

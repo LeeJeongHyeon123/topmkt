@@ -1236,7 +1236,7 @@ function submitComment() {
     
     // 비로그인 상태에서는 댓글 작성 폼이 존재하지 않음
     if (!commentElement) {
-        alert('댓글을 작성하려면 로그인이 필요합니다.');
+        Toast.info('댓글을 작성하려면 로그인이 필요합니다.');
         window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname);
         return;
     }
@@ -1244,12 +1244,12 @@ function submitComment() {
     const content = commentElement.value.trim();
     
     if (content.length < 2) {
-        alert('댓글은 2자 이상 입력해주세요.');
+        Toast.error('댓글은 2자 이상 입력해주세요.');
         return;
     }
     
     if (content.length > 1000) {
-        alert('댓글은 1000자 이하로 입력해주세요.');
+        Toast.error('댓글은 1000자 이하로 입력해주세요.');
         return;
     }
     
@@ -1277,7 +1277,7 @@ function submitComment() {
     })
     .catch(error => {
         console.error('댓글 작성 오류:', error);
-        alert('댓글 작성 중 오류가 발생했습니다: ' + error.message);
+        Toast.error('댓글 작성 중 오류가 발생했습니다: ' + error.message);
     });
 }
 
@@ -1316,7 +1316,7 @@ function submitReply(parentId) {
     const content = document.getElementById(`replyContent_${parentId}`).value.trim();
     
     if (content.length < 2) {
-        alert('답글은 2자 이상 입력해주세요.');
+        Toast.error('답글은 2자 이상 입력해주세요.');
         return;
     }
     
@@ -1345,7 +1345,7 @@ function submitReply(parentId) {
     })
     .catch(error => {
         console.error('답글 작성 오류:', error);
-        alert('답글 작성 중 오류가 발생했습니다: ' + error.message);
+        Toast.error('답글 작성 중 오류가 발생했습니다: ' + error.message);
     });
 }
 
@@ -1373,7 +1373,7 @@ function updateComment(commentId) {
     const content = document.getElementById(`editContent_${commentId}`).value.trim();
     
     if (content.length < 2) {
-        alert('댓글은 2자 이상 입력해주세요.');
+        Toast.error('댓글은 2자 이상 입력해주세요.');
         return;
     }
     
@@ -1397,7 +1397,7 @@ function updateComment(commentId) {
     })
     .catch(error => {
         console.error('댓글 수정 오류:', error);
-        alert('댓글 수정 중 오류가 발생했습니다: ' + error.message);
+        Toast.error('댓글 수정 중 오류가 발생했습니다: ' + error.message);
     });
 }
 
@@ -1426,7 +1426,7 @@ function deleteComment(commentId) {
     })
     .catch(error => {
         console.error('댓글 삭제 오류:', error);
-        alert('댓글 삭제 중 오류가 발생했습니다: ' + error.message);
+        Toast.error('댓글 삭제 중 오류가 발생했습니다: ' + error.message);
     });
 }
 
@@ -1448,7 +1448,7 @@ function deleteNotice(noticeId) {
     .then(response => response.json())
     .then(data => {
         if (data.data && data.data.success) {
-            alert('공지사항이 삭제되었습니다.');
+            Toast.success('공지사항이 삭제되었습니다.');
             window.location.href = '/notices';
         } else {
             throw new Error((data.data && data.data.message) || data.message || '삭제 중 오류가 발생했습니다.');
@@ -1456,7 +1456,7 @@ function deleteNotice(noticeId) {
     })
     .catch(error => {
         console.error('삭제 오류:', error);
-        alert('삭제 중 오류가 발생했습니다: ' + error.message);
+        Toast.error('삭제 중 오류가 발생했습니다: ' + error.message);
     });
 }
 
@@ -1489,7 +1489,7 @@ function shareContent() {
         }
     } catch (error) {
         console.error('공유 기능 오류:', error);
-        alert('공유 기능에 오류가 발생했습니다.');
+        Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
 
@@ -1499,7 +1499,7 @@ function shareContent() {
 function fallbackShare(title, url) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => {
-            alert('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
+            Toast.success('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
         }).catch(() => {
             showShareModal(title, url);
         });
@@ -1719,7 +1719,7 @@ function showShareModal(title, url) {
             </div>
             
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button onclick="navigator.clipboard.writeText('${url}').then(() => alert('복사되었습니다!'))" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <button onclick="navigator.clipboard.writeText('${url}').then(() => Toast.success('복사되었습니다!'))" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
                     링크 복사
                 </button>
                 <button onclick="this.closest('[style*=\\"position: fixed\\"]').remove()" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">

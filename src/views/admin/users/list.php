@@ -1195,7 +1195,7 @@ function updateBulkActionsVisibility() {
 async function executeBulkAction() {
     const action = document.getElementById("bulk-action").value;
     if (!action || selectedUsers.size === 0) {
-        alert("작업을 선택하고 대상 회원을 선택하세요.");
+        Toast.info('작업을 선택하고 대상 회원을 선택하세요.');
         return;
     }
     
@@ -1219,7 +1219,7 @@ async function executeBulkAction() {
         const data = await response.json();
         
         if (data.success) {
-            alert(`작업이 완료되었습니다. 성공: ${formatNumber(data.success_count)}개, 실패: ${formatNumber(data.fail_count)}개`);
+            Toast.success(`작업이 완료되었습니다. 성공: ${formatNumber(data.success_count)}개, 실패: ${formatNumber(data.fail_count)}개`);
             clearSelection();
             loadUsersData(currentPage);
         } else {
@@ -1227,7 +1227,7 @@ async function executeBulkAction() {
         }
     } catch (error) {
         console.error("벌크 작업 실패:", error);
-        alert("작업 실행에 실패했습니다: " + error.message);
+        Toast.error("작업 실행에 실패했습니다: " + error.message);
     }
 }
 
@@ -1281,7 +1281,7 @@ async function viewUserDetail(userId) {
         }
     } catch (error) {
         console.error("사용자 상세보기 실패:", error);
-        alert("사용자 정보를 불러올 수 없습니다: " + error.message);
+        Toast.error("사용자 정보를 불러올 수 없습니다: " + error.message);
     }
 }
 
@@ -1299,7 +1299,7 @@ async function updateUserStatus() {
     const reason = document.getElementById("status-reason").value;
     
     if (!newStatus) {
-        alert("새로운 상태를 선택하세요.");
+        Toast.info('새로운 상태를 선택하세요.');
         return;
     }
     
@@ -1319,7 +1319,7 @@ async function updateUserStatus() {
         const data = await response.json();
         
         if (data.success) {
-            alert("사용자 상태가 성공적으로 변경되었습니다.");
+            Toast.success('사용자 상태가 성공적으로 변경되었습니다.');
             closeModal("status-change-modal");
             loadUsersData(currentPage);
         } else {
@@ -1327,7 +1327,7 @@ async function updateUserStatus() {
         }
     } catch (error) {
         console.error("상태 변경 실패:", error);
-        alert("상태 변경에 실패했습니다: " + error.message);
+        Toast.error("상태 변경에 실패했습니다: " + error.message);
     }
 }
 
@@ -1345,7 +1345,7 @@ async function updateUserRole() {
     const reason = document.getElementById("role-reason").value;
     
     if (!newRole) {
-        alert("새로운 권한을 선택하세요.");
+        Toast.info('새로운 권한을 선택하세요.');
         return;
     }
     
@@ -1365,7 +1365,7 @@ async function updateUserRole() {
         const data = await response.json();
         
         if (data.success) {
-            alert("사용자 권한이 성공적으로 변경되었습니다.");
+            Toast.success('사용자 권한이 성공적으로 변경되었습니다.');
             closeModal("role-change-modal");
             loadUsersData(currentPage);
         } else {
@@ -1373,7 +1373,7 @@ async function updateUserRole() {
         }
     } catch (error) {
         console.error("권한 변경 실패:", error);
-        alert("권한 변경에 실패했습니다: " + error.message);
+        Toast.error("권한 변경에 실패했습니다: " + error.message);
     }
 }
 
@@ -1389,7 +1389,7 @@ async function sendNotification() {
     const message = document.getElementById("notify-message").value.trim();
     
     if (!message) {
-        alert("발송할 메시지를 입력하세요.");
+        Toast.error('발송할 메시지를 입력하세요.');
         return;
     }
     
@@ -1408,14 +1408,14 @@ async function sendNotification() {
         const data = await response.json();
         
         if (data.success) {
-            alert("알림이 성공적으로 발송되었습니다.");
+            Toast.success('알림이 성공적으로 발송되었습니다.');
             closeModal("notify-modal");
         } else {
             throw new Error(data.message || "알림 발송 실패");
         }
     } catch (error) {
         console.error("알림 발송 실패:", error);
-        alert("알림 발송에 실패했습니다: " + error.message);
+        Toast.error("알림 발송에 실패했습니다: " + error.message);
     }
 }
 
@@ -1426,7 +1426,7 @@ async function exportUsers() {
         window.open(`/admin/users/export?${params}`, "_blank");
     } catch (error) {
         console.error("내보내기 실패:", error);
-        alert("데이터 내보내기에 실패했습니다: " + error.message);
+        Toast.error("데이터 내보내기에 실패했습니다: " + error.message);
     }
 }
 

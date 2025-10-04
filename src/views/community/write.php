@@ -618,14 +618,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 파일 크기 검증 (공통 설정 사용: 30MB)
             if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-                alert(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
+                Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
                 return;
             }
             
             // 이미지 개수 제한 검사 (20개)
             const currentImages = quill.container.querySelectorAll('img').length;
             if (currentImages >= 20) {
-                alert(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
+                Toast.error(`최대 20개의 이미지만 업로드할 수 있습니다. (현재: ${currentImages}개)`);
                 return;
             }
             
@@ -715,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     errorMessage += '\n상세: ' + error.message;
                 }
                 
-                alert(errorMessage);
+                Toast.error(errorMessage);
             }
         };
         
@@ -790,7 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let i = 20; i < images.length; i++) {
                 images[i].remove();
             }
-            alert('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
+            Toast.error('최대 20개의 이미지만 허용됩니다. 초과된 이미지가 제거되었습니다.');
         }
         
         // 이미지 카운터 업데이트
@@ -1271,25 +1271,25 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 유효성 검사
         if (!title) {
-            alert('제목을 입력해주세요.');
+            Toast.error('제목을 입력해주세요.');
             titleInput.focus();
             return;
         }
         
         if (title.length > 200) {
-            alert('제목은 200자 이내로 입력해주세요.');
+            Toast.error('제목은 200자 이내로 입력해주세요.');
             titleInput.focus();
             return;
         }
         
         if (!editorText || editorText.length <= 1) {
-            alert('내용을 입력해주세요.');
+            Toast.error('내용을 입력해주세요.');
             quill.focus();
             return;
         }
         
         if (editorText.length > 10000) {
-            alert('내용은 10,000자 이내로 입력해주세요.');
+            Toast.error('내용은 10,000자 이내로 입력해주세요.');
             quill.focus();
             return;
         }
@@ -1334,7 +1334,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data.status === 'success') {
                 // alert를 표시한 후 setTimeout을 사용하여 리다이렉트 보장
-                alert(data.message);
+                Toast.error(data.message);
                 setTimeout(() => {
                     if (data.data && data.data.redirectUrl) {
                         window.location.href = data.data.redirectUrl;
@@ -1343,13 +1343,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }, 100); // 100ms 지연으로 alert 완료 후 리다이렉트
             } else {
-                alert(data.message || '오류가 발생했습니다.');
+                Toast.error(data.message || '오류가 발생했습니다.');
             }
         })
         .catch(error => {
             hideLoading();
             console.error('Error:', error);
-            alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+            Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
         });
     });
     
@@ -1459,18 +1459,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 hideLoading();
                 
                 if (data.status === 'success') {
-                    alert(data.message);
+                    Toast.error(data.message);
                     setTimeout(() => {
                         window.location.href = data.data.redirectUrl || '/community';
                     }, 100); // 100ms 지연으로 alert 완료 후 리다이렉트
                 } else {
-                    alert(data.message || '삭제 중 오류가 발생했습니다.');
+                    Toast.error(data.message || '삭제 중 오류가 발생했습니다.');
                 }
             })
             .catch(error => {
                 hideLoading();
                 console.error('Error:', error);
-                alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+                Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
             });
         });
     }
