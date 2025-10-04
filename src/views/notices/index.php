@@ -637,12 +637,9 @@ body {
 </style>
 
 <div class="notices-container">
-    <!-- 헤더 섹션 -->
-    <div class="notices-header">
-        <h1>📢 공지사항</h1>
-        <p>중요한 소식과 업데이트를 확인하세요</p>
-    </div>
-    
+    <!-- 헤더 컴포넌트 -->
+    <?php include_once SRC_PATH . '/components/NoticesHeader.php'; ?>
+
     <!-- 게시판 컨트롤 영역 -->
     <div class="board-controls">
         <!-- 검색 폼 -->
