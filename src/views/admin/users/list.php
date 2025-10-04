@@ -4,6 +4,9 @@
  * Ultra Think 6단계: 프론트엔드 뷰 및 JavaScript 구현
  */
 
+// Modal 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Modal.php';
+
 // 페이지 정보 설정
 $page_title = '회원 목록';
 $page_description = '등록된 회원들을 관리하고 모니터링하세요';
@@ -714,20 +717,16 @@ $content = '
     </div>
 
     <!-- 사용자 상세 모달 -->
-    <div class="modal" id="user-detail-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">회원 상세 정보</h3>
-                <button class="modal-close" onclick="closeModal(\'user-detail-modal\')">&times;</button>
-            </div>
-            <div class="modal-body" id="user-detail-content">
-                <!-- 상세 정보가 여기에 로드됩니다 -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal(\'user-detail-modal\')">닫기</button>
-            </div>
-        </div>
-    </div>
+    <?= renderModal(
+        'user-detail-modal',
+        '회원 상세 정보',
+        '<div id="user-detail-content"><!-- 상세 정보가 여기에 로드됩니다 --></div>',
+        [
+            'footerButtons' => [
+                ['text' => '닫기', 'type' => 'secondary', 'onclick' => 'closeModal("user-detail-modal")']
+            ]
+        ]
+    ) ?>
 
     <!-- 상태 변경 모달 -->
     <div class="modal" id="status-change-modal">
@@ -810,6 +809,7 @@ $content = '
 
 // 페이지별 추가 스크립트
 $additional_scripts = '
+<script src="/assets/js/modal.js"></script>
 <script>
 // 전역 변수
 let currentUserId = null;
@@ -1448,18 +1448,14 @@ function refreshData() {
     loadUsersData(currentPage);
 }
 
-// 모달 열기
-function openModal(modalId) {
-    document.getElementById(modalId).classList.add("show");
-    document.body.style.overflow = "hidden";
-}
-
-// 모달 닫기
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove("show");
-    document.body.style.overflow = "";
-    currentUserId = null;
-}
+// 모달 닫기 시 추가 정리 작업
+const originalCloseModal = closeModal;
+window.closeModal = function(modalId) {
+    originalCloseModal(modalId);
+    if (modalId === 'user-detail-modal' || modalId === 'status-change-modal' || modalId === 'role-change-modal') {
+        currentUserId = null;
+    }
+};
 
 // 유틸리티 함수들
 function escapeHtml(text) {

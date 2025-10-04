@@ -87,8 +87,8 @@ fi
 echo "${BLUE}[2/5]${NC} 모달 직접 코딩 감지 중..."
 echo ""
 
-# openModal, closeModal 함수 직접 정의 감지 (백업/테스트 파일 제외 + Modal 컴포넌트 구현 전까지 임시 제외)
-MODAL_FUNCTIONS=$(grep -rn 'function openModal\|function closeModal' ${SRC_DIR}/ 2>/dev/null | grep -v "Modal.php" | grep -vE "${EXCLUDE_PATTERN}" | grep -v "admin/users/list.php" | grep -v "admin/corporate/pending.php")
+# openModal, closeModal 함수 직접 정의 감지 (백업/테스트 파일 제외)
+MODAL_FUNCTIONS=$(grep -rn 'function openModal\|function closeModal' ${SRC_DIR}/ 2>/dev/null | grep -v "Modal.php" | grep -vE "${EXCLUDE_PATTERN}")
 
 if [ ! -z "$MODAL_FUNCTIONS" ]; then
     echo "${RED}❌ 모달 함수 직접 정의 발견:${NC}"
@@ -96,7 +96,21 @@ if [ ! -z "$MODAL_FUNCTIONS" ]; then
         echo "   $line"
     done
     echo ""
-    echo "${YELLOW}💡 해결: Modal.php 컴포넌트 사용 (예정)${NC}"
+    echo "${YELLOW}💡 해결: Modal.php 컴포넌트 및 modal.js 사용${NC}"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# Modal HTML 직접 작성 감지 (renderModal 없이 <div class="modal" 사용)
+MODAL_HTML=$(grep -rn '<div class="modal"' ${SRC_DIR}/ 2>/dev/null | grep -v "renderModal" | grep -v "Modal.php" | grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$MODAL_HTML" ]; then
+    echo "${RED}❌ 모달 HTML 직접 작성 발견:${NC}"
+    echo "$MODAL_HTML" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: renderModal('id', '제목', '내용') 또는 renderConfirmModal() 사용${NC}"
     echo ""
     VIOLATIONS_FOUND=1
 fi
@@ -165,6 +179,28 @@ if [ ! -z "$MISSING_IMPORT" ]; then
     echo ""
     echo "${YELLOW}💡 해결: 파일 상단에 추가${NC}"
     echo "   <?php require_once SRC_PATH . '/components/ui/Button.php'; ?>"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# renderModal 사용하지만 Modal.php import 안한 파일 (백업/테스트 파일 제외)
+# 주석에 있는 것은 제외하고 실제 함수 호출만 감지
+MISSING_MODAL_IMPORT=$(grep -rl 'renderModal(' ${SRC_DIR}/ 2>/dev/null | grep -vE "${EXCLUDE_PATTERN}" | while read file; do
+    # 주석이 아닌 실제 사용만 확인
+    if grep 'renderModal(' "$file" | grep -qv "^[[:space:]]*\*" && ! grep -q "require.*Modal.php" "$file" 2>/dev/null; then
+        echo "$file"
+    fi
+done)
+
+if [ ! -z "$MISSING_MODAL_IMPORT" ]; then
+    echo "${RED}❌ Modal.php import 누락:${NC}"
+    echo "$MISSING_MODAL_IMPORT" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: 파일 상단에 추가${NC}"
+    echo "   <?php require_once SRC_PATH . '/components/ui/Modal.php'; ?>"
+    echo "   <script src=\"/assets/js/modal.js\"></script>"
     echo ""
     VIOLATIONS_FOUND=1
 fi
