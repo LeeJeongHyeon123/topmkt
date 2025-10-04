@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>헤더 반응형 디버깅 도구</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .debug-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .status-good { color: #28a745; }
+        .status-bad { color: #dc3545; }
+        .status-warning { color: #ffc107; }
+
+        .size-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .target-size {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+
+        .test-instructions {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .test-pass {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .test-fail {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .responsive-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .guide-item {
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .desktop { background: #e2f3ff; border: 2px solid #0066cc; }
+        .tablet { background: #fff0e6; border: 2px solid #ff6600; }
+        .mobile { background: #f0fff0; border: 2px solid #00cc66; }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h1>🔍 헤더 반응형 디버깅 도구</h1>
+        <p>이 도구는 812×858 사이즈에서 user-menu 짤림 문제 해결을 검증합니다.</p>
+    </div>
+
+    <div class="debug-panel">
+        <h2>📐 현재 화면 크기</h2>
+        <div class="size-display" id="currentSize">-</div>
+        <div id="sizeStatus">-</div>
+    </div>
+
+    <div class="debug-panel">
+        <h2>🎯 반응형 브레이크포인트 가이드</h2>
+        <div class="responsive-guide">
+            <div class="guide-item desktop">
+                <h3>🖥️ 데스크톱</h3>
+                <p><strong>901px 이상</strong></p>
+                <p>user-menu 표시</p>
+            </div>
+            <div class="guide-item tablet">
+                <h3>📱 태블릿</h3>
+                <p><strong>481px~900px</strong></p>
+                <p>햄버거 메뉴 사용</p>
+                <p style="color: #ff6600;"><strong>812×858 포함!</strong></p>
+            </div>
+            <div class="guide-item mobile">
+                <h3>📱 모바일</h3>
+                <p><strong>480px 이하</strong></p>
+                <p>컴팩트 헤더</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-panel">
+        <h2>🧪 테스트 결과</h2>
+        <div id="testResults">테스트를 실행하려면 브라우저 크기를 조정하세요.</div>
+    </div>
+
+    <div class="debug-panel">
+        <h2>📋 테스트 방법</h2>
+        <div class="test-instructions">
+            <ol>
+                <li>브라우저 개발자 도구 열기 (F12)</li>
+                <li>반응형 모드 활성화</li>
+                <li>화면 크기를 <strong>812×858</strong>로 설정</li>
+                <li>메인 사이트 (/) 접속</li>
+                <li>헤더에서 햄버거 메뉴가 나타나는지 확인</li>
+                <li>user-menu가 완전히 숨겨졌는지 확인</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="debug-panel">
+        <h2>🔗 링크</h2>
+        <p><a href="/" target="_blank">메인 사이트에서 테스트하기 →</a></p>
+        <p><a href="/community" target="_blank">커뮤니티 페이지에서 테스트하기 →</a></p>
+    </div>
+
+    <script>
+        function updateSizeInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const currentSizeEl = document.getElementById('currentSize');
+            const sizeStatusEl = document.getElementById('sizeStatus');
+            const testResultsEl = document.getElementById('testResults');
+
+            currentSizeEl.textContent = `${width} × ${height}`;
+
+            let statusText = '';
+            let statusClass = '';
+            let testResult = '';
+
+            if (width === 812 && height === 858) {
+                statusText = '🎯 타겟 크기 완전 일치!';
+                statusClass = 'status-good';
+                currentSizeEl.classList.add('target-size');
+                testResult = '<div class="test-result test-pass">✅ 812×858 크기에서 햄버거 메뉴가 표시되어야 합니다.</div>';
+            } else if (width >= 805 && width <= 820 && height >= 850 && height <= 870) {
+                statusText = '✅ 타겟 크기 근사치 (테스트 가능)';
+                statusClass = 'status-good';
+                currentSizeEl.classList.add('target-size');
+                testResult = '<div class="test-result test-pass">✅ 타겟 크기 근사치에서 햄버거 메뉴가 표시되어야 합니다.</div>';
+            } else {
+                currentSizeEl.classList.remove('target-size');
+
+                if (width <= 900) {
+                    if (width <= 480) {
+                        statusText = '📱 작은 모바일 모드';
+                        statusClass = 'status-warning';
+                        testResult = '<div class="test-result test-pass">📱 작은 모바일: 컴팩트 헤더 + 햄버거 메뉴</div>';
+                    } else {
+                        statusText = '📱 태블릿 모드 (햄버거 메뉴 사용)';
+                        statusClass = 'status-good';
+                        testResult = '<div class="test-result test-pass">📱 태블릿 모드: 햄버거 메뉴가 표시됩니다.</div>';
+                    }
+                } else {
+                    statusText = '🖥️ 데스크톱 모드 (user-menu 표시)';
+                    statusClass = 'status-warning';
+                    testResult = '<div class="test-result test-pass">🖥️ 데스크톱 모드: user-menu가 표시됩니다.</div>';
+                }
+            }
+
+            sizeStatusEl.innerHTML = `<span class="${statusClass}">${statusText}</span>`;
+            testResultsEl.innerHTML = testResult;
+
+            // 미디어 쿼리 상태 추가
+            const mediaQueries = [
+                { name: '태블릿/모바일 (max-width: 900px)', query: '(max-width: 900px)' },
+                { name: '데스크톱 (min-width: 901px)', query: '(min-width: 901px)' },
+                { name: '작은 모바일 (max-width: 480px)', query: '(max-width: 480px)' }
+            ];
+
+            let mediaInfo = '<h3>🎨 활성 미디어 쿼리:</h3>';
+            mediaQueries.forEach(({ name, query }) => {
+                const matches = window.matchMedia(query).matches;
+                mediaInfo += `<div class="test-result ${matches ? 'test-pass' : 'test-fail'}">${matches ? '✅' : '❌'} ${name}</div>`;
+            });
+
+            testResultsEl.innerHTML += mediaInfo;
+        }
+
+        // 초기 실행 및 리사이즈 이벤트
+        updateSizeInfo();
+        window.addEventListener('resize', updateSizeInfo);
+
+        // 실시간 업데이트
+        setInterval(updateSizeInfo, 1000);
+    </script>
+</body>
+</html>

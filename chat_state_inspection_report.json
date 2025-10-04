@@ -1,0 +1,80 @@
+{
+  "timestamp": "2025-09-15T08:05:59.195Z",
+  "inspection": {
+    "pageAccess": true,
+    "domStructure": {
+      "chatContainer": {
+        "exists": false
+      },
+      "chatSidebar": {
+        "exists": false
+      },
+      "chatMain": {
+        "exists": false
+      },
+      "chatRoomsList": {
+        "exists": false
+      },
+      "activeChatArea": {
+        "exists": false
+      },
+      "chatPartnerName": {
+        "exists": false
+      },
+      "messagesContainer": null,
+      "chatMessages": {
+        "exists": false
+      }
+    },
+    "javascriptErrors": [],
+    "firebaseStatus": {
+      "loaded": false,
+      "error": "Firebase not loaded"
+    },
+    "chatRooms": {
+      "domRooms": [],
+      "jsRooms": [],
+      "loadingElement": {
+        "exists": false
+      }
+    },
+    "chatElements": {
+      "#chatPartnerName": {
+        "found": false,
+        "count": 0,
+        "details": null
+      },
+      "#chatPartnerAvatar": {
+        "found": false,
+        "count": 0,
+        "details": null
+      },
+      "#activeChatArea": {
+        "found": false,
+        "count": 0,
+        "details": null
+      },
+      "#chatMessages": {
+        "found": false,
+        "count": 0,
+        "details": null
+      },
+      ".message-item": {
+        "found": false,
+        "count": 0,
+        "details": null
+      },
+      ".message-avatar": {
+        "found": false,
+        "count": 0,
+        "details": null
+      },
+      ".chat-partner-info": {
+        "found": false,
+        "count": 0,
+        "details": null
+      }
+    },
+    "recommendations": []
+  }
+}

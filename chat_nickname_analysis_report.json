@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-09-15T08:01:45.060Z",
+  "targetRoomId": "-OSTjuT0YIJpiPVMKijP",
+  "analysis": {
+    "roomAccess": false,
+    "htmlStructure": null,
+    "nicknameElements": [],
+    "cssAnalysis": {},
+    "hiddenElements": [],
+    "zIndexIssues": [],
+    "recommendations": []
+  }
+}

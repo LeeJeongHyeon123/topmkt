@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>반응형 헤더 테스트 - 812*858 사이즈 검증</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f8f9fa;
+        }
+
+        .test-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 999999;
+        }
+
+        .test-content {
+            padding: 100px 20px 20px;
+            text-align: center;
+        }
+
+        .size-indicator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .target-size {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <div>현재 화면 크기: <span id="currentSize">-</span></div>
+        <div>타겟 크기: 812×858</div>
+        <div>상태: <span id="statusText">-</span></div>
+    </div>
+
+    <div class="test-content">
+        <div class="size-indicator target-size">
+            <h1>🎯 812×858 사이즈 테스트 영역</h1>
+            <p>이 크기에서 헤더의 햄버거 메뉴가 표시되어야 합니다.</p>
+            <p>user-menu는 숨겨지고 햄버거 메뉴로 대체됩니다.</p>
+        </div>
+
+        <div class="size-indicator">
+            <h2>📱 반응형 브레이크포인트</h2>
+            <ul style="text-align: left; display: inline-block;">
+                <li><strong>901px 이상:</strong> 데스크톱 모드 (user-menu 표시)</li>
+                <li><strong>481px~900px:</strong> 태블릿 모드 (햄버거 메뉴 사용) ⭐</li>
+                <li><strong>480px 이하:</strong> 작은 모바일 모드 (컴팩트 헤더)</li>
+            </ul>
+        </div>
+
+        <div class="size-indicator" id="instructions">
+            <h3>🔧 테스트 방법</h3>
+            <p>1. 브라우저 개발자 도구를 열어주세요 (F12)</p>
+            <p>2. 반응형 모드를 활성화하세요</p>
+            <p>3. 화면 크기를 812×858로 설정하세요</p>
+            <p>4. 헤더에서 햄버거 메뉴가 나타나는지 확인하세요</p>
+            <p>5. user-menu가 숨겨졌는지 확인하세요</p>
+        </div>
+    </div>
+
+    <script>
+        function updateSizeInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const currentSize = document.getElementById('currentSize');
+            const statusText = document.getElementById('statusText');
+
+            currentSize.textContent = `${width}×${height}`;
+
+            if (width === 812 && height === 858) {
+                statusText.textContent = '🎯 타겟 크기 일치!';
+                statusText.style.color = '#28a745';
+            } else if (width >= 801 && width <= 820 && height >= 850 && height <= 870) {
+                statusText.textContent = '✅ 타겟 크기 근사치';
+                statusText.style.color = '#17a2b8';
+            } else if (width <= 900) {
+                statusText.textContent = '📱 태블릿/모바일 모드';
+                statusText.style.color = '#6f42c1';
+            } else {
+                statusText.textContent = '🖥️ 데스크톱 모드';
+                statusText.style.color = '#6c757d';
+            }
+        }
+
+        // 초기 실행 및 리사이즈 이벤트
+        updateSizeInfo();
+        window.addEventListener('resize', updateSizeInfo);
+
+        // 타겟 크기 감지
+        setInterval(() => {
+            const instructions = document.getElementById('instructions');
+            if (window.innerWidth === 812 && window.innerHeight === 858) {
+                instructions.style.background = '#d4edda';
+                instructions.style.border = '2px solid #28a745';
+            } else {
+                instructions.style.background = 'white';
+                instructions.style.border = 'none';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

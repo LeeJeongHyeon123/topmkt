@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>768px 우측 짤림 디버깅</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-result {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .overflow { background: #ffebee; color: #c62828; }
+        .ok { background: #e8f5e8; color: #2e7d2e; }
+    </style>
+</head>
+<body>
+    <h2>768px 우측 짤림 디버깅 도구</h2>
+
+    <p><strong>사용 방법:</strong></p>
+    <ol>
+        <li>https://www.topmktx.com/events?year=2025&month=2&view=list 페이지로 이동</li>
+        <li>브라우저를 768px 크기로 조정</li>
+        <li>F12 개발자 도구 → Console</li>
+        <li>아래 코드를 복사해서 실행:</li>
+    </ol>
+
+    <textarea rows="30" cols="100" style="width: 100%;">
+// 768px 우측 짤림 디버깅 스크립트
+function debug768Overflow() {
+    console.log('🔍 768px 우측 짤림 디버깅 시작');
+    console.log('현재 뷰포트:', window.innerWidth + 'px');
+
+    if (window.innerWidth > 768) {
+        console.log('⚠️ 브라우저 크기를 768px로 조정해주세요');
+        return;
+    }
+
+    const results = [];
+    const viewportWidth = window.innerWidth;
+
+    // 모든 요소를 검사
+    const allElements = document.querySelectorAll('*');
+    const overflowElements = [];
+
+    allElements.forEach((el, index) => {
+        const rect = el.getBoundingClientRect();
+        const styles = window.getComputedStyle(el);
+
+        // 뷰포트를 벗어나는 요소 찾기
+        if (rect.right > viewportWidth) {
+            const overflow = rect.right - viewportWidth;
+            overflowElements.push({
+                element: el,
+                tagName: el.tagName,
+                className: el.className,
+                id: el.id,
+                overflow: overflow,
+                width: rect.width,
+                left: rect.left,
+                right: rect.right,
+                styles: {
+                    width: styles.width,
+                    maxWidth: styles.maxWidth,
+                    margin: styles.margin,
+                    padding: styles.padding,
+                    boxSizing: styles.boxSizing
+                }
+            });
+        }
+    });
+
+    console.log('\n📊 분석 결과:');
+    console.log('뷰포트 너비:', viewportWidth + 'px');
+    console.log('오버플로우 요소 개수:', overflowElements.length + '개');
+
+    if (overflowElements.length === 0) {
+        console.log('✅ 오버플로우 요소 없음!');
+        return;
+    }
+
+    console.log('\n❌ 오버플로우 요소들:');
+    overflowElements
+        .sort((a, b) => b.overflow - a.overflow)
+        .slice(0, 10) // 상위 10개만
+        .forEach((item, index) => {
+            console.log(`${index + 1}. ${item.tagName}${item.className ? '.' + item.className : ''}${item.id ? '#' + item.id : ''}`);
+            console.log(`   오버플로우: +${item.overflow.toFixed(1)}px (${item.left.toFixed(1)}px ~ ${item.right.toFixed(1)}px, 너비: ${item.width.toFixed(1)}px)`);
+            console.log(`   CSS width: ${item.styles.width}, max-width: ${item.styles.maxWidth}`);
+            console.log(`   margin: ${item.styles.margin}, padding: ${item.styles.padding}`);
+            console.log(`   box-sizing: ${item.styles.boxSizing}`);
+            console.log('');
+        });
+
+    // 가장 큰 오버플로우 요소 강조
+    const biggest = overflowElements[0];
+    if (biggest) {
+        console.log('🎯 가장 큰 오버플로우 요소:');
+        console.log(biggest.element);
+
+        // 임시로 빨간 테두리 추가
+        biggest.element.style.border = '3px solid red';
+        biggest.element.style.zIndex = '10000';
+
+        setTimeout(() => {
+            biggest.element.style.border = '';
+            biggest.element.style.zIndex = '';
+        }, 5000);
+
+        console.log('↑ 위 요소에 5초간 빨간 테두리 표시');
+    }
+
+    return overflowElements;
+}
+
+// 실행
+debug768Overflow();
+    </textarea>
+
+    <p><strong>스크립트 실행 후:</strong></p>
+    <ul>
+        <li>Console에서 오버플로우 요소들 확인</li>
+        <li>가장 문제가 되는 요소에 빨간 테두리가 5초간 표시됨</li>
+        <li>결과를 알려주세요!</li>
+    </ul>
+
+    <div class="debug-result">
+        <strong>예상 결과:</strong><br>
+        - events-header, events-container, events-layout 등의 요소들이 768px를 초과<br>
+        - 특정 CSS 스타일(width, margin, padding)이 원인<br>
+        - 우선순위가 높은 다른 CSS가 우리 수정을 덮어쓰는 경우
+    </div>
+</body>
+</html>

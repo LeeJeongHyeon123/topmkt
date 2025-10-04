@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-09-15T08:04:24.603Z",
+  "targetRoomId": "-OSTjuT0YIJpiPVMKijP",
+  "analysis": {
+    "chatPageAccess": true,
+    "chatHeaderName": null,
+    "messageElements": [],
+    "nicknameVisibility": {
+      "headerNickname": null,
+      "messageNicknames": []
+    },
+    "cssIssues": [],
+    "recommendations": []
+  }
+}

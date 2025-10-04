@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendar Layout Check</title>
+</head>
+<body>
+    <h2>Calendar Layout 확인</h2>
+    <p>브라우저에서 직접 실행하세요:</p>
+
+    <script>
+    // 캘린더 페이지로 이동 후 콘솔에서 실행
+    function checkCalendarLayout() {
+        const layout = document.querySelector('.events-layout');
+        const main = document.querySelector('.events-main');
+        const sidebar = document.querySelector('.events-sidebar');
+
+        if (!layout) {
+            console.log('❌ .events-layout을 찾을 수 없습니다');
+            return;
+        }
+
+        const layoutStyles = window.getComputedStyle(layout);
+        const viewportWidth = window.innerWidth;
+
+        console.log('🔍 캘린더 레이아웃 분석:');
+        console.log('- 뷰포트 크기:', viewportWidth + 'px');
+        console.log('- Display:', layoutStyles.display);
+        console.log('- Grid Template Columns:', layoutStyles.gridTemplateColumns);
+        console.log('- Gap:', layoutStyles.gap);
+
+        if (main && sidebar) {
+            const mainRect = main.getBoundingClientRect();
+            const sidebarRect = sidebar.getBoundingClientRect();
+
+            console.log('\\n📐 요소 위치:');
+            console.log('- Main:', Math.round(mainRect.left) + '~' + Math.round(mainRect.right) + 'px (너비:' + Math.round(mainRect.width) + 'px)');
+            console.log('- Sidebar:', Math.round(sidebarRect.left) + '~' + Math.round(sidebarRect.right) + 'px (너비:' + Math.round(sidebarRect.width) + 'px)');
+
+            const isCorrectLayout = sidebarRect.left > mainRect.right - 50; // 여유 50px
+            console.log('\\n✅ 올바른 배치:', isCorrectLayout ? '예 (사이드바가 우측)' : '아니오 (사이드바가 아래쪽)');
+
+            if (viewportWidth >= 1025 && !isCorrectLayout) {
+                console.log('⚠️  PC 사이즈인데 사이드바가 우측에 없습니다!');
+            } else if (viewportWidth >= 1025 && isCorrectLayout) {
+                console.log('🎉 PC 사이즈에서 올바른 2컬럼 레이아웃!');
+            }
+        }
+
+        return {
+            viewport: viewportWidth,
+            display: layoutStyles.display,
+            gridTemplate: layoutStyles.gridTemplateColumns,
+            isCorrect: viewportWidth >= 1025 ? (sidebar && main && sidebar.getBoundingClientRect().left > main.getBoundingClientRect().right - 50) : true
+        };
+    }
+
+    console.log('캘린더 페이지에서 checkCalendarLayout() 함수를 실행하세요!');
+    </script>
+
+    <div>
+        <h3>사용 방법:</h3>
+        <ol>
+            <li>https://www.topmktx.com/events?year=2025&month=3&view=calendar 페이지로 이동</li>
+            <li>F12를 눌러 개발자 도구 열기</li>
+            <li>Console 탭에서 다음 명령어 실행:</li>
+            <code>checkCalendarLayout()</code>
+        </ol>
+    </div>
+</body>
+</html>
