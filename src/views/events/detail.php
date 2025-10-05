@@ -2735,25 +2735,22 @@ function getAuthHeaders() {
 // 행사 신청 상태 확인
 async function checkEventRegistrationStatus() {
     try {
-        const response = await fetch(`/api/events/${eventId}/registration-status?event_id=${eventId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
+        const result = await ApiClient.get(`/api/events/${eventId}/registration-status?event_id=${eventId}`, {
+            noLoading: true,
+            noErrorToast: true
         });
-        
-        const result = await response.json();
-        
-        if (response.ok && result.status === 'success' && result.data.registration) {
+
+        if (result.success && result.data && result.data.registration) {
             const registration = result.data.registration;
             updateEventRegistrationUI(registration.status, registration);
-        } else if (response.status === 401) {
-            console.log('🔐 등록 상태 확인을 위해 로그인이 필요합니다.');
         } else {
             console.log('📊 등록 상태 정보 없음:', result.message || '알 수 없는 오류');
             // 신청 안함 상태로 UI 초기화
             updateEventRegistrationUI('none', null);
         }
     } catch (error) {
-        console.error('행사 신청 상태 확인 오류:', error);
+        console.log('ℹ️ 행사 신청 상태 확인 실패 (정상):', error.message);
         // 오류 시에도 기본 상태로 초기화
         updateEventRegistrationUI('none', null);
     }
@@ -2968,49 +2965,40 @@ async function loadEventUserInfo() {
     console.log('📝 행사 신청: 사용자 정보 로드 시작...');
 
     try {
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
         // 사용자 정보 가져오기
-        const userResponse = await fetch('/auth/me', {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (userResponse.ok) {
-            const userData = await userResponse.json();
-            console.log('👤 행사 신청: API 응답 전체:', JSON.stringify(userData, null, 2));
+        let userInfo = null;
+        try {
+            const userData = await ApiClient.get('/auth/me', { noLoading: true, noErrorToast: true });
             if (userData.success && userData.user) {
                 console.log('✅ 행사 신청: 사용자 정보 자동 입력 시작');
                 fillEventUserInfo(userData.user);
+                userInfo = userData.user;
             } else {
                 console.log('❌ 행사 신청: 사용자 정보 구조 오류', userData);
             }
-        } else {
-            console.log('❌ 행사 신청: API 요청 실패:', userResponse.status, userResponse.statusText);
+        } catch (error) {
+            console.log('❌ 행사 신청: 사용자 정보 로드 실패:', error.message);
         }
-        
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
         // 이전 신청 데이터 가져오기
-        const prevResponse = await fetch(`/api/events/${eventId}/previous-registration`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-        
-        // 응답 처리 - 401 오류도 정상적으로 처리
-        const prevData = await prevResponse.json();
-        
-        if (prevResponse.ok && prevData.status === 'success' && prevData.data) {
-            // 성공적인 응답: 이전 신청 데이터로 폼 채우기
-            fillEventRegistrationForm(prevData.data);
-        } else if (prevResponse.status === 401 || prevData.message === '로그인이 필요합니다.') {
-            // 인증 필요: 정상적인 상황이므로 로그만 출력
-            console.log('🔐 인증이 필요합니다. 로그인 후 이전 신청 데이터를 불러올 수 있습니다.');
-        } else if (prevData.status === 'success' && prevData.data === null) {
-            // 성공적인 응답이지만 데이터가 없는 경우 (정상 상황)
-            console.log('📝 이전 신청 데이터 없음:', prevData.message);
-        } else if (prevData.status === 'error') {
-            // 기타 오류: 자세한 로그 출력
-            console.log('📝 이전 신청 데이터 없음:', prevData.message);
-        } else {
-            // 예상치 못한 응답
-            console.warn('⚠️ 예상치 못한 응답:', prevData);
+        let previousRegistration = null;
+        try {
+            const prevData = await ApiClient.get(`/api/events/${eventId}/previous-registration`, {
+                noLoading: true,
+                noErrorToast: true
+            });
+
+            if (prevData.success && prevData.data) {
+                // 성공적인 응답: 이전 신청 데이터로 폼 채우기
+                fillEventRegistrationForm(prevData.data);
+                previousRegistration = prevData.data;
+            } else if (prevData.data === null) {
+                console.log('📝 이전 신청 데이터 없음:', prevData.message);
+            }
+        } catch (error) {
+            console.log('ℹ️ 이전 신청 내역 없음');
         }
     } catch (error) {
         console.error('사용자 정보 로드 오류:', error);
@@ -3096,28 +3084,26 @@ async function submitEventRegistration() {
         formData.forEach((value, key) => {
             data[key] = value;
         });
-        
-        const response = await fetch(`/api/events/${eventId}/registration?event_id=${eventId}`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            Toast.error('✅ ' + result.message);
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+        const result = await ApiClient.post(`/api/events/${eventId}/registration?event_id=${eventId}`,
+            data,
+            { noLoading: true } // 버튼 상태로 로딩 표시
+        );
+
+        if (result.success) {
+            Toast.success('✅ ' + result.message);
             closeEventRegistrationModal();
-            
+
             // UI 업데이트
             if (result.data) {
                 updateEventRegistrationUI(result.data.status, result.data);
             }
         } else {
-            if (result.data && result.data.errors) {
+            if (result.errors) {
                 let errorMsg = '입력 정보를 확인해주세요:\n';
-                for (const field in result.data.errors) {
-                    errorMsg += '- ' + result.data.errors[field] + '\n';
+                for (const field in result.errors) {
+                    errorMsg += '- ' + result.errors[field] + '\n';
                 }
                 Toast.error(errorMsg);
             } else {
@@ -3126,7 +3112,7 @@ async function submitEventRegistration() {
         }
     } catch (error) {
         console.error('행사 신청 제출 오류:', error);
-        Toast.error('❌ 네트워크 오류가 발생했습니다.');
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     }
 }
 
@@ -3138,23 +3124,16 @@ async function cancelEventRegistration() {
     
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        
-        const headers = getAuthHeaders();
-        headers['X-CSRF-TOKEN'] = csrfToken;
-        
-        const response = await fetch(`/api/events/${eventId}/registration?event_id=${eventId}`, {
-            method: 'DELETE',
-            headers: headers,
-            body: JSON.stringify({
-                csrf_token: csrfToken
-            })
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.delete)
+        const result = await ApiClient.delete(`/api/events/${eventId}/registration?event_id=${eventId}`, {
+            noLoading: true,
+            body: { csrf_token: csrfToken }
         });
-        
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            Toast.error('✅ ' + result.message);
-            
+
+        if (result.success) {
+            Toast.success('✅ ' + result.message);
+
             // UI 업데이트
             updateEventRegistrationUI('cancelled', null);
         } else {
@@ -3162,7 +3141,7 @@ async function cancelEventRegistration() {
         }
     } catch (error) {
         console.error('행사 신청 취소 오류:', error);
-        Toast.error('❌ 네트워크 오류가 발생했습니다.');
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     }
 }
 
@@ -3519,47 +3498,19 @@ async function confirmDeleteEvent(eventId) {
         confirm_delete: true
     });
 
-    // 삭제 요청
-    fetch(`/events/${eventId}/delete`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({
+    // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+    ApiClient.post(`/events/${eventId}/delete`,
+        {
             csrf_token: csrfToken,
             confirm_delete: true
-        })
-    })
-    .then(response => {
-        console.log('=== 응답 정보 ===');
-        console.log('응답 상태:', response.status);
-        console.log('응답 상태 텍스트:', response.statusText);
-        console.log('응답 헤더:', response.headers);
-        console.log('응답 OK 여부:', response.ok);
-        
-        // 응답이 JSON이 아닐 수 있으므로 텍스트로 먼저 읽어보기
-        return response.text().then(text => {
-            console.log('응답 원문:', text);
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('JSON 파싱 오류:', e);
-                throw new Error('서버 응답이 유효한 JSON이 아닙니다: ' + text);
-            }
-        });
-    })
-    .then(data => {
-        console.log('=== 파싱된 응답 데이터 ===');
-        console.log('응답 데이터:', data);
-        console.log('응답 상태:', data.status);
-        console.log('응답 데이터 객체:', data.data);
-        
-        // ResponseHelper 형식 처리
-        const isSuccess = data.status === 'success' && data.data && data.data.success === true;
-        const message = data.data ? data.data.message : (data.message || '알 수 없는 오류');
-        
-        if (isSuccess) {
+        },
+        { noLoading: true } // 버튼 상태로 로딩 표시
+    )
+    .then(result => {
+        console.log('=== 응답 데이터 ===');
+        console.log('응답 데이터:', result);
+
+        if (result.success) {
             Toast.success('✅ 행사가 성공적으로 삭제되었습니다.');
             // 이전 페이지로 돌아가기 (또는 행사 목록으로)
             if (document.referrer && document.referrer !== window.location.href) {
@@ -3568,9 +3519,9 @@ async function confirmDeleteEvent(eventId) {
                 window.location.href = '/events';
             }
         } else {
-            console.error('행사 삭제 실패:', message);
-            Toast.error('❌ 행사 삭제에 실패했습니다: ' + message);
-            
+            console.error('행사 삭제 실패:', result.message);
+            Toast.error('❌ 행사 삭제에 실패했습니다: ' + result.message);
+
             // 버튼 상태 복원
             deleteBtn.innerHTML = originalText;
             deleteBtn.disabled = false;
@@ -3578,8 +3529,8 @@ async function confirmDeleteEvent(eventId) {
     })
     .catch(error => {
         console.error('네트워크 오류:', error);
-        Toast.error('❌ 네트워크 오류가 발생했습니다: ' + error.message);
-        
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시는 선택적
+
         // 버튼 상태 복원
         deleteBtn.innerHTML = originalText;
         deleteBtn.disabled = false;
