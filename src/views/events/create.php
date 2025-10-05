@@ -1055,25 +1055,21 @@ function initializeForm() {
         
         // 🚀 v3.31.0: Loading 클래스 사용
         Loading.button(submitBtn, true, { text: '등록 중...' });
-        
-        // AJAX로 FormData 전송
-        fetch(form.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.redirected) {
-                // 성공 시 리다이렉트
-                window.location.href = response.url;
-            } else {
-                return response.text();
-            }
+
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        ApiClient.post(form.action, formData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true,
+            noErrorToast: true
         })
         .then(data => {
-            if (data) {
+            // 성공 시 리다이렉트 (data에 redirect URL이 있으면)
+            if (data.success || data.data?.success) {
+                const redirectUrl = data.redirect || data.data?.redirect || '/events';
+                window.location.href = redirectUrl;
+            } else {
                 // 오류 응답 처리
-                console.error('Form submission error:', data);
-                Toast.error('등록 중 오류가 발생했습니다.');
+                Toast.error(data.message || '등록 중 오류가 발생했습니다.');
                 Loading.button(submitBtn, false);
             }
         })
@@ -1186,21 +1182,13 @@ function imageHandler() {
             formData.append('upload_type', 'events');
             
             console.log('🔄 이미지 업로드 시작:', file.name, 'Size:', file.size);
-            
-            // 업로드 요청
-            const response = await fetch('/api/media/upload-image', {
-                method: 'POST',
-                body: formData
+
+            // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+            const result = await ApiClient.post('/api/media/upload-image', formData, {
+                headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+                noLoading: true
             });
-            
-            console.log('📡 서버 응답 상태:', response.status, response.statusText);
-            
-            // 응답 상태 코드 확인
-            if (!response.ok) {
-                throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
-            }
-            
-            const result = await response.json();
+
             console.log('📦 응답 데이터:', result);
             
             // 업로드 중 텍스트 제거

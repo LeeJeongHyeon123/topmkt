@@ -561,16 +561,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // FormData 생성
         const formData = new FormData(form);
-        
-        // AJAX 요청
-        fetch('/auth/reset-password', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        ApiClient.post('/auth/reset-password', formData, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            noLoading: true
         })
-        .then(response => response.json())
         .then(data => {
             if (data.success) {
                 Toast.success(data.message || '비밀번호가 성공적으로 변경되었습니다.');

@@ -644,14 +644,13 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             // PUT 요청은 FormData와 호환성 문제가 있어 POST로 변경
             formData.append('_method', 'PUT'); // Laravel 스타일 메서드 오버라이드
-            
-            const response = await fetch('/api/notices/<?= $notice['id'] ?>', {
-                method: 'POST',
-                body: formData
+
+            // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+            const result = await ApiClient.post('/api/notices/<?= $notice['id'] ?>', formData, {
+                headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+                noLoading: true
             });
-            
-            const result = await response.json();
-            
+
             if (result.success) {
                 Toast.success('공지사항이 성공적으로 수정되었습니다.');
                 setTimeout(() => {
@@ -727,16 +726,16 @@ function uploadImageToQuill(file) {
     // 로딩 상태 표시
     const range = quill.getSelection(true);
     quill.insertText(range.index, '이미지 업로드 중...', 'italic', true);
-    
-    fetch('/api/media/upload-image', {
-        method: 'POST',
-        body: formData
+
+    // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+    ApiClient.post('/api/media/upload-image', formData, {
+        headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+        noLoading: true
     })
-    .then(response => response.json())
     .then(data => {
         // 로딩 텍스트 제거
         quill.deleteText(range.index, '이미지 업로드 중...'.length);
-        
+
         if (data.success) {
             // 성공시 이미지 삽입
             quill.insertEmbed(range.index, 'image', data.data.url, 'user');

@@ -85,15 +85,12 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
     if (form.dataset.parentId) {
         formData.append('parent_id', form.dataset.parentId);
     }
-    
-    fetch('/api/comments', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData
+
+    // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+    ApiClient.post('/api/comments', formData, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        noLoading: true
     })
-    .then(response => response.json())
     .then(data => {
         if (data.success) {
             // 댓글 목록 새로고침

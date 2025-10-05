@@ -725,20 +725,13 @@ function quillImageHandler() {
         try {
             const formData = new FormData();
             formData.append('image', file);
-            
-            const response = await fetch('/upload-image', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+
+            // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+            const result = await ApiClient.post('/upload-image', formData, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                noLoading: true
             });
-            
-            if (!response.ok) {
-                throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
-            }
-            
-            const result = await response.json();
+
             console.log('📦 응답 데이터:', result);
             
             // 업로드 중 텍스트 제거
@@ -994,17 +987,17 @@ document.getElementById('eventEditForm').addEventListener('submit', function(e) 
     // 에디터 내용 추가
     formData.set('description', quill.root.innerHTML);
     
-    // 서버로 전송
-    fetch(this.action, {
-        method: 'POST',
-        body: formData
+    // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+    ApiClient.post(this.action, formData, {
+        headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+        noLoading: true
     })
-    .then(response => {
-        if (response.ok) {
+    .then(data => {
+        if (data.success || data.data?.success) {
             // 성공 시 상세 페이지로 이동
             window.location.href = '/events/detail?id=<?= $event['id'] ?>';
         } else {
-            throw new Error('서버 오류가 발생했습니다.');
+            throw new Error(data.message || '서버 오류가 발생했습니다.');
         }
     })
     .catch(error => {

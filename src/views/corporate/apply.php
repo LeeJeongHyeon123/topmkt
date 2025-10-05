@@ -698,31 +698,23 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Ajax로 폼 제출 후 리다이렉트 처리
         e.preventDefault();
-        
+
         const formData = new FormData(form);
-        
-        fetch('/corp/apply', {
-            method: 'POST',
-            body: formData
+
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        ApiClient.post('/corp/apply', formData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true,
+            noErrorToast: true
         })
-        .then(response => {
-            console.log('[CORP_APPLY] Response 수신:', {
-                status: response.status,
-                statusText: response.statusText,
-                redirected: response.redirected,
-                url: response.url,
-                ok: response.ok
-            });
-            
-            if (response.redirected) {
-                console.log('[CORP_APPLY] 서버에서 리다이렉트됨:', response.url);
-                window.location.href = response.url;
-            } else if (response.ok) {
+        .then(data => {
+            console.log('[CORP_APPLY] 응답 수신:', data);
+
+            if (data.success || data.data?.success) {
                 console.log('[CORP_APPLY] 성공 응답, /corp/status로 이동');
                 window.location.href = '/corp/status';
             } else {
-                console.error('[CORP_APPLY] 서버 오류 응답:', response.status, response.statusText);
-                throw new Error('서버 오류가 발생했습니다: ' + response.status);
+                throw new Error(data.message || '서버 오류가 발생했습니다');
             }
         })
         .catch(error => {

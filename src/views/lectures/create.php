@@ -1529,33 +1529,11 @@ function updateImageListOnServer(updatedImageData) {
     formData.append('action', 'update_images');
     formData.append('lecture_images', JSON.stringify(updatedImageData));
     formData.append('csrf_token', <?php echo json_encode($_SESSION['csrf_token']); ?>);
-    
-    fetch(window.location.origin + '/lectures/update-images', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        // console.log('Response status:', response.status);
-        // console.log('Response headers:', [...response.headers.entries()]);
-        
-        // 응답이 JSON인지 확인
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            // HTML 응답인 경우 내용 확인을 위해 텍스트로 읽기
-            return response.text().then(text => {
-                console.error('Non-JSON response:', text.substring(0, 500));
-                throw new Error('서버에서 올바르지 않은 응답을 받았습니다. 로그인 상태나 권한을 확인해주세요.');
-            });
-        }
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        return response.json();
+
+    // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+    ApiClient.post(window.location.origin + '/lectures/update-images', formData, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        noLoading: true
     })
     .then(data => {
         if (data.success) {
@@ -3011,36 +2989,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log(`${key}: ${value}`);
         }
         
-        // AJAX 제출
-        fetch('/lectures/store', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => {
-            // 서버 응답 상태 확인
-            if (!response.ok) {
-                throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
-            }
-            
-            // JSON 응답 검증
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new Error('서버에서 올바르지 않은 응답을 받았습니다.');
-            }
-            
-            return response.json();
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        ApiClient.post('/lectures/store', formData, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            noLoading: true
         })
         .then(data => {
             showLoading(false);
-            
-            // 응답 데이터 검증
-            if (typeof data !== 'object' || data === null) {
-                throw new Error('서버에서 올바르지 않은 데이터를 받았습니다.');
-            }
-            
+
             if (data.success || (data.data && data.data.success)) {
                 // 중첩된 응답 구조 처리
                 const responseData = data.data || data;

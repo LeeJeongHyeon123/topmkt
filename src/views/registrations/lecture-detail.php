@@ -772,23 +772,15 @@ document.getElementById('confirmStatusBtn').addEventListener('click', async func
     const originalText = button.textContent;
     button.textContent = '🔄 처리 중...';
     button.disabled = true;
-    
+
     try {
-        const response = await fetch(`/api/registrations/${currentRegistrationId}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                status: currentStatus,
-                admin_notes: adminNotes,
-                csrf_token: csrfToken
-            })
-        });
-        
-        const result = await response.json();
-        
+        // v3.42.0: ApiClient 사용
+        const result = await ApiClient.post(`/api/registrations/${currentRegistrationId}/status`, {
+            status: currentStatus,
+            admin_notes: adminNotes,
+            csrf_token: csrfToken
+        }, { noLoading: true });
+
         if (result.status === 'success') {
             // 메시지가 문자열인지 확인
             const message = typeof result.message === 'string' ? result.message : '처리가 완료되었습니다.';
