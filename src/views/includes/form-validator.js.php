@@ -1,3 +1,4 @@
+<script>
 /**
  * FormValidator 클래스
  *
@@ -332,3 +333,4 @@
     console.log('✅ FormValidator 클래스 로드 완료 (v3.41.0)');
 
 })(window);
+</script>

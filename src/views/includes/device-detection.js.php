@@ -1,6 +1,7 @@
+<script>
 /**
  * 디바이스 감지 및 화면 크기 쿠키 저장 시스템
- * 
+ *
  * 모든 페이지에서 자동으로 로드되어 사용자의 화면 크기를 감지하고
  * 쿠키에 저장하여 서버사이드에서 정확한 모바일 감지가 가능하게 합니다.
  */
@@ -233,3 +234,4 @@ if (typeof window !== 'undefined') {
     expires.setTime(expires.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7일
     document.cookie = `screen_width=${width}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
 }
+</script>

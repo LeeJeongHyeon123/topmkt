@@ -1,3 +1,4 @@
+<script>
 /**
  * ApiClient 클래스
  *
@@ -412,3 +413,4 @@
     console.log('✅ ApiClient 클래스 로드 완료 (v3.42.0)');
 
 })(window);
+</script>
