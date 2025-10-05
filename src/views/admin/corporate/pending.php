@@ -490,35 +490,56 @@ $content = '
             <div class="summary-card-label">1주 이상 대기</div>
         </div>
     </div>
-    
-    <!-- 검색 및 필터 섹션 -->
-    <div class="filter-section">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label class="filter-label">검색:</label>
-                <input type="text" class="filter-input" id="searchInput" placeholder="회사명, 사업자번호, 신청자명으로 검색..." onkeyup="filterApplications()">
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">대기 기간:</label>
-                <select class="filter-select" id="waitTimeFilter" onchange="filterApplications()">
-                    <option value="all">전체</option>
-                    <option value="today">오늘 신청</option>
-                    <option value="week">1주일 이내</option>
-                    <option value="urgent">3일 이상 대기</option>
-                    <option value="critical">1주일 이상 대기</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">기업 유형:</label>
-                <select class="filter-select" id="companyTypeFilter" onchange="filterApplications()">
-                    <option value="all">전체</option>
-                    <option value="domestic">국내 기업</option>
-                    <option value="overseas">해외 기업</option>
-                </select>
-            </div>
-        </div>
-    </div>
+';
 
+// SearchFilter 컴포넌트 추가
+require_once SRC_PATH . '/components/ui/SearchFilter.php';
+
+$content .= SearchFilter::create([
+        'method' => 'JS',
+        'layout' => 'inline',
+        'filters' => [
+            [
+                'type' => 'select',
+                'name' => 'waitTime',
+                'id' => 'waitTimeFilter',
+                'label' => '대기기간',
+                'options' => [
+                    'all' => '전체',
+                    'today' => '오늘 신청',
+                    'week' => '1주일 이내',
+                    'urgent' => '3일 이상 대기',
+                    'critical' => '1주일 이상 대기'
+                ],
+                'value' => 'all'
+            ],
+            [
+                'type' => 'select',
+                'name' => 'companyType',
+                'id' => 'companyTypeFilter',
+                'label' => '기업 유형',
+                'options' => [
+                    'all' => '전체',
+                    'domestic' => '국내 기업',
+                    'overseas' => '해외 기업'
+                ],
+                'value' => 'all'
+            ]
+        ],
+        'searchInput' => true,
+        'searchName' => 'search',
+        'searchInputId' => 'searchInput',
+        'searchPlaceholder' => '회사명, 사업자번호, 신청자명으로 검색...',
+        'searchValue' => '',
+        'submitButton' => false,
+        'resetButton' => false,
+        'collapsible' => false,
+        'title' => '🔍 검색 및 필터',
+        'onSubmit' => 'filterApplications()',
+        'cssClass' => 'admin-corporate-pending-filter'
+    ]);
+
+$content .= '
     <!-- 기업인증 목록 -->
     <div class="applications-section">
         <div class="section-header">
@@ -644,7 +665,10 @@ $content = '
         </div>
     </div>
 </div>
+';
 
+// 페이지별 추가 스크립트
+$additional_scripts = <<<'SCRIPTS'
 <script>
 // 암호화된 데이터인지 확인하고 복호화가 필요한 경우 처리
 function decryptIfNeeded(data) {
@@ -785,27 +809,27 @@ async function viewApplication(applicationId) {
     const content = document.getElementById("detailContent");
     
     // 로딩 표시
-    content.innerHTML = \'<div style="text-align: center; padding: 40px;"><div style="font-size: 18px;">로딩 중...</div></div>\';
+    content.innerHTML = '<div style="text-align: center; padding: 40px;"><div style="font-size: 18px;">로딩 중...</div></div>';
     modal.style.display = "block";
-    
+
     try {
         const formData = new FormData();
         formData.append("application_id", applicationId);
-        
+
         const response = await fetch("/admin/corporate/detail", {
             method: "POST",
             body: formData
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             renderApplicationDetail(result.data);
         } else {
-            content.innerHTML = \'<div style="text-align: center; padding: 40px; color: #e53e3e;">오류: \' + result.error + \'</div>\';
+            content.innerHTML = '<div style="text-align: center; padding: 40px; color: #e53e3e;">오류: ' + result.error + '</div>';
         }
     } catch (error) {
-        content.innerHTML = \'<div style="text-align: center; padding: 40px; color: #e53e3e;">상세 정보를 불러오는 중 오류가 발생했습니다.</div>\';
+        content.innerHTML = '<div style="text-align: center; padding: 40px; color: #e53e3e;">상세 정보를 불러오는 중 오류가 발생했습니다.</div>';
     }
 }
 
@@ -931,10 +955,7 @@ document.getElementById("processForm").addEventListener("submit", async function
 });
 
 // 모달 외부 클릭은 modal.js에서 자동 처리됨
-</script>
 
-<script src="/assets/js/modal.js"></script>
-<script>
 // Modal.js 통합 - 래퍼 함수 정의
 function closeProcessModal() {
     closeModal("processModal");
@@ -945,7 +966,9 @@ function closeApplicationDetailModal() {
     closeModal("detailModal");
 }
 </script>
-';
+
+<script src="/assets/js/modal.js"></script>
+SCRIPTS;
 
 // 레이아웃 렌더링
 include SRC_PATH . '/views/templates/admin_layout.php';

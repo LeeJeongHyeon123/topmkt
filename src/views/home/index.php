@@ -6,6 +6,9 @@ $page_title = '홈';
 $page_description = '글로벌 네트워크 마케팅 리더들의 커뮤니티 - 성공을 함께 만들어가세요';
 $current_page = 'home';
 
+// Card 컴포넌트 로드 (v3.38.0)
+require_once SRC_PATH . '/components/ui/Card.php';
+
 require_once SRC_PATH . '/views/templates/header.php';
 ?>
 
@@ -57,61 +60,41 @@ require_once SRC_PATH . '/views/templates/header.php';
         </div>
         
         <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <div class="icon-bg">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-                <h3>커뮤니티 네트워킹</h3>
-                <p>전 세계 네트워크 마케팅 전문가들과 연결되어 경험과 노하우를 공유하세요</p>
-                <a href="/community" class="feature-link">
-                    <span>시작하기</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <div class="icon-bg green">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                </div>
-                <h3>전문 강의</h3>
-                <p>업계 전문가들의 실전 강의를 통해 실무 역량을 키워보세요</p>
-                <a href="/lectures" class="feature-link">
-                    <span>강의듣기</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <div class="icon-bg purple">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                </div>
-                <h3>행사 참여</h3>
-                <p>다양한 네트워킹 행사와 컨퍼런스에 참여하여 새로운 기회를 만나보세요</p>
-                <a href="/events" class="feature-link">
-                    <span>둘러보기</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <div class="icon-bg orange">
-                        <i class="fas fa-bullhorn"></i>
-                    </div>
-                </div>
-                <h3>공지사항</h3>
-                <p>플랫폼의 최신 소식과 중요한 공지사항을 확인하고 소통하세요</p>
-                <a href="/notices" class="feature-link">
-                    <span>확인하기</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
+            <?= Card::feature([
+                'icon' => 'fas fa-users',
+                'iconBg' => 'blue',
+                'title' => '커뮤니티 네트워킹',
+                'description' => '전 세계 네트워크 마케팅 전문가들과 연결되어 경험과 노하우를 공유하세요',
+                'link' => '/community',
+                'linkText' => '시작하기'
+            ]) ?>
+
+            <?= Card::feature([
+                'icon' => 'fas fa-graduation-cap',
+                'iconBg' => 'green',
+                'title' => '전문 강의',
+                'description' => '업계 전문가들의 실전 강의를 통해 실무 역량을 키워보세요',
+                'link' => '/lectures',
+                'linkText' => '강의듣기'
+            ]) ?>
+
+            <?= Card::feature([
+                'icon' => 'fas fa-calendar-alt',
+                'iconBg' => 'purple',
+                'title' => '행사 참여',
+                'description' => '다양한 네트워킹 행사와 컨퍼런스에 참여하여 새로운 기회를 만나보세요',
+                'link' => '/events',
+                'linkText' => '둘러보기'
+            ]) ?>
+
+            <?= Card::feature([
+                'icon' => 'fas fa-bullhorn',
+                'iconBg' => 'orange',
+                'title' => '공지사항',
+                'description' => '플랫폼의 최신 소식과 중요한 공지사항을 확인하고 소통하세요',
+                'link' => '/notices',
+                'linkText' => '확인하기'
+            ]) ?>
         </div>
     </div>
 </section>

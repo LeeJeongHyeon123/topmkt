@@ -8,6 +8,9 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// Pagination 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Pagination.php';
 ?>
 <!DOCTYPE html>
 <html lang="ko">

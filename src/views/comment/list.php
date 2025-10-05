@@ -776,46 +776,29 @@ function submitComment(event) {
     const submitBtn = document.querySelector('.comment-submit');
     submitBtn.disabled = true;
     submitBtn.textContent = '작성 중...';
-    
-    fetch('/api/comments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': getCsrfToken()
-        },
-        body: JSON.stringify({
+
+    // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+    ApiClient.post('/api/comments',
+        {
             post_id: window.currentPostId,
             content: content
-        })
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data);
-        
-        // 다양한 성공 응답 형태 처리
-        const isSuccess = data.success === true || 
-                         (data.status === 'success' && data.data && data.data.success === true) ||
-                         (data.data && data.data.success === true);
-        
-        if (isSuccess) {
+        },
+        { noLoading: true } // 버튼 상태로 로딩 표시
+    )
+    .then(result => {
+        console.log('댓글 작성 응답:', result);
+
+        if (result.success) {
             // 페이지 새로고침으로 댓글 목록 업데이트
             console.log('댓글 작성 성공, 페이지 새로고침');
             location.reload();
         } else {
-            const errorMessage = data.message || 
-                               (data.data && data.data.message) || 
-                               '댓글 작성에 실패했습니다.';
-            console.error('댓글 작성 실패:', errorMessage);
-            Toast.error(errorMessage);
+            Toast.error(result.message || '댓글 작성에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        Toast.error('댓글 작성 중 오류가 발생했습니다.');
+        console.error('댓글 작성 오류:', error);
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     })
     .finally(() => {
         submitBtn.disabled = false;
@@ -1082,7 +1065,7 @@ function updateComment(commentId) {
 }
 
 // 댓글 삭제
-function deleteComment(commentId) {
+async function deleteComment(commentId) {
     if (!(await Modal.confirm('정말로 이 댓글을 삭제하시겠습니까?', { type: 'warning' }))) {
         return;
     }

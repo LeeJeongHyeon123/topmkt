@@ -1402,7 +1402,7 @@ function updateComment(commentId) {
 }
 
 // 댓글 삭제
-function deleteComment(commentId) {
+async function deleteComment(commentId) {
     if (!(await Modal.confirm('댓글을 삭제하시겠습니까?', { type: 'warning' }))) {
         return;
     }
@@ -1431,7 +1431,7 @@ function deleteComment(commentId) {
 }
 
 // 공지사항 삭제
-function deleteNotice(noticeId) {
+async function deleteNotice(noticeId) {
     if (!(await Modal.confirm('정말로 이 공지사항을 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.', { type: 'warning' }))) {
         return;
     }

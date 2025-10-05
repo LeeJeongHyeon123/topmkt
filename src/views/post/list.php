@@ -1,4 +1,9 @@
-<?php include SRC_PATH . '/views/templates/header.php'; ?>
+<?php
+// Pagination 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Pagination.php';
+
+include SRC_PATH . '/views/templates/header.php';
+?>
 
 <div class="posts-container">
     <div class="posts-header">
@@ -39,14 +44,19 @@
         <?php endif; ?>
     </div>
     
-    <div class="posts-pagination">
-        <!-- 페이지네이션 (실제 구현에서는 총 페이지 수에 맞게 구현) -->
-        <a href="#" class="page-link disabled">이전</a>
-        <span class="page-current">1</span>
-        <a href="#" class="page-link">2</a>
-        <a href="#" class="page-link">3</a>
-        <a href="#" class="page-link">다음</a>
-    </div>
+    <?php
+    // 페이지네이션 렌더링 (Pagination 컴포넌트 사용)
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $totalPages = $pagination['total_pages'] ?? 1; // Controller에서 전달받은 총 페이지 수
+
+    if ($totalPages > 1) {
+        echo renderPagination($currentPage, $totalPages, [
+            'containerClass' => 'posts-pagination',
+            'linkClass' => 'page-link',
+            'preserveParams' => ['search'] // 검색어 유지
+        ]);
+    }
+    ?>
 </div>
 
 <?php include SRC_PATH . '/views/templates/footer.php'; ?> 

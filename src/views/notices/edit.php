@@ -549,7 +549,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 새 이미지 제거
-    window.removeNewImage = function(button, index) {
+    window.removeNewImage = async function(button, index) {
         if (!(await Modal.confirm('선택한 이미지를 제거하시겠습니까?', { type: 'warning' }))) return;
         
         button.closest('.existing-image-item').remove();
@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // 기존 이미지 제거
-    window.removeExistingImage = function(imageId) {
+    window.removeExistingImage = async function(imageId) {
         if (!(await Modal.confirm('정말 이 이미지를 제거하시겠습니까? 제거된 이미지는 복구할 수 없습니다.', { type: 'warning' }))) {
             return;
         }

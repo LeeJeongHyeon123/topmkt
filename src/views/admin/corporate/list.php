@@ -60,50 +60,8 @@ $additional_styles = '
     font-weight: 500;
 }
 
-/* 필터 섹션 */
-.filter-section {
-    background: white;
-    border-radius: 16px;
-    padding: 20px 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    margin-bottom: 30px;
-}
-
-.filter-row {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.filter-label {
-    font-weight: 500;
-    color: #4a5568;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
-.filter-input {
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 14px;
-    width: 300px;
-    transition: border-color 0.3s ease;
-}
-
-.filter-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
+/* 🚀 v3.37.0: 필터 CSS는 이제 /assets/css/search-filter.css에서 통합 관리 */
+/* .filter-section, .filter-row 등은 SearchFilter 컴포넌트에서 자동 제공 */
 
 .filter-select {
     padding: 8px 12px;
@@ -546,44 +504,69 @@ $content = '
             <div class="summary-card-label">총 강의</div>
         </div>
     </div>
-    
-    <!-- 검색 및 필터 섹션 -->
-    <div class="filter-section">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label class="filter-label">검색:</label>
-                <input type="text" class="filter-input" id="searchInput" placeholder="회사명, 사업자번호, 회원명으로 검색..." onkeyup="filterMembers()">
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">상태:</label>
-                <select class="filter-select" id="statusFilter" onchange="filterMembers()">
-                    <option value="all">전체</option>
-                    <option value="approved">승인됨</option>
-                    <option value="suspended">일시정지</option>
-                    <option value="rejected">거절됨</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">가입일:</label>
-                <select class="filter-select" id="joinDateFilter" onchange="filterMembers()">
-                    <option value="all">전체</option>
-                    <option value="today">오늘</option>
-                    <option value="week">1주일 이내</option>
-                    <option value="month">1개월 이내</option>
-                    <option value="quarter">3개월 이내</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">기업 유형:</label>
-                <select class="filter-select" id="companyTypeFilter" onchange="filterMembers()">
-                    <option value="all">전체</option>
-                    <option value="domestic">국내 기업</option>
-                    <option value="overseas">해외 기업</option>
-                </select>
-            </div>
-        </div>
-    </div>
+';
 
+// SearchFilter 컴포넌트 추가
+require_once SRC_PATH . '/components/ui/SearchFilter.php';
+
+$content .= SearchFilter::create([
+        'method' => 'JS',
+        'layout' => 'grid-3',
+        'filters' => [
+            [
+                'type' => 'select',
+                'name' => 'status',
+                'id' => 'statusFilter',
+                'label' => '상태',
+                'options' => [
+                    'all' => '전체',
+                    'approved' => '승인됨',
+                    'suspended' => '일시정지',
+                    'rejected' => '거절됨'
+                ],
+                'value' => 'all'
+            ],
+            [
+                'type' => 'select',
+                'name' => 'joinDate',
+                'id' => 'joinDateFilter',
+                'label' => '가입일',
+                'options' => [
+                    'all' => '전체',
+                    'today' => '오늘',
+                    'week' => '1주일 이내',
+                    'month' => '1개월 이내',
+                    'quarter' => '3개월 이내'
+                ],
+                'value' => 'all'
+            ],
+            [
+                'type' => 'select',
+                'name' => 'companyType',
+                'id' => 'companyTypeFilter',
+                'label' => '기업 유형',
+                'options' => [
+                    'all' => '전체',
+                    'domestic' => '국내 기업',
+                    'overseas' => '해외 기업'
+                ],
+                'value' => 'all'
+            ]
+        ],
+        'searchInput' => true,
+        'searchName' => 'search',
+        'searchInputId' => 'searchInput',
+        'searchPlaceholder' => '회사명, 사업자번호, 회원명으로 검색...',
+        'searchValue' => '',
+        'submitButton' => false,
+        'resetButton' => false,
+        'collapsible' => false,
+        'title' => '🔍 검색 및 필터',
+        'onSubmit' => 'filterMembers()',
+        'cssClass' => 'admin-corporate-filter'
+    ]);
+
+$content .= '
     <!-- 기업회원 목록 -->
     <div class="members-section">
         <div class="section-header">
@@ -717,12 +700,15 @@ $content = '
             
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeStatusModal()">취소</button>
-                <?= renderButton('변경', 'primary', 'md', ['buttonType' => 'submit', 'id' => 'statusSubmitBtn']) ?>
+                ' . renderButton('변경', 'primary', 'md', ['buttonType' => 'submit', 'id' => 'statusSubmitBtn']) . '
             </div>
         </form>
     </div>
 </div>
+';
 
+// 페이지별 추가 스크립트
+$additional_scripts = <<<'SCRIPTS'
 <script>
 // 전역 변수
 let originalMembersData = [];
@@ -819,9 +805,9 @@ async function manageMember(memberId) {
     const content = document.getElementById("manageContent");
     
     // 로딩 표시
-    content.innerHTML = \'<div style="text-align: center; padding: 40px;"><div style="font-size: 18px;">로딩 중...</div></div>\';
+    content.innerHTML = '<div style="text-align: center; padding: 40px;"><div style="font-size: 18px;">로딩 중...</div></div>';
     modal.style.display = "block";
-    
+
     try {
         // 회원 정보 로드 (실제로는 AJAX로 구현)
         content.innerHTML = `
@@ -834,7 +820,7 @@ async function manageMember(memberId) {
             </div>
         `;
     } catch (error) {
-        content.innerHTML = \'<div style="text-align: center; padding: 40px; color: #e53e3e;">정보를 불러오는 중 오류가 발생했습니다.</div>\';
+        content.innerHTML = '<div style="text-align: center; padding: 40px; color: #e53e3e;">정보를 불러오는 중 오류가 발생했습니다.</div>';
     }
 }
 
@@ -922,7 +908,7 @@ window.onclick = function(event) {
     }
 }
 </script>
-';
+SCRIPTS;
 
 // 레이아웃 렌더링
 include SRC_PATH . '/views/templates/admin_layout.php';

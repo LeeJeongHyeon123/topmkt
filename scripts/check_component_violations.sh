@@ -6,7 +6,7 @@
 # 목적: 개발자가 컴포넌트를 사용하지 않고
 #       직접 HTML/CSS를 작성했는지 자동 감지
 #
-# 검증 항목 (v3.41.0):
+# 검증 항목 (v3.42.0):
 #   1. Button 컴포넌트 (renderButton)
 #   2. Modal 컴포넌트 (renderModal, renderConfirmModal)
 #   3. Alert/Toast 컴포넌트
@@ -19,7 +19,8 @@
 #  10. Pagination 컴포넌트 (v3.39.0)
 #  11. UploadConfig 시스템 (v3.39.0)
 #  12. Modal.confirm() 확인 다이얼로그 (v3.40.0)
-#  13. FormValidator 검증 클래스 (v3.41.0) ⭐ NEW
+#  13. FormValidator 검증 클래스 (v3.41.0)
+#  14. ApiClient HTTP 클라이언트 (v3.42.0) ⭐ NEW
 #
 # 사용법: ./scripts/check_component_violations.sh
 # Git Hook: .git/hooks/pre-commit에서 자동 실행
@@ -639,6 +640,44 @@ if [ ! -z "$DUPLICATE_IS_VALID_PHONE" ]; then
 fi
 
 echo "${GREEN}✅ FormValidator 검증 완료${NC}"
+echo ""
+
+##############################################
+# 14. ApiClient HTTP 클라이언트 감지 (v3.42.0)
+##############################################
+
+echo "${BLUE}[14/14]${NC} ApiClient HTTP 클라이언트 감지 중..."
+
+# fetch() 직접 사용 감지 (ApiClient 사용 권장)
+DIRECT_FETCH=$(grep -rn 'fetch(' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "api-client.js.php" | \
+    grep -v "// fetch\|<!-- fetch\|* fetch" | \
+    grep -v "v3.42.0.*ApiClient" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$DIRECT_FETCH" ]; then
+    echo "${YELLOW}⚠️  fetch() 직접 사용 발견:${NC}"
+    echo "$DIRECT_FETCH" | while read line; do
+        echo "   $line"
+    done | head -10
+    echo "${YELLOW}💡 권장: ApiClient.get() / ApiClient.post() / ApiClient.put() / ApiClient.delete() 사용${NC}"
+fi
+
+# XMLHttpRequest 직접 사용 감지
+DIRECT_XHR=$(grep -rn 'new XMLHttpRequest\|XMLHttpRequest()' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "api-client.js.php" | \
+    grep -v "// XMLHttpRequest\|<!-- XMLHttpRequest" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$DIRECT_XHR" ]; then
+    echo "${YELLOW}⚠️  XMLHttpRequest 직접 사용 발견:${NC}"
+    echo "$DIRECT_XHR" | while read line; do
+        echo "   $line"
+    done | head -5
+    echo "${YELLOW}💡 권장: ApiClient 사용 (자동 에러 처리, 토큰 주입)${NC}"
+fi
+
+echo "${GREEN}✅ ApiClient 검증 완료${NC}"
 echo ""
 
 ##############################################

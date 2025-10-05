@@ -4,8 +4,9 @@
  * Ultra Think 6단계: 프론트엔드 뷰 및 JavaScript 구현
  */
 
-// Modal 컴포넌트 로드
+// Modal, Pagination 컴포넌트 로드
 require_once SRC_PATH . '/components/ui/Modal.php';
+require_once SRC_PATH . '/components/ui/Pagination.php';
 
 // 페이지 정보 설정
 $page_title = '회원 목록';
@@ -113,83 +114,8 @@ $additional_styles = '
 }
 
 /* 필터 섹션 */
-.filters-section {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 24px;
-    border: 1px solid #e2e8f0;
-}
-
-.filters-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.filters-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1a202c;
-}
-
-.filters-toggle {
-    background: none;
-    border: none;
-    color: #667eea;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.filters-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.filter-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #4a5568;
-}
-
-.filter-input {
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.filter-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.search-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 12px;
-    align-items: end;
-}
-
-.search-input {
-    padding: 10px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 14px;
-    flex: 1;
-}
+/* 🚀 v3.37.0: 필터 CSS는 이제 /assets/css/search-filter.css에서 통합 관리 */
+/* .filters-section, .filters-header 등은 SearchFilter 컴포넌트에서 자동 제공 */
 
 /* 테이블 섹션 */
 .table-section {
@@ -511,25 +437,20 @@ $additional_styles = '
 
 /* 반응형 */
 @media (max-width: 1200px) {
-    .filters-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
+    /* 🚀 v3.37.0: .filters-grid는 SearchFilter 컴포넌트에서 자동 관리 */
+    /* .filters-grid { grid-template-columns: repeat(3, 1fr); } */
+
     .stats-row {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .filters-grid {
-        grid-template-columns: 1fr;
-    }
-    
+    /* 🚀 v3.37.0: .filters-grid, .search-row는 SearchFilter 컴포넌트에서 자동 관리 */
+    /* .filters-grid { grid-template-columns: 1fr; } */
+    /* .search-row { grid-template-columns: 1fr; } */
+
     .stats-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .search-row {
         grid-template-columns: 1fr;
     }
     
@@ -585,102 +506,123 @@ $content = '
             </div>
         </div>
 
-        <!-- 필터 섹션 -->
-        <div class="filters-section">
-            <div class="filters-header">
-                <h3 class="filters-title">🔍 필터 및 검색</h3>
-                <button class="filters-toggle" onclick="toggleFilters()">
-                    <span id="filter-toggle-text">간단히 보기</span> <i id="filter-toggle-icon" class="fas fa-chevron-up"></i>
-                </button>
-            </div>
-            
-            <div id="filters-content">
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">상태</label>
-                        <select class="filter-input" id="filter-status">
-                            <option value="">전체</option>
-                            <option value="active">활성</option>
-                            <option value="inactive">비활성</option>
-                            <option value="suspended">정지</option>
-                            <option value="pending">대기</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">권한</label>
-                        <select class="filter-input" id="filter-role">
-                            <option value="">전체</option>
-                            <option value="ROLE_USER">일반 회원</option>
-                            <option value="ROLE_CORP">기업 회원</option>
-                            <option value="ROLE_MODERATOR">운영자</option>
-                            <option value="ROLE_ADMIN">관리자</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">기업 상태</label>
-                        <select class="filter-input" id="filter-corp-status">
-                            <option value="">전체</option>
-                            <option value="none">비기업</option>
-                            <option value="pending">인증 대기</option>
-                            <option value="approved">승인됨</option>
-                            <option value="rejected">거절됨</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">휴대폰 인증</label>
-                        <select class="filter-input" id="filter-verified">
-                            <option value="">전체</option>
-                            <option value="phone_verified">인증 완료</option>
-                            <option value="phone_unverified">미인증</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">로그인 활동</label>
-                        <select class="filter-input" id="filter-login-activity">
-                            <option value="">전체</option>
-                            <option value="recent_7days">최근 7일</option>
-                            <option value="recent_30days">최근 30일</option>
-                            <option value="inactive_30days">30일 이상 비활성</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">가입일 (시작)</label>
-                        <input type="date" class="filter-input" id="filter-date-from">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">가입일 (종료)</label>
-                        <input type="date" class="filter-input" id="filter-date-to">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">정렬 방식</label>
-                        <select class="filter-input" id="filter-sort">
-                            <option value="created_at">가입일 (최신순)</option>
-                            <option value="nickname">닉네임 (가나다순)</option>
-                            <option value="email">이메일 (가나다순)</option>
-                            <option value="last_login">마지막 로그인</option>
-                            <option value="status">상태별</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="search-row">
-                    <input type="text" class="search-input" id="search-input" placeholder="닉네임, 이메일, 전화번호로 검색...">
-                    <button class="btn btn-primary" onclick="applyFilters()">
-                        <i class="fas fa-search"></i> 검색
-                    </button>
-                    <button class="btn btn-secondary" onclick="resetFilters()">
-                        <i class="fas fa-undo"></i> 초기화
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- 필터 섹션 (SearchFilter 컴포넌트) -->
+';
+
+// SearchFilter 컴포넌트 추가
+require_once SRC_PATH . '/components/ui/SearchFilter.php';
+
+$content .= SearchFilter::create([
+            'method' => 'JS',
+            'layout' => 'grid-4',
+            'filters' => [
+                [
+                    'type' => 'select',
+                    'name' => 'status',
+                    'id' => 'filter-status',
+                    'label' => '상태',
+                    'options' => [
+                        '' => '전체',
+                        'active' => '활성',
+                        'inactive' => '비활성',
+                        'suspended' => '정지',
+                        'pending' => '대기'
+                    ]
+                ],
+                [
+                    'type' => 'select',
+                    'name' => 'role',
+                    'id' => 'filter-role',
+                    'label' => '권한',
+                    'options' => [
+                        '' => '전체',
+                        'ROLE_USER' => '일반 회원',
+                        'ROLE_CORP' => '기업 회원',
+                        'ROLE_MODERATOR' => '운영자',
+                        'ROLE_ADMIN' => '관리자'
+                    ]
+                ],
+                [
+                    'type' => 'select',
+                    'name' => 'corp-status',
+                    'id' => 'filter-corp-status',
+                    'label' => '기업 상태',
+                    'options' => [
+                        '' => '전체',
+                        'none' => '비기업',
+                        'pending' => '인증 대기',
+                        'approved' => '승인됨',
+                        'rejected' => '거절됨'
+                    ]
+                ],
+                [
+                    'type' => 'select',
+                    'name' => 'verified',
+                    'id' => 'filter-verified',
+                    'label' => '휴대폰 인증',
+                    'options' => [
+                        '' => '전체',
+                        'phone_verified' => '인증 완료',
+                        'phone_unverified' => '미인증'
+                    ]
+                ],
+                [
+                    'type' => 'select',
+                    'name' => 'login-activity',
+                    'id' => 'filter-login-activity',
+                    'label' => '로그인 활동',
+                    'options' => [
+                        '' => '전체',
+                        'recent_7days' => '최근 7일',
+                        'recent_30days' => '최근 30일',
+                        'inactive_30days' => '30일 이상 비활성'
+                    ]
+                ],
+                [
+                    'type' => 'date',
+                    'name' => 'date-from',
+                    'id' => 'filter-date-from',
+                    'label' => '가입일 (시작)'
+                ],
+                [
+                    'type' => 'date',
+                    'name' => 'date-to',
+                    'id' => 'filter-date-to',
+                    'label' => '가입일 (종료)'
+                ],
+                [
+                    'type' => 'select',
+                    'name' => 'sort',
+                    'id' => 'filter-sort',
+                    'label' => '정렬 방식',
+                    'options' => [
+                        'created_at' => '가입일 (최신순)',
+                        'nickname' => '닉네임 (가나다순)',
+                        'email' => '이메일 (가나다순)',
+                        'last_login' => '마지막 로그인',
+                        'status' => '상태별'
+                    ],
+                    'value' => 'created_at'
+                ]
+            ],
+            'searchInput' => true,
+            'searchName' => 'search',
+            'searchInputId' => 'search-input',
+            'searchPlaceholder' => '닉네임, 이메일, 전화번호로 검색...',
+            'searchValue' => '',
+            'submitButton' => true,
+            'submitText' => '<i class="fas fa-search"></i> 검색',
+            'resetButton' => true,
+            'resetText' => '<i class="fas fa-undo"></i> 초기화',
+            'collapsible' => true,
+            'collapsed' => false,
+            'title' => '🔍 필터 및 검색',
+            'onSubmit' => 'applyFilters()',
+            'onReset' => 'resetFilters()',
+            'cssClass' => 'admin-users-filter'
+        ]);
+
+$content .= <<<'HTML'
 
         <!-- 테이블 섹션 -->
         <div class="table-section">
@@ -712,7 +654,7 @@ $content = '
             </div>
         </div>
     </div>
-';
+HTML;
 
 // 모달들 추가
 $content .= renderModal(
@@ -796,7 +738,7 @@ $content .= renderModal(
 );
 
 // 페이지별 추가 스크립트
-$additional_scripts = '
+$additional_scripts = <<<'SCRIPTS'
 <script src="/assets/js/modal.js"></script>
 <script>
 // 전역 변수
@@ -1133,21 +1075,22 @@ function resetFilters() {
 }
 
 // 필터 토글
-function toggleFilters() {
-    const content = document.getElementById("filters-content");
-    const toggleText = document.getElementById("filter-toggle-text");
-    const toggleIcon = document.getElementById("filter-toggle-icon");
-    
-    if (content.style.display === "none") {
-        content.style.display = "block";
-        toggleText.textContent = "간단히 보기";
-        toggleIcon.className = "fas fa-chevron-up";
-    } else {
-        content.style.display = "none";
-        toggleText.textContent = "자세히 보기";
-        toggleIcon.className = "fas fa-chevron-down";
-    }
-}
+// 🚀 v3.37.0: toggleFilters()는 SearchFilter 컴포넌트의 SearchFilter.toggle()로 대체됨
+// function toggleFilters() {
+//     const content = document.getElementById("filters-content");
+//     const toggleText = document.getElementById("filter-toggle-text");
+//     const toggleIcon = document.getElementById("filter-toggle-icon");
+//
+//     if (content.style.display === "none") {
+//         content.style.display = "block";
+//         toggleText.textContent = "간단히 보기";
+//         toggleIcon.className = "fas fa-chevron-up";
+//     } else {
+//         content.style.display = "none";
+//         toggleText.textContent = "자세히 보기";
+//         toggleIcon.className = "fas fa-chevron-down";
+//     }
+// }
 
 // 전체 선택 토글
 function toggleSelectAll(checkbox) {
@@ -1526,7 +1469,7 @@ function getCorpStatusText(corpStatus) {
     return corpStatusMap[corpStatus] || corpStatus || "비기업";
 }
 </script>
-';
+SCRIPTS;
 
 // 레이아웃 렌더링
 include SRC_PATH . '/views/templates/admin_layout.php';

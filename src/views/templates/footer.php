@@ -489,5 +489,8 @@
 <!-- 🚀 v3.41.0: 통합 FormValidator 시스템 -->
 <?php require_once __DIR__ . '/../includes/form-validator.js.php'; ?>
 
+<!-- 🚀 v3.42.0: 통합 ApiClient HTTP 클라이언트 시스템 -->
+<?php require_once __DIR__ . '/../includes/api-client.js.php'; ?>
+
 </body>
 </html> 

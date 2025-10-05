@@ -3,6 +3,9 @@
  * 관리자 사용자 목록 페이지 (수정된 버전)
  */
 
+// Pagination 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Pagination.php';
+
 // 페이지 정보 설정
 $page_title = '회원 목록';
 $page_description = '등록된 회원들을 관리하고 모니터링하세요';
@@ -714,13 +717,13 @@ function renderUserDetail(user) {
     const html = '<div class="profile-image-container">' +
         '<img src="' + profileImage + '" alt="프로필 이미지" class="profile-image-large" ' +
              'onerror="this.src=\\'/assets/uploads/default-avatar.png\\'">' +
-        '<h3>' + escapeHtml(user.nickname) + '</h3>'
-            <div class="user-status-badges">
-                <span class="role-badge role-${user.role.toLowerCase().replace("role_", "")}">${getRoleText(user.role)}</span>
-                <span class="status-badge status-${user.status}">${getStatusText(user.status)}</span>
-                ${user.phone_verified === "1" ? '<span class="status-badge status-active">전화 인증됨</span>' : '<span class="status-badge status-inactive">전화 미인증</span>'}
-            </div>
-        </div>
+        '<h3>' + escapeHtml(user.nickname) + '</h3>' +
+            '<div class="user-status-badges">' +
+                '<span class="role-badge role-' + user.role.toLowerCase().replace("role_", "") + '">' + getRoleText(user.role) + '</span>' +
+                '<span class="status-badge status-' + user.status + '">' + getStatusText(user.status) + '</span>' +
+                (user.phone_verified === "1" ? '<span class="status-badge status-active">전화 인증됨</span>' : '<span class="status-badge status-inactive">전화 미인증</span>') +
+            '</div>' +
+        '</div>' +
         
         <div class="user-detail-section">
             <h3>📋 기본 정보</h3>

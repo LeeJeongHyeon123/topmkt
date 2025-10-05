@@ -1586,7 +1586,7 @@ function updateImageIndexes() {
             const newBtn = removeBtn.cloneNode(true);
             removeBtn.parentNode.replaceChild(newBtn, removeBtn);
             
-            newBtn.addEventListener('click', function(e) {
+            newBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
                 if (await Modal.confirm('이 이미지를 삭제하시겠습니까?', { type: 'danger' })) {
                     removeExistingImage(newIndex, item);
@@ -1647,7 +1647,7 @@ function updateLectureImagesDisplay(updatedImages) {
         
         // 삭제 버튼 이벤트 추가
         const removeBtn = imageItem.querySelector('.remove-existing-image');
-        removeBtn.addEventListener('click', function(e) {
+        removeBtn.addEventListener('click', async function(e) {
             e.preventDefault();
             if (await Modal.confirm('이 이미지를 삭제하시겠습니까?', { type: 'danger' })) {
                 removeExistingImage(index, imageItem);
@@ -2807,7 +2807,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // 이미지 제거
-        removeBtn.addEventListener('click', function(e) {
+        removeBtn.addEventListener('click', async function(e) {
             e.stopPropagation();
             fileInput.value = '';
             placeholder.style.display = 'block';
@@ -3969,7 +3969,7 @@ function displayExistingImages(images) {
 }
 
 // 기존 이미지 삭제 함수
-function removeExistingImage(index) {
+async function removeExistingImage(index) {
     if (await Modal.confirm('이 이미지를 삭제하시겠습니까?', { type: 'danger' })) {
         // currentImageData에서 제거
         if (currentImageData && currentImageData[index]) {

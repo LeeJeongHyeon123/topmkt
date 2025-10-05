@@ -900,38 +900,44 @@ body {
 
     <!-- 게시판 컨트롤 영역 -->
     <div class="board-controls">
-        <!-- 검색 폼 -->
+        <!-- 검색 폼 - 🚀 v3.37.0: SearchFilter 컴포넌트 적용 -->
         <div class="search-wrapper">
-            <form method="GET" action="/community" class="search-form">
-                <!-- 검색 필터 선택 -->
-                <select name="filter" class="search-filter" id="searchFilter">
-                    <option value="all" <?= ($filter ?? 'all') === 'all' ? 'selected' : '' ?>>전체</option>
-                    <option value="title" <?= ($filter ?? '') === 'title' ? 'selected' : '' ?>>제목만</option>
-                    <option value="content" <?= ($filter ?? '') === 'content' ? 'selected' : '' ?>>내용만</option>
-                    <option value="author" <?= ($filter ?? '') === 'author' ? 'selected' : '' ?>>작성자</option>
-                </select>
-                
-                <input type="text" 
-                       name="search" 
-                       value="<?= htmlspecialchars($search ?? '') ?>" 
-                       placeholder="검색어를 입력하세요..."
-                       class="search-input"
-                       maxlength="100"
-                       autocomplete="off"
-                       id="searchInput">
-                <button type="submit" class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-                <?php if (!empty($search)): ?>
-                    <a href="/community<?= $filter && $filter !== 'all' ? '?filter=' . urlencode($filter) : '' ?>" class="btn btn-secondary" style="margin-left: 15px;">
-                        ✖️ 검색 해제
-                    </a>
-                <?php endif; ?>
-            </form>
-            
+            <?php
+            require_once SRC_PATH . '/components/ui/SearchFilter.php';
+
+            echo SearchFilter::create([
+                'action' => '/community',
+                'method' => 'GET',
+                'layout' => 'inline',
+                'filters' => [
+                    [
+                        'type' => 'select',
+                        'name' => 'filter',
+                        'id' => 'searchFilter',
+                        'options' => [
+                            'all' => '전체',
+                            'title' => '제목만',
+                            'content' => '내용만',
+                            'author' => '작성자'
+                        ],
+                        'value' => $filter ?? 'all'
+                    ]
+                ],
+                'searchInput' => true,
+                'searchName' => 'search',
+                'searchPlaceholder' => '검색어를 입력하세요...',
+                'searchValue' => $search ?? '',
+                'submitButton' => true,
+                'submitText' => '<i class="fas fa-search"></i>',
+                'resetButton' => !empty($search),  // 검색어 있을 때만 표시
+                'resetText' => '✖️ 검색 해제',
+                'cssClass' => 'community-search-filter'
+            ]);
+            ?>
+
             <!-- 검색 힌트 -->
             <div class="search-hints" id="searchHints">
-                💡 검색 팁: 
+                💡 검색 팁:
                 <span class="search-hint-item" data-search="마케팅">마케팅</span>
                 <span class="search-hint-item" data-search="SNS">SNS</span>
                 <span class="search-hint-item" data-search="광고">광고</span>

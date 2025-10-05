@@ -2,6 +2,9 @@
 /**
  * 기업 신청 관리 대시보드 메인 페이지
  */
+
+// Card 컴포넌트 로드 (v3.38.0)
+require_once SRC_PATH . '/components/ui/Card.php';
 ?>
 
 <!-- Flatpickr CSS -->
@@ -340,47 +343,8 @@
 .status-waiting { background: #bee3f8; color: #2b6cb0; }
 
 /* 날짜 필터 스타일 */
-.date-filter-container {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.date-filter {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.date-filter label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #4a5568;
-    white-space: nowrap;
-}
-
-.date-input {
-    padding: 6px 10px;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    background: white;
-    color: #2d3748;
-    transition: border-color 0.2s ease;
-    cursor: pointer;
-}
-
-.date-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-}
+/* 🚀 v3.37.0: 날짜 필터 CSS는 이제 /assets/css/search-filter.css에서 통합 관리 */
+/* .date-filter-container, .date-filter 등은 SearchFilter 컴포넌트에서 자동 제공 */
 
 /* Flatpickr 커스터마이징 */
 .flatpickr-calendar {
@@ -651,39 +615,35 @@
         </div>
     </div>
     
-    <!-- 통계 카드 -->
+    <!-- 통계 카드 (Card 컴포넌트 사용 - v3.38.0) -->
     <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon primary"><?= ($contentType ?? 'lecture') === 'event' ? '🎉' : '📚' ?></div>
-            </div>
-            <div class="stat-value"><?= number_format($stats['total_lectures']) ?></div>
-            <div class="stat-label">등록된 <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?></div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon success">✅</div>
-            </div>
-            <div class="stat-value"><?= number_format($stats['approved_applications']) ?></div>
-            <div class="stat-label">승인된 신청</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon warning">⏳</div>
-            </div>
-            <div class="stat-value"><?= number_format($stats['pending_applications']) ?></div>
-            <div class="stat-label">대기중인 신청</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon primary">📊</div>
-            </div>
-            <div class="stat-value"><?= number_format($stats['total_applications']) ?></div>
-            <div class="stat-label">전체 신청</div>
-        </div>
+        <?= Card::stat([
+            'icon' => ($contentType ?? 'lecture') === 'event' ? '🎉' : '📚',
+            'value' => number_format($stats['total_lectures']),
+            'label' => '등록된 ' . (($contentType ?? 'lecture') === 'event' ? '행사' : '강의'),
+            'variant' => 'primary'
+        ]) ?>
+
+        <?= Card::stat([
+            'icon' => '✅',
+            'value' => number_format($stats['approved_applications']),
+            'label' => '승인된 신청',
+            'variant' => 'success'
+        ]) ?>
+
+        <?= Card::stat([
+            'icon' => '⏳',
+            'value' => number_format($stats['pending_applications']),
+            'label' => '대기중인 신청',
+            'variant' => 'warning'
+        ]) ?>
+
+        <?= Card::stat([
+            'icon' => '📊',
+            'value' => number_format($stats['total_applications']),
+            'label' => '전체 신청',
+            'variant' => 'primary'
+        ]) ?>
     </div>
     
     <!-- 내 강의 목록 -->
@@ -692,16 +652,38 @@
             <h2 class="section-title">
                 <?= ($contentType ?? 'lecture') === 'event' ? '🎉 최근 행사 목록' : '🎯 최근 강의 목록' ?>
             </h2>
-            <div class="date-filter-container">
-                <div class="date-filter">
-                    <label for="startDate">시작일:</label>
-                    <input type="date" id="startDate" class="date-input">
-                    <label for="endDate">종료일:</label>
-                    <input type="date" id="endDate" class="date-input">
-                    <button onclick="applyDateFilter()" class="btn btn-primary btn-sm">필터 적용</button>
-                    <button onclick="resetDateFilter()" class="btn btn-outline btn-sm">초기화</button>
-                </div>
-            </div>
+            <!-- 날짜 필터 (SearchFilter 컴포넌트) -->
+            <?php
+            require_once SRC_PATH . '/components/ui/SearchFilter.php';
+
+            echo SearchFilter::create([
+                'method' => 'JS',
+                'layout' => 'inline',
+                'filters' => [
+                    [
+                        'type' => 'date',
+                        'name' => 'startDate',
+                        'id' => 'startDate',
+                        'label' => '시작일'
+                    ],
+                    [
+                        'type' => 'date',
+                        'name' => 'endDate',
+                        'id' => 'endDate',
+                        'label' => '종료일'
+                    ]
+                ],
+                'searchInput' => false,
+                'submitButton' => true,
+                'submitText' => '필터 적용',
+                'resetButton' => true,
+                'resetText' => '초기화',
+                'collapsible' => false,
+                'onSubmit' => 'applyDateFilter()',
+                'onReset' => 'resetDateFilter()',
+                'cssClass' => 'registrations-date-filter'
+            ]);
+            ?>
         </div>
         
         <?php if (empty($lectures)): ?>

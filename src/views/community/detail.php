@@ -784,7 +784,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 삭제 버튼 처리
     const deleteBtn = document.getElementById('deleteBtn');
     if (deleteBtn && isOwner) {
-        deleteBtn.addEventListener('click', function() {
+        deleteBtn.addEventListener('click', async function() {
             if (!(await Modal.confirm('정말로 이 게시글을 삭제하시겠습니까?\n\n삭제된 게시글은 복구할 수 없습니다.', { type: 'warning' }))) {
                 return;
             }
@@ -842,7 +842,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 키보드 단축키
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', async function(e) {
         // ESC: 목록으로 돌아가기
         if (e.key === 'Escape') {
             if (await Modal.confirm('목록으로 돌아가시겠습니까?')) {

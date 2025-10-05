@@ -1191,24 +1191,20 @@ document.addEventListener('DOMContentLoaded', function() {
         statusIcon.className = 'input-status-icon show checking fas fa-spinner';
         messageText.textContent = '닉네임을 확인하는 중...';
         nicknameInput.classList.remove('valid', 'invalid');
-        
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
         try {
-            const response = await fetch('/auth/check-nickname', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ nickname })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                if (data.available) {
+            const result = await ApiClient.post('/auth/check-nickname',
+                { nickname },
+                { noLoading: true, noErrorToast: true }
+            );
+
+            if (result.success) {
+                if (result.data.available) {
                     // 사용 가능
                     statusIndicator.className = 'status-indicator available';
                     statusIcon.className = 'input-status-icon show valid fas fa-check';
-                    messageText.textContent = data.message;
+                    messageText.textContent = result.message;
                     nicknameInput.classList.add('valid');
                     nicknameInput.classList.remove('invalid');
                     isNicknameAvailable = true;
@@ -1216,15 +1212,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     // 사용 불가능
                     statusIndicator.className = 'status-indicator';
                     statusIcon.className = 'input-status-icon show invalid fas fa-times';
-                    messageText.textContent = data.message;
+                    messageText.textContent = result.message;
                     nicknameInput.classList.add('invalid');
                     nicknameInput.classList.remove('valid');
                     isNicknameAvailable = false;
                 }
             } else {
-                throw new Error(data.message || '중복 검사 중 오류가 발생했습니다.');
+                throw new Error(result.message || '중복 검사 중 오류가 발생했습니다.');
             }
-            
+
         } catch (error) {
             console.error('❌ 닉네임 중복검사 오류:', error);
             statusIndicator.className = 'status-indicator';
@@ -1265,24 +1261,20 @@ document.addEventListener('DOMContentLoaded', function() {
         statusIcon.className = 'input-status-icon show checking fas fa-spinner';
         messageText.textContent = '휴대폰 번호를 확인하는 중...';
         phoneInput.classList.remove('valid', 'invalid');
-        
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
         try {
-            const response = await fetch('/auth/check-phone', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ phone })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                if (data.available) {
+            const result = await ApiClient.post('/auth/check-phone',
+                { phone },
+                { noLoading: true, noErrorToast: true }
+            );
+
+            if (result.success) {
+                if (result.data.available) {
                     // 사용 가능
                     statusIndicator.className = 'status-indicator available';
                     statusIcon.className = 'input-status-icon show valid fas fa-check';
-                    messageText.textContent = data.message;
+                    messageText.textContent = result.message;
                     phoneInput.classList.add('valid');
                     phoneInput.classList.remove('invalid');
                     isPhoneAvailable = true;
@@ -1290,15 +1282,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     // 사용 불가능
                     statusIndicator.className = 'status-indicator';
                     statusIcon.className = 'input-status-icon show invalid fas fa-times';
-                    messageText.textContent = data.message;
+                    messageText.textContent = result.message;
                     phoneInput.classList.add('invalid');
                     phoneInput.classList.remove('valid');
                     isPhoneAvailable = false;
                 }
             } else {
-                throw new Error(data.message || '중복 검사 중 오류가 발생했습니다.');
+                throw new Error(result.message || '중복 검사 중 오류가 발생했습니다.');
             }
-            
+
         } catch (error) {
             console.error('❌ 휴대폰 중복검사 오류:', error);
             statusIndicator.className = 'status-indicator';

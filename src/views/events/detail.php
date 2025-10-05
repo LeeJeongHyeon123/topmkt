@@ -2957,7 +2957,7 @@ async function registerEvent() {
 }
 
 // 로그인 페이지로 리다이렉트
-function redirectToLogin() {
+async function redirectToLogin() {
     if (await Modal.confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
         window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname);
     }
@@ -3475,7 +3475,7 @@ function startChatWithAuthor(authorId, authorName) {
 }
 
 // 이벤트 삭제 확인 함수
-function confirmDeleteEvent(eventId) {
+async function confirmDeleteEvent(eventId) {
     if (!eventId) {
         Toast.error('잘못된 행사 ID입니다.');
         return;

@@ -645,45 +645,46 @@ body {
 
     <!-- 게시판 컨트롤 영역 -->
     <div class="board-controls">
-        <!-- 검색 폼 -->
+        <!-- 검색 폼 - 🚀 v3.37.0: SearchFilter 컴포넌트 적용 -->
         <div class="search-wrapper">
-            <form method="GET" action="/notices" class="search-form">
-                <!-- 기업명 검색 -->
-                <input type="text" 
-                       name="company" 
-                       value="<?= htmlspecialchars($company ?? '') ?>" 
-                       placeholder="기업명 검색..."
-                       class="company-filter"
-                       id="companyFilter"
-                       autocomplete="off"
-                       maxlength="50">
-                
-                <!-- 검색 필터 선택 -->
-                <select name="filter" class="company-filter" id="searchFilter">
-                    <option value="all" <?= ($filter ?? 'all') === 'all' ? 'selected' : '' ?>>전체</option>
-                    <option value="title" <?= ($filter ?? '') === 'title' ? 'selected' : '' ?>>제목만</option>
-                    <option value="content" <?= ($filter ?? '') === 'content' ? 'selected' : '' ?>>내용만</option>
-                </select>
-                
-                <input type="text" 
-                       name="search" 
-                       value="<?= htmlspecialchars($search ?? '') ?>" 
-                       placeholder="검색어를 입력하세요..."
-                       class="search-input"
-                       maxlength="100"
-                       autocomplete="off"
-                       id="searchInput">
-                
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> 검색
-                </button>
-                
-                <?php if (!empty($search) || !empty($company)): ?>
-                    <a href="/notices" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> 초기화
-                    </a>
-                <?php endif; ?>
-            </form>
+            <?php
+            require_once SRC_PATH . '/components/ui/SearchFilter.php';
+
+            echo SearchFilter::create([
+                'action' => '/notices',
+                'method' => 'GET',
+                'layout' => 'inline',
+                'filters' => [
+                    [
+                        'type' => 'text',
+                        'name' => 'company',
+                        'id' => 'companyFilter',
+                        'placeholder' => '기업명 검색...',
+                        'value' => $company ?? ''
+                    ],
+                    [
+                        'type' => 'select',
+                        'name' => 'filter',
+                        'id' => 'searchFilter',
+                        'options' => [
+                            'all' => '전체',
+                            'title' => '제목만',
+                            'content' => '내용만'
+                        ],
+                        'value' => $filter ?? 'all'
+                    ]
+                ],
+                'searchInput' => true,
+                'searchName' => 'search',
+                'searchPlaceholder' => '검색어를 입력하세요...',
+                'searchValue' => $search ?? '',
+                'submitButton' => true,
+                'submitText' => '<i class="fas fa-search"></i> 검색',
+                'resetButton' => !empty($search) || !empty($company),  // 검색어 또는 기업명 있을 때만
+                'resetText' => '<i class="fas fa-times"></i> 초기화',
+                'cssClass' => 'notices-search-filter'
+            ]);
+            ?>
         </div>
         
         <!-- 글쓰기 버튼 (기업 사용자만) -->

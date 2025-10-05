@@ -9,6 +9,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Pagination 컴포넌트 로드
+require_once SRC_PATH . '/components/ui/Pagination.php';
+
 // 페이지 정보 설정
 $page_title = '회원 목록';
 $page_description = '등록된 회원들을 관리하고 모니터링하세요';

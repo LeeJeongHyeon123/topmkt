@@ -19,9 +19,10 @@
     
     <!-- 기본 CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/search-filter.css"><!-- 🚀 v3.37.0: 검색/필터 컴포넌트 시스템 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- 관리자 공통 스타일 -->
     <?php include SRC_PATH . '/views/templates/admin_styles.php'; ?>
     

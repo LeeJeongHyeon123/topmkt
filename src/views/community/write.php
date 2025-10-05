@@ -1434,7 +1434,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 삭제 버튼 처리 (수정 페이지에서만)
     if (deleteBtn) {
-        deleteBtn.addEventListener('click', function() {
+        deleteBtn.addEventListener('click', async function() {
             if (!(await Modal.confirm('정말로 이 게시글을 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.', { type: 'warning' }))) {
                 return;
             }

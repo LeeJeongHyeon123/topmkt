@@ -66,6 +66,7 @@
     <link rel="stylesheet" href="/assets/css/main.css?v=<?= time() ?>">
     <link rel="stylesheet" href="/assets/css/loading.css">
     <link rel="stylesheet" href="/assets/css/badges.css"><!-- 🚀 v3.28.0: 통합 배지 시스템 -->
+    <link rel="stylesheet" href="/assets/css/search-filter.css"><!-- 🚀 v3.37.0: 검색/필터 컴포넌트 시스템 -->
     <!-- Font Awesome 6.4.0 with fallback for connection issues -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
