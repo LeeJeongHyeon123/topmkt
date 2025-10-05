@@ -1370,12 +1370,12 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
         
         console.log('🔧 취소 버튼 이벤트 핸들러 완전 재생성 - v3.14.1-FINAL');
-        
+
         // 최종 이벤트 리스너 등록
-        newCancelBtn.addEventListener('click', function(e) {
+        newCancelBtn.addEventListener('click', async function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             console.log('🚨 취소 버튼 클릭됨 - v3.14.1-FINAL ' + new Date().toLocaleTimeString());
             
             // 🔍 변수 상태 상세 디버깅
