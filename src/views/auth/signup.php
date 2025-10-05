@@ -1109,7 +1109,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const phone = phoneInput.value.trim();
         console.log('📱 발송 대상 번호:', phone);
         
-        if (!isValidPhoneFormat(phone)) {
+        // 🚀 v3.44.0: FormValidator 직접 사용
+        if (!FormValidator.isValidPhoneStrict(phone)) {
             console.warn('❌ 잘못된 휴대폰 번호 형식:', phone);
             Toast.error('010으로 시작하는 올바른 휴대폰 번호를 입력해주세요.');
             return;
@@ -1572,8 +1573,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         const isNicknameValid = nickname.length >= 2 && nickname.length <= 20 && isNicknameAvailable;
-        const isPhoneValid = isValidPhoneFormat(phone) && isPhoneAvailable;
-        const isEmailValid = isValidEmailFormat(email);
+        // 🚀 v3.44.0: FormValidator 직접 사용
+        const isPhoneValid = FormValidator.isValidPhoneStrict(phone) && isPhoneAvailable;
+        const isEmailValid = FormValidator.isValidEmail(email);
         const isPasswordValid = validatePassword(password);
         const isPasswordMatch = validatePasswordMatch(password, passwordConfirm);
         
@@ -1732,21 +1734,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 휴대폰 번호 형식 검증 (010으로 시작하는지 확인)
-    // 🚀 v3.41.0: FormValidator 사용
-    function isValidPhoneFormat(phone) {
-        const isValid = FormValidator.isValidPhoneStrict(phone);
-        console.log('📱 휴대폰 번호 형식 검증:', phone, '→', isValid);
-        return isValid;
-    }
-
-    // 이메일 형식 검증
-    // 🚀 v3.41.0: FormValidator 사용
-    function isValidEmailFormat(email) {
-        const isValid = FormValidator.isValidEmail(email);
-        console.log('📧 이메일 형식 검증:', email, '→', isValid);
-        return isValid;
-    }
+    // 🚀 v3.44.0: 중복 함수 제거 (FormValidator 직접 사용으로 전환)
+    // - isValidPhoneFormat() 제거 → FormValidator.isValidPhoneStrict() 직접 호출
+    // - isValidEmailFormat() 제거 → FormValidator.isValidEmail() 직접 호출
 
     // 인증번호 발송 (reCAPTCHA 토큰 포함)
     async function sendVerificationCode(phone, recaptchaToken) {
@@ -2031,7 +2021,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 발송 버튼 상태 업데이트
     function updateSendButtonState() {
         const phone = phoneInput.value.trim();
-        const isValidPhone = isValidPhoneFormat(phone) && phone.startsWith('010-');
+        // 🚀 v3.44.0: FormValidator 직접 사용
+        const isValidPhone = FormValidator.isValidPhoneStrict(phone) && phone.startsWith('010-');
         const shouldDisable = !isValidPhone || isPhoneVerified;
         
         console.log('🔘 발송 버튼 상태 업데이트:', {

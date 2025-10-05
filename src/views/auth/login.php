@@ -396,7 +396,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if (!isValidPhoneFormat(phone)) {
+        // 🚀 v3.44.0: FormValidator 직접 사용
+        if (!FormValidator.isValidPhoneStrict(phone)) {
             e.preventDefault();
             // 🚀 v3.30.0: Toast 알림 시스템 사용
             Toast.error('010으로 시작하는 올바른 휴대폰 번호를 입력해주세요.');
@@ -404,11 +405,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 휴대폰 번호 형식 검증
-    function isValidPhoneFormat(phone) {
-        const pattern = /^010-[0-9]{3,4}-[0-9]{4}$/;
-        return pattern.test(phone);
-    }
+    // 🚀 v3.44.0: 중복 함수 제거 (FormValidator 직접 사용으로 전환)
+    // - isValidPhoneFormat() 제거 → FormValidator.isValidPhoneStrict() 직접 호출
 
     // 🚀 v3.30.0: showMessage 함수 제거 (Toast 클래스로 대체됨)
 
