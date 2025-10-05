@@ -1410,17 +1410,15 @@ class MultiStepPasswordResetManager {
         
         // 🚀 v3.31.0: Loading 클래스 사용
         Loading.button(this.step1Button, true, { text: '처리 중...' });
-        
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
         try {
             const formData = new FormData(this.step1Form);
-            const response = await fetch('/auth/forgot-password', {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            
-            const data = await response.json();
-            
+            const data = await ApiClient.post('/auth/forgot-password',
+                formData,
+                { noLoading: true, noErrorToast: true }
+            );
+
             if (data.success) {
                 this.userData.phone = phone;
                 if (this.maskedPhoneDisplay) {
@@ -1432,7 +1430,7 @@ class MultiStepPasswordResetManager {
                 this.goToStep(2);
                 this.showAlert(data.message, 'success');
             } else {
-                this.showAlert(data.error || '오류가 발생했습니다.', 'error');
+                this.showAlert(data.error || data.message || '오류가 발생했습니다.', 'error');
             }
         } catch (error) {
             console.error('Step 1 Error:', error);
@@ -1454,23 +1452,18 @@ class MultiStepPasswordResetManager {
         
         // 🚀 v3.31.0: Loading 클래스 사용
         Loading.button(this.step2Button, true, { text: '인증 중...' });
-        
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
         try {
-            const response = await fetch('/auth/verify-reset-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
+            const data = await ApiClient.post('/auth/verify-reset-code',
+                {
                     phone: this.userData.phone,
                     verification_code: code,
                     csrf_token: document.querySelector('input[name="csrf_token"]').value
-                })
-            });
-            
-            const data = await response.json();
-            
+                },
+                { noLoading: true, noErrorToast: true }
+            );
+
             if (data.success) {
                 this.userData.verificationCode = code;
                 this.step3Form.querySelector('#final_phone').value = this.userData.phone;
@@ -1478,7 +1471,7 @@ class MultiStepPasswordResetManager {
                 this.goToStep(3);
                 this.showAlert('인증이 완료되었습니다. 새 비밀번호를 설정해주세요.', 'success');
             } else {
-                this.showAlert(data.error || '인증 코드가 올바르지 않습니다.', 'error');
+                this.showAlert(data.error || data.message || '인증 코드가 올바르지 않습니다.', 'error');
             }
         } catch (error) {
             console.error('Step 2 Error:', error);
@@ -1509,22 +1502,20 @@ class MultiStepPasswordResetManager {
         Loading.button(this.step3Button, true, { text: '저장 중...' });
         
         try {
+            // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
             const formData = new FormData(this.step3Form);
-            const response = await fetch('/auth/reset-password', {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            
-            const data = await response.json();
-            
+            const data = await ApiClient.post('/auth/reset-password',
+                formData,
+                { noLoading: true, noErrorToast: true }
+            );
+
             if (data.success) {
                 this.showAlert('비밀번호가 성공적으로 변경되었습니다. 로그인 페이지로 이동합니다.', 'success');
                 setTimeout(() => {
                     window.location.href = '/auth/login';
                 }, 2000);
             } else {
-                this.showAlert(data.error || '비밀번호 재설정에 실패했습니다.', 'error');
+                this.showAlert(data.error || data.message || '비밀번호 재설정에 실패했습니다.', 'error');
             }
         } catch (error) {
             console.error('Step 3 Error:', error);

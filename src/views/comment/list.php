@@ -826,59 +826,43 @@ function submitReply(parentId) {
     const textarea = form.querySelector('.reply-textarea');
     const rawContent = textarea.value;
     const content = normalizeText(rawContent);
-    
+
     if (!content) {
         Toast.error('답글 내용을 입력해주세요.');
         return;
     }
-    
+
     // 글자수 제한 검증 추가
     if (!validateCharacterLimit(content, 2000)) {
         return;
     }
-    
+
     const submitBtn = form.querySelector('.reply-submit');
     submitBtn.disabled = true;
     submitBtn.textContent = '작성 중...';
-    
-    fetch('/api/comments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': getCsrfToken()
-        },
-        body: JSON.stringify({
+
+    // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+    ApiClient.post('/api/comments',
+        {
             post_id: window.currentPostId,
             parent_id: parentId,
             content: content
-        })
-    })
-    .then(response => {
-        console.log('Reply response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Reply response data:', data);
-        
-        // 다양한 성공 응답 형태 처리
-        const isSuccess = data.success === true || 
-                         (data.status === 'success' && data.data && data.data.success === true) ||
-                         (data.data && data.data.success === true);
-        
-        if (isSuccess) {
+        },
+        { noLoading: true } // 버튼 상태로 로딩 표시
+    )
+    .then(result => {
+        console.log('답글 작성 응답:', result);
+
+        if (result.success) {
             console.log('답글 작성 성공, 페이지 새로고침');
             location.reload();
         } else {
-            const errorMessage = data.message || 
-                               (data.data && data.data.message) || 
-                               '답글 작성에 실패했습니다.';
-            console.error('답글 작성 실패:', errorMessage);
-            Toast.error(errorMessage);
+            Toast.error(result.message || '답글 작성에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        Toast.error('답글 작성 중 오류가 발생했습니다.');
+        console.error('답글 작성 오류:', error);
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     })
     .finally(() => {
         submitBtn.disabled = false;
@@ -988,72 +972,54 @@ function cancelEditComment(commentId) {
 // 댓글 수정 저장
 function updateComment(commentId) {
     const textarea = document.getElementById(`edit-content-${commentId}`);
-    
+
     if (!textarea) {
         Toast.error('편집 폼을 찾을 수 없습니다.');
         return;
     }
-    
+
     const content = normalizeText(textarea.value);
-    
+
     if (!content) {
         Toast.error('댓글 내용을 입력해주세요.');
         return;
     }
-    
+
     if (content.length < 2) {
         Toast.error('댓글은 2자 이상 입력해주세요.');
         return;
     }
-    
+
     // 글자수 제한 검증 (2,000자)
     if (!validateCharacterLimit(content, 2000)) {
         return;
     }
-    
+
     // 저장 버튼 비활성화
     const saveBtn = textarea.parentElement.querySelector('button[onclick*="updateComment"]');
     if (saveBtn) {
         saveBtn.disabled = true;
         saveBtn.textContent = '저장 중...';
     }
-    
-    fetch('/api/comments/' + commentId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': getCsrfToken()
-        },
-        body: JSON.stringify({
-            content: content
-        })
-    })
-    .then(response => {
-        console.log('Edit response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Edit response data:', data);
-        
-        // 다양한 성공 응답 형태 처리
-        const isSuccess = data.success === true || 
-                         (data.status === 'success' && data.data && data.data.success === true) ||
-                         (data.data && data.data.success === true);
-        
-        if (isSuccess) {
+
+    // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.put)
+    ApiClient.put(`/api/comments/${commentId}`,
+        { content: content },
+        { noLoading: true } // 버튼 상태로 로딩 표시
+    )
+    .then(result => {
+        console.log('댓글 수정 응답:', result);
+
+        if (result.success) {
             console.log('댓글 수정 성공, 페이지 새로고침');
             location.reload();
         } else {
-            const errorMessage = data.message || 
-                               (data.data && data.data.message) || 
-                               '댓글 수정에 실패했습니다.';
-            console.error('댓글 수정 실패:', errorMessage);
-            Toast.error(errorMessage);
+            Toast.error(result.message || '댓글 수정에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        Toast.error('댓글 수정 중 오류가 발생했습니다.');
+        console.error('댓글 수정 오류:', error);
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     })
     .finally(() => {
         // 버튼 상태 복원
@@ -1069,40 +1035,22 @@ async function deleteComment(commentId) {
     if (!(await Modal.confirm('정말로 이 댓글을 삭제하시겠습니까?', { type: 'warning' }))) {
         return;
     }
-    
-    fetch('/api/comments/' + commentId, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRF-Token': getCsrfToken()
-        }
-    })
-    .then(response => {
-        console.log('Delete response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Delete response data:', data);
-        
-        // 다양한 성공 응답 형태 처리 (댓글 작성과 동일한 로직)
-        const isSuccess = data.success === true || 
-                         (data.status === 'success' && data.data && data.data.success === true) ||
-                         (data.data && data.data.success === true) ||
-                         (data.status === 'success'); // ResponseHelper의 status 필드도 확인
-        
-        if (isSuccess) {
+
+    // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.delete)
+    ApiClient.delete(`/api/comments/${commentId}`, { noLoading: true })
+    .then(result => {
+        console.log('댓글 삭제 응답:', result);
+
+        if (result.success) {
             console.log('댓글 삭제 성공, 페이지 새로고침');
             location.reload();
         } else {
-            const errorMessage = data.message || 
-                               (data.data && data.data.message) || 
-                               '댓글 삭제에 실패했습니다.';
-            console.error('댓글 삭제 실패:', errorMessage);
-            Toast.error(errorMessage);
+            Toast.error(result.message || '댓글 삭제에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        Toast.error('댓글 삭제 중 오류가 발생했습니다.');
+        console.error('댓글 삭제 오류:', error);
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     });
 }
 

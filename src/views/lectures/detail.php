@@ -3180,30 +3180,23 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 신청 상태 확인
+// 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
 async function checkRegistrationStatus() {
     try {
         console.log('🔍 신청 상태 확인 시작...');
-        
-        const response = await fetch('/api/lectures/<?= $lecture["id"] ?>/registration-status', {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+
+        const result = await ApiClient.get('/api/lectures/<?= $lecture["id"] ?>/registration-status', {
+            noLoading: true,
+            noErrorToast: true
         });
-        
-        console.log('📡 API 응답 상태:', response.status);
-        
-        const result = await response.json();
+
         console.log('📋 신청 상태 데이터:', result);
-        console.log('📋 응답 데이터 구조:', JSON.stringify(result, null, 2));
-        
-        // API 응답 구조 수정: result.data가 실제 데이터
-        if (result.status === 'success' && result.data) {
+
+        if (result.success && result.data) {
             console.log('✅ API 성공 응답, data 사용');
             updateRegistrationUI(result.data);
         } else {
             console.log('ℹ️ API 응답 오류 또는 비로그인 상태:', result);
-            // 비로그인 사용자는 메시지 표시하지 않음
         }
     } catch (error) {
         console.log('ℹ️ 신청 상태 확인 실패 (정상):', error.message);
@@ -3554,47 +3547,42 @@ function resetRegistrationForm() {
 }
 
 // 사용자 정보 자동 입력
+// 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
 async function loadUserInfo() {
     console.log('📝 사용자 정보 및 이전 신청 내역 로드 시작...');
-    
+
     try {
         // 사용자 기본 정보 로드
-        const userResponse = await fetch('/auth/me', {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        
         let userInfo = null;
-        if (userResponse.ok) {
-            const userData = await userResponse.json();
-            userInfo = userData.user;
-            console.log('👤 로드된 사용자 정보 전체:', JSON.stringify(userInfo, null, 2));
-        } else {
-            console.log('❌ 사용자 정보 로드 실패:', userResponse.status, userResponse.statusText);
-        }
-        
-        // 이전 신청 내역 로드 (취소된 것 포함)
-        const registrationResponse = await fetch('/api/lectures/<?= $lecture["id"] ?>/previous-registration', {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+        try {
+            const userData = await ApiClient.get('/auth/me', { noLoading: true, noErrorToast: true });
+            if (userData.success) {
+                userInfo = userData.user || userData.data;
+                console.log('👤 로드된 사용자 정보 전체:', JSON.stringify(userInfo, null, 2));
             }
-        });
-        
+        } catch (error) {
+            console.log('❌ 사용자 정보 로드 실패:', error.message);
+        }
+
+        // 이전 신청 내역 로드 (취소된 것 포함)
         let previousRegistration = null;
-        if (registrationResponse.ok) {
-            const regData = await registrationResponse.json();
-            if (regData.status === 'success' && regData.data) {
+        try {
+            const regData = await ApiClient.get('/api/lectures/<?= $lecture["id"] ?>/previous-registration', {
+                noLoading: true,
+                noErrorToast: true
+            });
+
+            if (regData.success && regData.data) {
                 previousRegistration = regData.data;
                 console.log('📋 이전 신청 내역 발견:', previousRegistration);
             }
+        } catch (error) {
+            console.log('ℹ️ 이전 신청 내역 없음');
         }
-        
+
         // 폼 필드 자동 채우기
         fillRegistrationForm(userInfo, previousRegistration);
-        
+
     } catch (error) {
         console.error('정보 로드 오류:', error);
     }
@@ -3703,20 +3691,14 @@ async function submitRegistration() {
         // CSRF 토큰 추가
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         data.csrf_token = csrfToken;
-        
-        // 신청 요청
-        const response = await fetch('/api/lectures/<?= $lecture["id"] ?>/registration', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        
-        if (result.status === 'success') {
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+        const result = await ApiClient.post('/api/lectures/<?= $lecture["id"] ?>/registration',
+            data,
+            { noLoading: true } // 버튼 상태로 로딩 표시
+        );
+
+        if (result.success) {
             Toast.success('✅ ' + result.message);
             closeRegistrationModal();
             checkRegistrationStatus(); // 상태 새로고침
@@ -3834,30 +3816,22 @@ async function cancelRegistration() {
     
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        
-        const response = await fetch('/api/lectures/<?= $lecture["id"] ?>/registration', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({
-                csrf_token: csrfToken
-            })
+
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.delete)
+        const result = await ApiClient.delete('/api/lectures/<?= $lecture["id"] ?>/registration', {
+            noLoading: true,
+            body: { csrf_token: csrfToken }
         });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
+
+        if (result.success) {
             Toast.success('✅ 신청이 취소되었습니다.');
             checkRegistrationStatus(); // 상태 새로고침
         } else {
-            Toast.error('❌ 신청 취소에 실패했습니다.\n\n' + (data.message || '알 수 없는 오류'));
+            Toast.error('❌ 신청 취소에 실패했습니다.\n\n' + (result.message || '알 수 없는 오류'));
         }
     } catch (error) {
         console.error('신청 취소 오류:', error);
-        Toast.error('❌ 신청 취소 중 오류가 발생했습니다.');
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     }
 }
 
@@ -3903,50 +3877,19 @@ async function confirmDeleteLecture(lectureId) {
         confirm_delete: true
     });
 
-    // 삭제 요청
-    fetch('/lectures/' + lectureId + '/delete', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({
+    // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+    ApiClient.post('/lectures/' + lectureId + '/delete',
+        {
             csrf_token: csrfToken,
             confirm_delete: true
-        })
-    })
-    .then(response => {
-        console.log('=== 응답 정보 ===');
-        console.log('응답 상태:', response.status);
-        console.log('응답 상태 텍스트:', response.statusText);
-        console.log('응답 헤더:', response.headers);
-        console.log('응답 OK 여부:', response.ok);
-        
-        // 응답이 JSON이 아닐 수 있으므로 텍스트로 먼저 읽어보기
-        return response.text().then(text => {
-            console.log('응답 원문:', text);
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('JSON 파싱 오류:', e);
-                throw new Error('서버 응답이 유효한 JSON이 아닙니다: ' + text);
-            }
-        });
-    })
-    .then(data => {
-        console.log('=== 파싱된 응답 데이터 ===');
-        console.log('응답 데이터:', data);
-        console.log('응답 상태:', data.status);
-        console.log('응답 데이터 객체:', data.data);
-        
-        // ResponseHelper 형식 처리
-        const isSuccess = data.status === 'success' && data.data && data.data.success === true;
-        const message = data.data ? data.data.message : (data.message || '알 수 없는 오류');
-        
-        console.log('최종 성공 여부:', isSuccess);
-        console.log('최종 메시지:', message);
-        
-        if (isSuccess) {
+        },
+        { noLoading: true } // 버튼 상태로 로딩 표시
+    )
+    .then(result => {
+        console.log('=== 응답 데이터 ===');
+        console.log('응답 데이터:', result);
+
+        if (result.success) {
             console.log('✅ 강의 삭제 성공');
             Toast.success('✅ 강의가 성공적으로 삭제되었습니다.');
             // 이전 페이지로 돌아가기 (또는 강의 목록으로)
@@ -3956,8 +3899,8 @@ async function confirmDeleteLecture(lectureId) {
                 window.location.href = '/lectures';
             }
         } else {
-            console.error('❌ 강의 삭제 실패:', data);
-            Toast.error('❌ 강의 삭제에 실패했습니다.\n\n오류: ' + message);
+            console.error('❌ 강의 삭제 실패:', result);
+            Toast.error('❌ 강의 삭제에 실패했습니다.\n\n오류: ' + result.message);
             // 버튼 복구
             deleteBtn.innerHTML = originalText;
             deleteBtn.disabled = false;
@@ -3967,8 +3910,7 @@ async function confirmDeleteLecture(lectureId) {
         console.error('=== 강의 삭제 오류 ===');
         console.error('오류 객체:', error);
         console.error('오류 메시지:', error.message);
-        console.error('오류 스택:', error.stack);
-        Toast.error('❌ 강의 삭제 중 오류가 발생했습니다.\n\n네트워크를 확인하고 다시 시도해주세요.\n\n오류: ' + error.message);
+        // ApiClient가 이미 Toast 표시했으므로 추가 표시는 선택적
         // 버튼 복구
         deleteBtn.innerHTML = originalText;
         deleteBtn.disabled = false;
