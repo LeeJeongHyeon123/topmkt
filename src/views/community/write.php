@@ -1511,6 +1511,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // }, 30000); // 30초마다
 });
 </script>
-
-<script>
-</script>
