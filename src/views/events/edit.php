@@ -546,8 +546,7 @@ if (!isset($_SESSION['csrf_token'])) {
                                         </div>
                                     <?php endif; ?>
                                 </div>
-                                <input type="file" id="instructor_image_<?= $index ?>" name="instructor_images[]" 
-                                       accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" 
+                                <input type="file" id="instructor_image_<?= $index ?>" name="instructor_images[]"
                                        style="display: none;" onchange="handleInstructorImage(<?= $index ?>, this)">
                             </div>
                             
@@ -577,8 +576,7 @@ if (!isset($_SESSION['csrf_token'])) {
                                     <div>이미지 선택</div>
                                 </div>
                             </div>
-                            <input type="file" id="instructor_image_0" name="instructor_images[]" 
-                                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" 
+                            <input type="file" id="instructor_image_0" name="instructor_images[]"
                                    style="display: none;" onchange="handleInstructorImage(0, this)">
                         </div>
                         
@@ -612,8 +610,7 @@ if (!isset($_SESSION['csrf_token'])) {
                 </div>
             </div>
             
-            <input type="file" id="event_images" name="event_images[]" multiple 
-                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" 
+            <input type="file" id="event_images" name="event_images[]" multiple
                    style="display: none;" onchange="handleEventImages(this)">
             
             <div id="event-images-preview" class="image-preview-container">
@@ -643,6 +640,24 @@ if (!isset($_SESSION['csrf_token'])) {
 <?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
 
 <script>
+// 🔧 v3.53.0: 동적 accept 속성 설정 (UploadConfig 시스템 사용)
+(function setImageAcceptAttributes() {
+    const acceptValue = window.getImageAcceptAttribute();
+    const imageInputs = [
+        'event_images',
+        'instructor_image_0'
+    ];
+
+    imageInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.accept = acceptValue;
+        }
+    });
+
+    console.log('✅ 이미지 input accept 속성 동적 설정 완료:', acceptValue);
+})();
+
 // Quill 에디터 초기화
 const quill = new Quill('#description-editor', {
     theme: 'snow',
@@ -866,8 +881,7 @@ function addInstructor() {
                     <div>이미지 선택</div>
                 </div>
             </div>
-            <input type="file" id="instructor_image_${instructorIndex}" name="instructor_images[]" 
-                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" 
+            <input type="file" id="instructor_image_${instructorIndex}" name="instructor_images[]"
                    style="display: none;" onchange="handleInstructorImage(${instructorIndex}, this)">
         </div>
         
@@ -885,6 +899,13 @@ function addInstructor() {
     `;
     
     container.appendChild(newInstructor);
+
+    // 🔧 v3.53.0: 동적으로 추가된 input에 accept 속성 설정
+    const newInput = document.getElementById(`instructor_image_${instructorIndex}`);
+    if (newInput && window.getImageAcceptAttribute) {
+        newInput.accept = window.getImageAcceptAttribute();
+    }
+
     instructorIndex++;
 }
 

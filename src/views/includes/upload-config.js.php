@@ -32,6 +32,12 @@ window.validateImageExtension = function(fileName) {
     return window.TOPMKT_UPLOAD_CONFIG.allowedImageExtensions.includes(extension);
 };
 
+window.getImageAcceptAttribute = function() {
+    return window.TOPMKT_UPLOAD_CONFIG.allowedImageExtensions
+        .map(ext => `image/${ext}`)
+        .join(',');
+};
+
 // 디버깅용 정보 출력
 console.log('🚀 TOPMKT 업로드 설정 로드됨:', {
     maxFileSize: window.formatFileSize(window.TOPMKT_UPLOAD_CONFIG.maxFileSize),

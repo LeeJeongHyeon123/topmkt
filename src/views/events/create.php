@@ -927,8 +927,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="upload-help">JPG, PNG, GIF, WebP (최대 30MB)</div>
                     </div>
                 </div>
-                <input type="file" id="event_images" name="event_images[]" multiple 
-                       accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" style="display: none;">
+                <input type="file" id="event_images" name="event_images[]" multiple style="display: none;">
                 <div class="image-preview-container" id="event-image-preview"></div>
             </div>
         </div>
@@ -1524,8 +1523,7 @@ function addInstructor() {
                     <div>이미지 선택</div>
                 </div>
             </div>
-            <input type="file" id="instructor_image_${instructorIndex}" name="instructor_images[]" 
-                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" 
+            <input type="file" id="instructor_image_${instructorIndex}" name="instructor_images[]"
                    style="display: none;" onchange="handleInstructorImage(${instructorIndex}, this)">
         </div>
         
@@ -1544,7 +1542,13 @@ function addInstructor() {
     `;
     
     container.appendChild(instructorDiv);
-    
+
+    // 🔧 v3.53.0: 동적으로 추가된 input에 accept 속성 설정
+    const newInput = document.getElementById(`instructor_image_${instructorIndex}`);
+    if (newInput && window.getImageAcceptAttribute) {
+        newInput.accept = window.getImageAcceptAttribute();
+    }
+
     // 버튼 텍스트 업데이트
     updateAddInstructorButton();
 }
@@ -1949,6 +1953,15 @@ function getRegionCoordinates(address) {
 
 <!-- 디버깅용 스크립트 -->
 <script>
+// 🔧 v3.53.0: 동적 accept 속성 설정 (UploadConfig 시스템 사용)
+if (window.getImageAcceptAttribute) {
+    const eventImagesInput = document.getElementById('event_images');
+    if (eventImagesInput) {
+        eventImagesInput.accept = window.getImageAcceptAttribute();
+        console.log('✅ 이미지 input accept 속성 동적 설정 완료:', eventImagesInput.accept);
+    }
+}
+
 // 페이지 로드 시 전역 변수 및 오류 상태 확인
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔍 이벤트 생성 페이지 디버깅 정보:');
