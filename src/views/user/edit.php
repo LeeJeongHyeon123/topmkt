@@ -1356,7 +1356,7 @@ async function openDatePicker() {
 }
 
 // 회원탈퇴 기능
-document.getElementById('delete-account-btn').addEventListener('click', function() {
+document.getElementById('delete-account-btn').addEventListener('click', async function() {
     // 1차 확인 - 경고 메시지
     const warningMessage = `
 <div style="text-align: left; line-height: 1.8;">
