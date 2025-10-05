@@ -627,11 +627,10 @@ if (!isset($_SESSION['csrf_token'])) {
                 </div>
                 <div class="upload-controls">
                     <div class="file-input-wrapper">
-                        <input type="file" 
-                               id="profile-image" 
-                               name="profile_image" 
-                               class="file-input"
-                               accept="image/jpeg,image/png,image/gif,image/webp">
+                        <input type="file"
+                               id="profile-image"
+                               name="profile_image"
+                               class="file-input">
                         <label for="profile-image" class="file-input-label">
                             <i class="fas fa-upload"></i> 이미지 선택
                         </label>
@@ -1295,6 +1294,15 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script>
+// 🔧 v3.53.1: 동적 accept 속성 설정 (UploadConfig 시스템 사용)
+if (window.getImageAcceptAttribute) {
+    const profileImageInput = document.getElementById('profile-image');
+    if (profileImageInput) {
+        profileImageInput.accept = window.getImageAcceptAttribute();
+        console.log('✅ 프로필 이미지 input accept 속성 동적 설정 완료:', profileImageInput.accept);
+    }
+}
+
 // 날짜 입력 필드 개선
 document.addEventListener('DOMContentLoaded', function() {
     const dateInput = document.getElementById('birth_date');

@@ -609,7 +609,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function imageHandler() {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/jpeg,image/jpg,image/png,image/gif,image/webp');
+        if (window.getImageAcceptAttribute) {
+            input.setAttribute('accept', window.getImageAcceptAttribute());
+        }
         input.style.display = 'none';
         
         input.onchange = async function() {
