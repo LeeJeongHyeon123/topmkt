@@ -809,9 +809,9 @@ function debounce(func, wait) {
 // 사용자 통계 로드
 async function loadUserStats() {
     try {
-        const response = await fetch("/admin/users/stats");
-        const data = await response.json();
-        
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
+        const data = await ApiClient.get("/admin/users/stats", { noLoading: true, noErrorToast: true });
+
         if (data.success) {
             const stats = data.data;
             document.getElementById("total-users").textContent = formatNumber(stats.total_users || 0);
@@ -843,9 +843,9 @@ async function loadUsersData(page = 1) {
             ...currentFilters
         });
         
-        const response = await fetch(`/admin/users/data?${params}`);
-        const data = await response.json();
-        
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
+        const data = await ApiClient.get(`/admin/users/data?${params}`, { noLoading: true });
+
         if (data.success) {
             renderUsersTable(data.data);
             renderPagination(data.data);
@@ -1151,20 +1151,12 @@ async function executeBulkAction() {
     }
     
     try {
-        const response = await fetch("/admin/users/bulk-action", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken
-            },
-            body: JSON.stringify({
-                action: action,
-                user_ids: Array.from(selectedUsers)
-            })
-        });
-        
-        const data = await response.json();
-        
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+        const data = await ApiClient.post("/admin/users/bulk-action", {
+            action: action,
+            user_ids: Array.from(selectedUsers)
+        }, { noLoading: true });
+
         if (data.success) {
             Toast.success(`작업이 완료되었습니다. 성공: ${formatNumber(data.success_count)}개, 실패: ${formatNumber(data.fail_count)}개`);
             clearSelection();
@@ -1181,9 +1173,9 @@ async function executeBulkAction() {
 // 사용자 상세보기
 async function viewUserDetail(userId) {
     try {
-        const response = await fetch(`/admin/users/${userId}/detail`);
-        const data = await response.json();
-        
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
+        const data = await ApiClient.get(`/admin/users/${userId}/detail`, { noLoading: true });
+
         if (data.success) {
             const user = data.data;
             document.getElementById("user-detail-content").innerHTML = `
@@ -1251,20 +1243,12 @@ async function updateUserStatus() {
     }
     
     try {
-        const response = await fetch(`/admin/users/${currentUserId}/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken
-            },
-            body: JSON.stringify({
-                status: newStatus,
-                reason: reason
-            })
-        });
-        
-        const data = await response.json();
-        
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+        const data = await ApiClient.post(`/admin/users/${currentUserId}/status`, {
+            status: newStatus,
+            reason: reason
+        }, { noLoading: true });
+
         if (data.success) {
             Toast.success('사용자 상태가 성공적으로 변경되었습니다.');
             closeModal("status-change-modal");
@@ -1297,20 +1281,12 @@ async function updateUserRole() {
     }
     
     try {
-        const response = await fetch(`/admin/users/${currentUserId}/role`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken
-            },
-            body: JSON.stringify({
-                role: newRole,
-                reason: reason
-            })
-        });
-        
-        const data = await response.json();
-        
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+        const data = await ApiClient.post(`/admin/users/${currentUserId}/role`, {
+            role: newRole,
+            reason: reason
+        }, { noLoading: true });
+
         if (data.success) {
             Toast.success('사용자 권한이 성공적으로 변경되었습니다.');
             closeModal("role-change-modal");
@@ -1341,19 +1317,11 @@ async function sendNotification() {
     }
     
     try {
-        const response = await fetch(`/admin/users/${currentUserId}/notify`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken
-            },
-            body: JSON.stringify({
-                message: message
-            })
-        });
-        
-        const data = await response.json();
-        
+        // v3.42.0: ApiClient 사용
+        const data = await ApiClient.post(`/admin/users/${currentUserId}/notify`, {
+            message: message
+        }, { noLoading: true });
+
         if (data.success) {
             Toast.success('알림이 성공적으로 발송되었습니다.');
             closeModal("notify-modal");

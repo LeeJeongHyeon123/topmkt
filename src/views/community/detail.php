@@ -700,15 +700,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // CSRF 토큰 가져오기
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             console.log('API 호출:', `/api/posts/${postId}/like`); // 디버깅용
-            
-            fetch(`/api/posts/${postId}/like`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken
-                }
-            })
-            .then(response => response.json())
+
+            // v3.42.0: ApiClient 사용
+            ApiClient.post(`/api/posts/${postId}/like`, {}, { noLoading: true })
             .then(data => {
                 console.log('좋아요 API 응답:', data); // 디버깅용
                 
@@ -795,17 +789,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // CSRF 토큰 가져오기
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            
-            fetch(`/community/posts/${postId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    csrf_token: csrfToken
-                })
-            })
-            .then(response => response.json())
+
+            // v3.42.0: ApiClient 사용
+            ApiClient.delete(`/community/posts/${postId}`, {
+                csrf_token: csrfToken
+            }, { noLoading: true })
             .then(data => {
                 if (data.status === 'success') {
                     window.location.href = data.data?.redirectUrl || '/community';

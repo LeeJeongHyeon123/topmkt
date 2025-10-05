@@ -691,22 +691,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     async function loadUserStats() {
         try {
             console.log('📊 통계 로딩 시작...');
-            const response = await fetch('/admin/getUserStats', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            });
-            
-            console.log('📊 API 응답 상태:', response.status);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const data = await response.json();
+
+            // v3.42.0: ApiClient 사용
+            const data = await ApiClient.get('/admin/getUserStats', { noLoading: true });
+
             console.log('📊 받은 데이터:', data);
             
             if (data.success && data.stats) {
@@ -744,9 +732,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         
         try {
             const params = new URLSearchParams(currentFilters);
-            const response = await fetch(`/admin/users/data?${params}`);
-            const data = await response.json();
-            
+
+            // v3.42.0: ApiClient 사용
+            const data = await ApiClient.get(`/admin/users/data?${params}`, { noLoading: true });
+
             if (data.success) {
                 renderUsersTable(data.data.users);
                 renderPagination(data.data);
@@ -845,22 +834,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 '<div class="loading-indicator"><div class="spinner"></div><p>사용자 정보를 불러오는 중...</p></div>';
             
             console.log('👤 사용자 ID ' + userId + ' 상세 정보 로딩 시작...');
-            
-            // API 호출
-            const response = await fetch('/admin/users/' + userId + '/detail', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            });
-            
-            if (!response.ok) {
-                throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-            }
-            
-            const data = await response.json();
+
+            // v3.42.0: ApiClient 사용
+            const data = await ApiClient.get('/admin/users/' + userId + '/detail', { noLoading: true });
+
             console.log('👤 받은 사용자 데이터:', data);
             
             if (data.error) {
@@ -961,10 +938,9 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     // 사용자 편집 모달 열기
     function editUser(userId) {
         console.log('🖊️ 사용자 편집 모달 열기:', userId);
-        
-        // 먼저 사용자 상세 정보를 가져와서 편집 모달을 구성
-        fetch(`/admin/users/${userId}/detail`)
-            .then(response => response.json())
+
+        // v3.42.0: ApiClient 사용
+        ApiClient.get(`/admin/users/${userId}/detail`, { noLoading: true })
             .then(data => {
                 console.log('📊 API 응답 데이터:', data); // 디버깅용
                 if (data.success) {
@@ -1086,12 +1062,12 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         
         
         console.log('📤 사용자 편집 요청 전송:', userId);
-        
-        fetch(`/admin/users/${userId}/edit`, {
-            method: 'POST',
-            body: formData
+
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        ApiClient.post(`/admin/users/${userId}/edit`, formData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true
         })
-        .then(response => response.json())
         .then(data => {
             if (data.success) {
                 Toast.success('✅ ' + data.message);

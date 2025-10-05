@@ -1216,16 +1216,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // 조회수 업데이트
 function updateViewCount() {
     const noticeId = <?= $notice['id'] ?>;
-    
-    fetch(`/api/notices/${noticeId}/view`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            csrf_token: '<?= $_SESSION['csrf_token'] ?>'
-        })
-    }).catch(error => {
+
+    // v3.42.0: ApiClient 사용
+    ApiClient.post(`/api/notices/${noticeId}/view`, {
+        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
+    }, { noLoading: true, noErrorToast: true }).catch(error => {
         console.warn('조회수 업데이트 실패:', error);
     });
 }
@@ -1254,19 +1249,13 @@ function submitComment() {
     }
     
     const noticeId = <?= $notice['id'] ?>;
-    
-    fetch('/api/notice-comments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            notice_id: noticeId,
-            content: content,
-            csrf_token: '<?= $_SESSION['csrf_token'] ?>'
-        })
+
+    // v3.42.0: ApiClient 사용
+    ApiClient.post('/api/notice-comments', {
+        notice_id: noticeId,
+        content: content,
+        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
     })
-    .then(response => response.json())
     .then(data => {
         if (data.data && data.data.success) {
             // 댓글 목록 새로고침
@@ -1321,20 +1310,14 @@ function submitReply(parentId) {
     }
     
     const noticeId = <?= $notice['id'] ?>;
-    
-    fetch('/api/notice-comments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            notice_id: noticeId,
-            parent_id: parentId,
-            content: content,
-            csrf_token: '<?= $_SESSION['csrf_token'] ?>'
-        })
+
+    // v3.42.0: ApiClient 사용
+    ApiClient.post('/api/notice-comments', {
+        notice_id: noticeId,
+        parent_id: parentId,
+        content: content,
+        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
     })
-    .then(response => response.json())
     .then(data => {
         if (data.data && data.data.success) {
             // 댓글 목록 새로고침
@@ -1377,17 +1360,11 @@ function updateComment(commentId) {
         return;
     }
     
-    fetch(`/api/notice-comments/${commentId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            content: content,
-            csrf_token: '<?= $_SESSION['csrf_token'] ?>'
-        })
+    // v3.42.0: ApiClient 사용
+    ApiClient.put(`/api/notice-comments/${commentId}`, {
+        content: content,
+        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
     })
-    .then(response => response.json())
     .then(data => {
         if (data.data && data.data.success) {
             location.reload();
@@ -1407,16 +1384,10 @@ async function deleteComment(commentId) {
         return;
     }
     
-    fetch(`/api/notice-comments/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            csrf_token: '<?= $_SESSION['csrf_token'] ?>'
-        })
+    // v3.42.0: ApiClient 사용
+    ApiClient.delete(`/api/notice-comments/${commentId}`, {
+        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
     })
-    .then(response => response.json())
     .then(data => {
         if (data.data && data.data.success) {
             location.reload();
@@ -1436,16 +1407,10 @@ async function deleteNotice(noticeId) {
         return;
     }
     
-    fetch(`/api/notices/${noticeId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            csrf_token: '<?= $_SESSION['csrf_token'] ?>'
-        })
+    // v3.42.0: ApiClient 사용
+    ApiClient.delete(`/api/notices/${noticeId}`, {
+        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
     })
-    .then(response => response.json())
     .then(data => {
         if (data.data && data.data.success) {
             Toast.success('공지사항이 삭제되었습니다.');

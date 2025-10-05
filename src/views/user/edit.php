@@ -1127,12 +1127,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('❌ 크롭된 이미지 없음');
         }
         
-        // 프로필 정보 업데이트 요청
-        fetch('/profile/update', {
-            method: 'POST',
-            body: formData
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        ApiClient.post('/profile/update', formData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true
         })
-        .then(response => response.json())
         .then(data => {
             console.log('📋 서버 응답 데이터:', data);
             if (data.error) {
@@ -1166,14 +1165,11 @@ document.addEventListener('DOMContentLoaded', function() {
         imageFormData.append('csrf_token', form.csrf_token.value);
         
         console.log('📤 서버로 이미지 전송 시작');
-        
-        fetch('/profile/upload-image', {
-            method: 'POST',
-            body: imageFormData
-        })
-        .then(response => {
-            console.log('📨 서버 응답 상태:', response.status);
-            return response.json();
+
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        ApiClient.post('/profile/upload-image', imageFormData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true
         })
         .then(data => {
             console.log('📋 서버 응답 데이터:', data);
@@ -1486,19 +1482,12 @@ function confirmDeleteAccount() {
     const deleteBtn = document.querySelector('#delete-account-modal .btn-danger');
     Loading.button(deleteBtn, true, { text: '처리 중...' });
 
-    // API 호출
-    fetch('/api/user/delete-account', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            password: password,
-            reason: reason,
-            csrf_token: '<?php echo $_SESSION['csrf_token']; ?>'
-        })
-    })
-    .then(response => response.json())
+    // v3.42.0: ApiClient 사용
+    ApiClient.post('/api/user/delete-account', {
+        password: password,
+        reason: reason,
+        csrf_token: '<?php echo $_SESSION['csrf_token']; ?>'
+    }, { noLoading: true })
     .then(data => {
         console.log('서버 응답:', data); // 디버깅용
 

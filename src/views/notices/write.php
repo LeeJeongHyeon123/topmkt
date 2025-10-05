@@ -603,16 +603,16 @@ function uploadImageToQuill(file) {
     // 로딩 상태 표시
     const range = quill.getSelection(true);
     quill.insertText(range.index, '이미지 업로드 중...', 'italic', true);
-    
-    fetch('/api/media/upload-image', {
-        method: 'POST',
-        body: formData
+
+    // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+    ApiClient.post('/api/media/upload-image', formData, {
+        headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+        noLoading: true
     })
-    .then(response => response.json())
     .then(data => {
         // 로딩 텍스트 제거
         quill.deleteText(range.index, '이미지 업로드 중...'.length);
-        
+
         if (data.success) {
             // 성공시 이미지 삽입
             quill.insertEmbed(range.index, 'image', data.data.url, 'user');
@@ -822,17 +822,17 @@ function uploadImage(file) {
     const progressEl = document.getElementById('uploadProgress');
     const progressFill = document.getElementById('progressFill');
     const progressPercent = document.getElementById('progressPercent');
-    
+
     progressEl.style.display = 'block';
-    
-    fetch('/api/media/upload-image', {
-        method: 'POST',
-        body: formData
+
+    // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+    ApiClient.post('/api/media/upload-image', formData, {
+        headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+        noLoading: true
     })
-    .then(response => response.json())
     .then(data => {
         progressEl.style.display = 'none';
-        
+
         if (data.success) {
             // MediaController 응답 형식에 맞게 수정
             const imageUrl = data.data.url;
@@ -959,12 +959,13 @@ function submitForm() {
     const method = <?= $isEdit ? "'PUT'" : "'POST'" ?>;
     
     console.log('🚀 폼 제출 정보:', { url, method, isEdit: <?= $isEdit ? 'true' : 'false' ?> });
-    
-    fetch(url, {
-        method: method,
-        body: formData
-    })
-    .then(response => response.json())
+
+    // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+    const apiCall = method === 'PUT'
+        ? ApiClient.put(url, formData, { headers: {} })
+        : ApiClient.post(url, formData, { headers: {} });
+
+    apiCall
     .then(data => {
         if (data.success) {
             // 폼 제출 성공 상태로 설정
@@ -994,17 +995,11 @@ async function deleteNotice(noticeId) {
     
     // 삭제 시도 시 폼 제출 상태로 설정 (beforeunload 방지)
     isFormSubmitted = true;
-    
-    fetch(`/api/notices/${noticeId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            csrf_token: document.querySelector('input[name="csrf_token"]').value
-        })
+
+    // v3.42.0: ApiClient 사용
+    ApiClient.delete(`/api/notices/${noticeId}`, {
+        csrf_token: document.querySelector('input[name="csrf_token"]').value
     })
-    .then(response => response.json())
     .then(data => {
         if (data.success) {
             Toast.success('공지사항이 삭제되었습니다.');

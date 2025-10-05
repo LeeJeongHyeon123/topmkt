@@ -871,15 +871,14 @@ document.getElementById("statusForm").addEventListener("submit", async function(
     
     submitBtn.disabled = true;
     submitBtn.textContent = "처리 중...";
-    
+
     try {
-        const response = await fetch("/admin/corporate/manage", {
-            method: "POST",
-            body: formData
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        const result = await ApiClient.post("/admin/corporate/manage", formData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true
         });
-        
-        const result = await response.json();
-        
+
         if (result.success) {
             Toast.success(result.message);
             location.reload();

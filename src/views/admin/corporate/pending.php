@@ -816,12 +816,11 @@ async function viewApplication(applicationId) {
         const formData = new FormData();
         formData.append("application_id", applicationId);
 
-        const response = await fetch("/admin/corporate/detail", {
-            method: "POST",
-            body: formData
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        const result = await ApiClient.post("/admin/corporate/detail", formData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true
         });
-
-        const result = await response.json();
 
         if (result.success) {
             renderApplicationDetail(result.data);
@@ -930,15 +929,14 @@ document.getElementById("processForm").addEventListener("submit", async function
     
     submitBtn.disabled = true;
     submitBtn.textContent = "처리 중...";
-    
+
     try {
-        const response = await fetch("/admin/corporate/process", {
-            method: "POST",
-            body: formData
+        // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+        const result = await ApiClient.post("/admin/corporate/process", formData, {
+            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+            noLoading: true
         });
-        
-        const result = await response.json();
-        
+
         if (result.success) {
             Toast.success(result.message + "\n\nSMS 알림이 발송되었습니다.");
             location.reload();

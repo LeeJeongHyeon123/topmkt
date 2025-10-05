@@ -662,21 +662,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('upload_type', 'posts');
                 
                 console.log('🔄 이미지 업로드 시작:', file.name, 'Size:', file.size);
-                
-                // 업로드 요청
-                const response = await fetch('/api/media/upload-image', {
-                    method: 'POST',
-                    body: formData
+
+                // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
+                const result = await ApiClient.post('/api/media/upload-image', formData, {
+                    headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
+                    noLoading: true
                 });
-                
-                console.log('📡 서버 응답 상태:', response.status, response.statusText);
-                
-                // 응답 상태 코드 확인
-                if (!response.ok) {
-                    throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
-                }
-                
-                const result = await response.json();
+
                 console.log('📦 응답 데이터:', result);
                 
                 // 업로드 중 텍스트 제거
@@ -1327,11 +1319,22 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         }
         
-        fetch(url, fetchOptions)
-        .then(response => response.json())
+        // v3.42.0: ApiClient 사용
+        const apiCall = isEdit
+            ? ApiClient.put(url, {
+                title: title,
+                content: editorHtml,
+                csrf_token: document.querySelector('input[name="csrf_token"]').value
+            })
+            : ApiClient.post(url, fetchOptions.body, {
+                headers: {}, // FormData는 Content-Type 자동 설정
+                noLoading: true
+            });
+
+        apiCall
         .then(data => {
             hideLoading();
-            
+
             if (data.status === 'success') {
                 // alert를 표시한 후 setTimeout을 사용하여 리다이렉트 보장
                 Toast.error(data.message);
@@ -1444,20 +1447,14 @@ document.addEventListener('DOMContentLoaded', function() {
             isSubmitting = true;  // beforeunload 무시 플래그 설정
             
             showLoading();
-            
-            fetch(`/community/posts/${postId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    csrf_token: document.querySelector('input[name="csrf_token"]').value
-                })
-            })
-            .then(response => response.json())
+
+            // v3.42.0: ApiClient 사용
+            ApiClient.delete(`/community/posts/${postId}`, {
+                csrf_token: document.querySelector('input[name="csrf_token"]').value
+            }, { noLoading: true })
             .then(data => {
                 hideLoading();
-                
+
                 if (data.status === 'success') {
                     Toast.error(data.message);
                     setTimeout(() => {
