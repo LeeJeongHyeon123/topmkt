@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function handleFileSelection() {
+    async function handleFileSelection() {
         const files = fileInput.files;
         
         // 🚀 Ultra Think: 기존 이미지 + 새 이미지 = 총 5개 제한

@@ -1554,7 +1554,7 @@ function updateImageListOnServer(updatedImageData) {
 }
 
 // 이미지 인덱스 업데이트 함수 (전역 함수로 먼저 정의)
-function updateImageIndexes() {
+async function updateImageIndexes() {
     const existingImages = document.querySelectorAll('.existing-image');
     existingImages.forEach((item, newIndex) => {
         item.setAttribute('data-image-index', newIndex);
@@ -1598,7 +1598,7 @@ function updateImageUploadPlaceholder() {
 }
 
 // 강의 이미지 화면 업데이트 함수 (전역 함수로 먼저 정의)
-function updateLectureImagesDisplay(updatedImages) {
+async function updateLectureImagesDisplay(updatedImages) {
     // console.log('updateLectureImagesDisplay 호출됨, 이미지 개수:', updatedImages.length);
     
     const imagePreviewContainer = document.getElementById('lectureImagePreview');

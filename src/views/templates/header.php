@@ -1955,7 +1955,7 @@
         }
         
         // 데스크톱 드롭다운 스타일 적용 함수
-        function applyDesktopDropdownStyles(dropdown) {
+        async function applyDesktopDropdownStyles(dropdown) {
             dropdown.querySelectorAll('.dropdown-header').forEach(el => {
                 el.style.cssText = 'padding: 15px; border-bottom: 1px solid #f3f4f6;';
             });

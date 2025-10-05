@@ -1341,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 별도 함수로도 제공 (아이콘 클릭용)
-function openDatePicker() {
+async function openDatePicker() {
     const dateInput = document.getElementById('birth_date');
     if (dateInput) {
         dateInput.focus();
@@ -1462,7 +1462,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // 회원탈퇴 확인
-function confirmDeleteAccount() {
+async function confirmDeleteAccount() {
     const password = document.getElementById('delete-password').value;
     const reason = document.getElementById('delete-reason').value;
 

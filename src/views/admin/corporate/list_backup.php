@@ -1622,7 +1622,7 @@ function closeManageModal() {
 }
 
 // 탭 전환
-function switchTab(tabName) {
+async function switchTab(tabName) {
     // 모든 탭 버튼과 콘텐츠에서 active 클래스 제거
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));

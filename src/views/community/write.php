@@ -1117,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 최대 글자 수 도달 알림 표시 함수
-    function showMaxLengthWarning() {
+    async function showMaxLengthWarning() {
         // 기존 알림이 있으면 제거
         const existingWarning = document.querySelector('.max-length-warning');
         if (existingWarning) {
