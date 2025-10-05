@@ -2887,7 +2887,7 @@ function closeChatRoom() {
 /**
  * 채팅방 나가기
  */
-function leaveChatRoom() {
+async function leaveChatRoom() {
     const menu = document.querySelector('.chat-options-menu');
     if (menu) menu.remove();
 
