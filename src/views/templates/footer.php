@@ -486,5 +486,8 @@
 <!-- 🚀 v3.36.0: Modal.confirm() 시스템 -->
 <script src="/assets/js/modal.js?v=<?= time() ?>"></script>
 
+<!-- 🚀 v3.41.0: 통합 FormValidator 시스템 -->
+<?php require_once __DIR__ . '/../includes/form-validator.js.php'; ?>
+
 </body>
 </html> 

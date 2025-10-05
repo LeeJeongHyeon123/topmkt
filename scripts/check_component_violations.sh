@@ -2,11 +2,31 @@
 
 ##############################################
 # 탑마케팅 컴포넌트 미사용 감지 스크립트
-# 
+#
 # 목적: 개발자가 컴포넌트를 사용하지 않고
 #       직접 HTML/CSS를 작성했는지 자동 감지
 #
+# 검증 항목 (v3.41.0):
+#   1. Button 컴포넌트 (renderButton)
+#   2. Modal 컴포넌트 (renderModal, renderConfirmModal)
+#   3. Alert/Toast 컴포넌트
+#   4. GradientHeader 컴포넌트
+#   5. CharacterCounter 클래스 (v3.29.0)
+#   6. 컴포넌트 import 누락
+#   7. Toast 알림 (v3.30.0)
+#   8. Loading 인디케이터 (v3.31.0)
+#   9. SearchFilter 컴포넌트 (v3.37.0)
+#  10. Pagination 컴포넌트 (v3.39.0)
+#  11. UploadConfig 시스템 (v3.39.0)
+#  12. Modal.confirm() 확인 다이얼로그 (v3.40.0)
+#  13. FormValidator 검증 클래스 (v3.41.0) ⭐ NEW
+#
 # 사용법: ./scripts/check_component_violations.sh
+# Git Hook: .git/hooks/pre-commit에서 자동 실행
+#
+# 참고: Card 컴포넌트는 상황에 따라 사용/미사용이 모두 적합할 수 있어
+#       검증 항목에서 제외되었습니다. 자세한 내용은
+#       /docs/Card_Component_Migration_Guidelines.md 참조
 ##############################################
 
 PROJECT_ROOT="/var/www/html/topmkt"
@@ -35,7 +55,7 @@ VIOLATIONS_FOUND=0
 # 1. 버튼 직접 코딩 감지
 ##############################################
 
-echo "${BLUE}[1/5]${NC} 버튼 직접 코딩 감지 중..."
+echo "${BLUE}[1/13]${NC} 버튼 직접 코딩 감지 중..."
 echo ""
 
 # btn-primary 직접 사용 감지 (Button.php 제외, 백업/테스트 파일 제외)
@@ -84,7 +104,7 @@ fi
 # 2. 모달 직접 코딩 감지
 ##############################################
 
-echo "${BLUE}[2/5]${NC} 모달 직접 코딩 감지 중..."
+echo "${BLUE}[2/13]${NC} 모달 직접 코딩 감지 중..."
 echo ""
 
 # openModal, closeModal 함수 직접 정의 감지 (백업/테스트 파일 제외)
@@ -119,7 +139,7 @@ fi
 # 3. 알림 직접 코딩 감지
 ##############################################
 
-echo "${BLUE}[3/5]${NC} 알림 직접 코딩 감지 중..."
+echo "${BLUE}[3/13]${NC} 알림 직접 코딩 감지 중..."
 echo ""
 
 # alert-success, alert-error 직접 사용 감지 (백업/테스트 파일 제외)
@@ -140,7 +160,7 @@ fi
 # 4. 그라디언트 헤더 직접 코딩 감지
 ##############################################
 
-echo "${BLUE}[4/5]${NC} 그라디언트 헤더 직접 코딩 감지 중..."
+echo "${BLUE}[4/13]${NC} 그라디언트 헤더 직접 코딩 감지 중..."
 echo ""
 
 # linear-gradient 인라인 스타일 감지 (백업/테스트 파일 제외 + GradientHeader 컴포넌트 구현 전까지 임시 제외)
@@ -161,7 +181,7 @@ fi
 # 5. 글자 수 카운터 직접 코딩 감지 (v3.29.0)
 ##############################################
 
-echo "${BLUE}[5/7]${NC} 글자 수 카운터 직접 코딩 감지 중..."
+echo "${BLUE}[5/13]${NC} 글자 수 카운터 직접 코딩 감지 중..."
 echo ""
 
 # updateCharCounter, updateCharacterCount 함수 직접 정의 감지 (CharacterCounter 클래스 제외, 백업/테스트 파일 제외)
@@ -214,7 +234,7 @@ fi
 # 6. 컴포넌트 import 누락 감지
 ##############################################
 
-echo "${BLUE}[6/7]${NC} 컴포넌트 import 누락 감지 중..."
+echo "${BLUE}[6/13]${NC} 컴포넌트 import 누락 감지 중..."
 echo ""
 
 # renderButton 사용하지만 Button.php import 안한 파일 (백업/테스트 파일 제외)
@@ -262,7 +282,7 @@ fi
 # 7. Toast 알림 직접 코딩 감지 (v3.30.0)
 ##############################################
 
-echo "${BLUE}[7/8]${NC} Toast 알림 직접 코딩 감지 중..."
+echo "${BLUE}[7/13]${NC} Toast 알림 직접 코딩 감지 중..."
 echo ""
 
 # showMessage, showAlert, showSuccessMessage, showErrorMessage 함수 직접 정의 감지
@@ -291,7 +311,7 @@ fi
 # 8. Loading 인디케이터 직접 코딩 감지 (v3.31.0)
 ##############################################
 
-echo "${BLUE}[8/8]${NC} Loading 인디케이터 직접 코딩 감지 중..."
+echo "${BLUE}[8/13]${NC} Loading 인디케이터 직접 코딩 감지 중..."
 echo ""
 
 # setLoading, showLoading, hideLoading 함수 직접 정의 감지
@@ -336,6 +356,290 @@ if [ ! -z "$BUTTON_SPINNER" ]; then
     echo ""
     VIOLATIONS_FOUND=1
 fi
+
+##############################################
+# 9. SearchFilter 컴포넌트 직접 코딩 감지 (v3.37.0)
+##############################################
+
+echo "${BLUE}[9/13]${NC} SearchFilter 직접 코딩 감지 중..."
+echo ""
+
+# 검색/필터 폼 직접 작성 패턴 감지 (SearchFilter::create 사용 안한 경우)
+# 1. search-filter-grid 클래스를 수동으로 작성한 경우
+SEARCH_FILTER_GRID=$(grep -rn '<div class="search-filter-grid' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "SearchFilter.php" | \
+    grep -v "SearchFilter::create" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$SEARCH_FILTER_GRID" ]; then
+    echo "${RED}❌ search-filter-grid 직접 작성 발견:${NC}"
+    echo "$SEARCH_FILTER_GRID" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: SearchFilter::create() 사용${NC}"
+    echo "   SearchFilter::create(['layout' => 'grid-3', 'filters' => [...]])"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# 2. search-filter-inline-row 클래스를 수동으로 작성한 경우
+SEARCH_FILTER_INLINE=$(grep -rn '<div class="search-filter-inline-row' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "SearchFilter.php" | \
+    grep -v "SearchFilter::create" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$SEARCH_FILTER_INLINE" ]; then
+    echo "${RED}❌ search-filter-inline-row 직접 작성 발견:${NC}"
+    echo "$SEARCH_FILTER_INLINE" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: SearchFilter::create() 사용${NC}"
+    echo "   SearchFilter::create(['layout' => 'inline', 'filters' => [...]])"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# 3. 필터 폼에 중복된 CSS 인라인 스타일 (v3.37.0에서 제거된 패턴)
+FILTER_INLINE_CSS=$(grep -rn 'display: grid.*grid-template-columns.*filter' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "SearchFilter.php" | \
+    grep -v "search-filter.css" | \
+    grep -v "v3.37.0.*제거" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$FILTER_INLINE_CSS" ]; then
+    echo "${YELLOW}⚠️  필터 인라인 CSS 발견 (중복 가능성):${NC}"
+    echo "$FILTER_INLINE_CSS" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: search-filter.css 사용 (중앙 관리)${NC}"
+    echo ""
+    # 경고만 하고 차단하지는 않음
+fi
+
+# 4. SearchFilter::create 사용하지만 SearchFilter.php import 안한 파일
+MISSING_SEARCHFILTER_IMPORT=$(grep -rl 'SearchFilter::create(' ${SRC_DIR}/ 2>/dev/null | grep -vE "${EXCLUDE_PATTERN}" | while read file; do
+    if ! grep -q "require.*SearchFilter.php\|include.*SearchFilter.php" "$file" 2>/dev/null; then
+        echo "$file"
+    fi
+done)
+
+if [ ! -z "$MISSING_SEARCHFILTER_IMPORT" ]; then
+    echo "${RED}❌ SearchFilter.php import 누락:${NC}"
+    echo "$MISSING_SEARCHFILTER_IMPORT" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: 파일 상단에 추가${NC}"
+    echo "   <?php require_once SRC_PATH . '/components/ui/SearchFilter.php'; ?>"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# 5. 필터 검색 폼에서 오래된 패턴 감지 (filter-container, filter-group 등)
+OLD_FILTER_PATTERN=$(grep -rn 'class="filter-container\|class="filter-group' ${SRC_DIR}/ 2>/dev/null | \
+    grep -v "SearchFilter.php" | \
+    grep -v "search-filter.css" | \
+    grep -v "v3.37.0.*마이그레이션" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$OLD_FILTER_PATTERN" ]; then
+    echo "${YELLOW}⚠️  오래된 필터 패턴 발견 (마이그레이션 권장):${NC}"
+    echo "$OLD_FILTER_PATTERN" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 마이그레이션: SearchFilter::create() 사용${NC}"
+    echo "   - layout: inline, grid-2, grid-3, grid-4"
+    echo "   - 15개 설정 옵션 지원"
+    echo "   - 자동 반응형 및 접근성 지원"
+    echo ""
+    # 경고만 하고 차단하지는 않음
+fi
+
+
+##############################################
+# 10. Pagination 컴포넌트 직접 코딩 감지 (v3.39.0)
+##############################################
+
+echo "${BLUE}[10/13]${NC} Pagination 컴포넌트 직접 코딩 감지 중..."
+echo ""
+
+# 1. PHP 서버사이드 수동 페이지네이션 패턴 감지
+# (JavaScript 동적 페이지네이션은 제외 - admin/users/*.php는 AJAX 기반이므로 정상)
+MANUAL_PAGINATION_PHP=$(grep -rn '<div class="pagination\|class="page-link' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "renderPagination" | \
+    grep -v "Pagination.php" | \
+    grep -v "admin/users/list" | \
+    grep -v "pagination\.innerHTML" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$MANUAL_PAGINATION_PHP" ]; then
+    echo "${RED}❌ PHP 수동 페이지네이션 발견 (renderPagination() 사용 권장):${NC}"
+    echo "$MANUAL_PAGINATION_PHP" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: renderPagination(\$currentPage, \$totalPages) 사용${NC}"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# 2. renderPagination() 사용하지만 Pagination.php import 안한 파일
+MISSING_PAGINATION_IMPORT=$(grep -rl 'renderPagination(' ${SRC_DIR}/ 2>/dev/null | grep -vE "${EXCLUDE_PATTERN}" | while read file; do
+    if ! grep -q "require.*Pagination.php\|include.*Pagination.php" "$file" 2>/dev/null; then
+        echo "$file"
+    fi
+done)
+
+if [ ! -z "$MISSING_PAGINATION_IMPORT" ]; then
+    echo "${RED}❌ Pagination 컴포넌트 사용하지만 import 누락:${NC}"
+    echo "$MISSING_PAGINATION_IMPORT" | while read line; do
+        echo "   $line"
+    done
+    echo ""
+    echo "${YELLOW}💡 해결: require_once SRC_PATH . '/components/ui/Pagination.php';${NC}"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+echo "${GREEN}✅ Pagination 컴포넌트 검증 완료${NC}"
+echo ""
+
+##############################################
+# 11. UploadConfig 시스템 직접 코딩 감지 (v3.39.0)
+##############################################
+
+echo "${BLUE}[11/13]${NC} UploadConfig 시스템 직접 코딩 감지 중..."
+echo ""
+
+# 1. 하드코딩된 파일 크기 제한 감지 (upload-config.js.php 사용 안한 경우)
+HARDCODED_FILE_SIZE=$(grep -rn 'file\.size.*1024.*1024\|maxSize.*MB' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "upload-config.js.php" | \
+    grep -v "validateFileSize" | \
+    grep -v "// " | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$HARDCODED_FILE_SIZE" ]; then
+    echo "${YELLOW}⚠️  하드코딩된 파일 크기 제한 발견:${NC}"
+    echo "$HARDCODED_FILE_SIZE" | while read line; do
+        echo "   $line"
+    done | head -5
+    echo ""
+    echo "${YELLOW}💡 권장: window.validateFileSize() 사용 (upload-config.js.php)${NC}"
+    echo ""
+    # 경고만 하고 차단하지는 않음
+fi
+
+# 2. 하드코딩된 MIME 타입 검증 감지
+HARDCODED_MIME=$(grep -rn 'image/jpeg.*image/png.*image/gif\|allowedTypes.*=.*\[' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "upload-config.js.php" | \
+    grep -v "validateImageExtension" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$HARDCODED_MIME" ]; then
+    echo "${YELLOW}⚠️  하드코딩된 MIME 타입 검증 발견:${NC}"
+    echo "$HARDCODED_MIME" | while read line; do
+        echo "   $line"
+    done | head -5
+    echo ""
+    echo "${YELLOW}💡 권장: window.validateImageExtension() 사용 (upload-config.js.php)${NC}"
+    echo ""
+    # 경고만 하고 차단하지는 않음
+fi
+
+echo "${GREEN}✅ UploadConfig 시스템 검증 완료${NC}"
+echo ""
+
+##############################################
+# 12. Modal.confirm() 확인 다이얼로그 감지 (v3.40.0)
+##############################################
+
+echo "${BLUE}[12/13]${NC} Modal.confirm() 확인 다이얼로그 감지 중..."
+echo ""
+
+# 1. 네이티브 confirm() 사용 감지 (Modal.confirm() 사용 안한 경우)
+# - window.confirm( 패턴
+# - if (confirm( 패턴
+# - const result = confirm( 패턴
+# 제외: confirmLogout, confirmPassword 등 변수명, 주석
+NATIVE_CONFIRM=$(grep -rn '\bconfirm(' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "Modal.confirm" | \
+    grep -v "confirmLogout\|confirmPassword\|confirmed" | \
+    grep -v "// confirm\|<!-- confirm" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$NATIVE_CONFIRM" ]; then
+    echo "${RED}❌ 네이티브 confirm() 사용 발견:${NC}"
+    echo "$NATIVE_CONFIRM" | while read line; do
+        echo "   $line"
+    done | head -10
+    echo ""
+    echo "${YELLOW}💡 해결: Modal.confirm('메시지', { type: 'warning' }) 사용${NC}"
+    echo ""
+    VIOLATIONS_FOUND=1
+fi
+
+# 2. Modal.confirm() 사용하지만 footer.php import 누락 확인 (선택 사항)
+# footer.php에 Modal.confirm() 스크립트가 포함되어 있으므로
+# footer.php include 확인은 생략 (모든 페이지가 footer 포함)
+
+echo "${GREEN}✅ Modal.confirm() 검증 완료${NC}"
+echo ""
+
+##############################################
+# 13. FormValidator 검증 클래스 감지 (v3.41.0)
+##############################################
+
+echo "${BLUE}[13/13]${NC} FormValidator 검증 클래스 감지 중..."
+echo ""
+
+# 1. 중복 검증 함수 감지 (FormValidator 사용 안한 경우)
+# - function isValidEmail( 패턴
+# - function isValidPhone( 패턴
+# - function validatePassword( 패턴 (UI 업데이트 포함된 로컬 함수는 제외)
+# 제외: form-validator.js.php 자체, 주석
+
+# isValidEmail 중복 함수
+DUPLICATE_IS_VALID_EMAIL=$(grep -rn 'function isValidEmail\|function isValidEmailFormat' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "form-validator.js.php" | \
+    grep -v "// function\|<!-- function" | \
+    grep -v "v3.41.0.*FormValidator" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$DUPLICATE_IS_VALID_EMAIL" ]; then
+    echo "${YELLOW}⚠️  중복 이메일 검증 함수 발견:${NC}"
+    echo "$DUPLICATE_IS_VALID_EMAIL" | while read line; do
+        echo "   $line"
+    done | head -5
+    echo ""
+    echo "${YELLOW}💡 권장: FormValidator.isValidEmail() 사용${NC}"
+    echo ""
+    # 경고만 하고 차단하지는 않음
+fi
+
+# isValidPhone 중복 함수
+DUPLICATE_IS_VALID_PHONE=$(grep -rn 'function isValidPhone\|function isValidPhoneFormat' ${SRC_DIR}/ --include="*.php" 2>/dev/null | \
+    grep -v "form-validator.js.php" | \
+    grep -v "// function\|<!-- function" | \
+    grep -v "v3.41.0.*FormValidator" | \
+    grep -vE "${EXCLUDE_PATTERN}")
+
+if [ ! -z "$DUPLICATE_IS_VALID_PHONE" ]; then
+    echo "${YELLOW}⚠️  중복 전화번호 검증 함수 발견:${NC}"
+    echo "$DUPLICATE_IS_VALID_PHONE" | while read line; do
+        echo "   $line"
+    done | head -5
+    echo ""
+    echo "${YELLOW}💡 권장: FormValidator.isValidPhone() 또는 FormValidator.isValidPhoneStrict() 사용${NC}"
+    echo ""
+    # 경고만 하고 차단하지는 않음
+fi
+
+echo "${GREEN}✅ FormValidator 검증 완료${NC}"
+echo ""
 
 ##############################################
 # 최종 결과

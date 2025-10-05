@@ -3752,13 +3752,13 @@ function validateRegistrationForm() {
     
     if (!participantEmail) {
         errors.participant_email = '이메일을 입력해주세요.';
-    } else if (!isValidEmail(participantEmail)) {
+    } else if (!FormValidator.isValidEmail(participantEmail)) {
         errors.participant_email = '올바른 이메일 형식을 입력해주세요.';
     }
-    
+
     if (!participantPhone) {
         errors.participant_phone = '연락처를 입력해주세요.';
-    } else if (!isValidPhone(participantPhone)) {
+    } else if (!FormValidator.isValidPhone(participantPhone)) {
         errors.participant_phone = '올바른 연락처 형식을 입력해주세요. (예: 010-1234-5678)';
     }
     
@@ -3773,18 +3773,9 @@ function validateRegistrationForm() {
     return true;
 }
 
-// 이메일 유효성 검사
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-// 전화번호 유효성 검사
-function isValidPhone(phone) {
-    // 한국 휴대폰 번호 형식 (010-1234-5678, 01012345678 등)
-    const phoneRegex = /^(010|011|016|017|018|019)[-]?\d{3,4}[-]?\d{4}$/;
-    return phoneRegex.test(phone.replace(/\s/g, ''));
-}
+// 🚀 v3.41.0: FormValidator 사용 (중복 함수 제거)
+// isValidEmail() → FormValidator.isValidEmail()
+// isValidPhone() → FormValidator.isValidPhone()
 
 // 폼 에러 메시지 제거
 function clearFormErrors() {

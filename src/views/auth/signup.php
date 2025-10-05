@@ -1426,9 +1426,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 강화된 비밀번호 검증 함수
+    // 🚀 v3.41.0: FormValidator 사용
     function validatePassword(password) {
         const requirementsContainer = document.getElementById('password-requirements');
-        
+
         // 비밀번호가 비어있으면 요구사항 박스 숨기기
         if (password.length === 0) {
             requirementsContainer.style.display = 'none';
@@ -1436,16 +1437,15 @@ document.addEventListener('DOMContentLoaded', function() {
             updatePasswordStrength(password);
             return false;
         }
-        
+
+        // 🚀 FormValidator로 비밀번호 검증
+        const validation = FormValidator.validatePassword(password);
+        const requirements = validation.requirements;
+        const isValid = validation.isValid;
+
         // 비밀번호가 있으면 요구사항 박스 보이기
         requirementsContainer.style.display = 'block';
-        const requirements = {
-            length: password.length >= 8,
-            letter: /[a-zA-Z]/.test(password),
-            number: /[0-9]/.test(password),
-            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-        };
-        
+
         // UI 업데이트
         const reqElements = {
             length: document.getElementById('req-length'),
@@ -1453,7 +1453,7 @@ document.addEventListener('DOMContentLoaded', function() {
             number: document.getElementById('req-number'),
             special: document.getElementById('req-special')
         };
-        
+
         Object.keys(requirements).forEach(req => {
             if (requirements[req]) {
                 reqElements[req].classList.add('valid');
@@ -1461,9 +1461,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 reqElements[req].classList.remove('valid');
             }
         });
-        
-        const isValid = Object.values(requirements).every(req => req);
-        
+
         // 입력 필드 스타일 업데이트
         const passwordStatusIcon = document.getElementById('password-status-icon');
         if (password.length > 0) {
@@ -1480,44 +1478,17 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordInput.classList.remove('valid', 'invalid');
             passwordStatusIcon.className = 'input-status-icon';
         }
-        
+
         // 비밀번호 강도 업데이트
         updatePasswordStrength(password);
-        
+
         return isValid;
     }
     
     // 비밀번호 강도 계산 함수
+    // 🚀 v3.41.0: FormValidator 사용
     function calculatePasswordStrength(password) {
-        if (password.length === 0) return { score: 0, label: '', className: '' };
-        
-        let score = 0;
-        const checks = {
-            length: password.length >= 8,
-            longLength: password.length >= 12,
-            lowercase: /[a-z]/.test(password),
-            uppercase: /[A-Z]/.test(password),
-            number: /[0-9]/.test(password),
-            special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-            noRepeat: !/(.)\1{2,}/.test(password), // 3글자 이상 연속 반복 없음
-            noSequence: !/(?:abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|012|123|234|345|456|567|678|789)/i.test(password)
-        };
-        
-        // 기본 점수 계산
-        if (checks.length) score += 1;
-        if (checks.longLength) score += 1;
-        if (checks.lowercase) score += 1;
-        if (checks.uppercase) score += 1;
-        if (checks.number) score += 1;
-        if (checks.special) score += 1;
-        if (checks.noRepeat) score += 1;
-        if (checks.noSequence) score += 1;
-        
-        // 강도별 분류
-        if (score >= 7) return { score, label: '매우 강함', className: 'strong' };
-        if (score >= 5) return { score, label: '강함', className: 'good' };
-        if (score >= 3) return { score, label: '보통', className: 'fair' };
-        return { score, label: '약함', className: 'weak' };
+        return FormValidator.calculatePasswordStrength(password);
     }
     
     // 비밀번호 강도 UI 업데이트 함수
@@ -1549,22 +1520,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 비밀번호 일치 검증 함수
+    // 🚀 v3.41.0: FormValidator 사용
     function validatePasswordMatch(password, passwordConfirm) {
         const matchStatus = document.getElementById('password-match-status');
         const matchIndicator = document.getElementById('match-indicator');
         const matchText = document.getElementById('match-text');
-        
+
         if (passwordConfirm.length === 0) {
             matchStatus.style.display = 'none';
             passwordConfirmInput.classList.remove('valid', 'invalid');
             return false;
         }
-        
+
         matchStatus.style.display = 'block';
-        
+
         const passwordConfirmStatusIcon = document.getElementById('password-confirm-status-icon');
-        
-        if (password === passwordConfirm) {
+
+        // 🚀 FormValidator로 비밀번호 일치 검증
+        const isMatch = FormValidator.validatePasswordMatch(password, passwordConfirm);
+
+        if (isMatch) {
             matchIndicator.classList.add('valid');
             matchText.textContent = '비밀번호가 일치합니다';
             passwordConfirmInput.classList.add('valid');
@@ -1766,17 +1741,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 휴대폰 번호 형식 검증 (010으로 시작하는지 확인)
+    // 🚀 v3.41.0: FormValidator 사용
     function isValidPhoneFormat(phone) {
-        const pattern = /^010-[0-9]{3,4}-[0-9]{4}$/;
-        const isValid = pattern.test(phone);
+        const isValid = FormValidator.isValidPhoneStrict(phone);
         console.log('📱 휴대폰 번호 형식 검증:', phone, '→', isValid);
         return isValid;
     }
 
     // 이메일 형식 검증
+    // 🚀 v3.41.0: FormValidator 사용
     function isValidEmailFormat(email) {
-        const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const isValid = pattern.test(email);
+        const isValid = FormValidator.isValidEmail(email);
         console.log('📧 이메일 형식 검증:', email, '→', isValid);
         return isValid;
     }
