@@ -1653,9 +1653,8 @@ function handleInstructorImage(index, input) {
     
     // console.log('선택된 파일:', file.name, file.type, file.size);
     
-    // 파일 유효성 검사
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    // 🚀 v3.45.0: UploadConfig 시스템 사용
+    if (!window.validateImageExtension(file.name)) {
         Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
         input.value = '';
         return;
@@ -2207,19 +2206,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // 🚀 v3.45.0: UploadConfig 시스템 사용
     function validateLectureImageFile(file) {
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
+        if (!window.validateImageExtension(file.name)) {
             Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return false;
         }
-        
+
         // 파일 크기 검증 (공통 설정 사용: 30MB)
         if (!window.validateFileSize || !window.validateFileSize(file.size)) {
             Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             return false;
         }
-        
+
         return true;
     }
     
@@ -2823,21 +2822,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 이미지 파일 유효성 검사
+    // 🚀 v3.45.0: UploadConfig 시스템 사용
     function validateImageFile(file) {
         // 파일 형식 검사
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
+        if (!window.validateImageExtension(file.name)) {
             Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
             return false;
         }
-        
+
         // 파일 크기 검사 (공통 설정 사용: 30MB)
         if (!window.validateFileSize || !window.validateFileSize(file.size)) {
             Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
             return false;
         }
-        
+
         return true;
     }
     

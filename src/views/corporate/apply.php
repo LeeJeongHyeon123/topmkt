@@ -652,9 +652,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // 파일 타입 검증
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-        if (!allowedTypes.includes(file.type)) {
+        // 🚀 v3.45.0: 파일 타입 검증 (이미지 + PDF)
+        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        const isImage = window.validateImageExtension(file.name);
+
+        if (!isPdf && !isImage) {
             Toast.info('JPG, PNG, WebP, PDF 파일만 업로드 가능합니다.');
             fileInput.value = '';
             return;

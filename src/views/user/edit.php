@@ -1057,9 +1057,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // 파일 형식 검증
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!allowedTypes.includes(file.type)) {
+            // 🚀 v3.45.0: UploadConfig 시스템 사용
+            if (!window.validateImageExtension(file.name)) {
                 Toast.error('지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WebP만 허용됩니다.');
                 e.target.value = '';
                 return;

@@ -689,15 +689,14 @@ function quillImageHandler() {
         const file = input.files[0];
         if (!file) return;
         
-        // 파일 크기 검증 (30MB)
-        if (file.size > 30 * 1024 * 1024) {
-            Toast.error('파일 크기는 30MB를 초과할 수 없습니다.');
+        // 🚀 v3.45.0: UploadConfig 시스템 사용
+        if (!window.validateFileSize(file.size)) {
+            Toast.error(window.getFileSizeErrorMessage());
             return;
         }
-        
+
         // 파일 형식 검증
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
+        if (!window.validateImageExtension(file.name)) {
             Toast.warning('허용되지 않는 파일 형식입니다. (jpg, jpeg, png, gif, webp만 가능)');
             return;
         }
