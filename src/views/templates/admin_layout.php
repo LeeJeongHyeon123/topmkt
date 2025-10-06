@@ -71,6 +71,14 @@
         </main>
     </div>
     
+    <!-- 🚀 필수 JavaScript 컴포넌트 로드 -->
+    <script>
+    <?php require_once __DIR__ . '/../includes/toast.js.php'; ?>
+    <?php require_once __DIR__ . '/../includes/loading.js.php'; ?>
+    <?php require_once __DIR__ . '/../includes/api-client.js.php'; ?>
+    <?php require_once __DIR__ . '/../includes/date-utils.js.php'; ?>
+    </script>
+
     <!-- 페이지별 추가 스크립트 -->
     <?php if (isset($additional_scripts)): ?>
         <?= $additional_scripts ?>
