@@ -1570,6 +1570,7 @@ function loadChatRoomInfo(roomId) {
         
         if (!roomData) {
             console.error(`❌ 채팅방 ${roomId}의 데이터가 Firebase에 존재하지 않음`);
+            Toast.error('채팅방을 불러올 수 없습니다.\n페이지를 새로고침해주세요.');
             return;
         }
         
@@ -1582,6 +1583,7 @@ function loadChatRoomInfo(roomId) {
     
     roomRef.on('value', window.roomListeners[roomId], function(error) {
         console.error(`❌ 채팅방 ${roomId} 로드 실패:`, error);
+        Toast.error('채팅방 연결에 실패했습니다.\n잠시 후 다시 시도해주세요.');
     });
 }
 
@@ -1722,6 +1724,7 @@ function renderChatRoomItem(roomId, roomData) {
                         renderChatRoomItem(roomId, roomData);
                     }).catch((error) => {
                         console.error(`❌ 사용자 ${otherUserId} 프로필 로드 실패:`, error);
+                        Toast.warning('사용자 프로필을 불러올 수 없습니다.');
                         delete roomItem.dataset.loadingUser;
                     });
                 }
@@ -1903,6 +1906,7 @@ function openChatRoom(roomId, retryCount = 0) {
     if (!roomData) {
         console.error('❌ 채팅방 데이터를 찾을 수 없습니다:', roomId);
         console.error('📋 사용 가능한 채팅방 목록:', Object.keys(chatRooms));
+        Toast.error('채팅방을 찾을 수 없습니다.\n목록에서 다시 선택해주세요.');
 
         // Firebase에서 직접 데이터 가져오기 시도
         console.log('🔄 Firebase에서 직접 채팅방 데이터 로드 시도...');
@@ -2016,6 +2020,7 @@ function updateChatHeader(roomData) {
                     }
                 }).catch(error => {
                     console.error(`❌ 사용자 ${otherUserId} 정보 로드 오류:`, error);
+                    Toast.warning('사용자 정보를 불러올 수 없습니다.');
                     // 에러 시 기본값으로 폴백
                     users[otherUserId] = {
                         id: otherUserId,
@@ -2186,6 +2191,7 @@ function loadMessages(roomId) {
     
     messagesRef.on('value', window.currentMessageListener, function(error) {
         console.error('❌ 메시지 로드 실패:', error);
+        Toast.error('메시지를 불러올 수 없습니다.\n연결 상태를 확인해주세요.');
         messagesContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">메시지를 불러올 수 없습니다.</div>';
     });
 }
@@ -2338,6 +2344,7 @@ function sendMessage() {
                             console.log(`✅ 참여자 ${participantId}의 채팅방 목록 복구 완료`);
                         }).catch((error) => {
                             console.error(`❌ 참여자 ${participantId}의 채팅방 목록 복구 실패:`, error);
+                            Toast.warning('채팅방 목록 동기화에 실패했습니다.');
                         });
                     }
                 });
@@ -2444,6 +2451,7 @@ function searchUsers(query = null) {
         })
         .catch(error => {
             console.error('사용자 검색 오류:', error);
+            Toast.error('사용자 검색에 실패했습니다.\n잠시 후 다시 시도해주세요.');
             usersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #e53e3e;">검색 중 오류가 발생했습니다.</div>';
         });
 }
@@ -3033,6 +3041,7 @@ async function loadUserInfo(userId) {
             console.error(`❌ API 응답 오류: ${response.status} ${response.statusText}`);
             const errorText = await response.text();
             console.error(`❌ 오류 내용: ${errorText}`);
+            Toast.error('사용자 정보를 불러올 수 없습니다.');
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
@@ -3074,6 +3083,7 @@ async function loadUserInfo(userId) {
         return Promise.resolve();
     } catch (error) {
         console.error('❌ 사용자 정보 로드 실패:', error);
+        Toast.warning('사용자 정보를 불러올 수 없습니다.');
         return Promise.reject(error);
     }
 }
