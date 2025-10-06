@@ -282,12 +282,6 @@ if (!isset($_SESSION['csrf_token'])) {
     box-shadow: none !important;
 }
 
-.loading {
-    display: none;
-    color: #667eea;
-    font-size: 0.9rem;
-}
-
 /* 모바일 반응형 */
 @media (max-width: 768px) {
     .lecture-create-container {
