@@ -495,5 +495,10 @@
 <!-- 🚀 v3.42.0: 통합 ApiClient HTTP 클라이언트 시스템 -->
 <?php require_once __DIR__ . '/../includes/api-client.js.php'; ?>
 
+<!-- 🚀 v3.62.0: 날짜/시간 포맷 유틸리티 시스템 -->
+<script>
+<?php require_once __DIR__ . '/../includes/date-utils.js.php'; ?>
+</script>
+
 </body>
 </html> 

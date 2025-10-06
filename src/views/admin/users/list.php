@@ -933,13 +933,13 @@ function renderUsersTable(data) {
                                 <div>게시글: ${formatNumber(user.post_count || 0)}개</div>
                                 <div>댓글: ${formatNumber(user.comment_count || 0)}개</div>
                                 <div style="color: #718096;">
-                                    ${user.last_login ? "로그인: " + formatDate(user.last_login) : "미로그인"}
+                                    ${user.last_login ? "로그인: " + formatDate(user.last_login, { includeTime: true }) : "미로그인"}
                                 </div>
                             </div>
                         </td>
                         <td>
                             <div style="font-size: 12px; color: #718096;">
-                                ${formatDate(user.created_at)}
+                                ${formatDate(user.created_at, { includeTime: true })}
                             </div>
                         </td>
                         <td>
@@ -1186,8 +1186,8 @@ async function viewUserDetail(userId) {
                         <p><strong>게시글:</strong> ${formatNumber(user.post_count || 0)}개</p>
                         <p><strong>댓글:</strong> ${formatNumber(user.comment_count || 0)}개</p>
                         <p><strong>받은 좋아요:</strong> ${formatNumber(user.total_likes || 0)}개</p>
-                        <p><strong>가입일:</strong> ${formatDate(user.created_at)}</p>
-                        <p><strong>마지막 로그인:</strong> ${user.last_login ? formatDate(user.last_login) : "없음"}</p>
+                        <p><strong>가입일:</strong> ${formatDate(user.created_at, { includeTime: true })}</p>
+                        <p><strong>마지막 로그인:</strong> ${user.last_login ? formatDate(user.last_login, { includeTime: true }) : "없음"}</p>
                         <p><strong>로그인 시도:</strong> ${formatNumber(user.login_attempts || 0)}회</p>
                     </div>
                 </div>
@@ -1199,7 +1199,7 @@ async function viewUserDetail(userId) {
                             ${user.recent_activity.slice(0, 10).map(activity => `
                                 <div style="padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
                                     <strong>${activity.action}</strong> - ${activity.description}
-                                    <div style="color: #718096; font-size: 11px;">${formatDate(activity.created_at)}</div>
+                                    <div style="color: #718096; font-size: 11px;">${formatDate(activity.created_at, { includeTime: true })}</div>
                                 </div>
                             `).join("")}
                         </div>
@@ -1391,11 +1391,7 @@ function formatPhone(phone) {
     return phone.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
 }
 
-function formatDate(dateString) {
-    if (!dateString) return "없음";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("ko-KR") + " " + date.toLocaleTimeString("ko-KR", {hour: "2-digit", minute: "2-digit"});
-}
+// 🚀 v3.62.0: formatDate는 date-utils.js.php 통합 시스템 사용 (footer.php 전역 로드)
 
 function getStatusText(status) {
     const statusMap = {
