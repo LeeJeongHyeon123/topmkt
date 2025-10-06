@@ -120,6 +120,7 @@ window.getCoordinates = function(address) {
             
             // API 실패 시 fallback 좌표 시스템
             console.error('네이버 Geocoding API 실패, fallback 좌표 적용');
+            Toast.info('정확한 좌표를 가져올 수 없어 근사 좌표를 사용합니다.');
             
             // 지역별 근사 좌표 fallback 시스템
             const regionCoordinates = getRegionCoordinates(address);
@@ -181,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('네이버 Maps API 로딩 완료');
     }).catch(error => {
         console.error('네이버 Maps API 로딩 실패:', error);
+        Toast.warning('지도 기능을 불러올 수 없습니다.\n주소 검색은 정상 작동합니다.');
         updateCoordinateStatus('❌ 지도 API 로딩 실패', false);
     });
 });

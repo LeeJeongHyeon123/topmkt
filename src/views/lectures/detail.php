@@ -2102,7 +2102,7 @@ body {
                                      class="instructor-avatar clickable-image"
                                      loading="lazy"
                                      decoding="async"
-                                     onerror="console.error('강사 이미지 로딩 실패:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                     onerror="console.error('강사 이미지 로딩 실패:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex'; Toast.warning('강사 이미지를 불러올 수 없습니다.');"
                                      onclick="openInstructorImageModal('<?= htmlspecialchars($imagePath) ?>', '<?= htmlspecialchars($name) ?> 강사님')"
                                      title="<?= htmlspecialchars($name) ?> 강사님 (클릭하면 크게 볼 수 있습니다)">
                                 <!-- 이미지 로딩 실패 시 대체 표시 -->
@@ -2406,6 +2406,7 @@ body {
                                         
                                     } catch (error) {
                                         console.error('❌ 네이버 지도 초기화 실패:', error);
+                                        Toast.warning('지도를 불러올 수 없어 텍스트로 표시합니다.');
                                         showMapFallback_<?= $lecture['id'] ?>();
                                     }
                                 }
@@ -2425,6 +2426,7 @@ body {
                                 window.addEventListener('error', function(e) {
                                     if (e.filename && e.filename.includes('maps.js')) {
                                         console.error('네이버 지도 스크립트 오류:', e.message);
+                                        Toast.warning('지도를 불러올 수 없어 텍스트로 표시합니다.');
                                         showMapFallback_<?= $lecture['id'] ?>();
                                     }
                                 });

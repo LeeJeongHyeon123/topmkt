@@ -3421,6 +3421,7 @@ document.head.appendChild(Object.assign(document.createElement('script'), {
     },
     onerror: function() {
         console.error('카카오 주소 검색 API 로드 실패');
+        Toast.warning('주소 검색 기능을 불러오지 못했습니다.\n페이지를 새로고침해주세요.');
     }
 }));
 
@@ -3584,6 +3585,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeCoordinates();
     }).catch(error => {
         console.error('네이버 지도 API 로딩 실패:', error);
+        Toast.warning('지도 기능을 불러오지 못했습니다.\n주소 검색은 정상 작동합니다.');
         // API 로딩 실패해도 주소 검색은 동작하도록
         initializeCoordinates();
     });

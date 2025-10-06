@@ -2664,6 +2664,7 @@ window.initEventVenueMap = function() {
 
     } catch (error) {
         console.error('🗺️ 행사장 지도 초기화 오류:', error);
+        Toast.warning('지도를 불러올 수 없어 텍스트로 표시합니다.');
         showEventMapFallback();
     }
 };
@@ -3002,6 +3003,7 @@ async function loadEventUserInfo() {
         }
     } catch (error) {
         console.error('사용자 정보 로드 오류:', error);
+        Toast.error('사용자 정보를 불러올 수 없습니다.\n수동으로 입력해주세요.');
     }
 }
 

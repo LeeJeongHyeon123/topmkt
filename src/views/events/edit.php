@@ -729,6 +729,7 @@ function quillImageHandler() {
         const range = quill.getSelection();
         if (!range) {
             console.error('❌ Quill 에디터 선택 범위를 가져올 수 없습니다.');
+            Toast.warning('에디터에서 커서 위치를 찾을 수 없습니다.\n에디터를 클릭한 후 다시 시도해주세요.');
             return;
         }
         
