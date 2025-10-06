@@ -1420,6 +1420,120 @@ in /var/www/html/topmkt/src/views/templates/header.php:141
 - 기업 회원 관리
 - 커뮤니티 게시판
 
+## 통합 컴포넌트 시스템
+
+탑마케팅은 재사용 가능한 컴포넌트 기반 아키텍처를 사용합니다. 모든 컴포넌트는 footer.php에서 전역으로 로드되어 모든 페이지에서 즉시 사용 가능합니다.
+
+### 1. Toast 알림 시스템 (v3.30.0)
+**파일**: `/src/views/includes/toast.js.php`
+**사용법**:
+```javascript
+Toast.success('성공 메시지');
+Toast.error('오류 메시지');
+Toast.info('안내 메시지');
+Toast.warning('경고 메시지');
+```
+
+### 2. Loading 인디케이터 (v3.31.0)
+**파일**: `/src/views/includes/loading.js.php`
+**사용법**:
+```javascript
+Loading.show('로딩 중...');
+Loading.hide();
+Loading.button(buttonElement, true, { text: '처리 중...' });
+```
+
+### 3. Modal 시스템 (v3.36.0)
+**파일**: `/public/assets/js/modal.js`
+**사용법**:
+```javascript
+Modal.confirm({
+    title: '확인',
+    message: '정말 삭제하시겠습니까?',
+    onConfirm: () => { /* 확인 시 동작 */ }
+});
+```
+
+### 4. FormValidator (v3.41.0)
+**파일**: `/src/views/includes/form-validator.js.php`
+**사용법**:
+```javascript
+const validator = new FormValidator(formElement);
+validator.addRule('email', { required: true, email: true });
+if (validator.validate()) { /* 검증 통과 */ }
+```
+
+### 5. ApiClient (v3.42.0)
+**파일**: `/src/views/includes/api-client.js.php`
+**사용법**:
+```javascript
+const data = await ApiClient.get('/api/endpoint');
+await ApiClient.post('/api/endpoint', { key: 'value' });
+await ApiClient.put('/api/endpoint', { key: 'value' });
+await ApiClient.delete('/api/endpoint');
+```
+
+### 6. UploadConfig 시스템
+**파일**: `/src/config/upload.php`, `/src/views/includes/upload-config.js.php`
+**사용법**:
+```javascript
+if (window.validateFileSize(file.size)) { /* 크기 검증 */ }
+if (window.validateImageExtension(file.name)) { /* 확장자 검증 */ }
+input.accept = window.getImageAcceptAttribute();
+```
+
+### 7. CharacterCounter (v3.29.0)
+**파일**: `/src/views/includes/char-counter.js.php`
+**사용법**:
+```javascript
+new CharacterCounter(inputElement, {
+    max: 2000,
+    min: 10,
+    counterElement: document.getElementById('counter')
+});
+```
+
+### 8. Pagination 컴포넌트
+**파일**: `/src/views/includes/pagination.js.php`
+**사용법**:
+```javascript
+window.Pagination.render(paginationData, containerElement);
+```
+
+### 9. Utils 유틸리티 (v3.57.0) ⭐ NEW
+**파일**: `/src/views/includes/utils.js.php`
+**사용법**:
+```javascript
+// Debounce: 연속 이벤트를 그룹화하여 마지막만 실행
+searchInput.addEventListener('input', debounce(() => {
+    performSearch();
+}, 300));
+
+// Throttle: 일정 시간 간격으로만 실행
+window.addEventListener('scroll', throttle(() => {
+    updateScrollPosition();
+}, 100));
+
+// Once: 한 번만 실행
+const init = once(() => { console.log('초기화'); });
+
+// Sleep: 대기 (async/await)
+await sleep(1000); // 1초 대기
+```
+
+### 컴포넌트 로드 순서 (footer.php)
+```
+1. Toast (v3.30.0)
+2. Loading (v3.31.0)
+3. Utils (v3.57.0) ⭐ NEW
+4. Modal (v3.36.0)
+5. FormValidator (v3.41.0)
+6. ApiClient (v3.42.0)
+7. UploadConfig
+8. CharacterCounter (v3.29.0)
+9. Pagination
+```
+
 ## 개발 환경 설정
 
 ### 필수 PHP 확장
