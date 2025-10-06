@@ -779,8 +779,7 @@ function quillImageHandler() {
                 }
             }
             
-            Toast.error('이미지 업로드 중 오류가 발생했습니다.
-상세: ' + error.message);
+            Toast.error('이미지 업로드 중 오류가 발생했습니다.\n상세: ' + error.message);
         }
     };
     
