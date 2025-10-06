@@ -711,14 +711,16 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
             const data = await ApiClient.get('/admin/getUserStats', { noLoading: true });
 
             console.log('📊 받은 데이터:', data);
-            
-            if (data.success && data.stats) {
-                document.getElementById('totalUsers').textContent = data.stats.total_users || 0;
-                document.getElementById('todaySignups').textContent = data.stats.today_signups || 0;
-                document.getElementById('activeUsers').textContent = data.stats.active_users || 0;
-                console.log('✅ 통계 로딩 성공');
+
+            // ApiClient가 정규화한 응답 구조: {success, data, message}
+            if (data.success && data.data) {
+                const stats = data.data;
+                document.getElementById('totalUsers').textContent = stats.total_users || 0;
+                document.getElementById('todaySignups').textContent = stats.today_signups || 0;
+                document.getElementById('activeUsers').textContent = stats.active_users || 0;
+                console.log('✅ 통계 로딩 성공:', stats);
             } else {
-                throw new Error(data.error || '통계 데이터가 없습니다');
+                throw new Error(data.message || '통계 데이터가 없습니다');
             }
         } catch (error) {
             console.error('❌ 통계 로드 오류:', error);
