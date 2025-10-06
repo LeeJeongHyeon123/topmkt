@@ -811,6 +811,7 @@ async function loadUserStats() {
         }
     } catch (error) {
         console.error("통계 로드 실패:", error);
+        Toast.error('통계 데이터를 불러올 수 없습니다.\n페이지를 새로고침해주세요.');
     }
 }
 
@@ -844,6 +845,7 @@ async function loadUsersData(page = 1) {
         }
     } catch (error) {
         console.error("사용자 데이터 로드 실패:", error);
+        Toast.error('사용자 데이터를 불러올 수 없습니다.\n잠시 후 다시 시도해주세요.');
         tableContainer.innerHTML = `
             <div class="empty-state">
                 <div>❌ 데이터 로드에 실패했습니다</div>
