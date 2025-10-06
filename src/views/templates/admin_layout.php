@@ -36,13 +36,16 @@
     <?php require_once SRC_PATH . '/views/includes/loading.js.php'; ?>
     <?php require_once SRC_PATH . '/views/includes/api-client.js.php'; ?>
     <?php require_once SRC_PATH . '/views/includes/date-utils.js.php'; ?>
+    <?php require_once SRC_PATH . '/views/includes/utils.js.php'; ?>
 
     <script>
     console.log('✅ [Admin Layout HEAD] 모든 컴포넌트 로드 완료:', {
         Toast: typeof window.Toast,
         Loading: typeof window.Loading,
         ApiClient: typeof window.ApiClient,
-        DateUtils: typeof window.DateUtils
+        DateUtils: typeof window.DateUtils,
+        formatNumber: typeof window.formatNumber,
+        formatPhone: typeof window.formatPhone
     });
     </script>
 </head>

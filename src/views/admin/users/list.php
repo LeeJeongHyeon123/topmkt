@@ -1381,16 +1381,7 @@ function isBase64(str) {
     }
 }
 
-function formatNumber(number) {
-    if (number === null || number === undefined) return "0";
-    return Number(number).toLocaleString("ko-KR");
-}
-
-function formatPhone(phone) {
-    if (!phone) return "없음";
-    return phone.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
-}
-
+// 🚀 v3.63.0: formatNumber, formatPhone은 utils.js.php 통합 시스템 사용 (admin_layout.php 전역 로드)
 // 🚀 v3.62.0: formatDate는 date-utils.js.php 통합 시스템 사용 (footer.php 전역 로드)
 
 function getStatusText(status) {
