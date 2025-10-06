@@ -70,16 +70,25 @@
             </div>
         </main>
     </div>
-    
-    <!-- 🚀 필수 JavaScript 컴포넌트 로드 -->
+
+    <!-- 🚀 v3.63.0: 필수 JavaScript 컴포넌트 로드 (페이지 스크립트보다 먼저 로드) -->
     <script>
     <?php require_once __DIR__ . '/../includes/toast.js.php'; ?>
+    </script>
+
+    <script>
     <?php require_once __DIR__ . '/../includes/loading.js.php'; ?>
+    </script>
+
+    <script>
     <?php require_once __DIR__ . '/../includes/api-client.js.php'; ?>
+    </script>
+
+    <script>
     <?php require_once __DIR__ . '/../includes/date-utils.js.php'; ?>
     </script>
 
-    <!-- 페이지별 추가 스크립트 -->
+    <!-- 페이지별 추가 스크립트 (필수 컴포넌트가 이미 로드됨) -->
     <?php if (isset($additional_scripts)): ?>
         <?= $additional_scripts ?>
     <?php endif; ?>
