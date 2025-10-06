@@ -1487,10 +1487,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                 </button>
             </div>
         </div>
-        
-        <div class="loading" id="loading">
-            ⏳ <?= $isEditMode ? '강의를 수정하고 있습니다...' : '강의를 등록하고 있습니다...' ?>
-        </div>
+
+        <!-- 로딩은 전역 Loading 컴포넌트 사용 (footer.php에서 로드) -->
     </form>
 </div>
 
@@ -3125,12 +3123,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 로딩 상태 함수
+    // 로딩 상태 함수 (Loading 컴포넌트 사용)
     function showLoading(show) {
-        const loading = document.getElementById('loading');
         const buttons = form.querySelectorAll('button[type="submit"]');
-        
-        loading.style.display = show ? 'block' : 'none';
+
+        if (show) {
+            Loading.show();
+        } else {
+            Loading.hide();
+        }
+
         buttons.forEach(btn => {
             btn.disabled = show;
         });

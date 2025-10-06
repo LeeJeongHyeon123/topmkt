@@ -577,13 +577,7 @@ html #quill-editor .ql-editor * {
     </form>
 </div>
 
-<!-- 로딩 오버레이 -->
-<div id="loadingOverlay" class="loading-overlay">
-    <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <p><?= $isEdit ? '게시글을 수정하고 있습니다...' : '게시글을 작성하고 있습니다...' ?></p>
-    </div>
-</div>
+<!-- 로딩은 전역 Loading 컴포넌트 사용 (footer.php에서 로드) -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -596,7 +590,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentCounter = document.getElementById('contentCounter');
     const submitBtn = document.getElementById('submitBtn');
     const submitText = document.getElementById('submitText');
-    const loadingOverlay = document.getElementById('loadingOverlay');
     const deleteBtn = document.getElementById('deleteBtn');
     
     const isEdit = <?= $isEdit ? 'true' : 'false' ?>;
@@ -1474,15 +1467,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 로딩 표시/숨김 함수
+    // 로딩 표시/숨김 함수 (Loading 컴포넌트 사용)
     function showLoading() {
-        loadingOverlay.style.display = 'flex';
+        Loading.show();
         submitBtn.disabled = true;
         if (deleteBtn) deleteBtn.disabled = true;
     }
-    
+
     function hideLoading() {
-        loadingOverlay.style.display = 'none';
+        Loading.hide();
         submitBtn.disabled = false;
         if (deleteBtn) deleteBtn.disabled = false;
     }
