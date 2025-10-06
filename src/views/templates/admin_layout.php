@@ -25,11 +25,38 @@
 
     <!-- 관리자 공통 스타일 -->
     <?php include SRC_PATH . '/views/templates/admin_styles.php'; ?>
-    
+
     <!-- 페이지별 추가 스타일 -->
     <?php if (isset($additional_styles)): ?>
         <?= $additional_styles ?>
     <?php endif; ?>
+
+    <!-- 🚀 v3.63.0: 필수 JavaScript 컴포넌트 로드 (HEAD에서 먼저 로드) -->
+    <script>
+    console.log('🔧 [Admin Layout HEAD] 컴포넌트 로딩 시작...');
+    </script>
+
+    <?php require_once SRC_PATH . '/views/includes/toast.js.php'; ?>
+    <script>
+    console.log('✅ [Admin Layout HEAD] Toast 로드 완료:', typeof window.Toast);
+    </script>
+
+    <?php require_once SRC_PATH . '/views/includes/loading.js.php'; ?>
+    <script>
+    console.log('✅ [Admin Layout HEAD] Loading 로드 완료:', typeof window.Loading);
+    </script>
+
+    <?php require_once SRC_PATH . '/views/includes/api-client.js.php'; ?>
+    <script>
+    console.log('✅ [Admin Layout HEAD] ApiClient 로드 완료:', typeof window.ApiClient);
+    console.log('📋 [Admin Layout HEAD] ApiClient 객체:', window.ApiClient);
+    </script>
+
+    <?php require_once SRC_PATH . '/views/includes/date-utils.js.php'; ?>
+    <script>
+    console.log('✅ [Admin Layout HEAD] DateUtils 로드 완료:', typeof window.DateUtils);
+    console.log('🎯 [Admin Layout HEAD] 모든 컴포넌트 로드 완료');
+    </script>
 </head>
 <body class="admin-page">
     <div class="admin-container">
@@ -71,50 +98,15 @@
         </main>
     </div>
 
-    <!-- 🚀 v3.63.0: 필수 JavaScript 컴포넌트 로드 -->
-    <script>
-    console.log('🔧 [Admin Layout] 컴포넌트 로딩 시작...');
-    </script>
-
-    <?php require_once SRC_PATH . '/views/includes/toast.js.php'; ?>
-    <script>
-    console.log('✅ [Admin Layout] Toast 로드 완료:', typeof window.Toast);
-    </script>
-
-    <?php require_once SRC_PATH . '/views/includes/loading.js.php'; ?>
-    <script>
-    console.log('✅ [Admin Layout] Loading 로드 완료:', typeof window.Loading);
-    </script>
-
-    <?php require_once SRC_PATH . '/views/includes/api-client.js.php'; ?>
-    <script>
-    console.log('✅ [Admin Layout] ApiClient 로드 완료:', typeof window.ApiClient);
-    console.log('📋 [Admin Layout] ApiClient 객체:', window.ApiClient);
-    </script>
-
-    <?php require_once SRC_PATH . '/views/includes/date-utils.js.php'; ?>
-    <script>
-    console.log('✅ [Admin Layout] DateUtils 로드 완료:', typeof window.DateUtils);
-    </script>
-
-    <script>
-    console.log('🎯 [Admin Layout] 모든 컴포넌트 로드 완료');
-    console.log('📊 [Admin Layout] 전역 객체 확인:', {
-        Toast: typeof window.Toast,
-        Loading: typeof window.Loading,
-        ApiClient: typeof window.ApiClient,
-        DateUtils: typeof window.DateUtils
-    });
-    </script>
-
-    <!-- 페이지별 추가 스크립트 (필수 컴포넌트가 이미 로드됨) -->
+    <!-- 페이지별 추가 스크립트 (필수 컴포넌트는 HEAD에서 이미 로드됨) -->
     <?php if (isset($additional_scripts)): ?>
         <script>
-        console.log('📄 [Admin Layout] 페이지 스크립트 로드 시작...');
+        console.log('📄 [Admin Layout BODY] 페이지 스크립트 로드 시작...');
+        console.log('🔍 [Admin Layout BODY] ApiClient 사용 가능 여부:', typeof window.ApiClient);
         </script>
         <?= $additional_scripts ?>
         <script>
-        console.log('✅ [Admin Layout] 페이지 스크립트 로드 완료');
+        console.log('✅ [Admin Layout BODY] 페이지 스크립트 로드 완료');
         </script>
     <?php endif; ?>
 </body>
