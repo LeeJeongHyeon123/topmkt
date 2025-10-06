@@ -793,18 +793,8 @@ function setupEventListeners() {
     });
 }
 
-// 디바운스 함수
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+// v3.57.0: 통합 utils.js.php의 debounce 함수 사용
+// (전역 window.debounce 사용)
 
 // 사용자 통계 로드
 async function loadUserStats() {

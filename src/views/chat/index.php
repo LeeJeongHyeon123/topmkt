@@ -2723,19 +2723,9 @@ function escapeHtml(text) {
 }
 
 /**
- * 디바운스 함수
+ * v3.57.0: debounce 함수는 통합 utils.js.php 사용
+ * (사용하지 않던 중복 코드 제거)
  */
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
 
 /**
  * 채팅 메시지 영역 스크롤 하단으로

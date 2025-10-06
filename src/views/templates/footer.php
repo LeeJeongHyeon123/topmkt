@@ -483,6 +483,9 @@
 <!-- 🚀 v3.31.0: 통합 Loading 인디케이터 시스템 -->
 <?php require_once __DIR__ . '/../includes/loading.js.php'; ?>
 
+<!-- 🚀 v3.57.0: 통합 유틸리티 함수 (debounce, throttle, once, sleep) -->
+<?php require_once __DIR__ . '/../includes/utils.js.php'; ?>
+
 <!-- 🚀 v3.36.0: Modal.confirm() 시스템 -->
 <script src="/assets/js/modal.js?v=<?= time() ?>"></script>
 
