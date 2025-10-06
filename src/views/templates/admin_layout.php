@@ -32,30 +32,18 @@
     <?php endif; ?>
 
     <!-- 🚀 v3.63.0: 필수 JavaScript 컴포넌트 로드 (HEAD에서 먼저 로드) -->
-    <script>
-    console.log('🔧 [Admin Layout HEAD] 컴포넌트 로딩 시작...');
-    </script>
-
     <?php require_once SRC_PATH . '/views/includes/toast.js.php'; ?>
-    <script>
-    console.log('✅ [Admin Layout HEAD] Toast 로드 완료:', typeof window.Toast);
-    </script>
-
     <?php require_once SRC_PATH . '/views/includes/loading.js.php'; ?>
-    <script>
-    console.log('✅ [Admin Layout HEAD] Loading 로드 완료:', typeof window.Loading);
-    </script>
-
     <?php require_once SRC_PATH . '/views/includes/api-client.js.php'; ?>
-    <script>
-    console.log('✅ [Admin Layout HEAD] ApiClient 로드 완료:', typeof window.ApiClient);
-    console.log('📋 [Admin Layout HEAD] ApiClient 객체:', window.ApiClient);
-    </script>
-
     <?php require_once SRC_PATH . '/views/includes/date-utils.js.php'; ?>
+
     <script>
-    console.log('✅ [Admin Layout HEAD] DateUtils 로드 완료:', typeof window.DateUtils);
-    console.log('🎯 [Admin Layout HEAD] 모든 컴포넌트 로드 완료');
+    console.log('✅ [Admin Layout HEAD] 모든 컴포넌트 로드 완료:', {
+        Toast: typeof window.Toast,
+        Loading: typeof window.Loading,
+        ApiClient: typeof window.ApiClient,
+        DateUtils: typeof window.DateUtils
+    });
     </script>
 </head>
 <body class="admin-page">
