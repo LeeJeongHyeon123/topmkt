@@ -1,3 +1,4 @@
+<script>
 /**
  * 날짜/시간 포맷 유틸리티
  *
@@ -186,3 +187,4 @@
     console.log('✅ DateUtils 유틸리티 로드 완료');
 
 })();
+</script>
