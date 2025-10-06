@@ -3137,25 +3137,9 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.disabled = show;
         });
     }
-    
-    // 성공 메시지 표시
-    function Toast.success(message) {
-        // 기존 메시지 제거
-        const existingMsg = document.querySelector('.success-notification');
-        if (existingMsg) existingMsg.remove();
-        
-        const successDiv = document.createElement('div');
-        successDiv.className = 'success-notification';
-        successDiv.innerHTML = `
-            <div style="background: #10b981; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-                <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
-                ${message}
-            </div>
-        `;
-        form.insertBefore(successDiv, form.firstChild);
-        successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
+
+    // 🚀 v3.62.0: Toast.success는 전역 Toast 시스템 사용 (제거됨)
+
     // 강사 이미지 로딩 함수 (전역 함수로 정의)
     window.loadInstructorImage = function(index, imagePath) {
         // console.log(`강사 ${index} 이미지 로딩 시도:`, imagePath);
@@ -3207,25 +3191,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // console.log(`강사 ${index} 이미지 로딩 완료:`, imagePath);
     };
-    
-    // 에러 메시지 표시
-    function Toast.error(message) {
-        // 기존 메시지 제거
-        const existingMsg = document.querySelector('.error-notification');
-        if (existingMsg) existingMsg.remove();
-        
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-notification';
-        errorDiv.innerHTML = `
-            <div style="background: #ef4444; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
-                <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
-                ${message}
-            </div>
-        `;
-        form.insertBefore(errorDiv, form.firstChild);
-        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
+
+    // 🚀 v3.62.0: Toast.error는 전역 Toast 시스템 사용 (제거됨)
+
     // 필드별 에러 표시
     function showFieldErrors(errors) {
         // 기존 에러 초기화
