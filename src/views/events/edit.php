@@ -788,7 +788,7 @@ function quillImageHandler() {
 }
 
 // 기존 내용 설정
-quill.root.innerHTML = `<?= addslashes($event['description']) ?>`;
+quill.root.innerHTML = <?= json_encode($event['description']) ?>;
 
 // 이미지 카운터 업데이트 함수
 function updateImageCounter() {
