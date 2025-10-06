@@ -39,6 +39,21 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     
     <!-- 관리자 공통 스타일 -->
     <?php include SRC_PATH . '/views/templates/admin_styles.php'; ?>
+
+    <!-- 🚀 v3.63.0: 필수 JavaScript 컴포넌트 로드 (HEAD에서 먼저 로드) -->
+    <?php require_once SRC_PATH . '/views/includes/toast.js.php'; ?>
+    <?php require_once SRC_PATH . '/views/includes/loading.js.php'; ?>
+    <?php require_once SRC_PATH . '/views/includes/api-client.js.php'; ?>
+    <?php require_once SRC_PATH . '/views/includes/date-utils.js.php'; ?>
+
+    <script>
+    console.log('✅ [Admin Users Direct] 모든 컴포넌트 로드 완료:', {
+        Toast: typeof window.Toast,
+        Loading: typeof window.Loading,
+        ApiClient: typeof window.ApiClient,
+        DateUtils: typeof window.DateUtils
+    });
+    </script>
 </head>
 <body class="admin-page">
     <div class="admin-container">
