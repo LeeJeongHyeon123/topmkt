@@ -1734,6 +1734,7 @@ setTimeout(() => {
         console.log('✅ 이벤트 생성 페이지 - 이미지 제한 시스템 초기화 완료');
     } else {
         console.error('❌ Quill 에디터가 초기화되지 않았습니다.');
+        Toast.error('에디터 초기화에 실패했습니다.\n페이지를 새로고침해주세요.');
     }
 }, 1500);
 </script>

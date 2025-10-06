@@ -3132,6 +3132,7 @@ function showLectureStatusMessage(statusClass, iconClass, title, description) {
     
     if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
         console.error('❌ showLectureStatusMessage: 필수 DOM 요소 누락!');
+        Toast.warning('페이지 요소를 불러오는 중 오류가 발생했습니다.');
         return;
     }
     
@@ -3364,6 +3365,7 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     const actionsContainer = debugContainer || document.getElementById('registration-actions');
     if (!actionsContainer) {
         console.error('❌ registration-actions 컨테이너를 찾을 수 없습니다');
+        Toast.error('신청 버튼을 표시할 수 없습니다.\n페이지를 새로고침해주세요.');
         return;
     }
     
@@ -3405,6 +3407,7 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     // lectureInfo 유효성 검사
     if (!lectureInfo || typeof lectureInfo !== 'object') {
         console.error('❌ lectureInfo가 유효하지 않습니다:', lectureInfo);
+        Toast.error('강의 정보를 불러올 수 없습니다.');
         showDefaultRegistrationButton();
         return;
     }
@@ -3472,6 +3475,7 @@ function showDefaultRegistrationButton() {
     const actionsContainer = debugContainer || document.getElementById('registration-actions');
     if (!actionsContainer) {
         console.error('❌ registration-actions 컨테이너를 찾을 수 없습니다');
+        Toast.error('신청 버튼을 표시할 수 없습니다.\n페이지를 새로고침해주세요.');
         console.log('🔍 로그인 상태:', <?= $isLoggedIn ? 'true' : 'false' ?>);
         console.log('✏️ 편집 권한:', canEdit);
         return;
@@ -3587,6 +3591,7 @@ async function loadUserInfo() {
 
     } catch (error) {
         console.error('정보 로드 오류:', error);
+        Toast.error('사용자 정보를 불러올 수 없습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
 
@@ -3833,7 +3838,7 @@ async function cancelRegistration() {
         }
     } catch (error) {
         console.error('신청 취소 오류:', error);
-        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
+        Toast.error('신청 취소 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
 
@@ -3912,7 +3917,7 @@ async function confirmDeleteLecture(lectureId) {
         console.error('=== 강의 삭제 오류 ===');
         console.error('오류 객체:', error);
         console.error('오류 메시지:', error.message);
-        // ApiClient가 이미 Toast 표시했으므로 추가 표시는 선택적
+        Toast.error('강의 삭제 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
         // 버튼 복구
         deleteBtn.innerHTML = originalText;
         deleteBtn.disabled = false;
@@ -4101,6 +4106,7 @@ function updateLectureStatusMessage(registration) {
     
     if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
         console.error('❌ 필수 DOM 요소가 누락됨!');
+        Toast.warning('페이지 요소를 불러오는 중 오류가 발생했습니다.');
         return;
     }
     

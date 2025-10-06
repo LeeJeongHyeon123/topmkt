@@ -1596,6 +1596,7 @@ async function updateLectureImagesDisplay(updatedImages) {
     const imagePreviewContainer = document.getElementById('lectureImagePreview');
     if (!imagePreviewContainer) {
         console.error('lectureImagePreview 컨테이너를 찾을 수 없음');
+        Toast.warning('이미지 미리보기 영역을 찾을 수 없습니다.');
         return;
     }
     
@@ -1668,6 +1669,7 @@ function handleInstructorImage(index, input) {
         // console.log(`찾은 파일 입력 요소:`, fileInput);
         if (!fileInput) {
             console.error(`강사 이미지 입력 요소를 찾을 수 없습니다: #instructor_image_${index}`);
+            Toast.warning(`강사 ${index}의 이미지 입력 요소를 찾을 수 없습니다.`);
             return;
         }
         
@@ -1678,6 +1680,7 @@ function handleInstructorImage(index, input) {
         // console.log(`찾은 컨테이너:`, container);
         if (!container) {
             console.error('이미지 컨테이너를 찾을 수 없습니다');
+            Toast.warning('이미지 컨테이너를 찾을 수 없습니다.');
             return;
         }
         
@@ -2004,6 +2007,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!durationText) {
             console.error('duration-text 요소를 찾을 수 없습니다');
+            Toast.warning('기간 표시 영역을 찾을 수 없습니다.');
             return;
         }
         
@@ -2089,9 +2093,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // console.log('소요시간 계산 이벤트 리스너 등록 완료');
     } else {
-        console.error('날짜/시간 입력 요소를 찾을 수 없습니다:', { 
-            startDateElement, endDateElement, startTimeElement, endTimeElement 
+        console.error('날짜/시간 입력 요소를 찾을 수 없습니다:', {
+            startDateElement, endDateElement, startTimeElement, endTimeElement
         });
+        Toast.warning('날짜/시간 입력 요소를 찾을 수 없습니다.');
     }
     
     // 종료 날짜의 최소값 업데이트 함수
@@ -3019,6 +3024,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('폼 제출 오류:', error);
+            Toast.error('강의 등록 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
             showLoading(false);
             
             // 네트워크 오류 타입별 처리
@@ -3157,6 +3163,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fileInput = document.querySelector(`#instructor_image_${index}`);
         if (!fileInput) {
             console.error(`강사 이미지 입력 요소를 찾을 수 없습니다: #instructor_image_${index}`);
+            Toast.warning(`강사 ${index}의 이미지 입력 요소를 찾을 수 없습니다.`);
             return;
         }
         
@@ -3164,6 +3171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = uploadDiv ? uploadDiv.querySelector('.instructor-image-container') : null;
         if (!container) {
             console.error('이미지 컨테이너를 찾을 수 없습니다');
+            Toast.warning('이미지 컨테이너를 찾을 수 없습니다.');
             return;
         }
         
@@ -3849,7 +3857,8 @@ function loadInstructorImageDirect(index, imageUrl) {
         console.log(`강사 ${index} 이미지 로딩 성공:`, imageUrl);
     } else {
         console.error(`강사 ${index}의 이미지 컨테이너를 찾을 수 없습니다`);
-        
+        Toast.warning(`강사 ${index}의 이미지 컨테이너를 찾을 수 없습니다.`);
+
         // 디버깅: 현재 DOM 구조 출력
         console.log('현재 강사 아이템들:', document.querySelectorAll('.instructor-item'));
         console.log(`instructor_image_${index} 요소:`, document.querySelector(`#instructor_image_${index}`));

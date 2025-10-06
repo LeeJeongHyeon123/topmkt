@@ -1087,6 +1087,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!recaptchaLoaded) {
             console.error('❌ reCAPTCHA가 아직 로드되지 않음');
+            Toast.error('보안 검증 로드 중입니다.\n잠시 후 다시 시도해주세요.');
             throw new Error('reCAPTCHA가 아직 로드되지 않았습니다.');
         }
         
@@ -1099,6 +1100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return token;
         } catch (error) {
             console.error('❌ reCAPTCHA 토큰 생성 실패:', error);
+            Toast.error('보안 검증에 실패했습니다.\n페이지를 새로고침해주세요.');
             throw error;
         }
     }
@@ -1224,6 +1226,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         } catch (error) {
             console.error('❌ 닉네임 중복검사 오류:', error);
+            Toast.error('닉네임 중복 검사 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
             statusIndicator.className = 'status-indicator';
             statusIcon.className = 'input-status-icon show invalid fas fa-exclamation-triangle';
             messageText.textContent = '중복 검사 중 오류가 발생했습니다. 다시 시도해주세요.';
@@ -1294,6 +1297,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         } catch (error) {
             console.error('❌ 휴대폰 중복검사 오류:', error);
+            Toast.error('휴대폰 중복 검사 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
             statusIndicator.className = 'status-indicator';
             statusIcon.className = 'input-status-icon show invalid fas fa-exclamation-triangle';
             messageText.textContent = '중복 검사 중 오류가 발생했습니다. 다시 시도해주세요.';

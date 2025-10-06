@@ -3114,7 +3114,7 @@ async function submitEventRegistration() {
         }
     } catch (error) {
         console.error('행사 신청 제출 오류:', error);
-        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
+        Toast.error('행사 신청 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
 
@@ -3143,7 +3143,7 @@ async function cancelEventRegistration() {
         }
     } catch (error) {
         console.error('행사 신청 취소 오류:', error);
-        // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
+        Toast.error('신청 취소 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
 
@@ -3252,6 +3252,7 @@ function openInstructorImageModal(imageSrc, instructorName) {
     
     if (!modal || !modalImage || !modalName) {
         console.error('강사 이미지 모달 요소를 찾을 수 없습니다.');
+        Toast.warning('이미지 모달을 표시할 수 없습니다.');
         return;
     }
     
@@ -3531,7 +3532,7 @@ async function confirmDeleteEvent(eventId) {
     })
     .catch(error => {
         console.error('네트워크 오류:', error);
-        // ApiClient가 이미 Toast 표시했으므로 추가 표시는 선택적
+        Toast.error('행사 삭제 중 네트워크 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
 
         // 버튼 상태 복원
         deleteBtn.innerHTML = originalText;
