@@ -1781,26 +1781,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.TopMarketingLoading.setStage('인증번호 생성 중...');
                 window.TopMarketingLoading.setProgress(60);
             }
-            
-            const response = await fetch('/auth/send-verification', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(requestData)
+
+            // v3.56.0: ApiClient 사용
+            const data = await ApiClient.post('/auth/send-verification', requestData, {
+                noLoading: true // TopMarketingLoading을 사용하므로 기본 로딩 비활성화
             });
 
-            console.log('📡 응답 상태:', response.status, response.statusText);
-            console.log('📡 응답 헤더:', [...response.headers.entries()]);
-            
+            console.log('📥 응답 데이터:', data);
+
             if (window.TopMarketingLoading) {
                 window.TopMarketingLoading.setStage('📱 SMS 발송 중...');
                 window.TopMarketingLoading.setProgress(90);
             }
-            
-            const data = await response.json();
-            console.log('📥 응답 데이터:', data);
             
             if (data.success) {
                 console.log('✅ SMS 발송 성공');
@@ -1853,21 +1845,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const requestData = { phone: phone, code: code };
         console.log('📤 인증 확인 요청 데이터:', requestData);
 
-        fetch('/auth/verify-code', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify(requestData)
-        })
-        .then(response => {
-            console.log('📡 인증 확인 응답 상태:', response.status, response.statusText);
-            return response.json();
+        // v3.56.0: ApiClient 사용 (Promise 체인 유지)
+        ApiClient.post('/auth/verify-code', requestData, {
+            noLoading: true // Loading.button을 사용하므로 기본 로딩 비활성화
         })
         .then(data => {
             console.log('📥 인증 확인 응답 데이터:', data);
-            
+
             if (data.success) {
                 console.log('✅ 휴대폰 인증 성공');
                 Toast.success('휴대폰 인증이 완료되었습니다.');
