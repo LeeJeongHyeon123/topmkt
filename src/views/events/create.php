@@ -1702,7 +1702,24 @@ function initializeDateRestrictions() {
         console.log('✅ 신청 마감일 최소 날짜+시간 설정:', nowDatetime);
     }
 
-    console.log('✅ 날짜 제한 초기화 완료 (v3.67.4)');
+    // 🚀 v3.67.4: 시간 필드 클릭 시 시간 선택 모달 자동 열기
+    const startTimeInput = document.getElementById('start_time');
+    if (startTimeInput) {
+        startTimeInput.addEventListener('click', function() {
+            openDatePicker(this);
+        });
+        console.log('✅ 시작시간 클릭 이벤트 설정 완료');
+    }
+
+    const endTimeInput = document.getElementById('end_time');
+    if (endTimeInput) {
+        endTimeInput.addEventListener('click', function() {
+            openDatePicker(this);
+        });
+        console.log('✅ 종료시간 클릭 이벤트 설정 완료');
+    }
+
+    console.log('✅ 날짜/시간 제한 초기화 완료 (v3.67.4)');
 }
 
 // 폼 유효성 검사
