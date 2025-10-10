@@ -1349,70 +1349,90 @@ function showShareModal(title, url) {
 // ESC 키로 모달 닫기
 // ESC 키 이벤트는 profile-modal.js의 통합 시스템에서 자동 처리됨
 
-// 프로필 페이지 성능 측정 및 로깅
+// 프로필 페이지 성능 측정 및 로깅 (v3.66.0 최적화)
 (function() {
     // 성능 측정 시작
     const performanceStart = performance.now();
-    const navigationStart = performance.timing.navigationStart;
-    const loadStart = performance.timing.loadEventStart;
-    
+
     // 페이지 로드 시간 측정
     window.addEventListener('load', function() {
-        const loadTime = performance.now() - performanceStart;
-        const totalLoadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-        
-        console.log('🚀 프로필 페이지 성능 분석');
-        console.log('👤 사용자:', '<?= htmlspecialchars($user['nickname'] ?? '') ?>');
-        console.log('📊 통계:', <?= json_encode($stats) ?>);
-        console.log('');
-        console.log('⏱️ 로딩 시간 분석:');
-        console.log('├─ DNS 조회:', (performance.timing.domainLookupEnd - performance.timing.domainLookupStart) + 'ms');
-        console.log('├─ TCP 연결:', (performance.timing.connectEnd - performance.timing.connectStart) + 'ms');
-        console.log('├─ 서버 응답:', (performance.timing.responseEnd - performance.timing.requestStart) + 'ms');
-        console.log('├─ DOM 생성:', (performance.timing.domContentLoadedEventEnd - performance.timing.domLoading) + 'ms');
-        console.log('├─ 리소스 로딩:', (performance.timing.loadEventEnd - performance.timing.domContentLoadedEventEnd) + 'ms');
-        console.log('└─ 총 로딩 시간:', totalLoadTime + 'ms');
-        
-        // 리소스별 로딩 시간
-        const resources = performance.getEntriesByType('resource');
-        console.log('');
-        console.log('📁 리소스 로딩 시간:');
-        
-        let slowResources = [];
-        resources.forEach(function(resource) {
-            const loadTime = resource.responseEnd - resource.startTime;
-            if (loadTime > 100) { // 100ms 이상 소요된 리소스만
-                slowResources.push({
-                    name: resource.name.split('/').pop(),
-                    time: Math.round(loadTime),
-                    type: resource.initiatorType
-                });
-            }
-        });
-        
-        // 느린 리소스 상위 10개
-        slowResources.sort((a, b) => b.time - a.time);
-        slowResources.slice(0, 10).forEach(function(resource, index) {
-            console.log(`${index + 1}. ${resource.name} (${resource.type}): ${resource.time}ms`);
-        });
-        
-        // 메모리 사용량 (가능한 경우)
-        if (performance.memory) {
+        // 로드 이벤트 완료 후 약간의 지연을 두고 측정 (모든 타이밍 값이 설정되도록)
+        setTimeout(function() {
+            const timing = performance.timing;
+
+            // 안전한 타이밍 계산 (음수 방지)
+            const safeCalc = (end, start) => {
+                if (!end || !start || end === 0 || start === 0) return 0;
+                const result = end - start;
+                return result >= 0 ? result : 0;
+            };
+
+            const dnsTime = safeCalc(timing.domainLookupEnd, timing.domainLookupStart);
+            const tcpTime = safeCalc(timing.connectEnd, timing.connectStart);
+            const serverTime = safeCalc(timing.responseEnd, timing.requestStart);
+            const domTime = safeCalc(timing.domContentLoadedEventEnd, timing.domLoading);
+            const resourceTime = safeCalc(timing.loadEventEnd, timing.domContentLoadedEventEnd);
+            const totalTime = safeCalc(timing.loadEventEnd, timing.navigationStart);
+
+            console.log('🚀 프로필 페이지 성능 분석 (v3.66.0)');
+            console.log('👤 사용자:', '<?= htmlspecialchars($user['nickname'] ?? '') ?>');
+            console.log('📊 통계:', <?= json_encode($stats) ?>);
             console.log('');
-            console.log('💾 메모리 사용량:');
-            console.log('├─ 사용 중:', Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB');
-            console.log('├─ 할당됨:', Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + 'MB');
-            console.log('└─ 한계:', Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024) + 'MB');
-        }
-        
-        // 성능 경고
-        if (totalLoadTime > 2000) {
-            console.warn('🐌 페이지 로딩이 2초 이상 걸렸습니다!');
-        } else if (totalLoadTime > 1000) {
-            console.warn('⚠️ 페이지 로딩이 1초 이상 걸렸습니다.');
-        } else {
-            console.log('✅ 페이지 로딩 속도 양호');
-        }
+            console.log('⏱️ 로딩 시간 분석:');
+            console.log('├─ DNS 조회:', dnsTime + 'ms');
+            console.log('├─ TCP 연결:', tcpTime + 'ms');
+            console.log('├─ 서버 응답:', serverTime + 'ms', serverTime > 1000 ? '⚠️ 느림!' : '✅');
+            console.log('├─ DOM 생성:', domTime + 'ms');
+            console.log('├─ 리소스 로딩:', resourceTime + 'ms');
+            console.log('└─ 총 로딩 시간:', totalTime + 'ms');
+
+            // 리소스별 로딩 시간
+            const resources = performance.getEntriesByType('resource');
+            console.log('');
+            console.log('📁 리소스 로딩 시간:');
+
+            let slowResources = [];
+            resources.forEach(function(resource) {
+                const loadTime = resource.responseEnd - resource.startTime;
+                if (loadTime > 100) { // 100ms 이상 소요된 리소스만
+                    slowResources.push({
+                        name: resource.name.split('/').pop(),
+                        time: Math.round(loadTime),
+                        type: resource.initiatorType
+                    });
+                }
+            });
+
+            // 느린 리소스 상위 10개
+            slowResources.sort((a, b) => b.time - a.time);
+            slowResources.slice(0, 10).forEach(function(resource, index) {
+                console.log(`${index + 1}. ${resource.name} (${resource.type}): ${resource.time}ms`);
+            });
+
+            // 메모리 사용량 (가능한 경우)
+            if (performance.memory) {
+                console.log('');
+                console.log('💾 메모리 사용량:');
+                console.log('├─ 사용 중:', Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB');
+                console.log('├─ 할당됨:', Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + 'MB');
+                console.log('└─ 한계:', Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024) + 'MB');
+            }
+
+            // 성능 경고 (서버 응답 시간 기준)
+            if (serverTime > 2000) {
+                console.warn('🐌 서버 응답이 2초 이상 걸렸습니다! 캐시를 확인하세요.');
+            } else if (serverTime > 1000) {
+                console.warn('⚠️ 서버 응답이 1초 이상 걸렸습니다.');
+            }
+
+            if (totalTime > 3000) {
+                console.warn('🐌 전체 페이지 로딩이 3초 이상 걸렸습니다!');
+            } else if (totalTime > 1500) {
+                console.warn('⚠️ 전체 페이지 로딩이 1.5초 이상 걸렸습니다.');
+            } else {
+                console.log('✅ 페이지 로딩 속도 양호');
+            }
+        }, 100); // 100ms 지연으로 모든 타이밍 값이 설정되도록 보장
     });
     
     // DOM 준비 완료 시간

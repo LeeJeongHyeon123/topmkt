@@ -31,11 +31,14 @@ class UserOptimized {
                 mkdir(ROOT_PATH . '/cache', 0755, true);
             }
 
-            // 캐시 파일이 있고 10분 미만이면 사용
-            if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 600) {
+            // 🚀 v3.66.0: 캐시 TTL 10분 → 1시간 연장 (성능 최적화)
+            // 캐시 파일이 있고 1시간 미만이면 사용
+            $cacheTTL = 3600; // 1시간 (60분 * 60초)
+            if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTTL) {
                 $cachedData = json_decode(file_get_contents($cacheFile), true);
                 if ($cachedData) {
-                    error_log("Profile cache hit for user $userId");
+                    $cacheAge = time() - filemtime($cacheFile);
+                    error_log("✅ Profile cache HIT for user $userId (age: {$cacheAge}s / {$cacheTTL}s)");
                     return $cachedData;
                 }
             }
@@ -141,13 +144,15 @@ class UserOptimized {
     
     /**
      * 최적화된 통계 정보 조회 (캐시 테이블 사용)
+     * v3.66.0: 캐시 TTL 10분 → 1시간 연장
      */
     private function getOptimizedStats($userId) {
-        // 1. 캐시 테이블에서 먼저 조회
-        $sql = "SELECT * FROM user_stats_cache WHERE user_id = ? AND last_updated > DATE_SUB(NOW(), INTERVAL 10 MINUTE)";
+        // 1. 캐시 테이블에서 먼저 조회 (1시간 TTL)
+        $sql = "SELECT * FROM user_stats_cache WHERE user_id = ? AND last_updated > DATE_SUB(NOW(), INTERVAL 1 HOUR)";
         $cached = $this->db->fetch($sql, [$userId]);
-        
+
         if ($cached) {
+            error_log("✅ Stats cache HIT for user $userId");
             return [
                 'post_count' => (int)$cached['post_count'],
                 'comment_count' => (int)$cached['comment_count'],
@@ -155,6 +160,8 @@ class UserOptimized {
                 'join_days' => (int)$cached['join_days']
             ];
         }
+
+        error_log("❌ Stats cache MISS for user $userId, recalculating...");
         
         // 2. 캐시 미스면 실시간 계산
         $stats = [];
