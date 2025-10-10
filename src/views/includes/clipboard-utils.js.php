@@ -1,3 +1,4 @@
+<script>
 /**
  * Clipboard Utilities (클립보드 유틸리티)
  *
@@ -200,3 +201,4 @@
 
     console.log('✅ ClipboardUtils 로드 완료 (v3.65.0)');
 })();
+</script>
