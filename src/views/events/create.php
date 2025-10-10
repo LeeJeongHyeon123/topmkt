@@ -1064,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeImageUpload();
     initializeInstructorSystem();
     initializeRegistrationToggle();
+    initializeDateRestrictions(); // 🚀 v3.67.3: 날짜 제한 초기화
 
     // 글자 수 카운터 초기화 (1초 지연 후)
     setTimeout(() => {
@@ -1619,7 +1620,7 @@ function initializeRegistrationToggle() {
     const noRadio = document.getElementById('allow_registration_no');
     const yesHelp = document.getElementById('registration-help-yes');
     const noHelp = document.getElementById('registration-help-no');
-    
+
     function updateHelpText() {
         if (yesRadio.checked) {
             yesHelp.style.display = 'inline';
@@ -1629,12 +1630,53 @@ function initializeRegistrationToggle() {
             noHelp.style.display = 'inline';
         }
     }
-    
+
     yesRadio.addEventListener('change', updateHelpText);
     noRadio.addEventListener('change', updateHelpText);
-    
+
     // 초기 상태 설정
     updateHelpText();
+}
+
+// 🚀 v3.67.3: 날짜 제한 초기화 (오늘 이전 날짜 선택 불가)
+function initializeDateRestrictions() {
+    // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
+    const today = new Date().toISOString().split('T')[0];
+
+    // 현재 날짜 + 시간을 YYYY-MM-DDTHH:mm 형식으로 가져오기 (datetime-local용)
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const nowDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    // 시작일 최소 날짜 설정
+    const startDateInput = document.getElementById('start_date');
+    if (startDateInput) {
+        startDateInput.setAttribute('min', today);
+        console.log('✅ 시작일 최소 날짜 설정:', today);
+    }
+
+    // 종료일 최소 날짜 설정
+    const endDateInput = document.getElementById('end_date');
+    if (endDateInput) {
+        endDateInput.setAttribute('min', today);
+        console.log('✅ 종료일 최소 날짜 설정:', today);
+    }
+
+    // 신청 마감일 최소 날짜+시간 설정
+    const deadlineInput = document.getElementById('registration_deadline');
+    if (deadlineInput) {
+        deadlineInput.setAttribute('min', nowDatetime);
+        console.log('✅ 신청 마감일 최소 날짜+시간 설정:', nowDatetime);
+    }
+
+    // 참고: 최신 브라우저에서는 input[type="date"]와 input[type="datetime-local"]을
+    // 클릭하면 자동으로 달력이 열립니다. 추가적인 클릭 이벤트 핸들러는 필요하지 않습니다.
+
+    console.log('✅ 날짜 제한 초기화 완료 (v3.67.3)');
 }
 
 // 폼 유효성 검사
