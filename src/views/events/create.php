@@ -701,6 +701,53 @@ document.addEventListener('DOMContentLoaded', function() {
         font-size: 0.7rem;
     }
 }
+
+/* 글자 수 카운터 스타일 (강의 등록과 동일) */
+.input-with-counter {
+    position: relative;
+}
+
+.character-counter {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 5px;
+}
+
+.character-counter span:first-child {
+    font-weight: 700;
+    color: #2563eb;
+    font-size: 1rem;
+}
+
+.character-counter.warning {
+    color: #f59e0b;
+}
+
+.character-counter.warning span:first-child {
+    color: #f59e0b;
+}
+
+.character-counter.error {
+    color: #ef4444;
+}
+
+.character-counter.error span:first-child {
+    color: #ef4444;
+}
+
+.character-counter.success {
+    color: #10b981;
+}
+
+.character-counter.success span:first-child {
+    color: #10b981;
+}
+
+.counter-limit {
+    font-weight: normal;
+    font-size: 0.85rem;
+}
 </style>
 
 <div class="event-create-container">
@@ -724,9 +771,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="form-group">
                 <label for="title" class="form-label required">행사 제목</label>
-                <input type="text" id="title" name="title" class="form-input" 
-                       placeholder="예: 2024 마케팅 트렌드 컨퍼런스" required maxlength="200"
-                       value="<?= $isEditMode ? htmlspecialchars($event['title'] ?? '', ENT_QUOTES, 'UTF-8') : '' ?>">
+                <div class="input-with-counter">
+                    <input type="text" id="title" name="title" class="form-input"
+                           placeholder="5자 이상 입력하세요 (예: 2024 마케팅 트렌드 컨퍼런스)" required
+                           value="<?= $isEditMode ? htmlspecialchars($event['title'] ?? '', ENT_QUOTES, 'UTF-8') : '' ?>">
+                    <div class="character-counter">
+                        <span id="title-counter">0</span><span class="counter-limit">/100자 (최소 5자)</span>
+                    </div>
+                </div>
                 <div class="help-text">참가자의 관심을 끌 수 있는 명확하고 흥미로운 제목을 작성해주세요.</div>
             </div>
 
@@ -750,7 +802,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="quill-container">
                     <div id="quill-editor"></div>
                 </div>
-                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
+                <div id="descriptionCounter" class="character-counter" style="margin-top: 8px;">
+                    <span id="description-counter">0</span><span class="counter-limit">/10,000자 (최소 10자)</span>
+                </div>
+                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500; margin-top: 8px;">📷 이미지: 0 / 20</div>
                 <textarea name="description" id="description" style="display: none;"></textarea>
             </div>
         </div>
@@ -880,12 +935,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="help-text">참가자 수 제한이 없으면 비워두세요.</div>
                 </div>
                 <div class="form-group">
-                    <label for="registration_fee" class="form-label">참가비</label>
-                    <div class="fee-input-container">
-                        <input type="text" id="registration_fee_display" class="form-input" 
-                               placeholder="50,000">
-                        <input type="hidden" id="registration_fee" name="registration_fee" value="0">
-                    </div>
+                    <label for="registration_fee" class="form-label">참가비 (원)</label>
+                    <input type="number" id="registration_fee" name="registration_fee" class="form-input"
+                           min="0" step="1" value="<?= $isEditMode ? ($event['registration_fee'] ?? 0) : 0 ?>"
+                           placeholder="0">
                     <div class="help-text">무료 행사인 경우 0 또는 비워두세요.</div>
                 </div>
             </div>
@@ -986,6 +1039,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 // 전역 변수
+const isEditMode = <?= $isEditMode ? 'true' : 'false' ?>; // PHP에서 전달된 편집 모드 상태
 let quill;
 let instructorCount = 0;
 let eventImageCount = 0;
@@ -1006,11 +1060,17 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeQuillEditor();
     initializeLocationToggle();
     initializeAddressSearch();
-    initializeFeeInput();
+    // initializeFeeInput(); // v3.64.0: 더 이상 필요하지 않음 (type="number"로 변경)
     initializeImageUpload();
     initializeInstructorSystem();
     initializeRegistrationToggle();
-    
+
+    // 글자 수 카운터 초기화 (1초 지연 후)
+    setTimeout(() => {
+        initializeTitleCounter();
+        initializeDescriptionCounter();
+    }, 1000);
+
     <?php if ($isEditMode): ?>
     // 편집 모드일 때 기존 데이터 로드
     loadEditData();
@@ -1054,8 +1114,10 @@ function initializeForm() {
             return;
         }
         
-        // 🚀 v3.31.0: Loading 클래스 사용
-        Loading.button(submitBtn, true, { text: '등록 중...' });
+        // 🚀 v3.64.0: Loading 컴포넌트 통일 (overlay 방식)
+        const loadingMessage = isEditMode ? '행사 수정 중입니다...' : '행사 등록 중입니다...';
+        Loading.overlay(true, { message: loadingMessage });
+        submitBtn.disabled = true;
 
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
         ApiClient.post(form.action, formData, {
@@ -1070,14 +1132,18 @@ function initializeForm() {
                 window.location.href = redirectUrl;
             } else {
                 // 오류 응답 처리
-                Toast.error(data.message || '등록 중 오류가 발생했습니다.');
-                Loading.button(submitBtn, false);
+                const errorMessage = isEditMode ? '수정 중 오류가 발생했습니다.' : '등록 중 오류가 발생했습니다.';
+                Toast.error(data.message || errorMessage);
+                Loading.overlay(false);
+                submitBtn.disabled = false;
             }
         })
         .catch(error => {
             console.error('Form submission error:', error);
-            Toast.error('등록 중 오류가 발생했습니다.');
-            Loading.button(submitBtn, false);
+            const errorMessage = isEditMode ? '수정 중 오류가 발생했습니다.' : '등록 중 오류가 발생했습니다.';
+            Toast.error(errorMessage);
+            Loading.overlay(false);
+            submitBtn.disabled = false;
         });
     });
 }
@@ -1316,42 +1382,8 @@ function initializeAddressSearch() {
     addressField.addEventListener('click', openAddressSearch);
 }
 
-// 참가비 입력 초기화
-function initializeFeeInput() {
-    const feeDisplayInput = document.getElementById('registration_fee_display');
-    const feeHiddenInput = document.getElementById('registration_fee');
-    
-    feeDisplayInput.addEventListener('input', function(e) {
-        let value = e.target.value;
-        
-        // 숫자와 콤마만 허용
-        value = value.replace(/[^\d,]/g, '');
-        
-        // 콤마 제거 후 숫자로 변환
-        let numericValue = removeCommas(value);
-        
-        if (numericValue === '') {
-            e.target.value = '';
-            feeHiddenInput.value = '0';
-            return;
-        }
-        
-        let num = parseInt(numericValue);
-        if (isNaN(num)) {
-            num = 0;
-        }
-        
-        // 표시용: 콤마 추가
-        e.target.value = numberWithCommas(num);
-        
-        // 실제 값: 숫자만
-        feeHiddenInput.value = num;
-    });
-    
-    // 초기값 설정
-    feeDisplayInput.value = '0';
-    feeHiddenInput.value = '0';
-}
+// 🚀 v3.64.0: 참가비 입력 필드를 type="number"로 변경하여 이 함수는 더 이상 필요하지 않음
+// (기존에는 type="text"로 콤마 포맷팅을 했으나, type="number"로 HTML5 네이티브 처리)
 
 // 이미지 업로드 초기화
 function initializeImageUpload() {
@@ -1404,24 +1436,7 @@ function initializeImageUpload() {
     });
 }
 
-// 더 이상 필요하지 않은 업로드 함수들은 제거
-
-// 🚀 v3.27.0: 이미지 파일 검증 (공통 업로드 설정 사용)
-function validateImageFile(file) {
-    // 파일 확장자 검증
-    if (!window.validateImageExtension(file.name)) {
-        Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
-        return false;
-    }
-
-    // 파일 크기 검증
-    if (!window.validateFileSize(file.size)) {
-        Toast.error(window.getFileSizeErrorMessage());
-        return false;
-    }
-    
-    return true;
-}
+// 🚀 v3.64.0: validateImageFile은 upload-config.js.php 통합 시스템 사용 (window.validateImageFile)
 
 // 이미지 미리보기 추가
 function addImagePreview(src, filename, customId = null, isLoading = false) {
@@ -1532,9 +1547,9 @@ function addInstructor() {
         </div>
         
         <div class="form-group">
-            <label for="instructor_name_${instructorIndex}" class="form-label required">강사명</label>
-            <input type="text" id="instructor_name_${instructorIndex}" name="instructor_names[]" 
-                   class="form-input" placeholder="홍길동" required>
+            <label for="instructor_name_${instructorIndex}" class="form-label">강사명</label>
+            <input type="text" id="instructor_name_${instructorIndex}" name="instructor_names[]"
+                   class="form-input" placeholder="홍길동">
         </div>
         
         <div class="form-group">
@@ -1686,6 +1701,59 @@ function validateForm() {
     return true;
 }
 
+// 🚀 v3.67.0: 행사 제목 글자수 카운터 및 검증
+function initializeTitleCounter() {
+    const titleInput = document.getElementById('title');
+    const titleCounter = document.getElementById('title-counter');
+
+    if (!titleInput || !titleCounter) return;
+
+    function updateTitleCounter() {
+        const length = titleInput.value.trim().length;
+        titleCounter.textContent = length;
+
+        const counterContainer = titleCounter.parentElement;
+        if (length === 0) {
+            counterContainer.className = 'character-counter';
+        } else if (length < 5) {
+            counterContainer.className = 'character-counter warning';
+        } else if (length > 100) {
+            counterContainer.className = 'character-counter error';
+        } else {
+            counterContainer.className = 'character-counter success';
+        }
+    }
+
+    titleInput.addEventListener('input', updateTitleCounter);
+    updateTitleCounter(); // 초기화
+}
+
+// 🚀 v3.67.0: 행사 설명 글자수 카운터 (Quill 에디터)
+function initializeDescriptionCounter() {
+    const descriptionCounter = document.getElementById('description-counter');
+
+    if (!descriptionCounter || !window.quill) return;
+
+    function updateDescriptionCounter() {
+        const length = window.quill.getText().trim().length;
+        descriptionCounter.textContent = length.toLocaleString();
+
+        const counterContainer = descriptionCounter.parentElement;
+        if (length === 0) {
+            counterContainer.className = 'character-counter';
+        } else if (length < 10) {
+            counterContainer.className = 'character-counter warning';
+        } else if (length > 10000) {
+            counterContainer.className = 'character-counter error';
+        } else {
+            counterContainer.className = 'character-counter success';
+        }
+    }
+
+    window.quill.on('text-change', updateDescriptionCounter);
+    updateDescriptionCounter(); // 초기화
+}
+
 // 전역 이미지 카운터 업데이트 함수
 window.updateImageCounter = function() {
     const imageCounter = document.getElementById('imageCounter');
@@ -1778,9 +1846,8 @@ function loadEditData() {
     // 정원 및 참가비 로드
     if (eventData.max_participants) document.getElementById('max_participants').value = eventData.max_participants;
     if (eventData.registration_fee) {
-        const fee = eventData.registration_fee.toString();
-        document.getElementById('registration_fee').value = fee;
-        document.getElementById('registration_fee_display').value = numberWithCommas(fee);
+        // v3.64.0: registration_fee는 이제 type="number"이므로 직접 설정
+        document.getElementById('registration_fee').value = eventData.registration_fee;
     }
     
     // 참가 신청 허용 여부 로드
