@@ -1711,11 +1711,11 @@ function initializeDateRestrictions() {
 
             // 📌 테두리 스타일 + 년도 선택 활성화
             onReady: function(selectedDates, dateStr, instance) {
-                // Flatpickr 캘린더에 테두리 추가
+                // Flatpickr 캘린더에 파란색 테두리 추가
                 const calendar = instance.calendarContainer;
-                calendar.style.border = '3px solid #667eea';
+                calendar.style.border = '3px solid #007bff';
                 calendar.style.borderRadius = '12px';
-                calendar.style.boxShadow = '0 10px 40px rgba(102, 126, 234, 0.3)';
+                calendar.style.boxShadow = '0 10px 40px rgba(0, 123, 255, 0.3)';
 
                 // 🔥 년도 선택 가능하게 설정 (클릭해서 직접 입력 가능)
                 const yearElement = instance.currentYearElement;
@@ -1729,7 +1729,7 @@ function initializeDateRestrictions() {
                     console.log('✅ 년도 직접 입력 활성화');
                 }
 
-                console.log('✅ Flatpickr 신청 마감일 초기화 완료 (테두리 + 년도 선택)');
+                console.log('✅ Flatpickr 신청 마감일 초기화 완료 (파란색 테두리 + 년도 선택)');
             },
 
             // 기존 값 복원 (수정 모드)
@@ -2247,31 +2247,32 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 </script>
 
-<!-- 🚀 v3.68.4: 모든 날짜/시간 input 테두리 보라색 통일 -->
+<!-- 🚀 v3.68.5: 모든 날짜/시간 input 테두리 파란색 통일 -->
 <style>
-/* 📌 네이티브 date/time input: 브라우저 기본 파란색 → 보라색 강제 변경 */
+/* 📌 모든 date/time input: 파란색 통일 (브라우저 기본 스타일 따름) */
 input[type="date"]:focus,
 input[type="time"]:focus,
-input[type="datetime-local"]:focus {
-    border-color: #667eea !important;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+input[type="datetime-local"]:focus,
+input.flatpickr-input:focus {
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
     outline: none !important;
     transform: translateY(-1px) !important;
     transition: all 0.3s ease !important;
 }
 
-/* 📌 캘린더 전체: 명확한 보라색 3px 테두리 */
+/* 📌 캘린더 전체: 파란색 3px 테두리 */
 .flatpickr-calendar {
-    border: 3px solid #667eea !important;
+    border: 3px solid #007bff !important;
     border-radius: 12px !important;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25) !important;
+    box-shadow: 0 8px 24px rgba(0, 123, 255, 0.25) !important;
     font-family: inherit !important;
     overflow: hidden !important;
 }
 
-/* 📌 월/년도 헤더: 보라색 그라디언트 */
+/* 📌 월/년도 헤더: 파란색 그라디언트 */
 .flatpickr-months {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
     border-top-left-radius: 9px !important;
     border-top-right-radius: 9px !important;
     padding: 12px 0 !important;
@@ -2290,8 +2291,8 @@ input[type="datetime-local"]:focus {
 /* 📌 월 드롭다운: 자연스러운 스타일 */
 .flatpickr-monthDropdown-months {
     background: white !important;
-    color: #667eea !important;
-    border: 2px solid #667eea !important;
+    color: #007bff !important;
+    border: 2px solid #007bff !important;
     border-radius: 6px !important;
     padding: 4px 8px !important;
     font-weight: 600 !important;
@@ -2333,24 +2334,24 @@ input[type="datetime-local"]:focus {
 
 /* 선택된 날짜 */
 .flatpickr-day.selected {
-    background: #667eea !important;
-    border-color: #667eea !important;
+    background: #007bff !important;
+    border-color: #007bff !important;
     color: white !important;
 }
 
 .flatpickr-day.today {
-    border-color: #667eea !important;
+    border-color: #007bff !important;
     font-weight: 700 !important;
 }
 
 .flatpickr-day:hover:not(.selected):not(.flatpickr-disabled) {
     background: #f3f4f6 !important;
-    border-color: #667eea !important;
+    border-color: #007bff !important;
 }
 
 /* 📌 시간 선택 영역: 완벽한 정렬 */
 .flatpickr-time {
-    border-top: 2px solid #667eea !important;
+    border-top: 2px solid #007bff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -2381,9 +2382,9 @@ input[type="datetime-local"]:focus {
 }
 
 .flatpickr-time input.numInput:focus {
-    border-color: #667eea !important;
+    border-color: #007bff !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1) !important;
 }
 
 /* 📌 구분자 (콜론): 정밀한 정렬 */
@@ -2395,7 +2396,7 @@ input[type="datetime-local"]:focus {
     height: 38px !important;
     display: inline-flex !important;
     align-items: center !important;
-    color: #667eea !important;
+    color: #007bff !important;
 }
 
 /* 📌 오전/오후: 짤림 방지 (min-width 추가) */
@@ -2405,12 +2406,12 @@ input[type="datetime-local"]:focus {
     font-size: 15px !important;
     font-weight: 700 !important;
     padding: 0 12px !important;
-    border: 2px solid #667eea !important;
+    border: 2px solid #007bff !important;
     border-radius: 6px !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
     background: white !important;
-    color: #667eea !important;
+    color: #007bff !important;
     text-align: center !important;
     line-height: 34px !important;
     display: inline-flex !important;
@@ -2419,7 +2420,7 @@ input[type="datetime-local"]:focus {
 }
 
 .flatpickr-am-pm:hover {
-    background: #667eea !important;
+    background: #007bff !important;
     color: white !important;
 }
 
@@ -2431,10 +2432,10 @@ input.flatpickr-input {
     transition: all 0.3s ease !important;
 }
 
-/* 📌 Focus 스타일: 시작일/종료일과 완전 동일 */
+/* 📌 Focus 스타일: 파란색으로 통일 (위에서 이미 선언되어 중복이지만 명시적으로 유지) */
 input.flatpickr-input:focus {
-    border-color: #667eea !important;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
     outline: none !important;
     transform: translateY(-1px) !important;
 }
