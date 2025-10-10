@@ -2364,16 +2364,17 @@ input.flatpickr-input:focus {
 .flatpickr-time .numInputWrapper {
     display: inline-flex !important;
     align-items: center !important;
-    height: 32px !important;
+    height: 40px !important;
 }
 
-/* 📌 시간/분 입력 필드: 깔끔한 네이티브 스타일 */
+/* 📌 시간/분 입력 필드: 넉넉한 높이로 입력 가능한 UI */
 .flatpickr-time input.numInput {
     width: 48px !important;
-    height: 32px !important;
+    height: 40px !important;
     text-align: center !important;
     font-size: 14px !important;
     font-weight: 500 !important;
+    line-height: 40px !important;
     padding: 0 !important;
     border: 1px solid #e5e7eb !important;
     border-radius: 4px !important;
@@ -2395,18 +2396,22 @@ input.flatpickr-input:focus {
     padding: 0 2px !important;
 }
 
-/* 📌 오전/오후: 깔끔한 버튼 */
+/* 📌 오전/오후: 넉넉한 높이 + 완벽한 세로 정렬 */
 .flatpickr-am-pm {
     min-width: 60px !important;
-    height: 32px !important;
+    height: 40px !important;
     font-size: 13px !important;
     font-weight: 500 !important;
+    line-height: 40px !important;
     padding: 0 10px !important;
     border: 1px solid #e5e7eb !important;
     border-radius: 4px !important;
     cursor: pointer !important;
     background: white !important;
     color: #374151 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .flatpickr-am-pm:hover {
