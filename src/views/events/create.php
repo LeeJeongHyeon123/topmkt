@@ -852,12 +852,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="form-row">
                 <div class="form-group">
                     <label for="registration_deadline" class="form-label required">신청 마감일</label>
-                    <input type="datetime-local" id="registration_deadline" name="registration_deadline" class="form-input" required
+                    <input type="text" id="registration_deadline" name="registration_deadline" class="form-input" required
                            placeholder="날짜와 시간을 선택하세요"
                            value="<?php
                                if ($isEditMode && !empty($event['registration_deadline'])) {
                                    $timestamp = strtotime($event['registration_deadline']);
-                                   echo $timestamp ? htmlspecialchars(date('Y-m-d\TH:i', $timestamp), ENT_QUOTES, 'UTF-8') : '';
+                                   echo $timestamp ? htmlspecialchars(date('Y-m-d H:i', $timestamp), ENT_QUOTES, 'UTF-8') : '';
                                } else {
                                    echo '';
                                }
