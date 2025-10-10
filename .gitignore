@@ -33,3 +33,5 @@ Thumbs.db
 # 백업 파일
 *.backup
 *.bak
+backup_*.sql
+*.sql
