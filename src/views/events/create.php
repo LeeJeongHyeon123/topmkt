@@ -2188,3 +2188,47 @@ window.addEventListener('unhandledrejection', function(e) {
     console.error('🚨 Promise 거부 감지:', e.reason);
 });
 </script>
+
+<!-- 🚀 v3.67.5: datetime-local 입력 박스 테두리 스타일 -->
+<style>
+/* 신청 마감일 (datetime-local) 입력 박스 테두리 추가 */
+input[type="datetime-local"] {
+    border: 2px solid #d1d5db !important; /* 기본 회색 테두리 */
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 포커스 시 테두리 강조 */
+input[type="datetime-local"]:focus {
+    border-color: #667eea !important; /* 보라색 테두리 */
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    outline: none !important;
+}
+
+/* 호버 시 테두리 강조 */
+input[type="datetime-local"]:hover {
+    border-color: #9ca3af !important; /* 진한 회색 테두리 */
+}
+
+/* 달력/시간 선택 팝업 영역 (브라우저 네이티브 컨트롤) */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+/* 날짜/시간 선택 모달 내부 영역 구분 (일부 브라우저에서만 작동) */
+input[type="datetime-local"]::-webkit-datetime-edit {
+    padding: 4px;
+}
+
+input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+</style>
