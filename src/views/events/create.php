@@ -53,6 +53,12 @@ if (!isset($_SESSION['csrf_token'])) {
 <!-- 카카오 주소 검색 API -->
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
+<!-- 🚀 v3.68.0: Flatpickr datetime picker 라이브러리 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
 <!-- 네이버 Maps API (강의 등록과 동일) -->
 <script>
 // 네이버 Maps API 로딩 함수 (강의 등록과 동일)
@@ -1692,14 +1698,53 @@ function initializeDateRestrictions() {
         console.log('✅ 종료일 최소 날짜 설정:', today);
     }
 
-    // 신청 마감일 최소 날짜+시간 설정 및 클릭 이벤트
+    // 🚀 v3.68.0: Flatpickr를 사용한 신청 마감일 커스텀 datetime picker
     const deadlineInput = document.getElementById('registration_deadline');
-    if (deadlineInput) {
+    if (deadlineInput && typeof flatpickr !== 'undefined') {
+        flatpickr(deadlineInput, {
+            enableTime: true,              // 시간 선택 활성화
+            dateFormat: "Y-m-d H:i",       // 날짜 형식 (2025-10-10 21:30)
+            time_24hr: false,              // 12시간 형식 (오전/오후)
+            minDate: "today",              // 오늘 이전 날짜 선택 불가
+            locale: "ko",                  // 한국어
+            disableMobile: true,           // 모바일에서도 커스텀 UI 사용
+
+            // 📌 테두리 스타일이 적용된 커스텀 테마
+            onReady: function(selectedDates, dateStr, instance) {
+                // Flatpickr 캘린더에 테두리 추가
+                const calendar = instance.calendarContainer;
+                calendar.style.border = '3px solid #667eea';
+                calendar.style.borderRadius = '12px';
+                calendar.style.boxShadow = '0 10px 40px rgba(102, 126, 234, 0.3)';
+                console.log('✅ Flatpickr 신청 마감일 초기화 완료 (테두리 적용)');
+            },
+
+            // 기존 값 복원 (수정 모드)
+            defaultDate: deadlineInput.value || null,
+
+            // 날짜 변경 시 hidden input 형식 변환
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length > 0) {
+                    const date = selectedDates[0];
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                    // datetime-local 형식으로 변환 (YYYY-MM-DDTHH:mm)
+                    deadlineInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    console.log('✅ 신청 마감일 선택:', deadlineInput.value);
+                }
+            }
+        });
+    } else if (deadlineInput) {
+        // Flatpickr 로드 실패 시 네이티브 datetime-local 폴백
         deadlineInput.setAttribute('min', nowDatetime);
         deadlineInput.addEventListener('click', function() {
             openDatePicker(this);
         });
-        console.log('✅ 신청 마감일 최소 날짜+시간 설정:', nowDatetime);
+        console.warn('⚠️ Flatpickr 로드 실패, 네이티브 datetime picker 사용');
     }
 
     // 🚀 v3.67.4: 시간 필드 클릭 시 시간 선택 모달 자동 열기
@@ -2189,46 +2234,122 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 </script>
 
-<!-- 🚀 v3.67.5: datetime-local 입력 박스 테두리 스타일 -->
+<!-- 🚀 v3.68.0: Flatpickr 커스텀 스타일 (명확한 테두리) -->
 <style>
-/* 신청 마감일 (datetime-local) 입력 박스 테두리 추가 */
-input[type="datetime-local"] {
-    border: 2px solid #d1d5db !important; /* 기본 회색 테두리 */
-    border-radius: 8px !important;
-    padding: 10px 12px !important;
-    transition: all 0.3s ease !important;
+/* 📌 Flatpickr 캘린더 전체 테두리 스타일 */
+.flatpickr-calendar {
+    border: 3px solid #667eea !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3) !important;
+    font-family: 'Noto Sans KR', sans-serif !important;
 }
 
-/* 포커스 시 테두리 강조 */
-input[type="datetime-local"]:focus {
-    border-color: #667eea !important; /* 보라색 테두리 */
+/* Flatpickr 월/년도 헤더 스타일 */
+.flatpickr-months {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+    padding: 10px 0 !important;
+}
+
+.flatpickr-current-month {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg {
+    fill: white !important;
+}
+
+/* 날짜 셀 스타일 */
+.flatpickr-day {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+
+.flatpickr-day:hover {
+    background: rgba(102, 126, 234, 0.1) !important;
+    border-color: #667eea !important;
+}
+
+.flatpickr-day.today {
+    border-color: #667eea !important;
+    font-weight: 700 !important;
+    background: rgba(102, 126, 234, 0.1) !important;
+}
+
+.flatpickr-day.selected {
+    background: #667eea !important;
+    border-color: #667eea !important;
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+/* 시간 선택 영역 테두리 */
+.flatpickr-time {
+    border-top: 2px solid #667eea !important;
+    background: #f9fafb !important;
+    padding: 10px !important;
+}
+
+.flatpickr-time-separator,
+.flatpickr-am-pm {
+    color: #667eea !important;
+    font-weight: 600 !important;
+}
+
+.numInputWrapper span {
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+}
+
+.numInputWrapper span:hover {
+    background: #667eea !important;
+    border-color: #667eea !important;
+}
+
+/* 입력 필드 스타일 (Flatpickr가 적용된 input) */
+input.flatpickr-input {
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px !important;
+    padding: 10px 40px 10px 12px !important;
+    transition: all 0.3s ease !important;
+    font-size: 14px !important;
+}
+
+input.flatpickr-input:focus {
+    border-color: #667eea !important;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
     outline: none !important;
 }
 
-/* 호버 시 테두리 강조 */
-input[type="datetime-local"]:hover {
-    border-color: #9ca3af !important; /* 진한 회색 테두리 */
+input.flatpickr-input:hover {
+    border-color: #9ca3af !important;
 }
 
-/* 달력/시간 선택 팝업 영역 (브라우저 네이티브 컨트롤) */
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
+/* 비활성화된 날짜 스타일 */
+.flatpickr-day.flatpickr-disabled {
+    color: #d1d5db !important;
+    background: #f9fafb !important;
+    cursor: not-allowed !important;
+    text-decoration: line-through !important;
 }
 
-input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-    background-color: rgba(102, 126, 234, 0.1);
+/* 애니메이션 효과 */
+.flatpickr-calendar.open {
+    animation: flatpickrFadeIn 0.3s ease !important;
 }
 
-/* 날짜/시간 선택 모달 내부 영역 구분 (일부 브라우저에서만 작동) */
-input[type="datetime-local"]::-webkit-datetime-edit {
-    padding: 4px;
-}
-
-input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
-    padding: 0;
+@keyframes flatpickrFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>
