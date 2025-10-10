@@ -1639,6 +1639,7 @@ function initializeRegistrationToggle() {
 }
 
 // 🚀 v3.67.3: 날짜 제한 초기화 (오늘 이전 날짜 선택 불가)
+// 🚀 v3.67.4: 클릭 시 달력 자동 열기 기능 추가
 function initializeDateRestrictions() {
     // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
     const today = new Date().toISOString().split('T')[0];
@@ -1652,31 +1653,56 @@ function initializeDateRestrictions() {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const nowDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
 
-    // 시작일 최소 날짜 설정
+    // 달력 열기 헬퍼 함수
+    function openDatePicker(inputElement) {
+        try {
+            // 최신 브라우저: showPicker() 메서드 사용
+            if (inputElement.showPicker && typeof inputElement.showPicker === 'function') {
+                inputElement.showPicker();
+                console.log('✅ showPicker()로 달력 열기:', inputElement.id);
+            } else {
+                // 폴백: focus() 메서드 사용
+                inputElement.focus();
+                console.log('✅ focus()로 달력 열기:', inputElement.id);
+            }
+        } catch (error) {
+            console.warn('⚠️ 달력 열기 실패:', error);
+            // 에러 발생 시에도 focus는 시도
+            inputElement.focus();
+        }
+    }
+
+    // 시작일 최소 날짜 설정 및 클릭 이벤트
     const startDateInput = document.getElementById('start_date');
     if (startDateInput) {
         startDateInput.setAttribute('min', today);
+        startDateInput.addEventListener('click', function() {
+            openDatePicker(this);
+        });
         console.log('✅ 시작일 최소 날짜 설정:', today);
     }
 
-    // 종료일 최소 날짜 설정
+    // 종료일 최소 날짜 설정 및 클릭 이벤트
     const endDateInput = document.getElementById('end_date');
     if (endDateInput) {
         endDateInput.setAttribute('min', today);
+        endDateInput.addEventListener('click', function() {
+            openDatePicker(this);
+        });
         console.log('✅ 종료일 최소 날짜 설정:', today);
     }
 
-    // 신청 마감일 최소 날짜+시간 설정
+    // 신청 마감일 최소 날짜+시간 설정 및 클릭 이벤트
     const deadlineInput = document.getElementById('registration_deadline');
     if (deadlineInput) {
         deadlineInput.setAttribute('min', nowDatetime);
+        deadlineInput.addEventListener('click', function() {
+            openDatePicker(this);
+        });
         console.log('✅ 신청 마감일 최소 날짜+시간 설정:', nowDatetime);
     }
 
-    // 참고: 최신 브라우저에서는 input[type="date"]와 input[type="datetime-local"]을
-    // 클릭하면 자동으로 달력이 열립니다. 추가적인 클릭 이벤트 핸들러는 필요하지 않습니다.
-
-    console.log('✅ 날짜 제한 초기화 완료 (v3.67.3)');
+    console.log('✅ 날짜 제한 초기화 완료 (v3.67.4)');
 }
 
 // 폼 유효성 검사
