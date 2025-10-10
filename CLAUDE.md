@@ -215,9 +215,25 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.58.0 ~ v3.65.0)
+## 최근 주요 작업 (v3.58.0 ~ v3.72.0)
 
-### v3.65.0 - ClipboardUtils 컴포넌트 통합 (2025-10-10) 🆕
+### v3.72.0 - 신청 마감일 날짜/시간 Input 분리 완전 개선 (2025-10-10) 🔥
+**문제**: 신청 마감일만 Flatpickr로 날짜+시간 통합 input → 시작일/종료일과 일관성 부족
+**해결**: 네이티브 date/time input으로 완전 분리
+- Flatpickr 완전 제거 (229줄 → 26줄, 88% 코드 감소)
+- HTML: registration_deadline_date + registration_deadline_time 분리
+- 폼 제출 시 자동 합치기 로직 (hidden input)
+- 백엔드 호환성 100% 검증 (PHP DateTime, MySQL DATETIME)
+- 완벽한 UI 일관성 달성 (시작일/종료일/신청마감일 모두 동일 구조)
+- **관련 버전**: v3.68.2~v3.72.0 (9번 반복 개선)
+  - v3.68.2: Flatpickr UI 5가지 문제 해결
+  - v3.68.3~v3.68.5: 색상 통일 (보라색 → 파란색)
+  - v3.69.0: Flatpickr 라이트 디자인 재구축
+  - v3.70.0~v3.70.1: "T" 구분자 제거
+  - v3.71.0: 시간 입력 높이 증가 (32px → 40px)
+  - v3.72.0: 날짜/시간 input 완전 분리 (최종 완성)
+
+### v3.65.0 - ClipboardUtils 컴포넌트 통합 (2025-10-10)
 - 클립보드 복사 유틸리티 통합
 - 5개 파일 마이그레이션 완료
 - 3개 중복 copyToClipboard 함수 제거 (51줄)
@@ -362,4 +378,4 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 **마지막 업데이트**: 2025-10-10
 **작업자**: Claude (Anthropic)
-**최신 버전**: v3.65.0
+**최신 버전**: v3.72.0
