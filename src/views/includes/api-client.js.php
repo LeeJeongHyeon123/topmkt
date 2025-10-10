@@ -300,10 +300,10 @@
         async request(url, options = {}) {
             const fullUrl = this.config.baseURL + url;
 
-            // 로딩 인디케이터 시작
+            // 🚀 v3.64.0: 로딩 인디케이터 시작 (overlay 메서드 사용)
             const showLoading = this.config.autoLoading && !options.noLoading;
             if (showLoading && window.Loading) {
-                window.Loading.show();
+                window.Loading.overlay(true, { message: '처리 중입니다...' });
             }
 
             try {
@@ -357,9 +357,9 @@
                     this.handleNetworkError(error, options);
                 }
             } finally {
-                // 로딩 인디케이터 종료
+                // 🚀 v3.64.0: 로딩 인디케이터 종료 (overlay 메서드 사용)
                 if (showLoading && window.Loading) {
-                    window.Loading.hide();
+                    window.Loading.overlay(false);
                 }
             }
         }

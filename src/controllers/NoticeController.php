@@ -908,9 +908,58 @@ class NoticeController {
             if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
                 // 파일 권한 설정
                 chmod($uploadPath, 0644);
-                
-                error_log("✅ 이미지 업로드 성공: " . $webFilePath);
-                return $webFilePath;
+
+                // 🚀 Phase 2: WebP 변환 (EventController와 동일한 로직)
+                $webpFilename = $timestamp . '_' . $randomHash . '.webp';
+                $webpUploadPath = $uploadDir . $webpFilename;
+                $webpWebFilePath = $webPath . $webpFilename;
+
+                try {
+                    // GD 라이브러리로 이미지 로드
+                    $sourceImage = null;
+                    switch ($extension) {
+                        case 'jpg':
+                        case 'jpeg':
+                            $sourceImage = imagecreatefromjpeg($uploadPath);
+                            break;
+                        case 'png':
+                            $sourceImage = imagecreatefrompng($uploadPath);
+                            break;
+                        case 'gif':
+                            $sourceImage = imagecreatefromgif($uploadPath);
+                            break;
+                        case 'webp':
+                            // 이미 WebP인 경우 변환 불필요
+                            error_log("✅ 이미 WebP 형식: " . $webFilePath);
+                            return $webFilePath;
+                    }
+
+                    if ($sourceImage) {
+                        // WebP로 변환 (품질 80)
+                        if (imagewebp($sourceImage, $webpUploadPath, 80)) {
+                            chmod($webpUploadPath, 0644);
+                            imagedestroy($sourceImage);
+
+                            // 원본 파일 삭제 (WebP만 유지)
+                            if (file_exists($uploadPath)) {
+                                unlink($uploadPath);
+                            }
+
+                            error_log("✅ WebP 변환 성공: " . $webpWebFilePath);
+                            return $webpWebFilePath;
+                        } else {
+                            imagedestroy($sourceImage);
+                            error_log("⚠️ WebP 변환 실패, 원본 반환: " . $webFilePath);
+                            return $webFilePath;
+                        }
+                    } else {
+                        error_log("⚠️ 이미지 로드 실패, 원본 반환: " . $webFilePath);
+                        return $webFilePath;
+                    }
+                } catch (Exception $e) {
+                    error_log("⚠️ WebP 변환 중 오류: " . $e->getMessage() . ", 원본 반환");
+                    return $webFilePath;
+                }
             } else {
                 error_log("❌ 파일 이동 실패: " . $uploadPath);
                 return null;

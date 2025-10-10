@@ -661,12 +661,12 @@ class Notice {
      */
     public function isCompanyUser($userId) {
         $sql = "
-            SELECT COUNT(*) as count 
-            FROM users u 
-            JOIN company_profiles cp ON u.id = cp.user_id 
-            WHERE u.id = ? 
-            AND (u.role = 'ROLE_CORP' OR u.role = 'ROLE_ADMIN') 
-            AND u.corp_status = 'approved' 
+            SELECT COUNT(*) as count
+            FROM users u
+            JOIN company_profiles cp ON u.id = cp.user_id
+            WHERE u.id = ?
+            AND (u.role = 'ROLE_CORPORATE' OR u.role = 'ROLE_ADMIN')
+            AND u.corp_status = 'approved'
             AND cp.status = 'approved'
         ";
         $result = $this->db->fetch($sql, [$userId]);

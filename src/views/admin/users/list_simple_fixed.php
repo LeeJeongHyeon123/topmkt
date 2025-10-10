@@ -1,7 +1,13 @@
 <?php
 /**
- * 관리자 사용자 목록 페이지 (수정된 버전)
+ * 관리자 사용자 목록 페이지 (간단 버전)
+ * 500 오류 긴급 수정용
  */
+
+// 디버깅을 위한 에러 출력 활성화
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Pagination 컴포넌트 로드
 require_once SRC_PATH . '/components/ui/Pagination.php';
@@ -11,7 +17,7 @@ $page_title = '회원 목록';
 $page_description = '등록된 회원들을 관리하고 모니터링하세요';
 $current_page = 'users';
 
-// 콘텐츠 정의
+// 콘텐츠 버퍼링 시작
 ob_start();
 ?>
 
@@ -113,11 +119,6 @@ ob_start();
     </div>
 </div>
 
-<?php
-$content = ob_get_clean();
-
-// 추가 CSS 정의
-$additional_styles = '
 <style>
 .admin-content {
     max-width: 100%;
@@ -448,35 +449,10 @@ $additional_styles = '
     gap: 10px;
     flex-wrap: wrap;
     margin-top: 10px;
+    justify-content: center;
 }
+</style>
 
-.activity-log {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 15px;
-    background: #fafafa;
-}
-
-.activity-item {
-    padding: 8px 0;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 0.9em;
-}
-
-.activity-item:last-child {
-    border-bottom: none;
-}
-
-.activity-time {
-    color: #718096;
-    font-size: 0.8em;
-}
-</style>';
-
-// 추가 JavaScript 정의
-$additional_scripts = '
 <script>
 // 전역 변수
 let currentPage = 1;
@@ -494,7 +470,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function setupEventListeners() {
     // 검색 입력 디바운싱
     let searchTimeout;
-    document.getElementById("searchInput").addEventListener("input", function() {
+    document.getElementById('searchInput').addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             loadUsersData();
@@ -502,12 +478,12 @@ function setupEventListeners() {
     });
     
     // 필터 변경 시 자동 검색
-    document.getElementById("statusFilter").addEventListener("change", loadUsersData);
-    document.getElementById("roleFilter").addEventListener("change", loadUsersData);
+    document.getElementById('statusFilter').addEventListener('change', loadUsersData);
+    document.getElementById('roleFilter').addEventListener('change', loadUsersData);
     
     // 전체 선택 체크박스
-    document.getElementById("selectAll").addEventListener("change", function() {
-        const checkboxes = document.querySelectorAll(".user-checkbox");
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.user-checkbox');
         checkboxes.forEach(cb => cb.checked = this.checked);
     });
 }
@@ -515,38 +491,25 @@ function setupEventListeners() {
 // 사용자 통계 로드
 async function loadUserStats() {
     try {
-        console.log("📊 통계 로딩 시작...");
-        const response = await fetch("/admin/getUserStats", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            credentials: "same-origin"
-        });
-        
-        console.log("📊 API 응답 상태:", response.status);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        console.log("📊 받은 데이터:", data);
+        console.log('📊 통계 로딩 시작...');
+
+        // v3.63.0: ApiClient 사용
+        const data = await ApiClient.get('/admin/getUserStats', { noLoading: true });
+        console.log('📊 받은 데이터:', data);
         
         if (data.success && data.stats) {
-            document.getElementById("totalUsers").textContent = data.stats.total_users || 0;
-            document.getElementById("todaySignups").textContent = data.stats.today_signups || 0;
-            document.getElementById("activeUsers").textContent = data.stats.active_users || 0;
-            console.log("✅ 통계 로딩 성공");
+            document.getElementById('totalUsers').textContent = data.stats.total_users || 0;
+            document.getElementById('todaySignups').textContent = data.stats.today_signups || 0;
+            document.getElementById('activeUsers').textContent = data.stats.active_users || 0;
+            console.log('✅ 통계 로딩 성공');
         } else {
-            throw new Error(data.error || "통계 데이터가 없습니다");
+            throw new Error(data.error || '통계 데이터가 없습니다');
         }
     } catch (error) {
-        console.error("❌ 통계 로드 오류:", error);
-        document.getElementById("totalUsers").textContent = "오류";
-        document.getElementById("todaySignups").textContent = "오류";
-        document.getElementById("activeUsers").textContent = "오류";
+        console.error('❌ 통계 로드 오류:', error);
+        document.getElementById('totalUsers').textContent = '오류';
+        document.getElementById('todaySignups').textContent = '오류';
+        document.getElementById('activeUsers').textContent = '오류';
     }
 }
 
@@ -555,47 +518,46 @@ async function loadUsersData() {
     if (isLoading) return;
     
     isLoading = true;
-    document.getElementById("loadingIndicator").style.display = "block";
-    document.getElementById("usersTable").style.display = "none";
-    document.getElementById("noDataMessage").style.display = "none";
+    document.getElementById('loadingIndicator').style.display = 'block';
+    document.getElementById('usersTable').style.display = 'none';
+    document.getElementById('noDataMessage').style.display = 'none';
     
     // 현재 필터 수집
     currentFilters = {
-        status: document.getElementById("statusFilter").value,
-        role: document.getElementById("roleFilter").value,
-        search: document.getElementById("searchInput").value.trim(),
+        status: document.getElementById('statusFilter').value,
+        role: document.getElementById('roleFilter').value,
+        search: document.getElementById('searchInput').value.trim(),
         page: currentPage
     };
     
     try {
         const params = new URLSearchParams(currentFilters);
-        const response = await fetch(`/admin/users/data?${params}`);
-        const data = await response.json();
-        
-        console.log("📊 사용자 데이터 응답:", data);
-        
+
+        // v3.63.0: ApiClient 사용
+        const data = await ApiClient.get(`/admin/users/data?${params}`, { noLoading: true });
+
         if (data.success) {
             renderUsersTable(data.data.users);
             renderPagination(data.data);
         } else {
-            console.error("데이터 로드 실패:", data.message);
-            document.getElementById("noDataMessage").style.display = "block";
+            console.error('데이터 로드 실패:', data.message);
+            document.getElementById('noDataMessage').style.display = 'block';
         }
     } catch (error) {
-        console.error("사용자 데이터 로드 오류:", error);
-        document.getElementById("noDataMessage").style.display = "block";
+        console.error('사용자 데이터 로드 오류:', error);
+        document.getElementById('noDataMessage').style.display = 'block';
     } finally {
         isLoading = false;
-        document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('loadingIndicator').style.display = 'none';
     }
 }
 
 // 사용자 테이블 렌더링
 function renderUsersTable(users) {
-    const tbody = document.getElementById("usersTableBody");
+    const tbody = document.getElementById('usersTableBody');
     
     if (!users || users.length === 0) {
-        document.getElementById("noDataMessage").style.display = "block";
+        document.getElementById('noDataMessage').style.display = 'block';
         return;
     }
     
@@ -605,8 +567,8 @@ function renderUsersTable(users) {
             <td>${user.id}</td>
             <td>${escapeHtml(user.nickname)}</td>
             <td>${escapeHtml(user.email)}</td>
-            <td>${escapeHtml(user.phone || "")}</td>
-            <td><span class="role-badge role-${user.role.toLowerCase().replace("role_", "")}">${getRoleText(user.role)}</span></td>
+            <td>${escapeHtml(user.phone || '')}</td>
+            <td><span class="role-badge role-${user.role.toLowerCase().replace('role_', '')}">${getRoleText(user.role)}</span></td>
             <td><span class="status-badge status-${user.status}">${getStatusText(user.status)}</span></td>
             <td>${formatDate(user.created_at)}</td>
             <td>
@@ -616,19 +578,19 @@ function renderUsersTable(users) {
                 </div>
             </td>
         </tr>
-    `).join("");
+    `).join('');
     
-    document.getElementById("usersTable").style.display = "table";
+    document.getElementById('usersTable').style.display = 'table';
 }
 
 // 페이지네이션 렌더링
 function renderPagination(data) {
-    const info = document.getElementById("paginationInfo");
-    const controls = document.getElementById("paginationControls");
+    const info = document.getElementById('paginationInfo');
+    const controls = document.getElementById('paginationControls');
     
     if (data.total === 0) {
-        info.textContent = "";
-        controls.innerHTML = "";
+        info.textContent = '';
+        controls.innerHTML = '';
         return;
     }
     
@@ -638,7 +600,7 @@ function renderPagination(data) {
     info.textContent = `${start}-${end} / 총 ${data.total}개`;
     
     // 페이지 컨트롤 생성
-    let paginationHTML = "";
+    let paginationHTML = '';
     
     if (data.page > 1) {
         paginationHTML += `<button onclick="changePage(${data.page - 1})" class="btn-secondary">이전</button>`;
@@ -663,173 +625,105 @@ function changePage(page) {
 async function viewUserDetail(userId) {
     try {
         // 모달 표시
-        document.getElementById("userDetailModal").style.display = "flex";
+        document.getElementById('userDetailModal').style.display = 'flex';
         
         // 로딩 상태 표시
-        document.getElementById("userDetailContent").innerHTML = `
-            <div class="loading-indicator">
-                <div class="spinner"></div>
-                <p>사용자 정보를 불러오는 중...</p>
-            </div>
-        `;
+        document.getElementById('userDetailContent').innerHTML = 
+            '<div class="loading-indicator"><div class="spinner"></div><p>사용자 정보를 불러오는 중...</p></div>';
         
-        console.log(`👤 사용자 ID ${userId} 상세 정보 로딩 시작...`);
-        
-        // API 호출
-        const response = await fetch(`/admin/users/${userId}/detail`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            credentials: "same-origin"
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        console.log("👤 받은 사용자 데이터:", data);
+        console.log('👤 사용자 ID ' + userId + ' 상세 정보 로딩 시작...');
+
+        // v3.63.0: ApiClient 사용
+        const data = await ApiClient.get('/admin/users/' + userId + '/detail', { noLoading: true });
+        console.log('👤 받은 사용자 데이터:', data);
         
         if (data.error) {
             throw new Error(data.error);
         }
         
-        // 사용자 상세 정보 렌더링 (data.data 사용)
+        // 사용자 상세 정보 렌더링
         renderUserDetail(data.data || data);
         
     } catch (error) {
-        console.error("❌ 사용자 상세 정보 로드 오류:", error);
-        document.getElementById("userDetailContent").innerHTML = `
-            <div class="no-data-message">
-                <p>❌ 사용자 정보를 불러올 수 없습니다</p>
-                <p><strong>오류:</strong> ${error.message}</p>
-            </div>
-        `;
+        console.error('❌ 사용자 상세 정보 로드 오류:', error);
+        document.getElementById('userDetailContent').innerHTML = 
+            '<div class="no-data-message"><p>❌ 사용자 정보를 불러올 수 없습니다</p><p><strong>오류:</strong> ' + error.message + '</p></div>';
     }
 }
 
 // 사용자 상세 정보 렌더링
 function renderUserDetail(user) {
-    const profileImage = user.profile_image_thumb || user.profile_image || "/assets/uploads/default-avatar.png";
+    const profileImage = user.profile_image_thumb || user.profile_image || '/assets/uploads/default-avatar.png';
     
-    const html = '<div class="profile-image-container">' +
-        '<img src="' + profileImage + '" alt="프로필 이미지" class="profile-image-large" ' +
-             'onerror="this.src=\\'/assets/uploads/default-avatar.png\\'">' +
-        '<h3>' + escapeHtml(user.nickname) + '</h3>' +
+    const html = 
+        '<div class="profile-image-container">' +
+            '<img src="' + profileImage + '" alt="프로필 이미지" class="profile-image-large" onerror="this.src=\'/assets/uploads/default-avatar.png\'">' +
+            '<h3>' + escapeHtml(user.nickname) + '</h3>' +
             '<div class="user-status-badges">' +
-                '<span class="role-badge role-' + user.role.toLowerCase().replace("role_", "") + '">' + getRoleText(user.role) + '</span>' +
+                '<span class="role-badge role-' + user.role.toLowerCase().replace('role_', '') + '">' + getRoleText(user.role) + '</span>' +
                 '<span class="status-badge status-' + user.status + '">' + getStatusText(user.status) + '</span>' +
-                (user.phone_verified === "1" ? '<span class="status-badge status-active">전화 인증됨</span>' : '<span class="status-badge status-inactive">전화 미인증</span>') +
+                (user.phone_verified === '1' ? '<span class="status-badge status-active">전화 인증됨</span>' : '<span class="status-badge status-inactive">전화 미인증</span>') +
             '</div>' +
         '</div>' +
         
-        <div class="user-detail-section">
-            <h3>📋 기본 정보</h3>
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <div class="detail-label">사용자 ID</div>
-                    <div class="detail-value">${user.id}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">닉네임</div>
-                    <div class="detail-value">${escapeHtml(user.nickname)}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">이메일</div>
-                    <div class="detail-value">${escapeHtml(user.email)}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">전화번호</div>
-                    <div class="detail-value">${escapeHtml(user.phone || "등록되지 않음")}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">실명</div>
-                    <div class="detail-value">${escapeHtml(user.real_name || "등록되지 않음")}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">생년월일</div>
-                    <div class="detail-value">${escapeHtml(user.birth_date || "등록되지 않음")}</div>
-                </div>
-            </div>
-        </div>
+        '<div class="user-detail-section">' +
+            '<h3>📋 기본 정보</h3>' +
+            '<div class="detail-grid">' +
+                '<div class="detail-item"><div class="detail-label">사용자 ID</div><div class="detail-value">' + user.id + '</div></div>' +
+                '<div class="detail-item"><div class="detail-label">닉네임</div><div class="detail-value">' + escapeHtml(user.nickname) + '</div></div>' +
+                '<div class="detail-item"><div class="detail-label">이메일</div><div class="detail-value">' + escapeHtml(user.email) + '</div></div>' +
+                '<div class="detail-item"><div class="detail-label">전화번호</div><div class="detail-value">' + escapeHtml(user.phone || '등록되지 않음') + '</div></div>' +
+                (user.real_name ? '<div class="detail-item"><div class="detail-label">실명</div><div class="detail-value">' + escapeHtml(user.real_name) + '</div></div>' : '') +
+                (user.birth_date ? '<div class="detail-item"><div class="detail-label">생년월일</div><div class="detail-value">' + escapeHtml(user.birth_date) + '</div></div>' : '') +
+            '</div>' +
+        '</div>' +
         
-        <div class="user-detail-section">
-            <h3>🏢 기업 정보</h3>
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <div class="detail-label">기업 상태</div>
-                    <div class="detail-value">${getCorpStatusText(user.corp_status)}</div>
-                </div>
-                ${user.company_name ? `
-                <div class="detail-item">
-                    <div class="detail-label">회사명</div>
-                    <div class="detail-value">${escapeHtml(user.company_name)}</div>
-                </div>` : ""}
-                ${user.business_number ? `
-                <div class="detail-item">
-                    <div class="detail-label">사업자번호</div>
-                    <div class="detail-value">${escapeHtml(user.business_number)}</div>
-                </div>` : ""}
-                ${user.position ? `
-                <div class="detail-item">
-                    <div class="detail-label">직책</div>
-                    <div class="detail-value">${escapeHtml(user.position)}</div>
-                </div>` : ""}
-            </div>
-        </div>
+        '<div class="user-detail-section">' +
+            '<h3>🏢 기업 정보</h3>' +
+            '<div class="detail-grid">' +
+                '<div class="detail-item"><div class="detail-label">기업 상태</div><div class="detail-value">' + getCorpStatusText(user.corp_status) + '</div></div>' +
+                (user.company_name ? '<div class="detail-item"><div class="detail-label">회사명</div><div class="detail-value">' + escapeHtml(user.company_name) + '</div></div>' : '') +
+                (user.business_number ? '<div class="detail-item"><div class="detail-label">사업자번호</div><div class="detail-value">' + escapeHtml(user.business_number) + '</div></div>' : '') +
+                (user.position ? '<div class="detail-item"><div class="detail-label">직책</div><div class="detail-value">' + escapeHtml(user.position) + '</div></div>' : '') +
+            '</div>' +
+        '</div>' +
         
-        <div class="user-detail-section">
-            <h3>📊 활동 통계</h3>
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <div class="detail-label">게시글 수</div>
-                    <div class="detail-value">${user.post_count || 0}개</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">댓글 수</div>
-                    <div class="detail-value">${user.comment_count || 0}개</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">로그인 시도</div>
-                    <div class="detail-value">${user.login_attempts || 0}회</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">최근 로그인</div>
-                    <div class="detail-value">${user.last_login ? formatDateTime(user.last_login) : "없음"}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">가입일</div>
-                    <div class="detail-value">${formatDateTime(user.created_at)}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">계정 수정일</div>
-                    <div class="detail-value">${user.updated_at ? formatDateTime(user.updated_at) : "없음"}</div>
-                </div>
-            </div>
-        </div>
-    `;
+        '<div class="user-detail-section">' +
+            '<h3>📊 활동 통계</h3>' +
+            '<div class="detail-grid">' +
+                '<div class="detail-item"><div class="detail-label">게시글 수</div><div class="detail-value">' + (user.post_count || 0) + '개</div></div>' +
+                '<div class="detail-item"><div class="detail-label">댓글 수</div><div class="detail-value">' + (user.comment_count || 0) + '개</div></div>' +
+                '<div class="detail-item"><div class="detail-label">로그인 시도</div><div class="detail-value">' + (user.login_attempts || 0) + '회</div></div>' +
+                '<div class="detail-item"><div class="detail-label">최근 로그인</div><div class="detail-value">' + (user.last_login ? formatDateTime(user.last_login) : '없음') + '</div></div>' +
+                '<div class="detail-item"><div class="detail-label">가입일</div><div class="detail-value">' + formatDateTime(user.created_at) + '</div></div>' +
+                '<div class="detail-item"><div class="detail-label">계정 수정일</div><div class="detail-value">' + (user.updated_at ? formatDateTime(user.updated_at) : '없음') + '</div></div>' +
+            '</div>' +
+        '</div>';
     
-    document.getElementById("userDetailContent").innerHTML = html;
+    document.getElementById('userDetailContent').innerHTML = html;
 }
 
 // 모달 닫기
 function closeUserDetailModal() {
-    document.getElementById("userDetailModal").style.display = "none";
+    document.getElementById('userDetailModal').style.display = 'none';
+    document.body.style.overflow = ''; // 스크롤 복원
 }
 
-// ESC 키로 모달 닫기
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") {
+// 모달 외부 클릭 시 닫기
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('userDetailModal');
+    if (event.target === modal) {
         closeUserDetailModal();
     }
 });
 
-// 모달 배경 클릭으로 닫기
-document.addEventListener("click", function(e) {
-    if (e.target.id === "userDetailModal") {
-        closeUserDetailModal();
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('userDetailModal');
+        if (modal && modal.style.display !== 'none') {
+            closeUserDetailModal();
+        }
     }
 });
 
@@ -841,57 +735,58 @@ function editUser(userId) {
 // 데이터 내보내기
 function exportUsers() {
     const params = new URLSearchParams(currentFilters);
-    window.open(`/admin/users/export?${params}`, "_blank");
+    window.open(`/admin/users/export?${params}`, '_blank');
 }
 
 // 유틸리티 함수들
 function escapeHtml(text) {
-    const div = document.createElement("div");
+    const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
 function getRoleText(role) {
     const roleMap = {
-        "ROLE_USER": "일반회원",
-        "ROLE_CORPORATE": "기업회원", 
-        "ROLE_ADMIN": "관리자",
-        "ROLE_SUPER_ADMIN": "슈퍼관리자"
+        'ROLE_USER': '일반회원',
+        'ROLE_CORPORATE': '기업회원',
+        'ROLE_ADMIN': '관리자',
+        'ROLE_SUPER_ADMIN': '슈퍼관리자'
     };
     return roleMap[role] || role;
 }
 
 function getStatusText(status) {
     const statusMap = {
-        "active": "활성",
-        "inactive": "비활성",
-        "suspended": "정지",
-        "pending": "대기"
+        'active': '활성',
+        'inactive': '비활성',
+        'suspended': '정지',
+        'pending': '대기'
     };
     return statusMap[status] || status;
 }
 
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("ko-KR");
-}
+// 🚀 Phase 7: formatDate/formatDateTime 중복 제거
+// DateUtils (date-utils.js.php) 전역 함수 사용
+// window.formatDate(), window.formatDateTime() 자동 사용
 
-function formatDateTime(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleString("ko-KR");
-}
-
+// 기업 상태 텍스트 변환 함수
 function getCorpStatusText(status) {
     const statusMap = {
-        "none": "없음",
-        "pending": "신청 대기",
-        "approved": "승인됨",
-        "rejected": "거절됨"
+        'approved': '승인됨',
+        'pending': '승인 대기',
+        'rejected': '거절됨',
+        'none': '미신청',
+        null: '미신청',
+        undefined: '미신청'
     };
-    return statusMap[status] || status;
+    return statusMap[status] || '알 수 없음';
 }
-</script>';
+</script>
 
-// 관리자 레이아웃 렌더링
+<?php
+// 콘텐츠 캡처
+$content = ob_get_clean();
+
+// 관리자 레이아웃 include
 require_once SRC_PATH . '/views/templates/admin_layout.php';
 ?>

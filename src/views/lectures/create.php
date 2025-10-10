@@ -976,11 +976,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     font-weight: 600;
 }
 
-#registration_fee_display {
+/* v3.64.0: registration_fee_display 제거, 이제 registration_fee가 type="number" */
+#registration_fee {
     font-size: 1.1em;
     font-weight: 600;
     color: #2563eb;
-    margin-top: 5px;
 }
 
 /* 강의 이미지 프리뷰 컨테이너 */
@@ -1200,11 +1200,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="instructor_name_0" class="form-label required">강사명</label>
+                            <label for="instructor_name_0" class="form-label">강사명</label>
                             <div class="input-with-counter">
                                 <input type="text" id="instructor_name_0" name="instructors[0][name]" class="form-input"
                                        value="<?= $isEditMode ? htmlspecialchars($lecture['instructors'][0]['name'] ?? '') : '' ?>"
-                                       placeholder="예: 김마케팅" required>
+                                       placeholder="예: 김마케팅">
                                 <div class="character-counter">
                                     <span id="instructor_name_0-counter">0</span><span class="counter-limit">/50자</span>
                                 </div>
@@ -1384,12 +1384,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
                 
                 <div class="form-group">
                     <label for="registration_fee" class="form-label">참가비 (원)</label>
-                    <input type="text" id="registration_fee_display" 
-                           class="form-input" value="<?= $isEditMode ? number_format($lecture['registration_fee'] ?? 0) : '0' ?>"
+                    <input type="number" id="registration_fee" name="registration_fee" class="form-input"
+                           min="0" step="1" value="<?= $isEditMode ? ($lecture['registration_fee'] ?? 0) : 0 ?>"
                            placeholder="0" style="text-align: right;">
-                    <input type="hidden" id="registration_fee" name="registration_fee" 
-                           value="<?= $isEditMode ? ($lecture['registration_fee'] ?? 0) : 0 ?>">
-                    <div class="form-help">무료인 경우 0을 입력하세요 (천 단위 콤마 자동 추가)</div>
+                    <div class="form-help">무료인 경우 0을 입력하세요</div>
                 </div>
                 
                 <div class="form-group">
@@ -1750,48 +1748,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const locationTypeInputs = document.querySelectorAll('input[name="location_type"]');
     const offlineFields = document.getElementById('offline-fields');
     const onlineFields = document.getElementById('online-fields');
-    
-    // 참가비 콤마 처리
-    const registrationFeeDisplay = document.getElementById('registration_fee_display');
-    const registrationFeeHidden = document.getElementById('registration_fee');
-    
-    // 숫자에 콤마 추가 함수
-    function numberWithCommas(x) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    
-    // 콤마 제거하고 숫자만 반환하는 함수
-    function removeCommas(str) {
-        return str.replace(/,/g, '');
-    }
-    
-    // 참가비 입력 이벤트
-    registrationFeeDisplay.addEventListener('input', function(e) {
-        let value = e.target.value;
-        
-        // 숫자가 아닌 문자 제거 (콤마 제외)
-        value = value.replace(/[^\d,]/g, '');
-        
-        // 콤마 제거
-        let numericValue = removeCommas(value);
-        
-        // 빈 값이면 0으로 설정
-        if (numericValue === '') {
-            numericValue = '0';
-        }
-        
-        // 숫자로 변환
-        let num = parseInt(numericValue);
-        if (isNaN(num)) {
-            num = 0;
-        }
-        
-        // 콤마 추가해서 표시
-        e.target.value = numberWithCommas(num);
-        
-        // hidden 필드에 실제 숫자값 저장
-        registrationFeeHidden.value = num;
-    });
+
+    // 🚀 v3.64.0: 참가비 콤마 처리 제거 (type="number"로 변경되어 더 이상 필요하지 않음)
     
     // 날짜/시간 필드 클릭 개선
     const dateTimeInputs = document.querySelectorAll('input[type="date"], input[type="time"], input[type="datetime-local"]');
@@ -1848,10 +1806,10 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="instructor_name_${instructorCount}" class="form-label required">강사명</label>
+                    <label for="instructor_name_${instructorCount}" class="form-label">강사명</label>
                     <div class="input-with-counter">
                         <input type="text" id="instructor_name_${instructorCount}" name="instructors[${instructorCount}][name]" class="form-input"
-                               placeholder="예: 김마케팅" required>
+                               placeholder="예: 김마케팅">
                         <div class="character-counter">
                             <span id="instructor_name_${instructorCount}-counter">0</span><span class="counter-limit">/50자</span>
                         </div>
@@ -2818,24 +2776,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // 🚀 v3.45.0: UploadConfig 시스템 사용
-    function validateImageFile(file) {
-        // 파일 형식 검사
-        if (!window.validateImageExtension(file.name)) {
-            Toast.info('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
-            return false;
-        }
 
-        // 파일 크기 검사 (공통 설정 사용: 30MB)
-        if (!window.validateFileSize || !window.validateFileSize(file.size)) {
-            Toast.error(window.getFileSizeErrorMessage ? window.getFileSizeErrorMessage() : '파일 크기가 너무 큽니다.');
-            return false;
-        }
+    // 🚀 v3.64.0: validateImageFile은 upload-config.js.php 통합 시스템 사용 (window.validateImageFile)
 
-        return true;
-    }
-    
     // 이미지 업로드 초기화
     initImageUpload();
     
@@ -3018,22 +2961,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.errors && Array.isArray(data.errors)) {
                     showFieldErrors(data.errors);
                 } else {
-                    Toast.error(data.message || '강의 등록 중 오류가 발생했습니다.');
+                    const errorMessage = isEditMode ? '강의 수정 중 오류가 발생했습니다.' : '강의 등록 중 오류가 발생했습니다.';
+                    Toast.error(data.message || errorMessage);
                 }
             }
         })
         .catch(error => {
             console.error('폼 제출 오류:', error);
-            Toast.error('강의 등록 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
+            const baseErrorMessage = isEditMode ? '강의 수정 중 오류가 발생했습니다.' : '강의 등록 중 오류가 발생했습니다.';
+            Toast.error(baseErrorMessage + '\n잠시 후 다시 시도해주세요.');
             showLoading(false);
-            
+
             // 네트워크 오류 타입별 처리
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
                 Toast.error('네트워크 연결을 확인해주세요.');
             } else if (error.message.includes('서버 오류')) {
                 Toast.error('서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
             } else {
-                Toast.error(error.message || '강의 등록 중 예상치 못한 오류가 발생했습니다.');
+                const unexpectedErrorMessage = isEditMode ? '강의 수정 중 예상치 못한 오류가 발생했습니다.' : '강의 등록 중 예상치 못한 오류가 발생했습니다.';
+                Toast.error(error.message || unexpectedErrorMessage);
             }
         });
     });
@@ -3122,15 +3068,16 @@ document.addEventListener('DOMContentLoaded', function() {
             field.style.borderColor = '#e2e8f0';
         }
     }
-    
-    // 로딩 상태 함수 (Loading 컴포넌트 사용)
+
+    // 🚀 v3.64.0: Loading 컴포넌트 사용 (overlay 메서드)
     function showLoading(show) {
         const buttons = form.querySelectorAll('button[type="submit"]');
 
         if (show) {
-            Loading.show();
+            const loadingMessage = isEditMode ? '강의 수정 중입니다...' : '강의 등록 중입니다...';
+            Loading.overlay(true, { message: loadingMessage });
         } else {
-            Loading.hide();
+            Loading.overlay(false);
         }
 
         buttons.forEach(btn => {
@@ -3720,10 +3667,10 @@ function createAdditionalInstructorField(container, index) {
 
         <div class="form-grid">
             <div class="form-group">
-                <label for="instructor_name_${index}" class="form-label required">강사명</label>
+                <label for="instructor_name_${index}" class="form-label">강사명</label>
                 <div class="input-with-counter">
                     <input type="text" id="instructor_name_${index}" name="instructors[${index}][name]" class="form-input"
-                           placeholder="예: 김마케팅" required>
+                           placeholder="예: 김마케팅">
                     <div class="character-counter">
                         <span id="instructor_name_${index}-counter">0</span><span class="counter-limit">/50자</span>
                     </div>
@@ -3936,14 +3883,7 @@ function updateExistingImagesField() {
     }
 }
 
-// 파일 크기 포맷팅
-function formatFileSize(bytes) {
-    if (!bytes) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
+// 🚀 v3.64.0: formatFileSize는 upload-config.js.php 통합 시스템 사용 (window.formatFileSize)
 
 // 이미지 순서 번호 업데이트
 function updateImageOrderNumbers() {

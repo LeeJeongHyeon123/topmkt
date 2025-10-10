@@ -1294,16 +1294,24 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             hideLoading();
 
-            if (data.status === 'success') {
-                // alert를 표시한 후 setTimeout을 사용하여 리다이렉트 보장
-                Toast.error(data.message);
+            console.log('🔍 API 응답 데이터:', data);
+            console.log('🔍 data.success:', data.success);
+            console.log('🔍 data.data:', data.data);
+            console.log('🔍 data.data.redirectUrl:', data.data?.redirectUrl);
+
+            // 🚀 v3.64.0: ApiClient가 { success: true, data: {...} } 형태로 정규화함
+            if (data.success === true) {
+                // 🚀 v3.64.0: 성공 메시지는 Toast.success 사용
+                Toast.success(data.message);
                 setTimeout(() => {
                     if (data.data && data.data.redirectUrl) {
+                        console.log('✅ 리다이렉트 시작:', data.data.redirectUrl);
                         window.location.href = data.data.redirectUrl;
                     } else {
+                        console.log('⚠️ redirectUrl 없음, 기본 페이지로 이동');
                         window.location.href = '/community';
                     }
-                }, 100); // 100ms 지연으로 alert 완료 후 리다이렉트
+                }, 1500); // 1.5초 지연으로 Toast 메시지 확인 후 리다이렉트
             } else {
                 Toast.error(data.message || '오류가 발생했습니다.');
             }
@@ -1431,15 +1439,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 로딩 표시/숨김 함수 (Loading 컴포넌트 사용)
+    // 🚀 v3.64.0: 로딩 표시/숨김 함수 (Loading.overlay 메서드 사용)
     function showLoading() {
-        Loading.show();
+        Loading.overlay(true, { message: '처리 중입니다...' });
         submitBtn.disabled = true;
         if (deleteBtn) deleteBtn.disabled = true;
     }
 
     function hideLoading() {
-        Loading.hide();
+        Loading.overlay(false);
         submitBtn.disabled = false;
         if (deleteBtn) deleteBtn.disabled = false;
     }

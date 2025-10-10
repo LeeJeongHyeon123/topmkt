@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 간단한 성능 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        .result {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 간단한 성능 테스트</h1>
+    <p>이 페이지는 강의 210 페이지와 비교하기 위한 간단한 테스트입니다.</p>
+
+    <button onclick="testClick()">클릭 테스트 (INP 측정)</button>
+    <button onclick="testMemory()">메모리 확인</button>
+    <button onclick="window.location.href='/lectures/210'">강의 210으로 이동</button>
+
+    <div id="results" class="result"></div>
+
+    <script>
+        function testClick() {
+            const start = performance.now();
+            const results = document.getElementById('results');
+
+            // 간단한 DOM 조작
+            results.textContent = '클릭 처리 중...';
+
+            setTimeout(() => {
+                const end = performance.now();
+                const duration = (end - start).toFixed(2);
+
+                results.textContent = `
+✅ 클릭 응답 시간: ${duration}ms
+
+비교:
+- 이 페이지: ${duration}ms
+- 강의 210: 55,480ms (예상)
+- 차이: ${(55480 / duration).toFixed(0)}배 느림
+
+이 페이지가 즉시 반응한다면, 강의 210 페이지에만 문제가 있는 것입니다.
+                `.trim();
+            }, 10);
+        }
+
+        function testMemory() {
+            const results = document.getElementById('results');
+
+            if (performance.memory) {
+                const usedMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+                const totalMB = (performance.memory.totalJSHeapSize / 1024 / 1024).toFixed(2);
+                const limitMB = (performance.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2);
+
+                results.textContent = `
+📊 JavaScript 메모리 사용량:
+
+사용 중: ${usedMB} MB
+전체 힙: ${totalMB} MB
+최대 한도: ${limitMB} MB
+사용률: ${((usedMB / limitMB) * 100).toFixed(1)}%
+
+이 페이지의 메모리 사용량이 적다면, 강의 210 페이지에 메모리 누수가 있는 것입니다.
+                `.trim();
+            } else {
+                results.textContent = 'Chrome에서만 메모리 측정이 가능합니다.';
+            }
+        }
+
+        // 페이지 로드 시 자동 측정
+        window.addEventListener('load', () => {
+            console.log('✅ 간단한 테스트 페이지 로드 완료');
+            console.log('이 페이지는 최소한의 JavaScript만 사용합니다.');
+        });
+    </script>
+</body>
+</html>

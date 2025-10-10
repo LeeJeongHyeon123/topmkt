@@ -492,22 +492,9 @@ function setupEventListeners() {
 async function loadUserStats() {
     try {
         console.log('📊 통계 로딩 시작...');
-        const response = await fetch('/admin/getUserStats', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        });
-        
-        console.log('📊 API 응답 상태:', response.status);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
+
+        // v3.63.0: ApiClient 사용
+        const data = await ApiClient.get('/admin/getUserStats', { noLoading: true });
         console.log('📊 받은 데이터:', data);
         
         if (data.success && data.stats) {
@@ -545,9 +532,10 @@ async function loadUsersData() {
     
     try {
         const params = new URLSearchParams(currentFilters);
-        const response = await fetch(`/admin/users/data?${params}`);
-        const data = await response.json();
-        
+
+        // v3.63.0: ApiClient 사용
+        const data = await ApiClient.get(`/admin/users/data?${params}`, { noLoading: true });
+
         if (data.success) {
             renderUsersTable(data.data.users);
             renderPagination(data.data);
@@ -644,22 +632,9 @@ async function viewUserDetail(userId) {
             '<div class="loading-indicator"><div class="spinner"></div><p>사용자 정보를 불러오는 중...</p></div>';
         
         console.log('👤 사용자 ID ' + userId + ' 상세 정보 로딩 시작...');
-        
-        // API 호출
-        const response = await fetch('/admin/users/' + userId + '/detail', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        });
-        
-        if (!response.ok) {
-            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-        }
-        
-        const data = await response.json();
+
+        // v3.63.0: ApiClient 사용
+        const data = await ApiClient.get('/admin/users/' + userId + '/detail', { noLoading: true });
         console.log('👤 받은 사용자 데이터:', data);
         
         if (data.error) {
@@ -790,23 +765,9 @@ function getStatusText(status) {
     return statusMap[status] || status;
 }
 
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR');
-}
-
-// 날짜/시간 포맷 함수 (상세 정보용)
-function formatDateTime(dateString) {
-    if (!dateString) return '없음';
-    const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
+// 🚀 Phase 7: formatDate/formatDateTime 중복 제거
+// DateUtils (date-utils.js.php) 전역 함수 사용
+// window.formatDate(), window.formatDateTime() 자동 사용
 
 // 기업 상태 텍스트 변환 함수
 function getCorpStatusText(status) {

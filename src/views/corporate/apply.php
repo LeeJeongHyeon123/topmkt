@@ -676,14 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fileUploadArea.style.display = 'block';
     };
 
-    // 파일 크기 포맷팅
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
+    // 🚀 v3.64.0: formatFileSize는 upload-config.js.php 통합 시스템 사용 (window.formatFileSize)
 
     // 폼 제출 처리
     form.addEventListener('submit', function(e) {

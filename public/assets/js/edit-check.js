@@ -146,7 +146,10 @@ window.EditChecker = {
             }
         });
 
-        console.log('✅ EditChecker: 수정 버튼 이벤트 리스너 적용 완료');
+        // 🚀 v3.64.0: 성능 최적화 - 디버그 모드에서만 로그 출력
+        if (window.DEBUG_MODE) {
+            console.log('✅ EditChecker: 수정 버튼 이벤트 리스너 적용 완료');
+        }
     }
 };
 
@@ -155,22 +158,47 @@ document.addEventListener('DOMContentLoaded', function() {
     EditChecker.initializeEditButtons();
 });
 
-// 동적으로 추가된 버튼들을 위한 MutationObserver
-const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-        mutation.addedNodes.forEach(function(node) {
-            if (node.nodeType === 1) { // Element 노드
-                // 새로 추가된 노드에서 수정 버튼 찾기
+// 🚀 v3.64.0: 성능 최적화 - MutationObserver 비활성화 (성능 문제로 인해)
+// 동적 댓글 추가 시에는 수동으로 EditChecker.initializeEditButtons() 호출 필요
+// 예: 댓글 추가 후 → EditChecker.initializeEditButtons();
+
+// MutationObserver는 성능 문제로 비활성화됨
+// 필요시 window.enableEditCheckObserver()로 활성화 가능
+window.enableEditCheckObserver = function() {
+    console.log('🔍 EditChecker MutationObserver 활성화');
+
+    let editCheckTimeout;
+    const observer = new MutationObserver(function(mutations) {
+        clearTimeout(editCheckTimeout);
+        editCheckTimeout = setTimeout(function() {
+            let hasNewButtons = false;
+
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1) {
+                        const hasEditButtons = node.classList && (
+                            node.classList.contains('btn-edit') ||
+                            node.classList.contains('edit-btn')
+                        );
+
+                        if (hasEditButtons) {
+                            hasNewButtons = true;
+                        }
+                    }
+                });
+            });
+
+            if (hasNewButtons) {
                 EditChecker.initializeEditButtons();
             }
-        });
+        }, 300);
     });
-});
 
-// body 요소 관찰 시작
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+    const targetContainer = document.querySelector('.comment-list, .main-content') || document.body;
+    observer.observe(targetContainer, {
+        childList: true,
+        subtree: false // subtree 제거로 성능 개선
+    });
+};
 
 console.log('🚀 EditChecker 로드 완료');

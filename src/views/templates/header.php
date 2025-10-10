@@ -1644,104 +1644,113 @@
         php_currentRole: <?= json_encode($currentRole ?? 'UNKNOWN') ?>,
         php_currentUserId: <?= json_encode($currentUserId ?? 0) ?>
     });
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // 🚀 New Mobile Hamburger Menu v4.0.0 (단일 버튼)
-        const mobileHamburger = document.getElementById('mobile-hamburger');
-        const mobileMenuModal = document.getElementById('mobileMenuModal');
-        const mobileDropdownClose = document.getElementById('mobileDropdownClose');
-        
-        // 화면 크기 감지 함수 (태블릿 포함)
-        const isMobile = () => window.innerWidth <= 900;
 
-        // 📱 레이아웃 강제 수정 함수 (812×858 사이즈 긴급 대응)
-        function forceCorrectLayout() {
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
+    // 🚀 v3.64.0: 모바일 메뉴 초기화 중복 실행 방지 (3번 반복 → 1번만 실행)
+    if (!window.headerMobileMenuInitialized) {
+        window.headerMobileMenuInitialized = true;
 
-            // 812×858 사이즈 또는 900px 이하 모든 경우 처리
-            if (screenWidth <= 900) {
-                // 강제로 요소들 숨기기
-                const elementsToHide = [
-                    '.main-nav',
-                    '.user-menu',
-                    '.nav-auth',
-                    'nav.main-nav',
-                    'header .main-nav',
-                    'header .user-menu',
-                    'header .nav-auth'
-                ];
+        document.addEventListener('DOMContentLoaded', function() {
+            // 🚀 New Mobile Hamburger Menu v4.0.0 (단일 버튼)
+            const mobileHamburger = document.getElementById('mobile-hamburger');
+            const mobileMenuModal = document.getElementById('mobileMenuModal');
+            const mobileDropdownClose = document.getElementById('mobileDropdownClose');
 
-                elementsToHide.forEach(selector => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach(el => {
+            // 화면 크기 감지 함수 (태블릿 포함)
+            const isMobile = () => window.innerWidth <= 900;
+
+            // 📱 레이아웃 강제 수정 함수 (812×858 사이즈 긴급 대응)
+            function forceCorrectLayout() {
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                // 812×858 사이즈 또는 900px 이하 모든 경우 처리
+                if (screenWidth <= 900) {
+                    // 강제로 요소들 숨기기
+                    const elementsToHide = [
+                        '.main-nav',
+                        '.user-menu',
+                        '.nav-auth',
+                        'nav.main-nav',
+                        'header .main-nav',
+                        'header .user-menu',
+                        'header .nav-auth'
+                    ];
+
+                    elementsToHide.forEach(selector => {
+                        const elements = document.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            if (el) {
+                                el.style.setProperty('display', 'none', 'important');
+                                el.style.setProperty('visibility', 'hidden', 'important');
+                                el.style.setProperty('opacity', '0', 'important');
+                                el.style.setProperty('position', 'absolute', 'important');
+                                el.style.setProperty('left', '-9999px', 'important');
+                                el.style.setProperty('width', '0', 'important');
+                                el.style.setProperty('height', '0', 'important');
+                                el.style.setProperty('overflow', 'hidden', 'important');
+                                el.style.setProperty('pointer-events', 'none', 'important');
+                            }
+                        });
+                    });
+
+                    // 햄버거 메뉴 강제 표시
+                    const hamburgerElements = document.querySelectorAll('.mobile-hamburger');
+                    hamburgerElements.forEach(el => {
                         if (el) {
-                            el.style.setProperty('display', 'none', 'important');
-                            el.style.setProperty('visibility', 'hidden', 'important');
-                            el.style.setProperty('opacity', '0', 'important');
-                            el.style.setProperty('position', 'absolute', 'important');
-                            el.style.setProperty('left', '-9999px', 'important');
-                            el.style.setProperty('width', '0', 'important');
-                            el.style.setProperty('height', '0', 'important');
-                            el.style.setProperty('overflow', 'hidden', 'important');
-                            el.style.setProperty('pointer-events', 'none', 'important');
+                            el.style.setProperty('display', 'flex', 'important');
+                            el.style.setProperty('visibility', 'visible', 'important');
+                            el.style.setProperty('position', 'fixed', 'important');
+                            el.style.setProperty('top', '14px', 'important');
+                            el.style.setProperty('right', '20px', 'important');
+                            el.style.setProperty('z-index', '999999', 'important');
                         }
                     });
-                });
-
-                // 햄버거 메뉴 강제 표시
-                const hamburgerElements = document.querySelectorAll('.mobile-hamburger');
-                hamburgerElements.forEach(el => {
-                    if (el) {
-                        el.style.setProperty('display', 'flex', 'important');
-                        el.style.setProperty('visibility', 'visible', 'important');
-                        el.style.setProperty('position', 'fixed', 'important');
-                        el.style.setProperty('top', '14px', 'important');
-                        el.style.setProperty('right', '20px', 'important');
-                        el.style.setProperty('z-index', '999999', 'important');
-                    }
-                });
-            }
-        }
-
-        // 📱 모바일 메뉴 모달 강제 닫힌 상태 초기화 (CRITICAL FIX)
-        function ensureMobileMenuClosed() {
-            if (mobileMenuModal) {
-                mobileMenuModal.classList.remove('active');
-                mobileMenuModal.style.position = 'fixed';
-                mobileMenuModal.style.top = '0';
-                mobileMenuModal.style.left = '0';
-                mobileMenuModal.style.right = '0';
-                mobileMenuModal.style.bottom = '0';
-                mobileMenuModal.style.zIndex = '9999';
-                mobileMenuModal.style.opacity = '0';
-                mobileMenuModal.style.visibility = 'hidden';
-                mobileMenuModal.style.pointerEvents = 'none';
-                mobileMenuModal.style.display = 'none'; // 완전히 숨기기
+                }
             }
 
-            if (mobileHamburger) {
-                mobileHamburger.classList.remove('active');
+            // 📱 모바일 메뉴 모달 강제 닫힌 상태 초기화 (CRITICAL FIX)
+            function ensureMobileMenuClosed() {
+                if (mobileMenuModal) {
+                    mobileMenuModal.classList.remove('active');
+                    mobileMenuModal.style.position = 'fixed';
+                    mobileMenuModal.style.top = '0';
+                    mobileMenuModal.style.left = '0';
+                    mobileMenuModal.style.right = '0';
+                    mobileMenuModal.style.bottom = '0';
+                    mobileMenuModal.style.zIndex = '9999';
+                    mobileMenuModal.style.opacity = '0';
+                    mobileMenuModal.style.visibility = 'hidden';
+                    mobileMenuModal.style.pointerEvents = 'none';
+                    mobileMenuModal.style.display = 'none'; // 완전히 숨기기
+                }
+
+                if (mobileHamburger) {
+                    mobileHamburger.classList.remove('active');
+                }
+
+                // body 스크롤 복원
+                document.body.style.overflow = '';
+
+                // 🚀 v3.64.0: 중복 로그 제거 (3번 반복 방지)
+                if (window.DEBUG_MODE) {
+                    console.log('📱 모바일 메뉴 모달 강제 닫힌 상태로 초기화 완료 (display: none 적용)');
+                }
             }
 
-            // body 스크롤 복원
-            document.body.style.overflow = '';
+            // 페이지 로드 시 즉시 실행 (1회만)
+            forceCorrectLayout();
+            ensureMobileMenuClosed();
 
-            console.log('📱 모바일 메뉴 모달 강제 닫힌 상태로 초기화 완료 (display: none 적용)');
-        }
+            // 🚀 v3.64.0: 리사이즈 이벤트 중복 등록 방지
+            if (!window.headerResizeListenerAdded) {
+                window.headerResizeListenerAdded = true;
+                window.addEventListener('resize', forceCorrectLayout);
+            }
 
-        // 페이지 로드 시 즉시 실행
-        forceCorrectLayout();
-        ensureMobileMenuClosed(); // 모바일 메뉴 닫힌 상태 보장
-
-        // 리사이즈 이벤트에도 실행
-        window.addEventListener('resize', forceCorrectLayout);
-
-        // DOM 변경 감지 후에도 실행 (추가 보장)
-        setTimeout(forceCorrectLayout, 100);
-        setTimeout(forceCorrectLayout, 500);
-        setTimeout(ensureMobileMenuClosed, 100); // 추가 보장
-        setTimeout(ensureMobileMenuClosed, 500); // 추가 보장
+            // 🚀 v3.64.0: setTimeout 중복 제거 (불필요한 3번 반복 실행 제거)
+            // 기존: setTimeout(forceCorrectLayout, 100/500) × 2
+            //      setTimeout(ensureMobileMenuClosed, 100/500) × 2
+            // 삭제 이유: 이미 즉시 실행되고 있으며, resize 이벤트로 충분
 
         // 햄버거 메뉴 버튼 클릭 이벤트 (애니메이션 포함)
         function toggleMobileMenu(e) {
@@ -2027,5 +2036,6 @@
                 return false;
             }
         });
-    });
+        }, { once: true }); // 🚀 v3.64.0: DOMContentLoaded 중복 실행 방지
+    } // 🚀 v3.64.0: headerMobileMenuInitialized 플래그 종료
     </script> 

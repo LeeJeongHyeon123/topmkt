@@ -198,30 +198,39 @@ class MediaController {
             // 업로드된 파일 권한 설정
             chmod($fullPath, 0644);
             error_log("[이미지업로드] 업로드 성공 - 파일: " . basename($safeFileName) . ", 크기: " . number_format($uploadedFile['size']) . "bytes");
-            
-            // 이미지 최적화 (PNG는 건너뛰기 - 파일 손상 방지)
-            if ($extension !== 'png') {
-                $this->optimizeImage($fullPath, $extension);
-            } else {
-                error_log('PNG 파일 최적화 건너뜀 - 원본 파일 유지: ' . $fullPath);
+
+            // 🚀 v3.64.0: 모든 이미지 최적화 (WebP 변환 + 리사이징)
+            $this->optimizeImage($fullPath, $extension);
+
+            // 🚀 v3.64.0 Phase 1: 최적화 후 파일명이 WebP로 변경되었을 수 있음
+            $optimizedPath = $fullPath;
+            $optimizedFileName = $safeFileName;
+
+            if (!file_exists($fullPath) && file_exists(preg_replace('/\.[^.]+$/', '.webp', $fullPath))) {
+                // WebP로 변환된 경우
+                $optimizedPath = preg_replace('/\.[^.]+$/', '.webp', $fullPath);
+                $optimizedFileName = preg_replace('/\.[^.]+$/', '.webp', $safeFileName);
+                error_log("[이미지업로드] WebP 변환 완료: $optimizedFileName");
             }
-            
-            // 웹 접근 URL 생성 
-            $webUrl = str_replace(ROOT_PATH . '/public', '', $fullPath);
-            
+
+            $finalFileSize = file_exists($optimizedPath) ? filesize($optimizedPath) : $uploadedFile['size'];
+
+            // 웹 접근 URL 생성
+            $webUrl = str_replace(ROOT_PATH . '/public', '', $optimizedPath);
+
             // 디버깅을 위한 로그
             error_log("이미지 업로드 경로 정보:");
             error_log("ROOT_PATH: " . ROOT_PATH);
-            error_log("Full Path: " . $fullPath);
+            error_log("Full Path: " . $optimizedPath);
             error_log("Web URL: " . $webUrl);
-            
+
             // 업로드 정보 로깅
-            $this->logUpload($safeFileName, $uploadedFile['size'], AuthMiddleware::getCurrentUserId());
-            
+            $this->logUpload($optimizedFileName, $finalFileSize, AuthMiddleware::getCurrentUserId());
+
             return $this->jsonResponse(true, '이미지가 성공적으로 업로드되었습니다.', [
                 'url' => $webUrl,
-                'filename' => $safeFileName,
-                'size' => $uploadedFile['size']
+                'filename' => $optimizedFileName,
+                'size' => $finalFileSize
             ]);
             
         } catch (Exception $e) {
@@ -382,37 +391,112 @@ class MediaController {
      * 이미지 최적화
      */
     private function optimizeImage($filePath, $extension) {
-        // EXIF 데이터 제거 및 기본 최적화
+        // 🚀 v3.64.0: WebP 변환 + 리사이징 최적화 시스템
         try {
+            $originalSize = filesize($filePath);
+            error_log("[이미지최적화] 시작 - 원본: " . number_format($originalSize) . " bytes");
+
+            // 원본 이미지 로드
+            $image = null;
             switch ($extension) {
                 case 'jpg':
                 case 'jpeg':
                     $image = imagecreatefromjpeg($filePath);
-                    if ($image !== false) {
-                        imagejpeg($image, $filePath, 85); // 85% 품질
-                        imagedestroy($image);
-                    }
                     break;
-                    
                 case 'png':
-                    // PNG 최적화는 파일 손상 위험이 있으므로 보수적으로 처리
                     $image = imagecreatefrompng($filePath);
-                    if ($image !== false) {
-                        // 투명도 보존
-                        imagealphablending($image, false);
-                        imagesavealpha($image, true);
-                        
-                        // 낮은 압축 레벨 사용 (0-9, 낮을수록 큰 파일)
-                        imagepng($image, $filePath, 3); // 압축 레벨 3 (보수적)
-                        imagedestroy($image);
-                        error_log('PNG 파일 최적화 완료: ' . $filePath);
-                    } else {
-                        error_log('PNG 파일 읽기 실패, 원본 유지: ' . $filePath);
-                    }
+                    break;
+                case 'gif':
+                    $image = imagecreatefromgif($filePath);
+                    break;
+                case 'webp':
+                    $image = imagecreatefromwebp($filePath);
                     break;
             }
+
+            if ($image === false) {
+                error_log("[이미지최적화] 이미지 로드 실패, 원본 유지");
+                return;
+            }
+
+            // 원본 크기
+            $originalWidth = imagesx($image);
+            $originalHeight = imagesy($image);
+            error_log("[이미지최적화] 원본 크기: {$originalWidth}x{$originalHeight}");
+
+            // 🎯 리사이징: 최대 2000px (긴 쪽 기준)
+            $maxDimension = 2000;
+            $needsResize = ($originalWidth > $maxDimension || $originalHeight > $maxDimension);
+
+            if ($needsResize) {
+                // 비율 유지하면서 리사이징
+                $ratio = min($maxDimension / $originalWidth, $maxDimension / $originalHeight);
+                $newWidth = (int)($originalWidth * $ratio);
+                $newHeight = (int)($originalHeight * $ratio);
+
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+
+                // PNG/GIF 투명도 보존
+                if ($extension === 'png' || $extension === 'gif') {
+                    imagealphablending($resizedImage, false);
+                    imagesavealpha($resizedImage, true);
+                    $transparent = imagecolorallocatealpha($resizedImage, 0, 0, 0, 127);
+                    imagefill($resizedImage, 0, 0, $transparent);
+                }
+
+                // 고품질 리샘플링
+                imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+                imagedestroy($image);
+                $image = $resizedImage;
+
+                error_log("[이미지최적화] 리사이징: {$originalWidth}x{$originalHeight} → {$newWidth}x{$newHeight}");
+            }
+
+            // 🎯 WebP 변환 (PNG 투명도 보존)
+            $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $filePath);
+
+            if ($extension === 'png') {
+                // PNG는 투명도 보존
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+                imagewebp($image, $webpPath, 85); // 85% 품질
+            } else {
+                // JPEG/GIF는 일반 WebP
+                imagewebp($image, $webpPath, 85);
+            }
+
+            $webpSize = filesize($webpPath);
+            $reduction = (1 - ($webpSize / $originalSize)) * 100;
+
+            error_log("[이미지최적화] WebP 변환 완료");
+            error_log("[이미지최적화] 용량: " . number_format($originalSize) . " → " . number_format($webpSize) . " bytes");
+            error_log("[이미지최적화] 감소율: " . number_format($reduction, 1) . "%");
+
+            // 원본 파일 삭제하고 WebP로 교체
+            if ($webpSize < $originalSize && file_exists($webpPath)) {
+                unlink($filePath);
+                rename($webpPath, preg_replace('/\.[^.]+$/', '.webp', $filePath));
+                error_log("[이미지최적화] 원본 삭제, WebP로 교체");
+            } else {
+                // WebP가 더 크면 원본 유지하고 WebP 삭제
+                if (file_exists($webpPath)) {
+                    unlink($webpPath);
+                }
+                // 원본 파일 재압축
+                if ($extension === 'jpg' || $extension === 'jpeg') {
+                    imagejpeg($image, $filePath, 85);
+                } elseif ($extension === 'png') {
+                    imagealphablending($image, false);
+                    imagesavealpha($image, true);
+                    imagepng($image, $filePath, 6); // 압축 레벨 6
+                }
+                error_log("[이미지최적화] WebP가 더 큼, 원본 유지 및 재압축");
+            }
+
+            imagedestroy($image);
+
         } catch (Exception $e) {
-            error_log('이미지 최적화 오류: ' . $e->getMessage());
+            error_log('[이미지최적화] 오류: ' . $e->getMessage());
             // 최적화 실패는 치명적이지 않으므로 계속 진행
         }
     }

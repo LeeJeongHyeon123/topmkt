@@ -515,7 +515,8 @@ if (!isset($_SESSION['csrf_token'])) {
                 
                 <div class="form-group">
                     <label for="registration_fee" class="form-label">참가비 (원)</label>
-                    <input type="number" id="registration_fee" name="registration_fee" class="form-input" min="0" step="1000" value="<?= $event['registration_fee'] ?>">
+                    <input type="number" id="registration_fee" name="registration_fee" class="form-input" min="0" step="1" value="<?= $event['registration_fee'] ?>" placeholder="0">
+                    <div class="help-text">무료 행사인 경우 0 또는 비워두세요.</div>
                 </div>
             </div>
         </div>
@@ -551,9 +552,9 @@ if (!isset($_SESSION['csrf_token'])) {
                             </div>
                             
                             <div class="form-group">
-                                <label for="instructor_name_<?= $index ?>" class="form-label required">강사명</label>
-                                <input type="text" id="instructor_name_<?= $index ?>" name="instructor_names[]" 
-                                       class="form-input" value="<?= htmlspecialchars($instructor['name']) ?>" required>
+                                <label for="instructor_name_<?= $index ?>" class="form-label">강사명</label>
+                                <input type="text" id="instructor_name_<?= $index ?>" name="instructor_names[]"
+                                       class="form-input" value="<?= htmlspecialchars($instructor['name']) ?>">
                             </div>
                             
                             <div class="form-group">
@@ -581,9 +582,9 @@ if (!isset($_SESSION['csrf_token'])) {
                         </div>
                         
                         <div class="form-group">
-                            <label for="instructor_name_0" class="form-label required">강사명</label>
-                            <input type="text" id="instructor_name_0" name="instructor_names[]" 
-                                   class="form-input" required>
+                            <label for="instructor_name_0" class="form-label">강사명</label>
+                            <input type="text" id="instructor_name_0" name="instructor_names[]"
+                                   class="form-input">
                         </div>
                         
                         <div class="form-group">
@@ -886,9 +887,9 @@ function addInstructor() {
         </div>
         
         <div class="form-group">
-            <label for="instructor_name_${instructorIndex}" class="form-label required">강사명</label>
-            <input type="text" id="instructor_name_${instructorIndex}" name="instructor_names[]" 
-                   class="form-input" required>
+            <label for="instructor_name_${instructorIndex}" class="form-label">강사명</label>
+            <input type="text" id="instructor_name_${instructorIndex}" name="instructor_names[]"
+                   class="form-input">
         </div>
         
         <div class="form-group">

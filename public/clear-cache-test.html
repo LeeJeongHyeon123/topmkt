@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🧹 캐시 완전 제거 테스트</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            margin: 0;
+        }
+        .panel {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #4ec9b0;
+            margin-top: 0;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        button.danger {
+            background: #dc2626;
+        }
+        button.danger:hover {
+            background: #b91c1c;
+        }
+        .code {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #3e3e42;
+        }
+        .metric-name {
+            color: #9cdcfe;
+        }
+        .metric-value {
+            color: #ce9178;
+            font-weight: bold;
+        }
+        .good { color: #4ec9b0 !important; }
+        .warning { color: #dcdcaa !important; }
+        .bad { color: #f48771 !important; }
+    </style>
+</head>
+<body>
+    <h1>🧹 캐시 완전 제거 테스트</h1>
+
+    <div class="panel">
+        <h2>🚨 긴급 조치 필요!</h2>
+        <p>현재 INP가 55,480ms (55초)로 더 악화되었습니다.</p>
+        <p>이는 <strong>이전 JavaScript 캐시가 남아있을 가능성</strong>이 높습니다.</p>
+    </div>
+
+    <div class="panel">
+        <h2>📋 1단계: 브라우저 캐시 완전 삭제</h2>
+        <button onclick="clearAllCache()" class="danger">🗑️ 모든 캐시 삭제</button>
+        <button onclick="clearServiceWorkers()" class="danger">🛠️ Service Worker 삭제</button>
+        <div id="cache-status" class="code"></div>
+    </div>
+
+    <div class="panel">
+        <h2>📋 2단계: 개발자 도구 캐시 비활성화</h2>
+        <div class="code">
+Chrome DevTools에서:
+1. F12 (개발자 도구 열기)
+2. Network 탭 클릭
+3. ✅ "Disable cache" 체크박스 ON
+4. 개발자 도구를 열어둔 채로 테스트
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>📋 3단계: 강력 새로고침</h2>
+        <button onclick="hardRefresh()">🔄 강력 새로고침 (Ctrl+Shift+R)</button>
+        <div class="code">
+Windows/Linux: Ctrl + Shift + R
+Mac: Cmd + Shift + R
+
+또는:
+F5를 누른 상태에서 새로고침 버튼 우클릭 → "캐시 비우기 및 강력 새로고침"
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>📋 4단계: 현재 상태 확인</h2>
+        <button onclick="checkCurrentState()">🔍 현재 상태 확인</button>
+        <div id="state-results"></div>
+    </div>
+
+    <div class="panel">
+        <h2>📋 5단계: 강의 페이지 테스트</h2>
+        <button onclick="window.location.href='/lectures/210?nocache=' + Date.now()">
+            📄 강의 210 페이지로 이동 (캐시 무효화)
+        </button>
+    </div>
+
+    <div class="panel">
+        <h2>🔍 디버깅 정보</h2>
+        <div class="metric">
+            <span class="metric-name">현재 시간</span>
+            <span class="metric-value" id="current-time"></span>
+        </div>
+        <div class="metric">
+            <span class="metric-name">페이지 URL</span>
+            <span class="metric-value" id="page-url"></span>
+        </div>
+        <div class="metric">
+            <span class="metric-name">캐시 상태</span>
+            <span class="metric-value" id="cache-state">확인 중...</span>
+        </div>
+    </div>
+
+    <script>
+        async function clearAllCache() {
+            const statusEl = document.getElementById('cache-status');
+            statusEl.textContent = '캐시 삭제 중...\n';
+
+            try {
+                // 1. Cache API 삭제
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    statusEl.textContent += `Cache Storage: ${cacheNames.length}개 발견\n`;
+
+                    for (const name of cacheNames) {
+                        await caches.delete(name);
+                        statusEl.textContent += `  ✅ 삭제됨: ${name}\n`;
+                    }
+                }
+
+                // 2. LocalStorage 삭제
+                localStorage.clear();
+                statusEl.textContent += '✅ LocalStorage 삭제됨\n';
+
+                // 3. SessionStorage 삭제
+                sessionStorage.clear();
+                statusEl.textContent += '✅ SessionStorage 삭제됨\n';
+
+                // 4. IndexedDB 삭제
+                if ('indexedDB' in window) {
+                    const dbs = await indexedDB.databases();
+                    for (const db of dbs) {
+                        indexedDB.deleteDatabase(db.name);
+                        statusEl.textContent += `✅ IndexedDB 삭제됨: ${db.name}\n`;
+                    }
+                }
+
+                statusEl.textContent += '\n🎉 모든 캐시가 삭제되었습니다!\n';
+                statusEl.textContent += '⚠️  이제 Ctrl+Shift+R로 강력 새로고침하세요.';
+
+            } catch (error) {
+                statusEl.textContent += `\n❌ 오류: ${error.message}`;
+            }
+        }
+
+        async function clearServiceWorkers() {
+            const statusEl = document.getElementById('cache-status');
+            statusEl.textContent = 'Service Worker 삭제 중...\n';
+
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    statusEl.textContent += `Service Worker: ${registrations.length}개 발견\n`;
+
+                    for (const registration of registrations) {
+                        await registration.unregister();
+                        statusEl.textContent += `  ✅ 삭제됨: ${registration.scope}\n`;
+                    }
+
+                    if (registrations.length === 0) {
+                        statusEl.textContent += '✅ Service Worker 없음\n';
+                    }
+                } else {
+                    statusEl.textContent += '⚠️  Service Worker 지원 안됨\n';
+                }
+            } catch (error) {
+                statusEl.textContent += `\n❌ 오류: ${error.message}`;
+            }
+        }
+
+        function hardRefresh() {
+            location.reload(true);
+        }
+
+        async function checkCurrentState() {
+            const resultsEl = document.getElementById('state-results');
+            let html = '<div style="margin-top: 20px;"><div class="code">';
+
+            // 전역 변수 확인
+            html += '🔍 메모리 누수 방지 플래그 확인:\n\n';
+            html += `lectureDetailKeydownRegistered: ${window.lectureDetailKeydownRegistered || 'undefined'}\n`;
+            html += `registrationModalKeydownRegistered: ${window.registrationModalKeydownRegistered || 'undefined'}\n\n`;
+
+            // 캐시 상태
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                html += `Cache Storage: ${cacheNames.length}개\n`;
+                cacheNames.forEach(name => {
+                    html += `  - ${name}\n`;
+                });
+            }
+
+            // 메모리 사용량
+            if (performance.memory) {
+                const usedMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+                html += `\nJavaScript 메모리: ${usedMB} MB\n`;
+            }
+
+            html += '</div></div>';
+            resultsEl.innerHTML = html;
+        }
+
+        // 페이지 로드 시 자동 확인
+        window.addEventListener('load', () => {
+            document.getElementById('current-time').textContent = new Date().toLocaleString();
+            document.getElementById('page-url').textContent = window.location.href;
+
+            checkCurrentState().then(() => {
+                const cacheStateEl = document.getElementById('cache-state');
+                if (window.lectureDetailKeydownRegistered) {
+                    cacheStateEl.textContent = '⚠️  이전 JavaScript 남아있음';
+                    cacheStateEl.className = 'metric-value warning';
+                } else {
+                    cacheStateEl.textContent = '✅ 깨끗함';
+                    cacheStateEl.className = 'metric-value good';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

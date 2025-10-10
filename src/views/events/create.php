@@ -772,7 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="form-group">
                 <label for="title" class="form-label required">행사 제목</label>
                 <div class="input-with-counter">
-                    <input type="text" id="title" name="title" class="form-input"
+                    <input type="text" id="title" name="title" class="form-input" maxlength="100"
                            placeholder="5자 이상 입력하세요 (예: 2024 마케팅 트렌드 컨퍼런스)" required
                            value="<?= $isEditMode ? htmlspecialchars($event['title'] ?? '', ENT_QUOTES, 'UTF-8') : '' ?>">
                     <div class="character-counter">
@@ -1729,13 +1729,27 @@ function initializeTitleCounter() {
 }
 
 // 🚀 v3.67.0: 행사 설명 글자수 카운터 (Quill 에디터)
+// 🚀 v3.67.1: 10,000자 초과 입력 방지 기능 추가
 function initializeDescriptionCounter() {
     const descriptionCounter = document.getElementById('description-counter');
 
     if (!descriptionCounter || !window.quill) return;
 
-    function updateDescriptionCounter() {
-        const length = window.quill.getText().trim().length;
+    function updateDescriptionCounter(delta, oldDelta, source) {
+        const text = window.quill.getText();
+        const length = text.trim().length;
+
+        // 10,000자 초과 시 초과된 부분 자동 삭제
+        if (length > 10000) {
+            // 사용자가 입력한 경우에만 차단 (프로그래매틱 변경은 허용)
+            if (source === 'user') {
+                const trimmedText = text.substring(0, 10000);
+                window.quill.setText(trimmedText);
+                Toast.warning('행사 설명은 최대 10,000자까지 입력 가능합니다.');
+                return;
+            }
+        }
+
         descriptionCounter.textContent = length.toLocaleString();
 
         const counterContainer = descriptionCounter.parentElement;
@@ -1751,7 +1765,7 @@ function initializeDescriptionCounter() {
     }
 
     window.quill.on('text-change', updateDescriptionCounter);
-    updateDescriptionCounter(); // 초기화
+    updateDescriptionCounter(null, null, 'api'); // 초기화 (source='api'로 차단 회피)
 }
 
 // 전역 이미지 카운터 업데이트 함수

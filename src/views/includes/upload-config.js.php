@@ -38,6 +38,24 @@ window.getImageAcceptAttribute = function() {
         .join(',');
 };
 
+// 🚀 v3.64.0: 통합 이미지 파일 검증 함수
+// ✅ Toast 컴포넌트 전역 로드 (footer.php) 의존
+window.validateImageFile = function(file) {
+    // 파일 형식 검사
+    if (!window.validateImageExtension(file.name)) {
+        Toast.warning('JPG, PNG, GIF, WebP 파일만 업로드 가능합니다.');
+        return false;
+    }
+
+    // 파일 크기 검사 (공통 설정 사용: 30MB)
+    if (!window.validateFileSize(file.size)) {
+        Toast.error(window.getFileSizeErrorMessage());
+        return false;
+    }
+
+    return true;
+};
+
 // 디버깅용 정보 출력
 console.log('🚀 TOPMKT 업로드 설정 로드됨:', {
     maxFileSize: window.formatFileSize(window.TOPMKT_UPLOAD_CONFIG.maxFileSize),

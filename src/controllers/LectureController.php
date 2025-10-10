@@ -338,37 +338,39 @@ class LectureController {
                                 $order = (int)$orderedItem['display_order'];
                                 
                                 // Check if this is a new uploaded image (매칭 개선)
+                                // 🚀 v3.64.0: WebP 변환으로 파일 크기가 달라지므로 temp_index 우선 매칭
                                 $matchedImageData = null;
-                                
-                                // 1. file_name으로 직접 매칭 시도
-                                if (isset($orderedItem['file_name']) && isset($newImagesByName[$orderedItem['file_name']])) {
+
+                                // 1. temp_index로 매칭 시도 (WebP 변환 대응, 최우선)
+                                if (isset($orderedItem['temp_index']) && isset($orderedItem['is_new'])) {
+                                    $tempIndex = (int)$orderedItem['temp_index'];
+                                    if (isset($uploadedImages[$tempIndex])) {
+                                        $matchedImageData = $uploadedImages[$tempIndex];
+                                        file_put_contents($debugLog, "✅ temp_index 매칭 성공: 인덱스 {$tempIndex} -> {$matchedImageData['file_name']} (WebP 최적화 대응)\n", FILE_APPEND);
+                                    }
+                                }
+                                // 2. file_name으로 직접 매칭 시도
+                                else if (isset($orderedItem['file_name']) && isset($newImagesByName[$orderedItem['file_name']])) {
                                     $matchedImageData = $newImagesByName[$orderedItem['file_name']];
-                                } 
-                                // 2. 파일 크기로 매칭 시도 (더 안전한 방식)
+                                    file_put_contents($debugLog, "✅ file_name 매칭 성공: {$orderedItem['file_name']}\n", FILE_APPEND);
+                                }
+                                // 3. original_name으로 매칭 시도 (호환성)
+                                else if (isset($orderedItem['file_name'])) {
+                                    foreach ($newImagesByName as $uploadedImage) {
+                                        if (isset($uploadedImage['original_name']) && $uploadedImage['original_name'] === $orderedItem['file_name']) {
+                                            $matchedImageData = $uploadedImage;
+                                            file_put_contents($debugLog, "✅ 원본명 매칭 성공: {$orderedItem['file_name']} -> {$uploadedImage['file_name']}\n", FILE_APPEND);
+                                            break;
+                                        }
+                                    }
+                                }
+                                // 4. 파일 크기로 매칭 시도 (fallback, WebP로 크기 변경되어 신뢰도 낮음)
                                 else if (isset($orderedItem['file_size']) && isset($orderedItem['is_new'])) {
                                     $targetSize = (int)$orderedItem['file_size'];
                                     foreach ($uploadedImages as $uploadedImage) {
                                         if (isset($uploadedImage['file_size']) && (int)$uploadedImage['file_size'] === $targetSize) {
                                             $matchedImageData = $uploadedImage;
-                                            file_put_contents($debugLog, "파일 크기 매칭 성공: 크기 {$targetSize} -> {$matchedImageData['file_name']}\n", FILE_APPEND);
-                                            break;
-                                        }
-                                    }
-                                }
-                                // 3. temp_index로 매칭 시도 (fallback)
-                                else if (isset($orderedItem['temp_index']) && isset($orderedItem['is_new'])) {
-                                    $tempIndex = (int)$orderedItem['temp_index'];
-                                    if (isset($uploadedImages[$tempIndex])) {
-                                        $matchedImageData = $uploadedImages[$tempIndex];
-                                        file_put_contents($debugLog, "temp_index 매칭 성공: 인덱스 {$tempIndex} -> {$matchedImageData['file_name']}\n", FILE_APPEND);
-                                    }
-                                }
-                                // 4. original_name으로 매칭 시도 (호환성)
-                                else if (isset($orderedItem['file_name'])) {
-                                    foreach ($newImagesByName as $uploadedImage) {
-                                        if (isset($uploadedImage['original_name']) && $uploadedImage['original_name'] === $orderedItem['file_name']) {
-                                            $matchedImageData = $uploadedImage;
-                                            file_put_contents($debugLog, "원본명 매칭 성공: {$orderedItem['file_name']} -> {$uploadedImage['file_name']}\n", FILE_APPEND);
+                                            file_put_contents($debugLog, "⚠️ 파일 크기 매칭 성공 (정확도 낮음): 크기 {$targetSize} -> {$matchedImageData['file_name']}\n", FILE_APPEND);
                                             break;
                                         }
                                     }
@@ -1666,15 +1668,30 @@ class LectureController {
                 $filePath = $uploadDir . $safeName;
                 
                 if (move_uploaded_file($tmpName, $filePath)) {
+                    // 🚀 v3.64.0: 이미지 최적화 (WebP 변환 + 리사이징)
+                    $this->optimizeImage($filePath, $fileExtension);
+
+                    // 최적화 후 파일명이 WebP로 변경되었을 수 있음
+                    $optimizedPath = $filePath;
+                    $optimizedWebPath = $webPath . $safeName;
+
+                    if (!file_exists($filePath) && file_exists(preg_replace('/\.[^.]+$/', '.webp', $filePath))) {
+                        // WebP로 변환된 경우
+                        $optimizedPath = preg_replace('/\.[^.]+$/', '.webp', $filePath);
+                        $optimizedWebPath = preg_replace('/\.[^.]+$/', '.webp', $webPath . $safeName);
+                    }
+
+                    $finalFileSize = file_exists($optimizedPath) ? filesize($optimizedPath) : $fileSize;
+
                     $imageData = [
                         'original_name' => $safeName,  // 안전한 파일명 사용
-                        'file_name' => $safeName,
-                        'file_path' => $webPath . $safeName,
-                        'file_size' => $fileSize,
+                        'file_name' => basename($optimizedPath),
+                        'file_path' => $optimizedWebPath,
+                        'file_size' => $finalFileSize,
                         'upload_time' => date('Y-m-d H:i:s')
                     ];
                     $uploadedImages[] = $imageData;
-                    error_log("이미지 업로드 성공: " . $safeName . " -> file_path: " . $imageData['file_path']);
+                    error_log("이미지 업로드 성공 (최적화 완료): " . basename($optimizedPath) . " -> file_path: " . $imageData['file_path'] . " (용량: " . number_format($finalFileSize) . " bytes)");
                 } else {
                     error_log("이미지 업로드 실패: " . $originalName . " -> " . $filePath);
                 }
@@ -1754,9 +1771,19 @@ class LectureController {
                             $filePath = $uploadDir . $safeName;
                             
                             if (move_uploaded_file($tmpName, $filePath)) {
+                                // 🚀 v3.64.0: 이미지 최적화 (WebP 변환 + 리사이징)
+                                $this->optimizeImage($filePath, $fileExtension);
+
+                                // 최적화 후 파일명이 WebP로 변경되었을 수 있음
+                                $optimizedPath = $filePath;
+                                if (!file_exists($filePath) && file_exists(preg_replace('/\.[^.]+$/', '.webp', $filePath))) {
+                                    $optimizedPath = preg_replace('/\.[^.]+$/', '.webp', $filePath);
+                                    $safeName = preg_replace('/\.[^.]+$/', '.webp', $safeName);
+                                }
+
                                 $instructorImages[$index] = $webPath . $safeName;
-                                file_put_contents($logFile, "강사 {$index} 이미지 업로드 성공: {$webPath}{$safeName}\n", FILE_APPEND);
-                                error_log("강사 {$index} 이미지 업로드 성공: " . $webPath . $safeName);
+                                file_put_contents($logFile, "강사 {$index} 이미지 업로드 성공 (최적화 완료): {$webPath}{$safeName}\n", FILE_APPEND);
+                                error_log("강사 {$index} 이미지 업로드 성공 (최적화 완료): " . $webPath . $safeName);
                             } else {
                                 file_put_contents($logFile, "강사 {$index} 이미지 업로드 실패\n", FILE_APPEND);
                                 error_log("강사 {$index} 이미지 업로드 실패");
@@ -1816,9 +1843,19 @@ class LectureController {
                     
                     // 파일 업로드
                     if (move_uploaded_file($tmpName, $uploadPath)) {
+                        // 🚀 v3.64.0: 이미지 최적화 (WebP 변환 + 리사이징)
+                        $this->optimizeImage($uploadPath, $fileExt);
+
+                        // 최적화 후 파일명이 WebP로 변경되었을 수 있음
+                        $optimizedPath = $uploadPath;
+                        if (!file_exists($uploadPath) && file_exists(preg_replace('/\.[^.]+$/', '.webp', $uploadPath))) {
+                            $optimizedPath = preg_replace('/\.[^.]+$/', '.webp', $uploadPath);
+                            $safeName = preg_replace('/\.[^.]+$/', '.webp', $safeName);
+                        }
+
                         $instructorImages[$i] = $webPath . $safeName;
-                        file_put_contents($logFile, "강사 {$i} 이미지 업로드 성공: {$webPath}{$safeName}\n", FILE_APPEND);
-                        error_log("강사 {$i} 이미지 업로드 성공: " . $webPath . $safeName);
+                        file_put_contents($logFile, "강사 {$i} 이미지 업로드 성공 (최적화 완료): {$webPath}{$safeName}\n", FILE_APPEND);
+                        error_log("강사 {$i} 이미지 업로드 성공 (최적화 완료): " . $webPath . $safeName);
                     } else {
                         file_put_contents($logFile, "강사 {$i} 이미지 업로드 실패: move_uploaded_file 실패\n", FILE_APPEND);
                         error_log("강사 {$i} 이미지 업로드 실패: move_uploaded_file 실패");
@@ -3126,33 +3163,150 @@ class LectureController {
     private function deleteDraftLectures($userId, $excludeLectureId = null) {
         try {
             error_log("deleteDraftLectures 호출: userId={$userId}, excludeLectureId={$excludeLectureId}");
-            
+
             // 해당 사용자의 draft 상태 강의들을 조회 (현재 등록 중인 강의는 제외)
             $sql = "SELECT id, lecture_images, instructors_json FROM lectures WHERE user_id = ? AND status = 'draft'";
             $params = [$userId];
-            
+
             if ($excludeLectureId) {
                 $sql .= " AND id != ?";
                 $params[] = $excludeLectureId;
             }
-            
+
             $draftLectures = $this->db->fetchAll($sql, $params);
             error_log("삭제 대상 draft 강의 수: " . count($draftLectures));
-            
+
             foreach ($draftLectures as $lecture) {
                 // 강의 관련 파일들 삭제
                 $this->deleteLectureFiles($lecture);
-                
+
                 // 데이터베이스에서 강의 삭제
                 $this->db->execute("DELETE FROM lectures WHERE id = ?", [$lecture['id']]);
                 error_log("Draft 강의 삭제 완료: ID=" . $lecture['id']);
             }
-            
+
         } catch (Exception $e) {
             error_log("deleteDraftLectures 오류: " . $e->getMessage());
             // draft 정리 실패는 치명적이지 않으므로 예외를 다시 던지지 않음
         }
     }
-    
+
+    /**
+     * 🚀 v3.64.0: 이미지 최적화 (WebP 변환 + 리사이징)
+     * MediaController의 optimizeImage와 동일한 로직
+     *
+     * @param string $filePath 업로드된 이미지 파일 경로
+     * @param string $extension 이미지 파일 확장자 (jpg, jpeg, png, gif, webp)
+     */
+    private function optimizeImage($filePath, $extension) {
+        try {
+            $originalSize = filesize($filePath);
+            error_log("[강의이미지최적화] 시작 - 원본: " . number_format($originalSize) . " bytes");
+
+            // 원본 이미지 로드
+            $image = null;
+            switch ($extension) {
+                case 'jpg':
+                case 'jpeg':
+                    $image = imagecreatefromjpeg($filePath);
+                    break;
+                case 'png':
+                    $image = imagecreatefrompng($filePath);
+                    break;
+                case 'gif':
+                    $image = imagecreatefromgif($filePath);
+                    break;
+                case 'webp':
+                    $image = imagecreatefromwebp($filePath);
+                    break;
+            }
+
+            if ($image === false) {
+                error_log("[강의이미지최적화] 이미지 로드 실패, 원본 유지");
+                return;
+            }
+
+            // 원본 크기
+            $originalWidth = imagesx($image);
+            $originalHeight = imagesy($image);
+            error_log("[강의이미지최적화] 원본 크기: {$originalWidth}x{$originalHeight}");
+
+            // 🎯 리사이징: 최대 2000px (긴 쪽 기준)
+            $maxDimension = 2000;
+            $needsResize = ($originalWidth > $maxDimension || $originalHeight > $maxDimension);
+
+            if ($needsResize) {
+                // 비율 유지하면서 리사이징
+                $ratio = min($maxDimension / $originalWidth, $maxDimension / $originalHeight);
+                $newWidth = (int)($originalWidth * $ratio);
+                $newHeight = (int)($originalHeight * $ratio);
+
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+
+                // PNG/GIF 투명도 보존
+                if ($extension === 'png' || $extension === 'gif') {
+                    imagealphablending($resizedImage, false);
+                    imagesavealpha($resizedImage, true);
+                    $transparent = imagecolorallocatealpha($resizedImage, 0, 0, 0, 127);
+                    imagefill($resizedImage, 0, 0, $transparent);
+                }
+
+                // 고품질 리샘플링
+                imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+                imagedestroy($image);
+                $image = $resizedImage;
+
+                error_log("[강의이미지최적화] 리사이징: {$originalWidth}x{$originalHeight} → {$newWidth}x{$newHeight}");
+            }
+
+            // 🎯 WebP 변환 (PNG 투명도 보존)
+            $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $filePath);
+
+            if ($extension === 'png') {
+                // PNG는 투명도 보존
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+                imagewebp($image, $webpPath, 85); // 85% 품질
+            } else {
+                // JPEG/GIF는 일반 WebP
+                imagewebp($image, $webpPath, 85);
+            }
+
+            $webpSize = filesize($webpPath);
+            $reduction = (1 - ($webpSize / $originalSize)) * 100;
+
+            error_log("[강의이미지최적화] WebP 변환 완료");
+            error_log("[강의이미지최적화] 용량: " . number_format($originalSize) . " → " . number_format($webpSize) . " bytes");
+            error_log("[강의이미지최적화] 감소율: " . number_format($reduction, 1) . "%");
+
+            // 원본 파일 삭제하고 WebP로 교체
+            if ($webpSize < $originalSize && file_exists($webpPath)) {
+                unlink($filePath);
+                rename($webpPath, preg_replace('/\.[^.]+$/', '.webp', $filePath));
+                error_log("[강의이미지최적화] 원본 삭제, WebP로 교체");
+            } else {
+                // WebP가 더 크면 원본 유지하고 WebP 삭제
+                if (file_exists($webpPath)) {
+                    unlink($webpPath);
+                }
+                // 원본 파일 재압축
+                if ($extension === 'jpg' || $extension === 'jpeg') {
+                    imagejpeg($image, $filePath, 85);
+                } elseif ($extension === 'png') {
+                    imagealphablending($image, false);
+                    imagesavealpha($image, true);
+                    imagepng($image, $filePath, 6); // 압축 레벨 6
+                }
+                error_log("[강의이미지최적화] WebP가 더 큼, 원본 유지 및 재압축");
+            }
+
+            imagedestroy($image);
+
+        } catch (Exception $e) {
+            error_log('[강의이미지최적화] 오류: ' . $e->getMessage());
+            // 최적화 실패는 치명적이지 않으므로 계속 진행
+        }
+    }
+
 }
 ?>

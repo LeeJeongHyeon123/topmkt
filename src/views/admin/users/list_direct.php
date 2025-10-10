@@ -1161,23 +1161,9 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         return statusMap[status] || status;
     }
 
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('ko-KR');
-    }
-
-    // 날짜/시간 포맷 함수 (상세 정보용)
-    function formatDateTime(dateString) {
-        if (!dateString) return '없음';
-        const date = new Date(dateString);
-        return date.toLocaleString('ko-KR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
+    // 🚀 Phase 7: formatDate/formatDateTime 중복 제거
+    // DateUtils (date-utils.js.php) 전역 함수 사용
+    // window.formatDate(), window.formatDateTime() 자동 사용
 
     // 기업 상태 텍스트 변환 함수
     function getCorpStatusText(status) {

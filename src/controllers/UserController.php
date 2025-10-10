@@ -597,27 +597,41 @@ class UserController {
             throw new Exception('이미지 리사이징에 실패했습니다.');
         }
         
-        // 이미지 저장
+        // 🚀 Phase 4: 모든 이미지를 WebP로 변환 저장
+        // 기존 확장자를 .webp로 변경
+        $webpTargetPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $targetPath);
+
+        // PNG 투명도 보존
+        if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
+            imagealphablending($newImage, false);
+            imagesavealpha($newImage, true);
+        }
+
+        // WebP로 저장
         $saveResult = false;
-        switch ($imageType) {
-            case IMAGETYPE_JPEG:
-                $saveResult = imagejpeg($newImage, $targetPath, 85);
-                break;
-            case IMAGETYPE_PNG:
-                $saveResult = imagepng($newImage, $targetPath, 8);
-                break;
-            case IMAGETYPE_GIF:
-                $saveResult = imagegif($newImage, $targetPath);
-                break;
-            case IMAGETYPE_WEBP:
-                if (function_exists('imagewebp')) {
-                    $saveResult = imagewebp($newImage, $targetPath, 85);
-                } else {
-                    // WebP 지원 안 되면 JPEG로 저장
-                    $targetPath = str_replace('.webp', '.jpg', $targetPath);
+        if (function_exists('imagewebp')) {
+            $saveResult = imagewebp($newImage, $webpTargetPath, 85);
+            if ($saveResult) {
+                error_log("✅ UserController: WebP 변환 완료 - " . basename($webpTargetPath));
+                // targetPath도 WebP 경로로 업데이트
+                $targetPath = $webpTargetPath;
+            }
+        }
+
+        // WebP 변환 실패 시 원본 형식으로 저장 (fallback)
+        if (!$saveResult) {
+            switch ($imageType) {
+                case IMAGETYPE_JPEG:
                     $saveResult = imagejpeg($newImage, $targetPath, 85);
-                }
-                break;
+                    break;
+                case IMAGETYPE_PNG:
+                    $saveResult = imagepng($newImage, $targetPath, 8);
+                    break;
+                case IMAGETYPE_GIF:
+                    $saveResult = imagegif($newImage, $targetPath);
+                    break;
+            }
+            error_log("⚠️ UserController: WebP 변환 실패, 원본 형식 저장 - " . basename($targetPath));
         }
         
         // 메모리 해제

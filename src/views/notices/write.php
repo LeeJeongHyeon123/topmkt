@@ -970,8 +970,8 @@ function submitForm() {
         if (data.success) {
             // 폼 제출 성공 상태로 설정
             isFormSubmitted = true;
-            
-            Toast.success(<?= $isEdit ? '공지사항이 성공적으로 수정되었습니다.' : '공지사항이 성공적으로 작성되었습니다.' ?>);
+
+            Toast.success('<?= $isEdit ? '공지사항이 성공적으로 수정되었습니다.' : '공지사항이 성공적으로 작성되었습니다.' ?>');
             window.location.href = '/notices/' + data.data.id;
         } else {
             throw new Error(data.message || '저장 중 오류가 발생했습니다.');

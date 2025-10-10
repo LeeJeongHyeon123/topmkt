@@ -209,12 +209,17 @@ class EventController extends LectureController {
             // 다중 강사 정보 추가 (lecture_instructors 테이블에서)
             $event['instructors'] = $this->getEventInstructors($eventId);
 
+            // 🚀 v3.64.0 Phase 1: instructor_image fallback도 WebP 지원
+            if (!empty($event['instructor_image'])) {
+                $event['instructor_image'] = $this->getWebPImagePath($event['instructor_image']);
+            }
+
             // 현재 신청인원 수 계산 (승인된 신청과 대기 중인 신청)
             $registrationCountSql = "SELECT COUNT(*) as count FROM event_registrations WHERE event_id = ? AND status IN ('approved', 'pending')";
             $registrationResult = $this->db->fetch($registrationCountSql, [$eventId]);
             $event['current_registration_count'] = $registrationResult ? intval($registrationResult['count']) : 0;
         }
-        
+
         return $event;
     }
     
@@ -244,12 +249,17 @@ class EventController extends LectureController {
             // 다중 강사 정보 추가 (lecture_instructors 테이블에서)
             $event['instructors'] = $this->getEventInstructors($eventId);
 
+            // 🚀 v3.64.0 Phase 1: instructor_image fallback도 WebP 지원
+            if (!empty($event['instructor_image'])) {
+                $event['instructor_image'] = $this->getWebPImagePath($event['instructor_image']);
+            }
+
             // 현재 신청인원 수 계산 (승인된 신청과 대기 중인 신청)
             $registrationCountSql = "SELECT COUNT(*) as count FROM event_registrations WHERE event_id = ? AND status IN ('approved', 'pending')";
             $registrationResult = $this->db->fetch($registrationCountSql, [$eventId]);
             $event['current_registration_count'] = $registrationResult ? intval($registrationResult['count']) : 0;
         }
-        
+
         return $event;
     }
     
@@ -292,11 +302,11 @@ class EventController extends LectureController {
                 ];
             }
             
-            // 데이터베이스 결과를 URL 형식으로 변환
+            // 🚀 v3.64.0 Phase 1: 데이터베이스 결과를 URL 형식으로 변환 + WebP 경로 확인
             return array_map(function($image) {
                 return [
                     'id' => $image['id'],
-                    'url' => $image['image_path'],
+                    'url' => $this->getWebPImagePath($image['image_path']),
                     'alt_text' => $image['alt_text'] ?? ''
                 ];
             }, $images);
@@ -314,15 +324,19 @@ class EventController extends LectureController {
         try {
             $sql = "
                 SELECT instructor_name as name, instructor_info as info, instructor_image as image, sort_order
-                FROM lecture_instructors 
-                WHERE lecture_id = ? 
+                FROM lecture_instructors
+                WHERE lecture_id = ?
                 ORDER BY sort_order ASC, id ASC
             ";
-            
+
             $instructors = $this->db->fetchAll($sql, [$eventId]);
-            
-            return $instructors;
-            
+
+            // 🚀 v3.64.0 Phase 1: 강사 이미지도 WebP 경로 확인
+            return array_map(function($instructor) {
+                $instructor['image'] = $this->getWebPImagePath($instructor['image']);
+                return $instructor;
+            }, $instructors);
+
         } catch (Exception $e) {
             error_log("EventController::getEventInstructors 오류: " . $e->getMessage());
             return [];
@@ -514,9 +528,13 @@ class EventController extends LectureController {
             
             // 성공 메시지 설정
             $_SESSION['success_message'] = '행사가 성공적으로 등록되었습니다.';
-            
-            // 행사 상세 페이지로 리다이렉트
-            header('Location: /events/detail?id=' . $eventId);
+
+            // 🚀 v3.64.0: Ajax 요청에는 JSON 응답 반환
+            ResponseHelper::json([
+                'success' => true,
+                'message' => '행사가 성공적으로 등록되었습니다.',
+                'redirect' => '/events/detail?id=' . $eventId
+            ], 200);
             exit;
             
         } catch (Exception $e) {
@@ -1551,18 +1569,33 @@ class EventController extends LectureController {
             
             // 파일 이동
             if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+                // 🚀 v3.64.0 Phase 1: 이미지 최적화 (WebP 변환 + 리사이징)
+                $this->optimizeImage($uploadPath, $fileExtension);
+
+                // 최적화 후 파일명이 WebP로 변경되었을 수 있음
+                $optimizedPath = $uploadPath;
+                $optimizedFileName = $fileName;
+
+                if (!file_exists($uploadPath) && file_exists(preg_replace('/\.[^.]+$/', '.webp', $uploadPath))) {
+                    // WebP로 변환된 경우
+                    $optimizedPath = preg_replace('/\.[^.]+$/', '.webp', $uploadPath);
+                    $optimizedFileName = preg_replace('/\.[^.]+$/', '.webp', $fileName);
+                }
+
+                $finalFileSize = file_exists($optimizedPath) ? filesize($optimizedPath) : $file['size'];
+
                 // 웹 경로 생성
-                $webPath = '/assets/uploads/events/' . date('Y/m') . '/' . $fileName;
-                
+                $webPath = '/assets/uploads/events/' . date('Y/m') . '/' . $optimizedFileName;
+
                 // 성공 응답
                 ResponseHelper::json([
                     'success' => true,
                     'message' => '이미지가 성공적으로 업로드되었습니다.',
                     'data' => [
                         'url' => $webPath,
-                        'filename' => $fileName,
+                        'filename' => $optimizedFileName,
                         'original_name' => $file['name'],
-                        'size' => $file['size'],
+                        'size' => $finalFileSize,
                         'type' => $fileType
                     ]
                 ], 200);
@@ -1761,8 +1794,27 @@ class EventController extends LectureController {
                     
                     // 파일 이동
                     if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-                        $webPath = '/assets/uploads/events/' . date('Y/m') . '/' . $fileName;
-                        
+                        // 🚀 v3.64.0 Phase 1: 이미지 최적화 (WebP 변환 + 리사이징)
+                        $this->optimizeImage($uploadPath, $fileExtension);
+
+                        // 최적화 후 파일명이 WebP로 변경되었을 수 있음
+                        $optimizedPath = $uploadPath;
+                        $optimizedFileName = $fileName;
+
+                        if (!file_exists($uploadPath) && file_exists(preg_replace('/\.[^.]+$/', '.webp', $uploadPath))) {
+                            // WebP로 변환된 경우
+                            $optimizedPath = preg_replace('/\.[^.]+$/', '.webp', $uploadPath);
+                            $optimizedFileName = preg_replace('/\.[^.]+$/', '.webp', $fileName);
+                            WebLogger::info('processUploadedEventImages: WebP 변환 완료', [
+                                'event_id' => $eventId,
+                                'file_index' => $i,
+                                'original_file' => $fileName,
+                                'webp_file' => $optimizedFileName
+                            ]);
+                        }
+
+                        $webPath = '/assets/uploads/events/' . date('Y/m') . '/' . $optimizedFileName;
+
                         WebLogger::info('processUploadedEventImages: 데이터베이스 저장 시도', [
                             'event_id' => $eventId,
                             'file_index' => $i,
@@ -1770,11 +1822,11 @@ class EventController extends LectureController {
                             'alt_text' => $file['name'],
                             'sort_order' => $i
                         ]);
-                        
+
                         // 데이터베이스에 저장
-                        $sql = "INSERT INTO event_images (event_id, image_path, alt_text, sort_order, created_at) 
+                        $sql = "INSERT INTO event_images (event_id, image_path, alt_text, sort_order, created_at)
                                VALUES (?, ?, ?, ?, NOW())";
-                        
+
                         $this->db->execute($sql, [
                             $eventId,
                             $webPath,
@@ -2188,12 +2240,13 @@ class EventController extends LectureController {
                 $this->processInstructorImages($eventId, $_FILES['instructor_images']);
             }
             
-            // 성공 메시지 설정
-            $_SESSION['success_message'] = '행사가 성공적으로 수정되었습니다.';
-            
-            // 행사 상세 페이지로 리다이렉트
-            header('Location: /events/detail?id=' . $eventId);
-            exit;
+            // v3.64.0: JSON 응답 반환 (프론트엔드 ApiClient가 JSON 기대)
+            ResponseHelper::json([
+                'success' => true,
+                'message' => '행사가 성공적으로 수정되었습니다.',
+                'redirect' => '/events/detail?id=' . $eventId
+            ], 200);
+            return;
             
         } catch (Exception $e) {
             error_log("EventController::update 오류: " . $e->getMessage());
@@ -2449,12 +2502,27 @@ class EventController extends LectureController {
                 
                 // 파일 이동
                 if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+                    // 🚀 v3.64.0 Phase 1: 이미지 최적화 (WebP 변환 + 리사이징)
+                    $this->optimizeImage($uploadPath, $fileExtension);
+
+                    // 최적화 후 파일명이 WebP로 변경되었을 수 있음
+                    $optimizedPath = $uploadPath;
+                    $optimizedFileName = $uniqueFileName;
+
+                    if (!file_exists($uploadPath) && file_exists(preg_replace('/\.[^.]+$/', '.webp', $uploadPath))) {
+                        // WebP로 변환된 경우
+                        $optimizedPath = preg_replace('/\.[^.]+$/', '.webp', $uploadPath);
+                        $optimizedFileName = preg_replace('/\.[^.]+$/', '.webp', $uniqueFileName);
+                    }
+
+                    $webPath = '/assets/uploads/instructors/' . $optimizedFileName;
+
                     // 기존 이미지 파일 삭제
                     if ($currentImagePath && file_exists(ROOT_PATH . '/public' . $currentImagePath)) {
                         unlink(ROOT_PATH . '/public' . $currentImagePath);
                     }
-                    
-                    error_log("handleSingleInstructorImage: 새 이미지 업로드 성공 - " . $webPath);
+
+                    error_log("handleSingleInstructorImage: 새 이미지 업로드 성공 (최적화 완료) - " . $webPath);
                     return $webPath;
                 } else {
                     error_log("handleSingleInstructorImage: 파일 이동 실패");
@@ -2975,12 +3043,157 @@ class EventController extends LectureController {
                 ORDER BY l.start_date ASC, l.start_time ASC
                 LIMIT :limit
             ";
-            
+
             return $this->db->fetchAll($sql, [':limit' => $limit]);
         } catch (Exception $e) {
             error_log("다가오는 행사 조회 오류: " . $e->getMessage());
             return [];
         }
     }
-    
+
+    /**
+     * 🚀 v3.64.0 Phase 1: 이미지 경로를 WebP로 변환 (파일 존재 시)
+     *
+     * @param string $imagePath 원본 이미지 경로 (예: /assets/uploads/events/image.jpg)
+     * @return string WebP 경로 또는 원본 경로
+     */
+    private function getWebPImagePath($imagePath) {
+        if (empty($imagePath)) {
+            return $imagePath;
+        }
+
+        // 이미 WebP면 그대로 반환
+        if (preg_match('/\.webp$/i', $imagePath)) {
+            return $imagePath;
+        }
+
+        // WebP 경로 생성
+        $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $imagePath);
+        $fullWebpPath = ROOT_PATH . '/public' . $webpPath;
+
+        // WebP 파일이 존재하면 WebP 경로 반환, 아니면 원본 반환
+        if (file_exists($fullWebpPath)) {
+            return $webpPath;
+        }
+
+        return $imagePath;
+    }
+
+    /**
+     * 🚀 v3.64.0 Phase 1: 이미지 최적화 (WebP 변환 + 리사이징)
+     * LectureController/MediaController와 동일한 로직
+     *
+     * @param string $filePath 업로드된 이미지 파일 경로
+     * @param string $extension 이미지 파일 확장자 (jpg, jpeg, png, gif, webp)
+     */
+    private function optimizeImage($filePath, $extension) {
+        try {
+            $originalSize = filesize($filePath);
+            error_log("[행사이미지최적화] 시작 - 원본: " . number_format($originalSize) . " bytes");
+
+            // 원본 이미지 로드
+            $image = null;
+            switch ($extension) {
+                case 'jpg':
+                case 'jpeg':
+                    $image = imagecreatefromjpeg($filePath);
+                    break;
+                case 'png':
+                    $image = imagecreatefrompng($filePath);
+                    break;
+                case 'gif':
+                    $image = imagecreatefromgif($filePath);
+                    break;
+                case 'webp':
+                    $image = imagecreatefromwebp($filePath);
+                    break;
+            }
+
+            if ($image === false) {
+                error_log("[행사이미지최적화] 이미지 로드 실패, 원본 유지");
+                return;
+            }
+
+            // 원본 크기
+            $originalWidth = imagesx($image);
+            $originalHeight = imagesy($image);
+            error_log("[행사이미지최적화] 원본 크기: {$originalWidth}x{$originalHeight}");
+
+            // 🎯 리사이징: 최대 2000px (긴 쪽 기준)
+            $maxDimension = 2000;
+            $needsResize = ($originalWidth > $maxDimension || $originalHeight > $maxDimension);
+
+            if ($needsResize) {
+                // 비율 유지하면서 리사이징
+                $ratio = min($maxDimension / $originalWidth, $maxDimension / $originalHeight);
+                $newWidth = (int)($originalWidth * $ratio);
+                $newHeight = (int)($originalHeight * $ratio);
+
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+
+                // PNG/GIF 투명도 보존
+                if ($extension === 'png' || $extension === 'gif') {
+                    imagealphablending($resizedImage, false);
+                    imagesavealpha($resizedImage, true);
+                    $transparent = imagecolorallocatealpha($resizedImage, 0, 0, 0, 127);
+                    imagefill($resizedImage, 0, 0, $transparent);
+                }
+
+                // 고품질 리샘플링
+                imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+                imagedestroy($image);
+                $image = $resizedImage;
+
+                error_log("[행사이미지최적화] 리사이징: {$originalWidth}x{$originalHeight} → {$newWidth}x{$newHeight}");
+            }
+
+            // 🎯 WebP 변환 (PNG 투명도 보존)
+            $webpPath = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $filePath);
+
+            if ($extension === 'png') {
+                // PNG는 투명도 보존
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+                imagewebp($image, $webpPath, 85); // 85% 품질
+            } else {
+                // JPEG/GIF는 일반 WebP
+                imagewebp($image, $webpPath, 85);
+            }
+
+            $webpSize = filesize($webpPath);
+            $reduction = (1 - ($webpSize / $originalSize)) * 100;
+
+            error_log("[행사이미지최적화] WebP 변환 완료");
+            error_log("[행사이미지최적화] 용량: " . number_format($originalSize) . " → " . number_format($webpSize) . " bytes");
+            error_log("[행사이미지최적화] 감소율: " . number_format($reduction, 1) . "%");
+
+            // 원본 파일 삭제하고 WebP로 교체
+            if ($webpSize < $originalSize && file_exists($webpPath)) {
+                unlink($filePath);
+                rename($webpPath, preg_replace('/\.[^.]+$/', '.webp', $filePath));
+                error_log("[행사이미지최적화] 원본 삭제, WebP로 교체");
+            } else {
+                // WebP가 더 크면 원본 유지하고 WebP 삭제
+                if (file_exists($webpPath)) {
+                    unlink($webpPath);
+                }
+                // 원본 파일 재압축
+                if ($extension === 'jpg' || $extension === 'jpeg') {
+                    imagejpeg($image, $filePath, 85);
+                } elseif ($extension === 'png') {
+                    imagealphablending($image, false);
+                    imagesavealpha($image, true);
+                    imagepng($image, $filePath, 6); // 압축 레벨 6
+                }
+                error_log("[행사이미지최적화] WebP가 더 큼, 원본 유지 및 재압축");
+            }
+
+            imagedestroy($image);
+
+        } catch (Exception $e) {
+            error_log('[행사이미지최적화] 오류: ' . $e->getMessage());
+            // 최적화 실패는 치명적이지 않으므로 계속 진행
+        }
+    }
+
 }

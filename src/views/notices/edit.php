@@ -653,8 +653,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (result.success) {
                 Toast.success('공지사항이 성공적으로 수정되었습니다.');
+                // result.notice_id 또는 result.data.notice_id 또는 URL에서 ID 추출
+                const noticeId = result.notice_id || result.data?.notice_id || <?= $notice['id'] ?>;
                 setTimeout(() => {
-                    window.location.href = '/notices/' + result.notice_id;
+                    window.location.href = '/notices/' + noticeId;
                 }, 1500);
             } else {
                 Toast.error(result.message || '수정 중 오류가 발생했습니다.');
