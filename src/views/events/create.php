@@ -53,9 +53,8 @@ if (!isset($_SESSION['csrf_token'])) {
 <!-- 카카오 주소 검색 API -->
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-<!-- 🚀 v3.68.0: Flatpickr datetime picker 라이브러리 -->
+<!-- 🚀 v3.68.1: Flatpickr datetime picker 라이브러리 (간소화) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 
@@ -854,7 +853,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="form-group">
                     <label for="registration_deadline" class="form-label required">신청 마감일</label>
                     <input type="datetime-local" id="registration_deadline" name="registration_deadline" class="form-input" required
-                           value="<?php 
+                           placeholder="날짜와 시간을 선택하세요"
+                           value="<?php
                                if ($isEditMode && !empty($event['registration_deadline'])) {
                                    $timestamp = strtotime($event['registration_deadline']);
                                    echo $timestamp ? htmlspecialchars(date('Y-m-d\TH:i', $timestamp), ENT_QUOTES, 'UTF-8') : '';
@@ -2234,27 +2234,25 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 </script>
 
-<!-- 🚀 v3.68.0: Flatpickr 커스텀 스타일 (명확한 테두리) -->
+<!-- 🚀 v3.68.1: Flatpickr 간소화된 커스텀 스타일 -->
 <style>
-/* 📌 Flatpickr 캘린더 전체 테두리 스타일 */
+/* 📌 캘린더 전체: 명확한 3px 테두리 */
 .flatpickr-calendar {
     border: 3px solid #667eea !important;
-    border-radius: 12px !important;
-    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3) !important;
-    font-family: 'Noto Sans KR', sans-serif !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    font-family: inherit !important;
 }
 
-/* Flatpickr 월/년도 헤더 스타일 */
+/* 월/년도 헤더 */
 .flatpickr-months {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    border-top-left-radius: 10px !important;
-    border-top-right-radius: 10px !important;
-    padding: 10px 0 !important;
+    background: #667eea !important;
+    border-top-left-radius: 5px !important;
+    border-top-right-radius: 5px !important;
 }
 
 .flatpickr-current-month {
     color: white !important;
-    font-weight: 600 !important;
 }
 
 .flatpickr-prev-month svg,
@@ -2262,61 +2260,75 @@ window.addEventListener('unhandledrejection', function(e) {
     fill: white !important;
 }
 
-/* 날짜 셀 스타일 */
-.flatpickr-day {
-    border: 1px solid #e5e7eb !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease !important;
-}
-
-.flatpickr-day:hover {
-    background: rgba(102, 126, 234, 0.1) !important;
+/* 선택된 날짜 */
+.flatpickr-day.selected {
+    background: #667eea !important;
     border-color: #667eea !important;
 }
 
 .flatpickr-day.today {
     border-color: #667eea !important;
-    font-weight: 700 !important;
-    background: rgba(102, 126, 234, 0.1) !important;
 }
 
-.flatpickr-day.selected {
-    background: #667eea !important;
-    border-color: #667eea !important;
-    color: white !important;
-    font-weight: 700 !important;
-}
-
-/* 시간 선택 영역 테두리 */
+/* 📌 시간 선택 영역: 정렬 수정 */
 .flatpickr-time {
-    border-top: 2px solid #667eea !important;
-    background: #f9fafb !important;
-    padding: 10px !important;
+    border-top: 2px solid #e5e7eb !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 15px 10px !important;
+    background: white !important;
 }
 
-.flatpickr-time-separator,
-.flatpickr-am-pm {
-    color: #667eea !important;
+/* 시간/분 입력 래퍼 */
+.flatpickr-time .numInputWrapper {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+/* 시간/분 입력 필드 */
+.flatpickr-time input.numInput {
+    width: 50px !important;
+    text-align: center !important;
+    font-size: 16px !important;
     font-weight: 600 !important;
+    padding: 8px 4px !important;
 }
 
-.numInputWrapper span {
+/* 구분자 (콜론) */
+.flatpickr-time-separator {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    padding: 0 4px !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    align-self: center !important;
+}
+
+/* 오전/오후 */
+.flatpickr-am-pm {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 8px 12px !important;
     border: 1px solid #d1d5db !important;
     border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    background: white !important;
 }
 
-.numInputWrapper span:hover {
+.flatpickr-am-pm:hover {
     background: #667eea !important;
+    color: white !important;
     border-color: #667eea !important;
 }
 
-/* 입력 필드 스타일 (Flatpickr가 적용된 input) */
+/* 입력 필드 */
 input.flatpickr-input {
     border: 2px solid #d1d5db !important;
     border-radius: 8px !important;
-    padding: 10px 40px 10px 12px !important;
-    transition: all 0.3s ease !important;
-    font-size: 14px !important;
+    padding: 10px 12px !important;
 }
 
 input.flatpickr-input:focus {
@@ -2325,31 +2337,9 @@ input.flatpickr-input:focus {
     outline: none !important;
 }
 
-input.flatpickr-input:hover {
-    border-color: #9ca3af !important;
-}
-
-/* 비활성화된 날짜 스타일 */
+/* 비활성화 날짜 */
 .flatpickr-day.flatpickr-disabled {
     color: #d1d5db !important;
-    background: #f9fafb !important;
     cursor: not-allowed !important;
-    text-decoration: line-through !important;
-}
-
-/* 애니메이션 효과 */
-.flatpickr-calendar.open {
-    animation: flatpickrFadeIn 0.3s ease !important;
-}
-
-@keyframes flatpickrFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 </style>
