@@ -2412,17 +2412,20 @@ window.addEventListener('unhandledrejection', function(e) {
     color: white !important;
 }
 
-/* 입력 필드 */
+/* 📌 입력 필드: form-input과 완전 동일한 스타일 (일관성) */
 input.flatpickr-input {
     border: 2px solid #d1d5db !important;
     border-radius: 8px !important;
     padding: 10px 12px !important;
+    transition: all 0.3s ease !important;
 }
 
+/* 📌 Focus 스타일: 시작일/종료일과 완전 동일 */
 input.flatpickr-input:focus {
     border-color: #667eea !important;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
     outline: none !important;
+    transform: translateY(-1px) !important;
 }
 
 /* 비활성화 날짜 */
