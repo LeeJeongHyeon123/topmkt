@@ -851,20 +851,33 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="form-row">
                 <div class="form-group">
-                    <label for="registration_deadline" class="form-label required">신청 마감일</label>
-                    <input type="text" id="registration_deadline" name="registration_deadline" class="form-input" required
-                           placeholder="날짜와 시간을 선택하세요"
+                    <label for="registration_deadline_date" class="form-label required">신청 마감일</label>
+                    <input type="date" id="registration_deadline_date" name="registration_deadline_date" class="form-input" required
                            value="<?php
                                if ($isEditMode && !empty($event['registration_deadline'])) {
                                    $timestamp = strtotime($event['registration_deadline']);
-                                   echo $timestamp ? htmlspecialchars(date('Y-m-d H:i', $timestamp), ENT_QUOTES, 'UTF-8') : '';
+                                   echo $timestamp ? htmlspecialchars(date('Y-m-d', $timestamp), ENT_QUOTES, 'UTF-8') : '';
                                } else {
                                    echo '';
                                }
                            ?>">
                     <div class="help-text">참가 신청 마감 일시를 설정하세요. 이 일시 이후로는 신청이 불가합니다.</div>
                 </div>
+                <div class="form-group">
+                    <label for="registration_deadline_time" class="form-label required">신청 마감시간</label>
+                    <input type="time" id="registration_deadline_time" name="registration_deadline_time" class="form-input" required
+                           value="<?php
+                               if ($isEditMode && !empty($event['registration_deadline'])) {
+                                   $timestamp = strtotime($event['registration_deadline']);
+                                   echo $timestamp ? htmlspecialchars(date('H:i', $timestamp), ENT_QUOTES, 'UTF-8') : '';
+                               } else {
+                                   echo '';
+                               }
+                           ?>">
+                </div>
             </div>
+            <!-- Hidden field: 날짜+시간 합친 값을 백엔드로 전송 -->
+            <input type="hidden" id="registration_deadline" name="registration_deadline" value="<?= $isEditMode && !empty($event['registration_deadline']) ? htmlspecialchars($event['registration_deadline'], ENT_QUOTES, 'UTF-8') : '' ?>">
         </div>
 
         <!-- 장소 정보 섹션 -->
@@ -1091,11 +1104,20 @@ function initializeForm() {
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         // 에디터 내용을 hidden textarea에 복사
         const editorContent = quill.root.innerHTML;
         document.getElementById('description').value = editorContent;
-        
+
+        // 🚀 v3.72.0: 신청 마감일 날짜+시간 합치기 (백엔드 호환성)
+        const deadlineDate = document.getElementById('registration_deadline_date').value;
+        const deadlineTime = document.getElementById('registration_deadline_time').value;
+        if (deadlineDate && deadlineTime) {
+            const combinedDeadline = `${deadlineDate} ${deadlineTime}`;
+            document.getElementById('registration_deadline').value = combinedDeadline;
+            console.log('✅ 신청 마감일 합치기:', combinedDeadline);
+        }
+
         // 폼을 FormData로 변환하여 파일 업로드 지원
         const formData = new FormData(form);
         
@@ -1698,66 +1720,23 @@ function initializeDateRestrictions() {
         console.log('✅ 종료일 최소 날짜 설정:', today);
     }
 
-    // 🚀 v3.68.2: Flatpickr를 사용한 신청 마감일 커스텀 datetime picker (년도 선택 가능)
-    const deadlineInput = document.getElementById('registration_deadline');
-    if (deadlineInput && typeof flatpickr !== 'undefined') {
-        flatpickr(deadlineInput, {
-            enableTime: true,              // 시간 선택 활성화
-            dateFormat: "Y-m-d H:i",       // 날짜 형식 (2025-10-10 21:30)
-            time_24hr: false,              // 12시간 형식 (오전/오후)
-            minDate: "today",              // 오늘 이전 날짜 선택 불가
-            locale: "ko",                  // 한국어
-            disableMobile: true,           // 모바일에서도 커스텀 UI 사용
+    // 🚀 v3.72.0: 신청 마감일 네이티브 input (시작일/종료일과 동일한 구조)
+    const deadlineDateInput = document.getElementById('registration_deadline_date');
+    const deadlineTimeInput = document.getElementById('registration_deadline_time');
 
-            // 📌 테두리 스타일 + 년도 선택 활성화
-            onReady: function(selectedDates, dateStr, instance) {
-                // Flatpickr 캘린더에 깔끔한 테두리 추가
-                const calendar = instance.calendarContainer;
-                calendar.style.border = '1px solid #e5e7eb';
-                calendar.style.borderRadius = '8px';
-                calendar.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
-
-                // 🔥 년도 선택 가능하게 설정 (클릭해서 직접 입력 가능)
-                const yearElement = instance.currentYearElement;
-                if (yearElement) {
-                    yearElement.removeAttribute('disabled');
-                    yearElement.style.pointerEvents = 'auto';
-                    yearElement.style.cursor = 'text';
-                    yearElement.setAttribute('type', 'number');
-                    yearElement.setAttribute('min', new Date().getFullYear());
-                    yearElement.setAttribute('max', new Date().getFullYear() + 10);
-                    console.log('✅ 년도 직접 입력 활성화');
-                }
-
-                console.log('✅ Flatpickr 신청 마감일 초기화 완료 (깔끔한 디자인 + 년도 선택)');
-            },
-
-            // 기존 값 복원 (수정 모드)
-            defaultDate: deadlineInput.value || null,
-
-            // 날짜 변경 시 값 업데이트 (Flatpickr dateFormat과 동일하게)
-            onChange: function(selectedDates, dateStr, instance) {
-                if (selectedDates.length > 0) {
-                    const date = selectedDates[0];
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const hours = String(date.getHours()).padStart(2, '0');
-                    const minutes = String(date.getMinutes()).padStart(2, '0');
-
-                    // 🔥 공백 구분 형식으로 변환 (YYYY-MM-DD HH:mm) - T 제거!
-                    deadlineInput.value = `${year}-${month}-${day} ${hours}:${minutes}`;
-                    console.log('✅ 신청 마감일 선택:', deadlineInput.value);
-                }
-            }
-        });
-    } else if (deadlineInput) {
-        // Flatpickr 로드 실패 시 네이티브 datetime-local 폴백
-        deadlineInput.setAttribute('min', nowDatetime);
-        deadlineInput.addEventListener('click', function() {
+    if (deadlineDateInput) {
+        deadlineDateInput.setAttribute('min', today);
+        deadlineDateInput.addEventListener('click', function() {
             openDatePicker(this);
         });
-        console.warn('⚠️ Flatpickr 로드 실패, 네이티브 datetime picker 사용');
+        console.log('✅ 신청 마감일 최소 날짜 설정:', today);
+    }
+
+    if (deadlineTimeInput) {
+        deadlineTimeInput.addEventListener('click', function() {
+            openDatePicker(this);
+        });
+        console.log('✅ 신청 마감시간 클릭 이벤트 설정 완료');
     }
 
     // 🚀 v3.67.4: 시간 필드 클릭 시 시간 선택 모달 자동 열기
@@ -2247,187 +2226,16 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 </script>
 
-<!-- 🚀 v3.69.0: 세련되고 깔끔한 Flatpickr 디자인 (네이티브 스타일에 가깝게) -->
+<!-- 🚀 v3.72.0: 네이티브 date/time input 포커스 스타일 -->
 <style>
 /* 📌 모든 date/time input: 파란색 통일 */
 input[type="date"]:focus,
 input[type="time"]:focus,
-input[type="datetime-local"]:focus,
-input.flatpickr-input:focus {
+input[type="datetime-local"]:focus {
     border-color: #007bff !important;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
     outline: none !important;
     transform: translateY(-1px) !important;
     transition: all 0.3s ease !important;
-}
-
-/* 📌 캘린더 전체: 깔끔한 얇은 테두리 */
-.flatpickr-calendar {
-    border: 1px solid #e5e7eb !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-    font-family: inherit !important;
-    overflow: hidden !important;
-}
-
-/* 📌 월/년도 헤더: 깔끔한 흰색 배경 */
-.flatpickr-months {
-    background: white !important;
-    border-bottom: 1px solid #e5e7eb !important;
-    padding: 10px 0 !important;
-}
-
-/* 월/년도 텍스트 */
-.flatpickr-current-month {
-    color: #1f2937 !important;
-    font-weight: 500 !important;
-    font-size: 14px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-}
-
-/* 📌 월 드롭다운: 미니멀 스타일 */
-.flatpickr-monthDropdown-months {
-    background: white !important;
-    color: #1f2937 !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 4px !important;
-    padding: 2px 6px !important;
-    font-weight: 500 !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-}
-
-.flatpickr-monthDropdown-months:hover {
-    background: #f9fafb !important;
-}
-
-/* 📌 년도 입력: 깔끔한 스타일 */
-.flatpickr-current-month .cur-year {
-    background: white !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 4px !important;
-    padding: 2px 6px !important;
-    color: #1f2937 !important;
-    font-weight: 500 !important;
-    font-size: 14px !important;
-    cursor: text !important;
-}
-
-.flatpickr-current-month .cur-year:hover {
-    background: #f9fafb !important;
-}
-
-/* 화살표: 회색 톤 */
-.flatpickr-prev-month svg,
-.flatpickr-next-month svg {
-    fill: #6b7280 !important;
-}
-
-.flatpickr-prev-month:hover,
-.flatpickr-next-month:hover {
-    background: #f3f4f6 !important;
-}
-
-/* 선택된 날짜: 연한 파란색 */
-.flatpickr-day.selected {
-    background: #e0f2fe !important;
-    border-color: #7dd3fc !important;
-    color: #0284c7 !important;
-    font-weight: 500 !important;
-}
-
-.flatpickr-day.today {
-    border-color: #93c5fd !important;
-    font-weight: 500 !important;
-}
-
-.flatpickr-day:hover:not(.selected):not(.flatpickr-disabled) {
-    background: #f9fafb !important;
-    border-color: #e5e7eb !important;
-}
-
-/* 📌 시간 선택 영역: 깔끔한 구분선 */
-.flatpickr-time {
-    border-top: 1px solid #e5e7eb !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    padding: 12px 10px !important;
-    background: white !important;
-}
-
-/* 시간/분 입력 래퍼 */
-.flatpickr-time .numInputWrapper {
-    display: inline-flex !important;
-    align-items: center !important;
-    height: 40px !important;
-}
-
-/* 📌 시간/분 입력 필드: 넉넉한 높이로 입력 가능한 UI */
-.flatpickr-time input.numInput {
-    width: 48px !important;
-    height: 40px !important;
-    text-align: center !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    line-height: 40px !important;
-    padding: 0 !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 4px !important;
-    background: white !important;
-    color: #1f2937 !important;
-}
-
-.flatpickr-time input.numInput:focus {
-    border-color: #60a5fa !important;
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.1) !important;
-}
-
-/* 📌 구분자 (콜론): 깔끔한 스타일 */
-.flatpickr-time-separator {
-    font-size: 16px !important;
-    font-weight: 400 !important;
-    color: #6b7280 !important;
-    padding: 0 2px !important;
-}
-
-/* 📌 오전/오후: 넉넉한 높이 + 완벽한 세로 정렬 */
-.flatpickr-am-pm {
-    min-width: 60px !important;
-    height: 40px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    line-height: 40px !important;
-    padding: 0 10px !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 4px !important;
-    cursor: pointer !important;
-    background: white !important;
-    color: #374151 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.flatpickr-am-pm:hover {
-    background: #f3f4f6 !important;
-}
-
-/* 📌 입력 필드: form-input과 동일 */
-input.flatpickr-input {
-    border: 2px solid #d1d5db !important;
-    border-radius: 8px !important;
-    padding: 10px 12px !important;
-}
-
-/* 비활성화 날짜 */
-.flatpickr-day.flatpickr-disabled {
-    color: #d1d5db !important;
-    cursor: not-allowed !important;
 }
 </style>
