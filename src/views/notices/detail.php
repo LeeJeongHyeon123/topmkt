@@ -952,9 +952,10 @@ body {
                     <?php foreach ($notice['images'] as $index => $image): ?>
                     <div class="attachment-item" onclick="openImageModal('<?= htmlspecialchars($image['file_path']) ?>')">
                         <div class="image-container">
-                            <img src="<?= htmlspecialchars($image['file_path']) ?>" 
-                                 alt="<?= htmlspecialchars($image['filename']) ?>" 
-                                 loading="lazy">
+                            <img src="<?= htmlspecialchars($image['file_path']) ?>"
+                                 alt="<?= htmlspecialchars($image['filename']) ?>"
+                                 loading="lazy"
+                                 onerror="this.onerror=null; const webpPath='<?= htmlspecialchars($image['file_path']) ?>'.replace(/\.(jpg|jpeg|png|gif)$/i, '.webp'); if(this.src !== webpPath) this.src = webpPath;">
                             <div class="image-overlay">
                                 <i class="fas fa-search-plus"></i>
                                 <span>확대보기</span>
@@ -1461,16 +1462,13 @@ function shareContent() {
 /**
  * 폴백 공유 기능 (클립보드 복사)
  */
+// 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
 function fallbackShare(title, url) {
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(() => {
-            Toast.success('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
-        }).catch(() => {
-            showShareModal(title, url);
-        });
-    } else {
+    copyToClipboard(url, {
+        successMessage: '🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
+    }).catch(() => {
         showShareModal(title, url);
-    }
+    });
 }
 
 // 전역 이벤트 핸들러 저장
@@ -1684,7 +1682,7 @@ function showShareModal(title, url) {
             </div>
             
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button onclick="navigator.clipboard.writeText('${url}').then(() => Toast.success('복사되었습니다!'))" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <button onclick="copyToClipboard('${url}')" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
                     링크 복사
                 </button>
                 <button onclick="this.closest('[style*=\\"position: fixed\\"]').remove()" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">

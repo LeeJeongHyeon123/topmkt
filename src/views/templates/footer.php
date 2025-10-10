@@ -441,23 +441,22 @@
                     
                     // 로컬 스토리지에 저장
                     localStorage.setItem('app_push_token', data.token);
-                    
-                    // 서버에 토큰 저장 (API 준비되면 주석 해제)
-                    /*
-                    fetch('/api/save-push-token', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            token: data.token,
-                            platform: 'mobile'
-                        })
+
+                    // 🚀 Phase 2: ApiClient로 서버에 토큰 저장
+                    ApiClient.post('/api/save-push-token', {
+                        token: data.token,
+                        platform: 'mobile'
+                    }, {
+                        noLoading: true, // 백그라운드 작업이므로 로딩 UI 숨김
+                        noErrorToast: true // 푸시 토큰 저장 실패는 사용자에게 표시하지 않음
                     })
-                    .then(res => res.json())
-                    .then(result => console.log('✅ 토큰 저장 성공:', result))
-                    .catch(err => console.error('❌ 토큰 저장 실패:', err));
-                    */
+                    .then(result => {
+                        console.log('✅ 푸시 토큰 서버 저장 성공:', result);
+                    })
+                    .catch(err => {
+                        console.error('❌ 푸시 토큰 저장 실패 (무시):', err);
+                        // 푸시 토큰 저장 실패는 치명적이지 않으므로 무시
+                    });
                 }
             } catch (e) {
                 console.error('메시지 파싱 실패:', e);
@@ -496,9 +495,10 @@
 <?php require_once __DIR__ . '/../includes/api-client.js.php'; ?>
 
 <!-- 🚀 v3.62.0: 날짜/시간 포맷 유틸리티 시스템 -->
-<script>
 <?php require_once __DIR__ . '/../includes/date-utils.js.php'; ?>
-</script>
+
+<!-- 🚀 v3.65.0: 클립보드 복사 유틸리티 시스템 -->
+<?php require_once __DIR__ . '/../includes/clipboard-utils.js.php'; ?>
 
 </body>
 </html> 

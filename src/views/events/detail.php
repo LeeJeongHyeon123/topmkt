@@ -3345,17 +3345,13 @@ function shareEventContent() {
 /**
  * 폴백 공유 기능 (클립보드 복사)
  */
+// 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용 (Toast.error 버그도 수정)
 function fallbackShare(title, url) {
-    // 클립보드에 URL 복사
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(() => {
-            Toast.error('🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.');
-        }).catch(() => {
-            showShareModal(title, url);
-        });
-    } else {
+    copyToClipboard(url, {
+        successMessage: '🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
+    }).catch(() => {
         showShareModal(title, url);
-    }
+    });
 }
 
 /**
@@ -3423,25 +3419,9 @@ function showShareModal(title, url) {
     });
 }
 
-/**
- * 클립보드 복사
- */
-function copyToClipboard(text) {
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            Toast.error('✅ 링크가 복사되었습니다!');
-        });
-    } else {
-        // 폴백 방법
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        Toast.error('✅ 링크가 복사되었습니다!');
-    }
-}
+// 🚀 Phase 8: copyToClipboard 중복 제거
+// ClipboardUtils (clipboard-utils.js.php) 전역 함수 사용
+// window.copyToClipboard() 자동 사용 (Toast.error 버그도 수정됨)
 
 // 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용
 

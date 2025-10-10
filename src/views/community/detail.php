@@ -758,18 +758,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     url: window.location.href
                 }).catch(console.error);
             } else {
-                // 클립보드에 URL 복사
-                navigator.clipboard.writeText(window.location.href).then(function() {
-                    Toast.success('게시글 링크가 클립보드에 복사되었습니다! 📋');
-                }).catch(function() {
-                    // 클립보드 접근 실패 시 대체 방법
-                    const textArea = document.createElement('textarea');
-                    textArea.value = window.location.href;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    Toast.success('게시글 링크가 클립보드에 복사되었습니다! 📋');
+                // 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
+                copyToClipboard(window.location.href, {
+                    successMessage: '게시글 링크가 클립보드에 복사되었습니다! 📋'
                 });
             }
         });
