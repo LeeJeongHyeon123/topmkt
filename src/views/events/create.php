@@ -2247,8 +2247,19 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 </script>
 
-<!-- 🚀 v3.68.2: Flatpickr 완전 개선된 커스텀 스타일 (오전/오후 짤림 해결, 시간 정렬, 월 박스, 테두리) -->
+<!-- 🚀 v3.68.4: 모든 날짜/시간 input 테두리 보라색 통일 -->
 <style>
+/* 📌 네이티브 date/time input: 브라우저 기본 파란색 → 보라색 강제 변경 */
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+    outline: none !important;
+    transform: translateY(-1px) !important;
+    transition: all 0.3s ease !important;
+}
+
 /* 📌 캘린더 전체: 명확한 보라색 3px 테두리 */
 .flatpickr-calendar {
     border: 3px solid #667eea !important;
