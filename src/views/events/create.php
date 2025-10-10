@@ -1735,7 +1735,7 @@ function initializeDateRestrictions() {
             // 기존 값 복원 (수정 모드)
             defaultDate: deadlineInput.value || null,
 
-            // 날짜 변경 시 hidden input 형식 변환
+            // 날짜 변경 시 값 업데이트 (Flatpickr dateFormat과 동일하게)
             onChange: function(selectedDates, dateStr, instance) {
                 if (selectedDates.length > 0) {
                     const date = selectedDates[0];
@@ -1745,8 +1745,8 @@ function initializeDateRestrictions() {
                     const hours = String(date.getHours()).padStart(2, '0');
                     const minutes = String(date.getMinutes()).padStart(2, '0');
 
-                    // datetime-local 형식으로 변환 (YYYY-MM-DDTHH:mm)
-                    deadlineInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    // 🔥 공백 구분 형식으로 변환 (YYYY-MM-DD HH:mm) - T 제거!
+                    deadlineInput.value = `${year}-${month}-${day} ${hours}:${minutes}`;
                     console.log('✅ 신청 마감일 선택:', deadlineInput.value);
                 }
             }
