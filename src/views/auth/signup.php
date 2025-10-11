@@ -77,18 +77,21 @@ require_once SRC_PATH . '/views/templates/header.php';
                         </label>
                         <div class="phone-verification-group">
                             <div class="input-wrapper phone-input-wrapper">
-                                <input 
-                                    type="tel" 
-                                    id="phone" 
-                                    name="phone" 
-                                    class="form-input phone-input" 
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    class="form-input phone-input"
                                     placeholder="010-1234-5678"
                                     value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>"
-                                    required 
+                                    required
                                     autocomplete="tel"
                                     pattern="010-[0-9]{3,4}-[0-9]{4}"
                                     maxlength="13"
                                 >
+                                <button type="button" class="phone-clear-btn" id="phone-clear-btn" title="전화번호 지우기">
+                                    ×
+                                </button>
                                 <i class="input-status-icon" id="phone-status-icon"></i>
                             </div>
                             <button type="button" id="send-verification-btn" class="btn btn-outline-primary">
@@ -321,8 +324,59 @@ require_once SRC_PATH . '/views/templates/header.php';
     align-items: stretch;
 }
 
+.phone-verification-group .btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.phone-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
 .phone-input {
     flex: 1;
+    padding-right: 70px !important;
+}
+
+.phone-clear-btn {
+    position: absolute;
+    right: 45px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.phone-clear-btn:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.phone-input-wrapper:hover .phone-clear-btn,
+.phone-input:focus ~ .phone-clear-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.phone-input-wrapper .phone-clear-btn.show {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .verification-input-group {
@@ -1052,6 +1106,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupPasswordToggle(passwordInput, passwordToggle);
     setupPasswordToggle(passwordConfirmInput, passwordConfirmToggle);
+
+    // 전화번호 삭제 버튼
+    const phoneClearBtn = document.getElementById('phone-clear-btn');
+    if (phoneClearBtn) {
+        phoneClearBtn.addEventListener('click', function() {
+            phoneInput.value = '';
+            phoneInput.focus();
+            phoneClearBtn.classList.remove('show');
+
+            // 상태 초기화
+            const statusMessage = document.getElementById('phone-status-message');
+            const statusIcon = document.getElementById('phone-status-icon');
+            if (statusMessage) statusMessage.style.display = 'none';
+            if (statusIcon) statusIcon.className = 'input-status-icon';
+            phoneInput.classList.remove('valid', 'invalid', 'error');
+
+            // 인증 상태 초기화
+            if (isPhoneVerified) {
+                resetVerification();
+            }
+
+            updateSendButtonState();
+            console.log('🗑️ 전화번호 삭제 완료');
+        });
+
+        // 전화번호 입력 시 X 버튼 표시/숨김
+        phoneInput.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                phoneClearBtn.classList.add('show');
+            } else {
+                phoneClearBtn.classList.remove('show');
+            }
+        });
+
+        // 초기 상태 설정
+        if (phoneInput.value.trim().length > 0) {
+            phoneClearBtn.classList.add('show');
+        }
+    }
 
     // 휴대폰 번호 포맷팅 및 010 검증 (백스페이스 완전 대응)
     let isDeleting = false;
