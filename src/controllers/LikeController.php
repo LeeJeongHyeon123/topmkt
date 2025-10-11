@@ -3,15 +3,13 @@
  * 좋아요 관련 컨트롤러
  */
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
-class LikeController {
-    private $db;
-    
+class LikeController extends BaseController {
     public function __construct() {
-        $this->db = Database::getInstance();
+        parent::__construct(); // BaseController의 생성자 호출
     }
     
     /**

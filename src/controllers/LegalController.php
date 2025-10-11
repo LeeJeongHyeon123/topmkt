@@ -3,7 +3,9 @@
  * 법적 문서 관련 컨트롤러
  */
 
-class LegalController {
+require_once SRC_PATH . '/controllers/BaseController.php';
+
+class LegalController extends BaseController {
     
     /**
      * 이용약관 페이지 표시
