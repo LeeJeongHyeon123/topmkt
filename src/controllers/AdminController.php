@@ -84,20 +84,13 @@ class AdminController {
     
     /**
      * 관리자 대시보드 메인 페이지
+     *
+     * Ultra Think: 서비스 초기 단계에서는 대시보드보다 기업 인증 처리가 우선순위가 높음
+     * /admin 접속 시 기업 인증 대기 페이지로 자동 리다이렉트
      */
     public function dashboard() {
-        // 대시보드 데이터 수집
-        $dashboardData = $this->getDashboardData();
-        
-        // 헤더 데이터
-        $headerData = [
-            'title' => '관리자 대시보드 - 탑마케팅',
-            'description' => '탑마케팅 관리자 페이지',
-            'pageSection' => 'admin'
-        ];
-        
-        // 뷰 렌더링
-        $this->renderView('admin/dashboard', $dashboardData, $headerData);
+        header('Location: /admin/corporate/pending');
+        exit;
     }
     
     /**

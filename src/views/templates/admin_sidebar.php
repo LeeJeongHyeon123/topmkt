@@ -13,24 +13,17 @@
     
     <nav class="sidebar-nav">
         <div class="nav-section">
-            <div class="nav-section-title">대시보드</div>
-            <a href="/admin" class="nav-item <?= ($current_page ?? '') === 'dashboard' ? 'active' : '' ?>">
-                <i>📊</i> 메인 대시보드
-            </a>
-        </div>
-        
-        <div class="nav-section">
             <div class="nav-section-title">회원 관리</div>
             <a href="/admin/users" class="nav-item">
                 <i>👥</i> 회원 목록
             </a>
         </div>
-        
+
         <div class="nav-section">
             <div class="nav-section-title">기업회원</div>
             <a href="/admin/corporate/pending" class="nav-item <?= ($current_page ?? '') === 'corporate-pending' ? 'active' : '' ?>">
                 <i>⏱️</i> 인증 대기
-                <?php 
+                <?php
                 // 대기 중인 기업인증 수 표시 (향후 구현)
                 if (isset($pending_corps_count) && $pending_corps_count > 0): ?>
                     <span class="nav-badge"><?= $pending_corps_count ?></span>
@@ -40,6 +33,6 @@
                 <i>📋</i> 기업회원 목록
             </a>
         </div>
-        
+
     </nav>
 </aside>
