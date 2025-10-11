@@ -421,13 +421,13 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
                     <label for="business_number" class="form-label">
                         사업자등록번호 <span class="required">*</span>
                     </label>
-                    <input type="text" 
-                           id="business_number" 
-                           name="business_number" 
-                           class="form-input" 
+                    <input type="text"
+                           id="business_number"
+                           name="business_number"
+                           class="form-input"
                            value="<?= htmlspecialchars(SecurityHelper::isEncrypted($existingData['business_number'] ?? '') ? SecurityHelper::decrypt($existingData['business_number']) : ($existingData['business_number'] ?? '')) ?>"
-                           placeholder="123-45-67890" 
-                           required maxlength="100">
+                           placeholder="123-45-67890"
+                           required maxlength="12">
                     <div class="form-help">하이픈(-)을 포함하여 입력해주세요.</div>
                 </div>
 
@@ -584,16 +584,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // 페이지 로드시 해외 기업 체크 상태 확인
     toggleOverseasMode(overseasCheckbox.checked);
 
-    // 사업자번호 자동 하이픈 추가
+    // 사업자번호 자동 하이픈 추가 (123-45-67890 형식, 10자리 제한)
     document.getElementById('business_number').addEventListener('input', function(e) {
+        // 숫자만 추출
         let value = e.target.value.replace(/[^0-9]/g, '');
-        if (value.length <= 10) {
-            if (value.length > 6) {
-                value = value.replace(/(\d{3})(\d{2})(\d{0,5})/, '$1-$2-$3');
-            } else if (value.length > 3) {
-                value = value.replace(/(\d{3})(\d{0,2})/, '$1-$2');
-            }
+
+        // 10자리 숫자로 제한
+        if (value.length > 10) {
+            value = value.substring(0, 10);
         }
+
+        // 하이픈 형태로 포맷팅 (항상 적용)
+        if (value.length > 5) {
+            value = value.replace(/(\d{3})(\d{2})(\d{0,5})/, '$1-$2-$3');
+        } else if (value.length > 3) {
+            value = value.replace(/(\d{3})(\d{0,2})/, '$1-$2');
+        }
+
         e.target.value = value;
     });
 
