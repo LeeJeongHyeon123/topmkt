@@ -344,12 +344,12 @@ require_once SRC_PATH . '/views/templates/header.php';
     right: 45px;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: #e2e8f0;
     border: none;
-    color: #94a3b8;
+    color: #64748b;
     cursor: pointer;
-    padding: 5px;
-    font-size: 18px;
+    padding: 0;
+    font-size: 16px;
     line-height: 1;
     opacity: 0;
     pointer-events: none;
@@ -358,13 +358,13 @@ require_once SRC_PATH . '/views/templates/header.php';
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
 }
 
 .phone-clear-btn:hover {
-    background: #f1f5f9;
+    background: #cbd5e1;
     color: #475569;
 }
 
