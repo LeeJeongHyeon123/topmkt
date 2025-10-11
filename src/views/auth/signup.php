@@ -89,10 +89,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                                     pattern="010-[0-9]{3,4}-[0-9]{4}"
                                     maxlength="13"
                                 >
-                                <button type="button" class="phone-clear-btn" id="phone-clear-btn" title="전화번호 지우기">
-                                    ×
-                                </button>
-                                <i class="input-status-icon" id="phone-status-icon"></i>
+                                <i class="input-status-icon" id="phone-status-icon" title="전화번호 지우기"></i>
                             </div>
                             <button type="button" id="send-verification-btn" class="btn btn-outline-primary">
                                 인증번호 발송
@@ -336,47 +333,16 @@ require_once SRC_PATH . '/views/templates/header.php';
 
 .phone-input {
     flex: 1;
-    padding-right: 70px !important;
+    padding-right: 45px !important;
 }
 
-.phone-clear-btn {
-    position: absolute;
-    right: 45px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #e2e8f0;
-    border: none;
-    color: #64748b;
+.phone-input-wrapper .input-status-icon {
     cursor: pointer;
-    padding: 0;
-    font-size: 16px;
-    line-height: 1;
-    opacity: 0;
-    pointer-events: none;
     transition: all 0.2s ease;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
 }
 
-.phone-clear-btn:hover {
-    background: #cbd5e1;
-    color: #475569;
-}
-
-.phone-input-wrapper:hover .phone-clear-btn,
-.phone-input:focus ~ .phone-clear-btn {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.phone-input-wrapper .phone-clear-btn.show {
-    opacity: 1;
-    pointer-events: auto;
+.phone-input-wrapper .input-status-icon:hover {
+    transform: scale(1.1);
 }
 
 .verification-input-group {
@@ -1107,36 +1073,20 @@ document.addEventListener('DOMContentLoaded', function() {
     setupPasswordToggle(passwordInput, passwordToggle);
     setupPasswordToggle(passwordConfirmInput, passwordConfirmToggle);
 
-    // 전화번호 Clear 버튼 표시/숨김 관리 함수
-    function updatePhoneClearButton() {
-        const statusIcon = document.getElementById('phone-status-icon');
-        const phoneClearBtn = document.getElementById('phone-clear-btn');
+    // 전화번호 상태 아이콘 클릭 시 삭제
+    const phoneStatusIcon = document.getElementById('phone-status-icon');
+    if (phoneStatusIcon) {
+        phoneStatusIcon.addEventListener('click', function() {
+            // 아이콘이 표시되어 있을 때만 동작
+            if (!this.classList.contains('show')) return;
 
-        if (!phoneClearBtn) return;
-
-        // 상태 아이콘이 표시 중이면 Clear 버튼 숨김
-        if (statusIcon && statusIcon.classList.contains('show')) {
-            phoneClearBtn.classList.remove('show');
-        } else if (phoneInput.value.trim().length > 0) {
-            // 입력값이 있고 상태 아이콘이 없으면 Clear 버튼 표시
-            phoneClearBtn.classList.add('show');
-        } else {
-            phoneClearBtn.classList.remove('show');
-        }
-    }
-
-    // 전화번호 삭제 버튼
-    const phoneClearBtn = document.getElementById('phone-clear-btn');
-    if (phoneClearBtn) {
-        phoneClearBtn.addEventListener('click', function() {
             phoneInput.value = '';
             phoneInput.focus();
 
             // 상태 초기화
             const statusMessage = document.getElementById('phone-status-message');
-            const statusIcon = document.getElementById('phone-status-icon');
             if (statusMessage) statusMessage.style.display = 'none';
-            if (statusIcon) statusIcon.className = 'input-status-icon';
+            this.className = 'input-status-icon';
             phoneInput.classList.remove('valid', 'invalid', 'error');
 
             // 인증 상태 초기화
@@ -1145,17 +1095,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             updateSendButtonState();
-            updatePhoneClearButton();
             console.log('🗑️ 전화번호 삭제 완료');
         });
-
-        // 전화번호 입력 시 Clear 버튼 상태 업데이트
-        phoneInput.addEventListener('input', function() {
-            updatePhoneClearButton();
-        });
-
-        // 초기 상태 설정
-        updatePhoneClearButton();
     }
 
     // 휴대폰 번호 포맷팅 및 010 검증 (백스페이스 완전 대응)
@@ -1361,17 +1302,15 @@ document.addEventListener('DOMContentLoaded', function() {
             statusIcon.className = 'input-status-icon';
             phoneInput.classList.remove('valid', 'invalid');
             isPhoneAvailable = false;
-            updatePhoneClearButton();
             return;
         }
-        
+
         // 로딩 상태 표시
         statusMessage.style.display = 'block';
         statusIndicator.className = 'status-indicator checking';
         statusIcon.className = 'input-status-icon show checking fas fa-spinner';
         messageText.textContent = '휴대폰 번호를 확인하는 중...';
         phoneInput.classList.remove('valid', 'invalid');
-        updatePhoneClearButton();
 
         // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
         try {
@@ -1389,7 +1328,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     phoneInput.classList.add('valid');
                     phoneInput.classList.remove('invalid');
                     isPhoneAvailable = true;
-                    updatePhoneClearButton();
                 } else {
                     // 사용 불가능
                     statusIndicator.className = 'status-indicator';
@@ -1398,7 +1336,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     phoneInput.classList.add('invalid');
                     phoneInput.classList.remove('valid');
                     isPhoneAvailable = false;
-                    updatePhoneClearButton();
                 }
             } else {
                 throw new Error(result.message || '중복 검사 중 오류가 발생했습니다.');
@@ -1413,7 +1350,6 @@ document.addEventListener('DOMContentLoaded', function() {
             phoneInput.classList.add('invalid');
             phoneInput.classList.remove('valid');
             isPhoneAvailable = false;
-            updatePhoneClearButton();
         }
         
         updateFormValidation();
