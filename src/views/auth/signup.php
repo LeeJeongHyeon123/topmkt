@@ -1107,13 +1107,30 @@ document.addEventListener('DOMContentLoaded', function() {
     setupPasswordToggle(passwordInput, passwordToggle);
     setupPasswordToggle(passwordConfirmInput, passwordConfirmToggle);
 
+    // 전화번호 Clear 버튼 표시/숨김 관리 함수
+    function updatePhoneClearButton() {
+        const statusIcon = document.getElementById('phone-status-icon');
+        const phoneClearBtn = document.getElementById('phone-clear-btn');
+
+        if (!phoneClearBtn) return;
+
+        // 상태 아이콘이 표시 중이면 Clear 버튼 숨김
+        if (statusIcon && statusIcon.classList.contains('show')) {
+            phoneClearBtn.classList.remove('show');
+        } else if (phoneInput.value.trim().length > 0) {
+            // 입력값이 있고 상태 아이콘이 없으면 Clear 버튼 표시
+            phoneClearBtn.classList.add('show');
+        } else {
+            phoneClearBtn.classList.remove('show');
+        }
+    }
+
     // 전화번호 삭제 버튼
     const phoneClearBtn = document.getElementById('phone-clear-btn');
     if (phoneClearBtn) {
         phoneClearBtn.addEventListener('click', function() {
             phoneInput.value = '';
             phoneInput.focus();
-            phoneClearBtn.classList.remove('show');
 
             // 상태 초기화
             const statusMessage = document.getElementById('phone-status-message');
@@ -1128,22 +1145,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             updateSendButtonState();
+            updatePhoneClearButton();
             console.log('🗑️ 전화번호 삭제 완료');
         });
 
-        // 전화번호 입력 시 X 버튼 표시/숨김
+        // 전화번호 입력 시 Clear 버튼 상태 업데이트
         phoneInput.addEventListener('input', function() {
-            if (this.value.trim().length > 0) {
-                phoneClearBtn.classList.add('show');
-            } else {
-                phoneClearBtn.classList.remove('show');
-            }
+            updatePhoneClearButton();
         });
 
         // 초기 상태 설정
-        if (phoneInput.value.trim().length > 0) {
-            phoneClearBtn.classList.add('show');
-        }
+        updatePhoneClearButton();
     }
 
     // 휴대폰 번호 포맷팅 및 010 검증 (백스페이스 완전 대응)
@@ -1343,12 +1355,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const statusIcon = document.getElementById('phone-status-icon');
         const messageText = document.getElementById('phone-message-text');
         
-        // 최소 01012345678 (11자) 이상이어야 함  
+        // 최소 01012345678 (11자) 이상이어야 함
         if (!phone || phone.length < 11) {
             statusMessage.style.display = 'none';
             statusIcon.className = 'input-status-icon';
             phoneInput.classList.remove('valid', 'invalid');
             isPhoneAvailable = false;
+            updatePhoneClearButton();
             return;
         }
         
@@ -1358,6 +1371,7 @@ document.addEventListener('DOMContentLoaded', function() {
         statusIcon.className = 'input-status-icon show checking fas fa-spinner';
         messageText.textContent = '휴대폰 번호를 확인하는 중...';
         phoneInput.classList.remove('valid', 'invalid');
+        updatePhoneClearButton();
 
         // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
         try {
@@ -1375,6 +1389,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     phoneInput.classList.add('valid');
                     phoneInput.classList.remove('invalid');
                     isPhoneAvailable = true;
+                    updatePhoneClearButton();
                 } else {
                     // 사용 불가능
                     statusIndicator.className = 'status-indicator';
@@ -1383,6 +1398,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     phoneInput.classList.add('invalid');
                     phoneInput.classList.remove('valid');
                     isPhoneAvailable = false;
+                    updatePhoneClearButton();
                 }
             } else {
                 throw new Error(result.message || '중복 검사 중 오류가 발생했습니다.');
@@ -1397,6 +1413,7 @@ document.addEventListener('DOMContentLoaded', function() {
             phoneInput.classList.add('invalid');
             phoneInput.classList.remove('valid');
             isPhoneAvailable = false;
+            updatePhoneClearButton();
         }
         
         updateFormValidation();
