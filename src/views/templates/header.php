@@ -63,6 +63,26 @@
     <link rel="shortcut icon" href="/favicon.ico?v=20250609">
     
     <!-- CSS -->
+    <!-- 인라인 CSS 컴포넌트들 -->
+    <style>
+    <?php
+    // CSS 컴포넌트 파일들을 인라인으로 포함
+    $cssFiles = [
+        '/assets/css/components/base.css',
+        '/assets/css/components/layout.css',
+        '/assets/css/components/buttons.css'
+    ];
+
+    foreach ($cssFiles as $cssFile) {
+        $fullPath = $_SERVER['DOCUMENT_ROOT'] . $cssFile;
+        if (file_exists($fullPath)) {
+            echo "/* " . basename($cssFile) . " */\n";
+            echo file_get_contents($fullPath) . "\n\n";
+        }
+    }
+    ?>
+    </style>
+    <!-- 메인 CSS -->
     <link rel="stylesheet" href="/assets/css/main.css?v=<?= time() ?>">
     <link rel="stylesheet" href="/assets/css/loading.css">
     <link rel="stylesheet" href="/assets/css/badges.css"><!-- 🚀 v3.28.0: 통합 배지 시스템 -->
