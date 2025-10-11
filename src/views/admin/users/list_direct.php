@@ -1098,10 +1098,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 }
                 
                 closeEditUserModal();
-                
+
                 // 사용자 목록 새로고침
-                if (typeof loadUsers === 'function') {
-                    loadUsers();
+                if (typeof loadUsersData === 'function') {
+                    loadUsersData();
                 }
             } else {
                 Toast.error('❌ 편집 실패: ' + data.error);
