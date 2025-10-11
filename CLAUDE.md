@@ -215,7 +215,19 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.58.0 ~ v3.72.0)
+## 최근 주요 작업 (v3.58.0 ~ v3.73.0)
+
+### v3.73.0 - 로그인 리다이렉트 기능 완전 복구 (2025-10-11) 🔥
+**문제**: 강의 상세 페이지 등에서 로그인 버튼 클릭 시 redirect 파라미터 없이 이동되어 로그인 성공 후 원래 페이지로 돌아오지 못하는 문제
+**해결**: 모든 로그인 버튼에 올바른 redirect 파라미터 추가 및 JavaScript 이벤트 처리 수정
+- 헤더 로그인 버튼들 (데스크톱, 모바일)에 `redirect=현재페이지URI` 파라미터 추가
+- 강의 상세 페이지 정적 로그인 버튼들에 `redirect=현재페이지URI` 파라미터 추가
+- 강의 상세 페이지 JavaScript 동적 로그인 버튼들에 `redirect=현재페이지URI` 파라미터 추가
+- AuthController::showLogin()에서 GET 파라미터를 세션에 저장하도록 수정
+- 로그인 페이지 hidden input에서 세션의 redirect 값을 사용하도록 수정
+- AuthController::isValidRedirectUrl()에서 `/lectures/`, `/events/` 경로 허용 추가
+- 강의 상세 페이지 JavaScript에서 로그인 버튼 클릭 시 preventDefault() 하지 않도록 수정
+- **결과**: 모든 페이지에서 로그인 후 원래 페이지로 정상 복귀 가능
 
 ### v3.72.0 - 신청 마감일 날짜/시간 Input 분리 완전 개선 (2025-10-10) 🔥
 **문제**: 신청 마감일만 Flatpickr로 날짜+시간 통합 input → 시작일/종료일과 일관성 부족
@@ -376,6 +388,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ---
 
-**마지막 업데이트**: 2025-10-10
+**마지막 업데이트**: 2025-10-11
 **작업자**: Claude (Anthropic)
-**최신 버전**: v3.72.0
+**최신 버전**: v3.73.0

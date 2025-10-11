@@ -311,7 +311,7 @@
                         </div>
                     <?php else: ?>
                         <!-- 비로그인 사용자 메뉴 -->
-                        <a href="/auth/login" class="nav-link login-btn">
+                        <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI'] ?? '/') ?>" class="nav-link login-btn">
                             <i class="fas fa-sign-in-alt"></i>
                             로그인
                         </a>
@@ -803,7 +803,7 @@
                     <div class="guest-icon">👋</div>
                     <div class="guest-message">탑마케팅에 오신 것을 환영합니다!</div>
                     <div class="auth-buttons">
-                        <a href="/auth/login" class="mobile-login-btn">로그인</a>
+                        <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI'] ?? '/') ?>" class="mobile-login-btn">로그인</a>
                         <a href="/auth/signup" class="mobile-signup-btn">회원가입</a>
                     </div>
                 </div>

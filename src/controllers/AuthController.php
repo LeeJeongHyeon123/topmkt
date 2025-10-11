@@ -36,6 +36,11 @@ class AuthController {
      * 로그인 페이지 표시
      */
     public function showLogin() {
+        // 리다이렉트 URL을 세션에 저장 (로그인 성공 후 사용)
+        if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+            $_SESSION['login_redirect'] = $_GET['redirect'];
+        }
+
         include SRC_PATH . '/views/auth/login.php';
     }
     
@@ -1458,6 +1463,8 @@ class AuthController {
             '/^\/community/',
             '/^\/user/',
             '/^\/post/',
+            '/^\/lectures/',
+            '/^\/events/',
             '/^\/home/',
             '/^\/legal/',
             '/^\/$/'

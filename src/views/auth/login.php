@@ -119,7 +119,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                     
                     <!-- 리다이렉트 URL -->
-                    <input type="hidden" name="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? '') ?>">
+                    <input type="hidden" name="redirect" value="<?= htmlspecialchars($_SESSION['login_redirect'] ?? '') ?>">
 
                     <?= renderButton('로그인', 'primary', 'lg', [
                         'buttonType' => 'submit',

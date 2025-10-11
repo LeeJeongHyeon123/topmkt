@@ -37,17 +37,23 @@ Refresh Token (30일)
 
 ### 인증 플로우
 ```
-1. 사용자 로그인
+1. 사용자 로그인 버튼 클릭 (redirect 파라미터 포함)
    ↓
-2. JWT 토큰 쌍 생성 (Access + Refresh)
+2. 로그인 페이지로 이동 (/auth/login?redirect=원래페이지)
    ↓
-3. HTTP-only 쿠키에 토큰 저장
+3. 사용자 로그인 정보 입력 및 제출
    ↓
-4. 클라이언트에서 자동 토큰 관리 시작
+4. JWT 토큰 쌍 생성 (Access + Refresh)
    ↓
-5. 55분 후 자동 토큰 갱신
+5. HTTP-only 쿠키에 토큰 저장
    ↓
-6. 30일간 반복 (Refresh Token 유효 기간)
+6. 저장된 redirect URL로 자동 리다이렉션
+   ↓
+7. 클라이언트에서 자동 토큰 관리 시작
+   ↓
+8. 55분 후 자동 토큰 갱신
+   ↓
+9. 30일간 반복 (Refresh Token 유효 기간)
 ```
 
 ## 구현 상세
@@ -127,10 +133,51 @@ class JWTAuth {
 
 | 메서드 | 엔드포인트 | 설명 | 응답 |
 |--------|------------|------|------|
+| `GET` | `/auth/login` | 로그인 페이지 표시 (redirect 파라미터 지원) | HTML 페이지 |
 | `POST` | `/auth/login` | 로그인 및 JWT 토큰 발급 | `{"success":true,"redirect":"/"}` |
 | `POST` | `/auth/logout` | 로그아웃 및 토큰 무효화 | `{"success":true}` |
 | `POST` | `/auth/refresh` | JWT 토큰 갱신 | `{"success":true,"message":"토큰 갱신됨"}` |
 | `GET` | `/auth/me` | 현재 사용자 정보 및 토큰 상태 | `{"success":true,"user":{...},"token_info":{...}}` |
+
+### 로그인 리다이렉트 기능 (v3.73.0)
+
+#### 리다이렉트 파라미터 처리
+```php
+// AuthController::showLogin()
+public function showLogin() {
+    // GET 파라미터에서 redirect URL을 세션에 저장
+    if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+        $_SESSION['login_redirect'] = $_GET['redirect'];
+    }
+    include SRC_PATH . '/views/auth/login.php';
+}
+```
+
+#### 로그인 성공 후 리다이렉션
+```php
+// AuthController::handleFormLogin()
+$redirect = $_POST['redirect'] ?? '';
+if (!empty($redirect)) {
+    header('Location: ' . $redirect);
+} else {
+    header('Location: /');
+}
+```
+
+#### 보안: 유효한 리다이렉트 URL 검증
+```php
+// AuthController::isValidRedirectUrl()
+$allowedPatterns = [
+    '/^\/community/',
+    '/^\/user/',
+    '/^\/post/',
+    '/^\/lectures/',  // 강의 페이지 허용
+    '/^\/events/',    // 행사 페이지 허용
+    '/^\/home/',
+    '/^\/legal/',
+    '/^\/$/'
+];
+```
 
 ### 토큰 상태 응답 예시
 ```json

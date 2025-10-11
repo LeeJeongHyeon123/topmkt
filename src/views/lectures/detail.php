@@ -4191,6 +4191,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerButtons = document.querySelectorAll('.btn-register');
     registerButtons.forEach(button => {
         button.addEventListener('click', function(e) {
+            // 로그인 버튼인 경우에는 기본 동작을 유지 (로그인 페이지로 이동)
+            const href = this.getAttribute('href');
+            if (href && href.includes('/auth/login')) {
+                console.log('🔑 로그인 버튼 클릭 - 기본 동작 유지');
+                return; // 기본 동작을 허용
+            }
+
+            // 그 외의 경우에는 신청 모달 표시
             e.preventDefault();
             showRegistrationModal();
         });
