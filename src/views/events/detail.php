@@ -2957,7 +2957,7 @@ async function registerEvent() {
 // 로그인 페이지로 리다이렉트
 async function redirectToLogin() {
     if (await Modal.confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
-        window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname);
+        window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
     }
 }
 

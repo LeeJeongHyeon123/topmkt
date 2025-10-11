@@ -1847,7 +1847,7 @@ body {
                         <small style="color: #ff6b6b; font-weight: bold;">🔧 DEBUG MODE: 강의 작성자 신청 테스트</small>
                     </div>
                 <?php elseif (!$isLoggedIn): ?>
-                    <a href="/auth/login?return_to=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-primary">
+                    <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-primary">
                         🚀 로그인 후 신청하기
                     </a>
                 <?php endif; ?>
@@ -3396,10 +3396,10 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     if (!isLoggedIn) {
         // DOM 요소 직접 생성하여 안전하게 처리
         const loginLink = document.createElement('a');
-        loginLink.href = '/auth/login?return_to=' + encodeURIComponent(window.location.pathname + window.location.search);
+        loginLink.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
         loginLink.className = 'btn btn-primary';
         loginLink.textContent = '🔑 로그인 후 신청하기';
-        
+
         actionsContainer.innerHTML = '';
         actionsContainer.appendChild(loginLink);
         
