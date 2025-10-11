@@ -338,11 +338,12 @@ require_once SRC_PATH . '/views/templates/header.php';
 
 .phone-input-wrapper .input-status-icon {
     cursor: pointer;
+    pointer-events: auto;
     transition: all 0.2s ease;
 }
 
 .phone-input-wrapper .input-status-icon:hover {
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.1);
 }
 
 .verification-input-group {
