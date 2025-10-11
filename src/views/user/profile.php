@@ -1022,9 +1022,17 @@ if (!empty($user['last_login'])) {
                         <?php foreach ($recentComments as $comment): ?>
                             <li class="activity-item">
                                 <div class="activity-title">
-                                    <a href="/community/posts/<?= $comment['post_id'] ?>#comment-<?= $comment['id'] ?>">
+                                    <?php
+                                    // v3.73.0: 댓글 타입에 따라 링크 경로 분기 처리
+                                    $commentType = $comment['comment_type'] ?? 'community';
+                                    $linkPath = ($commentType === 'notice')
+                                        ? "/notices/{$comment['post_id']}#comment-{$comment['id']}"
+                                        : "/community/posts/{$comment['post_id']}#comment-{$comment['id']}";
+                                    $linkIcon = ($commentType === 'notice') ? '📢' : '💬';
+                                    ?>
+                                    <a href="<?= $linkPath ?>">
                                         <?= htmlspecialchars($comment['post_title']) ?>
-                                    </a>에 댓글
+                                    </a>에 댓글 <?= $linkIcon ?>
                                     <?php
                                     // 삭제된 부모 댓글에 대한 답글인지 확인
                                     $isReplyToDeleted = !empty($comment['parent_id']) && ($comment['parent_status'] ?? '') === 'deleted';

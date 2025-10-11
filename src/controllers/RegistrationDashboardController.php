@@ -23,8 +23,8 @@ class RegistrationDashboardController extends BaseController
         }
         
         $userRole = AuthMiddleware::getUserRole();
-        // 관리자이거나 기업 회원이거나 일반 사용자(강의 생성자)라면 접근 허용
-        if ($userRole !== 'ROLE_CORPORATE' && $userRole !== 'ROLE_ADMIN' && $userRole !== 'ROLE_USER') {
+        // 기업 회원만 접근 허용 (자신의 강의/행사 신청 관리용)
+        if ($userRole !== 'ROLE_CORPORATE') {
             header('HTTP/1.1 403 Forbidden');
             include SRC_PATH . '/views/errors/403.php';
             exit;
@@ -104,36 +104,38 @@ class RegistrationDashboardController extends BaseController
             // 대시보드 통계 계산 (컨텐츠 타입별)
             $stats = $this->getDashboardStats($userId, $contentType, $startDate, $endDate);
             
-            // 최근 신청 목록 (최근 20개, 컨텐츠 타입별)
+            // 최근 신청 목록 (최근 20개, 컨텐츠 타입별) - v3.74.0: 날짜 필터 적용
             if ($contentType === 'event') {
                 // 행사의 경우 event_registrations 테이블 사용
                 $recentRegistrationsQuery = "
-                    SELECT 
+                    SELECT
                         r.id, r.participant_name, r.participant_email, r.status,
                         r.created_at, r.is_waiting_list, r.waiting_order,
                         l.title as lecture_title, l.id as lecture_id, l.content_type
                     FROM event_registrations r
                     JOIN lectures l ON r.event_id = l.id
-                    WHERE l.user_id = ? AND l.content_type = ?
+                    WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?
+                    AND l.start_date >= ? AND l.start_date <= ?
                     ORDER BY r.created_at DESC
                     LIMIT 20
                 ";
             } else {
                 // 강의의 경우 lecture_registrations 테이블 사용
                 $recentRegistrationsQuery = "
-                    SELECT 
+                    SELECT
                         r.id, r.participant_name, r.participant_email, r.status,
                         r.created_at, r.is_waiting_list, r.waiting_order,
                         l.title as lecture_title, l.id as lecture_id, l.content_type
                     FROM lecture_registrations r
                     JOIN lectures l ON r.lecture_id = l.id
-                    WHERE l.user_id = ? AND l.content_type = ?
+                    WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?
+                    AND l.start_date >= ? AND l.start_date <= ?
                     ORDER BY r.created_at DESC
                     LIMIT 20
                 ";
             }
-            
-            $recentRegistrations = $this->db->fetchAll($recentRegistrationsQuery, [$userId, $contentType]);
+
+            $recentRegistrations = $this->db->fetchAll($recentRegistrationsQuery, [$userId, $contentType, $startDate, $endDate]);
             
             // 뷰 렌더링
             $pageTitle = '신청 관리 대시보드';

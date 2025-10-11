@@ -7,12 +7,6 @@
 require_once SRC_PATH . '/components/ui/Card.php';
 ?>
 
-<!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-
 <style>
 /* 대시보드 전용 스타일 */
 .dashboard-container {
@@ -342,107 +336,85 @@ require_once SRC_PATH . '/components/ui/Card.php';
 .status-rejected { background: #fed7d7; color: #c53030; }
 .status-waiting { background: #bee3f8; color: #2b6cb0; }
 
-/* 날짜 필터 스타일 */
-/* 🚀 v3.37.0: 날짜 필터 CSS는 이제 /assets/css/search-filter.css에서 통합 관리 */
-/* .date-filter-container, .date-filter 등은 SearchFilter 컴포넌트에서 자동 제공 */
-
-/* Flatpickr 커스터마이징 */
-.flatpickr-calendar {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
-    border-radius: 12px !important;
-    border: 1px solid #e2e8f0 !important;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-}
-
-.flatpickr-calendar .flatpickr-months {
-    background: #667eea !important;
-    border-radius: 12px 12px 0 0 !important;
-    padding: 15px 20px !important;
-}
-
-.flatpickr-calendar .flatpickr-month {
-    color: white !important;
-}
-
-.flatpickr-calendar .flatpickr-prev-month,
-.flatpickr-calendar .flatpickr-next-month {
-    fill: white !important;
-}
-
-.flatpickr-calendar .flatpickr-current-month {
-    color: white !important;
-}
-
-.flatpickr-calendar .flatpickr-weekday {
-    color: #718096 !important;
-    font-weight: 600 !important;
-    font-size: 0.8rem !important;
-}
-
-.flatpickr-calendar .flatpickr-day {
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-}
-
-.flatpickr-calendar .flatpickr-day:hover {
-    background: #667eea !important;
-    color: white !important;
-}
-
-.flatpickr-calendar .flatpickr-day.selected {
-    background: #667eea !important;
-    border-color: #667eea !important;
-}
-
-.flatpickr-calendar .flatpickr-day.today {
-    background: #48bb78 !important;
-    color: white !important;
-    border-color: #48bb78 !important;
-}
-
-/* 커스텀 버튼 스타일 */
-.flatpickr-custom-buttons {
+/* 글로벌 대시보드 필터 스타일 - 좌우 배치 버전 (v3.75.0) */
+.dashboard-filter-wrapper {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
-    border-radius: 0 0 12px 12px;
+    justify-content: space-between;
+    margin-bottom: 24px;
 }
 
-.flatpickr-today-btn {
-    background: #48bb78;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+.dashboard-filter-title {
+    color: #2d3748;
     font-weight: 600;
-    cursor: pointer;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.dashboard-filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dashboard-filter-controls label {
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 0.85rem;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.dashboard-filter-controls .filter-date-input {
+    width: 140px;
+    padding: 6px 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    background: white;
+    color: #2d3748;
+    font-size: 0.85rem;
     transition: all 0.2s ease;
 }
 
-.flatpickr-today-btn:hover {
-    background: #38a169;
-    transform: translateY(-1px);
+.dashboard-filter-controls .filter-date-input:hover {
+    border-color: #667eea;
 }
 
-.flatpickr-apply-btn {
+.dashboard-filter-controls .filter-date-input:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.dashboard-filter-controls .btn-filter {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.dashboard-filter-controls .btn-filter-apply {
     background: #667eea;
     color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.flatpickr-apply-btn:hover {
+.dashboard-filter-controls .btn-filter-apply:hover {
     background: #5a67d8;
-    transform: translateY(-1px);
+}
+
+.dashboard-filter-controls .btn-filter-reset {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.dashboard-filter-controls .btn-filter-reset:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
 }
 
 .btn-sm {
@@ -507,16 +479,43 @@ require_once SRC_PATH . '/components/ui/Card.php';
     .dashboard-container {
         padding: 16px;
     }
-    
+
+    /* 글로벌 필터 반응형 (v3.75.0) */
+    .dashboard-filter-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .dashboard-filter-title {
+        font-size: 0.9rem;
+    }
+
+    .dashboard-filter-controls {
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .dashboard-filter-controls .filter-date-input {
+        width: 110px;
+        font-size: 0.8rem;
+    }
+
+    .dashboard-filter-controls .btn-filter {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+
     .stats-grid {
         grid-template-columns: 1fr;
         gap: 16px;
     }
-    
+
     .lecture-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .section-header {
         flex-direction: column;
         align-items: flex-start;
@@ -604,17 +603,33 @@ require_once SRC_PATH . '/components/ui/Card.php';
         
         <!-- 컨텐츠 타입 탭 -->
         <div class="content-type-tabs">
-            <button class="tab-button <?= ($contentType ?? 'lecture') === 'lecture' ? 'active' : '' ?>" 
+            <button class="tab-button <?= ($contentType ?? 'lecture') === 'lecture' ? 'active' : '' ?>"
                     onclick="switchContentType('lecture')">
                 🎓 강의 관리
             </button>
-            <button class="tab-button <?= ($contentType ?? 'lecture') === 'event' ? 'active' : '' ?>" 
+            <button class="tab-button <?= ($contentType ?? 'lecture') === 'event' ? 'active' : '' ?>"
                     onclick="switchContentType('event')">
                 🎉 행사 관리
             </button>
         </div>
     </div>
-    
+
+    <!-- 글로벌 대시보드 필터 (v3.75.0 - 좌우 배치 버전) -->
+    <div class="dashboard-filter-wrapper">
+        <h3 class="dashboard-filter-title">📊 기간별 현황</h3>
+
+        <div class="dashboard-filter-controls">
+            <label for="startDate">시작일</label>
+            <input type="date" id="startDate" class="filter-date-input" value="<?= htmlspecialchars($_GET['start_date'] ?? date('Y-m-d', strtotime('-1 month'))) ?>">
+
+            <label for="endDate">종료일</label>
+            <input type="date" id="endDate" class="filter-date-input" value="<?= htmlspecialchars($_GET['end_date'] ?? date('Y-m-d')) ?>">
+
+            <button type="button" class="btn-filter btn-filter-apply" onclick="applyDateFilter()">필터 적용</button>
+            <button type="button" class="btn-filter btn-filter-reset" onclick="resetDateFilter()">초기화</button>
+        </div>
+    </div>
+
     <!-- 통계 카드 (Card 컴포넌트 사용 - v3.38.0) -->
     <div class="stats-grid">
         <?= Card::stat([
@@ -639,10 +654,10 @@ require_once SRC_PATH . '/components/ui/Card.php';
         ]) ?>
 
         <?= Card::stat([
-            'icon' => '📊',
-            'value' => number_format($stats['total_applications']),
-            'label' => '전체 신청',
-            'variant' => 'primary'
+            'icon' => '❌',
+            'value' => number_format($stats['rejected_applications']),
+            'label' => '거절된 신청',
+            'variant' => 'danger'
         ]) ?>
     </div>
     
@@ -652,40 +667,12 @@ require_once SRC_PATH . '/components/ui/Card.php';
             <h2 class="section-title">
                 <?= ($contentType ?? 'lecture') === 'event' ? '🎉 최근 행사 목록' : '🎯 최근 강의 목록' ?>
             </h2>
-            <!-- 날짜 필터 (SearchFilter 컴포넌트) -->
-            <?php
-            require_once SRC_PATH . '/components/ui/SearchFilter.php';
-
-            echo SearchFilter::create([
-                'method' => 'JS',
-                'layout' => 'inline',
-                'filters' => [
-                    [
-                        'type' => 'date',
-                        'name' => 'startDate',
-                        'id' => 'startDate',
-                        'label' => '시작일'
-                    ],
-                    [
-                        'type' => 'date',
-                        'name' => 'endDate',
-                        'id' => 'endDate',
-                        'label' => '종료일'
-                    ]
-                ],
-                'searchInput' => false,
-                'submitButton' => true,
-                'submitText' => '필터 적용',
-                'resetButton' => true,
-                'resetText' => '초기화',
-                'collapsible' => false,
-                'onSubmit' => 'applyDateFilter()',
-                'onReset' => 'resetDateFilter()',
-                'cssClass' => 'registrations-date-filter'
-            ]);
-            ?>
+            <a href="<?= ($contentType ?? 'lecture') === 'event' ? '/events/create' : '/lectures/create' ?>"
+               class="btn btn-primary">
+                ➕ <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 등록하기
+            </a>
         </div>
-        
+
         <?php if (empty($lectures)): ?>
             <div style="text-align: center; padding: 60px 20px; color: #718096;">
                 <div style="font-size: 3rem; margin-bottom: 16px;">
@@ -834,13 +821,13 @@ require_once SRC_PATH . '/components/ui/Card.php';
 </div>
 
 <script>
-// Flatpickr 인스턴스를 저장할 변수
-let startDatePicker, endDatePicker;
-
-// 날짜 필터 기능
+// 날짜 필터 기능 (v3.75.0 - 네이티브 date input 사용)
 function applyDateFilter() {
-    const startDate = startDatePicker.selectedDates[0];
-    const endDate = endDatePicker.selectedDates[0];
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
 
     if (!startDate || !endDate) {
         Toast.info('시작일과 종료일을 모두 선택해주세요.');
@@ -854,8 +841,8 @@ function applyDateFilter() {
 
     // 현재 URL에 날짜 파라미터 추가
     const url = new URL(window.location.href);
-    url.searchParams.set('start_date', startDatePicker.formatDate(startDate, 'Y-m-d'));
-    url.searchParams.set('end_date', endDatePicker.formatDate(endDate, 'Y-m-d'));
+    url.searchParams.set('start_date', startDate);
+    url.searchParams.set('end_date', endDate);
     window.location.href = url.toString();
 }
 
@@ -875,89 +862,46 @@ function switchContentType(type) {
     window.location.href = url.toString();
 }
 
-// 커스텀 버튼 생성 함수
-function createCustomButtons(picker) {
-    return {
-        onReady: function() {
-            // 기존 버튼들 숨기기/제거
-            const clearButton = picker.calendarContainer.querySelector('.flatpickr-clear');
-            if (clearButton) {
-                clearButton.style.display = 'none';
-            }
-
-            // 커스텀 버튼 컨테이너 생성
-            const buttonContainer = document.createElement('div');
-            buttonContainer.className = 'flatpickr-custom-buttons';
-
-            // 오늘 버튼 (왼쪽에 위치 - 기존 삭제 버튼 자리)
-            const todayBtn = document.createElement('button');
-            todayBtn.className = 'flatpickr-today-btn';
-            todayBtn.textContent = '오늘';
-            todayBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                picker.setDate(new Date());
-            });
-
-            // 적용 버튼 (오른쪽에 위치 - 기존 오늘 버튼 자리)
-            const applyBtn = document.createElement('button');
-            applyBtn.className = 'flatpickr-apply-btn';
-            applyBtn.textContent = '적용';
-            applyBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                picker.close();
-            });
-
-            buttonContainer.appendChild(todayBtn);
-            buttonContainer.appendChild(applyBtn);
-            picker.calendarContainer.appendChild(buttonContainer);
-        }
-    };
-}
-
-// 페이지 로드 시 Flatpickr 초기화
+// 페이지 로드 시 날짜 input에 min/max 설정
 document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const startDate = urlParams.get('start_date');
-    const endDate = urlParams.get('end_date');
-    const contentType = urlParams.get('type') || 'lecture';
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
 
-    // 기본값: 최근 1개월
-    const today = new Date();
-    const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    // 시작일 변경 시 종료일의 최소값 설정
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('change', function() {
+            endDateInput.min = this.value;
+        });
 
-    // 시작일 Flatpickr 초기화
-    startDatePicker = flatpickr('#startDate', {
-        locale: 'ko',
-        dateFormat: 'Y-m-d',
-        defaultDate: startDate || oneMonthAgo,
-        onReady: function() {
-            const buttons = createCustomButtons(this);
-            buttons.onReady.call(this);
-        },
-        onChange: function(selectedDates, dateStr) {
-            // 종료일의 최소값을 시작일로 설정
-            if (endDatePicker) {
-                endDatePicker.set('minDate', dateStr);
-            }
+        // 종료일 변경 시 시작일의 최대값 설정
+        endDateInput.addEventListener('change', function() {
+            startDateInput.max = this.value;
+        });
+
+        // 초기 min/max 설정
+        if (startDateInput.value) {
+            endDateInput.min = startDateInput.value;
         }
-    });
-
-    // 종료일 Flatpickr 초기화
-    endDatePicker = flatpickr('#endDate', {
-        locale: 'ko',
-        dateFormat: 'Y-m-d',
-        defaultDate: endDate || today,
-        minDate: startDate || oneMonthAgo,
-        onReady: function() {
-            const buttons = createCustomButtons(this);
-            buttons.onReady.call(this);
-        },
-        onChange: function(selectedDates, dateStr) {
-            // 시작일의 최대값을 종료일로 설정
-            if (startDatePicker) {
-                startDatePicker.set('maxDate', dateStr);
-            }
+        if (endDateInput.value) {
+            startDateInput.max = endDateInput.value;
         }
-    });
+
+        // input 클릭 시 달력 picker 자동 표시 (v3.75.1)
+        startDateInput.addEventListener('click', function() {
+            try {
+                this.showPicker();
+            } catch (error) {
+                // showPicker()를 지원하지 않는 브라우저는 기본 동작 사용
+            }
+        });
+
+        endDateInput.addEventListener('click', function() {
+            try {
+                this.showPicker();
+            } catch (error) {
+                // showPicker()를 지원하지 않는 브라우저는 기본 동작 사용
+            }
+        });
+    }
 });
 </script>

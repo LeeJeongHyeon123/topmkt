@@ -156,6 +156,159 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     border-left: 4px solid #667eea;
 }
 
+/* 비활성 채팅방 스타일 */
+.chat-room-item.inactive-room {
+    opacity: 0.7;
+    background: #f8fafc;
+    border-left: 3px solid #a0aec0;
+}
+
+.chat-room-item.inactive-room:hover {
+    background: #edf2f7;
+    opacity: 0.8;
+}
+
+.chat-room-item.inactive-room .room-name.inactive-room {
+    color: #718096;
+    font-weight: 500;
+}
+
+.chat-room-item.disabled-room {
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+}
+
+/* 비활성 채팅방 모달 스타일 */
+.inactive-room-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.inactive-room-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.inactive-room-modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 0;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.inactive-room-modal.show .inactive-room-modal-content {
+    transform: scale(1);
+}
+
+.inactive-room-modal-header {
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inactive-room-modal-header h3 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.inactive-room-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #718096;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inactive-room-modal-close:hover {
+    background: #f7fafc;
+    color: #4a5568;
+}
+
+.inactive-room-modal-body {
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.inactive-room-info {
+    margin-bottom: 32px;
+}
+
+.inactive-room-info h4 {
+    margin: 16px 0 8px;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.inactive-room-info p {
+    margin: 0;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+.inactive-room-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.inactive-room-actions .btn {
+    min-width: 120px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.inactive-room-actions .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.inactive-room-actions .btn-primary:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-1px);
+}
+
+.inactive-room-actions .btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.inactive-room-actions .btn-secondary:hover {
+    background: #cbd5e0;
+}
+
 .room-info {
     display: flex;
     align-items: center;
@@ -1741,15 +1894,32 @@ function renderChatRoomItem(roomId, roomData) {
         }
     }
     
+    // 상대방의 참여 상태 확인
+    const otherParticipantId = Object.keys(roomData.participants || {}).find(id => id != currentUserId);
+    const otherParticipant = otherParticipantId ? roomData.participants[otherParticipantId] : null;
+    const isOtherParticipantInactive = otherParticipant && otherParticipant.status === 'inactive';
+
+    // 채팅방 상태에 따른 스타일 및 표시 결정
+    const roomStatusClass = isOtherParticipantInactive ? 'inactive-room' : '';
+    const roomStatusText = isOtherParticipantInactive ? ' (종료된 대화)' : '';
+    const roomNameWithStatus = roomName + roomStatusText;
+
+    // 비활성 채팅방의 경우 클릭 비활성화
+    const clickDisabledClass = isOtherParticipantInactive ? 'disabled-room' : '';
+    const clickHandler = isOtherParticipantInactive ?
+        'onclick="showInactiveRoomModal()"' :
+        `onclick="openChatRoom('${roomId}')"`;
+
+
     roomItem.innerHTML = `
-        <div class="room-info">
+        <div class="room-info ${roomStatusClass}">
             <div class="room-avatar">
                 ${partnerImage ? `
-                    <img src="${partnerImage}" 
-                         alt="${roomName}" 
-                         style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
-                         class="profile-image-clickable"
-                         data-user-id="${Object.keys(roomData.participants || {}).find(id => id != currentUserId) || ''}"
+                    <img src="${partnerImage}"
+                         alt="${roomNameWithStatus}"
+                         style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; ${isOtherParticipantInactive ? 'opacity: 0.6; filter: grayscale(50%);' : ''}"
+                         class="profile-image-clickable ${clickDisabledClass}"
+                         data-user-id="${otherParticipantId || ''}"
                          data-user-name="${roomName}"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
@@ -1763,7 +1933,7 @@ function renderChatRoomItem(roomId, roomData) {
             </div>
             <div class="room-details">
                 <div class="room-header">
-                    <div class="room-name">${roomName}</div>
+                    <div class="room-name ${roomStatusClass}">${roomNameWithStatus}</div>
                     <div class="room-time" id="lastTime-${roomId}">
                         ${roomData.lastMessageTime ? formatTime(roomData.lastMessageTime) : ''}
                     </div>
@@ -1774,6 +1944,15 @@ function renderChatRoomItem(roomId, roomData) {
             </div>
         </div>
     `;
+
+    // 비활성 채팅방의 경우 클릭 이벤트 추가
+    if (isOtherParticipantInactive) {
+        roomItem.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showInactiveRoomModal(roomId, roomName);
+        });
+    }
 
     // 🔥 room-name 디버깅 로그 추가
     setTimeout(() => {
@@ -2615,28 +2794,69 @@ function createPrivateChatRoom(user) {
         lastMessageTime: firebase.database.ServerValue.TIMESTAMP
     };
     
-    // Firebase에 채팅방 생성
-    const roomsRef = database.ref('chatRooms');
-    const newRoomRef = roomsRef.push();
-    const roomId = newRoomRef.key;
-    
-    newRoomRef.set(roomData)
+    // 사용자 쌍별로 고유한 채팅방 ID 생성
+    const participantIds = [currentUserId, user.id].sort((a, b) => a - b);
+    const roomId = `room_${participantIds[0]}_${participantIds[1]}`;
+
+    console.log(`🔍 채팅방 ID 생성: ${roomId} (사용자: ${currentUserId}, 상대방: ${user.id})`);
+
+    // Firebase에 채팅방 생성 (기존 방이 있으면 업데이트, 없으면 생성)
+    const roomRef = database.ref(`chatRooms/${roomId}`);
+
+    // 기존 채팅방 확인
+    roomRef.once('value')
+        .then((snapshot) => {
+            const existingRoom = snapshot.val();
+
+            if (existingRoom) {
+                console.log(`✅ 기존 채팅방 발견: ${roomId}`, existingRoom);
+
+                // 기존 방의 참여자 상태를 활성으로 업데이트
+                const participantsRef = database.ref(`chatRooms/${roomId}/participants`);
+                return Promise.all([
+                    participantsRef.child(currentUserId).update({
+                        status: 'active',
+                        rejoinedAt: firebase.database.ServerValue.TIMESTAMP
+                    }),
+                    participantsRef.child(user.id).update({
+                        status: 'active',
+                        rejoinedAt: firebase.database.ServerValue.TIMESTAMP
+                    })
+                ]);
+            } else {
+                console.log(`🆕 새 채팅방 생성: ${roomId}`);
+
+                // 새 채팅방 생성
+                return roomRef.set(roomData);
+            }
+        })
         .then(() => {
-            // 사용자별 채팅방 목록에 추가
+            // 사용자별 채팅방 목록에 추가 또는 업데이트
             const userRoomsRef = database.ref('userRooms');
+
             return Promise.all([
+                // 현재 사용자
                 userRoomsRef.child(`${currentUserId}/${roomId}`).set({
                     joinedAt: firebase.database.ServerValue.TIMESTAMP,
-                    lastRead: firebase.database.ServerValue.TIMESTAMP
+                    lastRead: firebase.database.ServerValue.TIMESTAMP,
+                    lastMessage: '',
+                    lastMessageTime: firebase.database.ServerValue.TIMESTAMP,
+                    partnerId: user.id,
+                    partnerName: user.nickname || '사용자'
                 }),
+                // 상대방 사용자
                 userRoomsRef.child(`${user.id}/${roomId}`).set({
                     joinedAt: firebase.database.ServerValue.TIMESTAMP,
-                    lastRead: firebase.database.ServerValue.TIMESTAMP
+                    lastRead: firebase.database.ServerValue.TIMESTAMP,
+                    lastMessage: '',
+                    lastMessageTime: firebase.database.ServerValue.TIMESTAMP,
+                    partnerId: currentUserId,
+                    partnerName: currentUser.nickname || '사용자'
                 })
             ]);
         })
         .then(() => {
-            console.log('✅ 채팅방 생성 완료:', roomId);
+            console.log('✅ 채팅방 설정 완료:', roomId);
             
             // 생성된 채팅방 열기
             setTimeout(() => {
@@ -2883,6 +3103,137 @@ function closeChatRoom() {
 
 
 /**
+ * 비활성 채팅방 모달 표시
+ */
+function showInactiveRoomModal(roomId, roomName) {
+    // 기존 모달이 있으면 제거
+    const existingModal = document.querySelector('.inactive-room-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'inactive-room-modal';
+    modal.innerHTML = `
+        <div class="inactive-room-modal-content">
+            <div class="inactive-room-modal-header">
+                <h3>종료된 대화</h3>
+                <button class="inactive-room-modal-close" onclick="closeInactiveRoomModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="inactive-room-modal-body">
+                <div class="inactive-room-info">
+                    <i class="fas fa-user-slash" style="font-size: 2rem; color: #718096; margin-bottom: 16px;"></i>
+                    <h4>${roomName}</h4>
+                    <p>상대방이 채팅방을 나가서 대화가 종료되었습니다.</p>
+                    <p style="font-size: 0.9rem; color: #718096; margin-top: 8px;">
+                        새로운 메시지를 보내면 대화가 다시 활성화됩니다.
+                    </p>
+                </div>
+                <div class="inactive-room-actions">
+                    <button class="btn btn-secondary" onclick="closeInactiveRoomModal()">
+                        닫기
+                    </button>
+                    <button class="btn btn-primary" onclick="reactivateChatRoom('${roomId}')">
+                        대화 다시 시작하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 배경 클릭시 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeInactiveRoomModal();
+        }
+    });
+
+    document.body.appendChild(modal);
+
+    // 애니메이션 효과
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+/**
+ * 비활성 채팅방 모달 닫기
+ */
+function closeInactiveRoomModal() {
+    const modal = document.querySelector('.inactive-room-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    }
+}
+
+/**
+ * 채팅방 다시 활성화
+ */
+async function reactivateChatRoom(roomId) {
+    try {
+        console.log(`🔄 채팅방 다시 활성화 시도: ${roomId}`);
+
+        // 현재 채팅방의 상대방 찾기
+        const currentRoom = chatRooms[roomId];
+        if (!currentRoom || !currentRoom.participants) {
+            Toast.error('채팅방 정보를 찾을 수 없습니다.');
+            return;
+        }
+
+        const participantIds = Object.keys(currentRoom.participants);
+        const otherParticipantId = participantIds.find(id => id != currentUserId);
+
+        if (!otherParticipantId) {
+            Toast.error('채팅방 정보를 찾을 수 없습니다.');
+            return;
+        }
+
+        // 상대방의 userRooms에서 방 제거 (다시 활성화)
+        const otherUserRoomRef = database.ref(`userRooms/${otherParticipantId}/${roomId}`);
+        await otherUserRoomRef.set({
+            joinedAt: firebase.database.ServerValue.TIMESTAMP,
+            lastRead: firebase.database.ServerValue.TIMESTAMP,
+            lastMessage: '',
+            lastMessageTime: firebase.database.ServerValue.TIMESTAMP,
+            partnerId: currentUserId,
+            partnerName: currentUser.nickname || '사용자'
+        });
+
+        // 채팅방의 참여자 상태를 활성으로 업데이트
+        const participantsRef = database.ref(`chatRooms/${roomId}/participants`);
+        await Promise.all([
+            participantsRef.child(currentUserId).update({
+                status: 'active',
+                rejoinedAt: firebase.database.ServerValue.TIMESTAMP
+            }),
+            participantsRef.child(otherParticipantId).update({
+                status: 'active',
+                rejoinedAt: firebase.database.ServerValue.TIMESTAMP
+            })
+        ]);
+
+        console.log(`✅ 채팅방 다시 활성화 완료: ${roomId}`);
+
+        // 모달 닫기
+        closeInactiveRoomModal();
+
+        // 채팅방 열기
+        openChatRoom(roomId);
+
+        Toast.success('대화가 다시 활성화되었습니다!');
+
+    } catch (error) {
+        console.error('❌ 채팅방 다시 활성화 실패:', error);
+        Toast.error('대화 활성화에 실패했습니다.');
+    }
+}
+
+/**
  * 채팅방 나가기
  */
 async function leaveChatRoom() {
@@ -2895,13 +3246,40 @@ async function leaveChatRoom() {
         try {
             console.log(`🚪 채팅방 나가기 시작: 사용자 ${currentUserId}, 채팅방 ${activeRoomId}`);
 
-            // 🔥 새로운 방식: 참여자 정보를 삭제하는 대신 비활성화 상태로 변경
+            // 현재 채팅방의 상대방 찾기
+            const currentRoom = chatRooms[activeRoomId];
+            if (!currentRoom || !currentRoom.participants) {
+                console.error('❌ 채팅방 정보를 찾을 수 없습니다');
+                Toast.error('채팅방 정보를 찾을 수 없습니다.');
+                return;
+            }
+
+            const participantIds = Object.keys(currentRoom.participants);
+            const otherParticipantId = participantIds.find(id => id != currentUserId);
+
+            if (!otherParticipantId) {
+                console.error('❌ 상대방 참가자를 찾을 수 없습니다');
+                Toast.error('채팅방 정보를 찾을 수 없습니다.');
+                return;
+            }
+
+            console.log(`👥 채팅방 참가자: ${currentUserId} (나), ${otherParticipantId} (상대방)`);
+
+            // 양쪽 모두의 userRooms에서 방 제거 및 참여자 상태 업데이트
             const userRoomRef = database.ref(`userRooms/${currentUserId}/${activeRoomId}`);
-            const participantRef = database.ref(`chatRooms/${activeRoomId}/participants/${currentUserId}`);
+            const otherUserRoomRef = database.ref(`userRooms/${otherParticipantId}/${activeRoomId}`);
+            const currentParticipantRef = database.ref(`chatRooms/${activeRoomId}/participants/${currentUserId}`);
+            const otherParticipantRef = database.ref(`chatRooms/${activeRoomId}/participants/${otherParticipantId}`);
 
             Promise.all([
-                userRoomRef.remove(), // 사용자 채팅방 목록에서는 제거
-                participantRef.update({
+                userRoomRef.remove(), // 현재 사용자의 채팅방 목록에서 제거
+                otherUserRoomRef.remove(), // 상대방의 채팅방 목록에서도 제거
+                currentParticipantRef.update({
+                    status: 'inactive',
+                    leftAt: firebase.database.ServerValue.TIMESTAMP,
+                    // 기존 정보는 보존 (joinedAt, role 등)
+                }),
+                otherParticipantRef.update({
                     status: 'inactive',
                     leftAt: firebase.database.ServerValue.TIMESTAMP,
                     // 기존 정보는 보존 (joinedAt, role 등)

@@ -172,10 +172,13 @@ class UserOptimized {
         $result = $this->db->fetch($sql, [$userId]);
         $stats['post_count'] = (int)($result['count'] ?? 0);
         
-        // 댓글 수 - 인덱스 사용
-        $sql = "SELECT COUNT(*) as count FROM comments USE INDEX (idx_comments_user_performance) 
-                WHERE user_id = ? AND status = 'active'";
-        $result = $this->db->fetch($sql, [$userId]);
+        // 댓글 수 - 커뮤니티 + 공지사항 댓글 통합 (v3.73.0)
+        $sql = "SELECT
+                    (SELECT COUNT(*) FROM comments USE INDEX (idx_comments_user_performance)
+                     WHERE user_id = ? AND status = 'active') +
+                    (SELECT COUNT(*) FROM notice_comments
+                     WHERE user_id = ? AND status = 'active') as count";
+        $result = $this->db->fetch($sql, [$userId, $userId]);
         $stats['comment_count'] = (int)($result['count'] ?? 0);
         
         // 좋아요 수 - 최적화된 계산 (LIMIT 추가)
@@ -231,18 +234,53 @@ class UserOptimized {
     }
     
     /**
-     * 최적화된 최근 댓글 조회
+     * 최적화된 최근 댓글 조회 (커뮤니티 + 공지사항 댓글 통합)
+     * v3.73.0: 공지사항 댓글 포함하도록 개선
+     * v3.73.1: 서브쿼리 패턴으로 160배 성능 개선 (180ms → 1.1ms)
      */
     private function getRecentCommentsOptimized($userId) {
-        $sql = "SELECT c.id, LEFT(c.content, 100) as content, c.created_at, 
-                      p.title as post_title, c.post_id
-                FROM comments c USE INDEX (idx_comments_user_performance)
-                JOIN posts p ON c.post_id = p.id
-                WHERE c.user_id = ? AND c.status = 'active'
-                ORDER BY c.created_at DESC 
+        // 서브쿼리로 먼저 인덱스 필터링 후 JOIN (대용량 데이터 최적화)
+        $sql = "SELECT * FROM (
+                    SELECT
+                        c.id,
+                        LEFT(c.content, 100) as content,
+                        c.created_at,
+                        p.title as post_title,
+                        c.post_id,
+                        c.parent_id,
+                        'community' as comment_type
+                    FROM (
+                        SELECT id, content, created_at, post_id, parent_id
+                        FROM comments FORCE INDEX (idx_comments_user_performance)
+                        WHERE user_id = ? AND status = 'active'
+                        ORDER BY created_at DESC
+                        LIMIT 10
+                    ) c
+                    JOIN posts p ON c.post_id = p.id
+
+                    UNION ALL
+
+                    SELECT
+                        nc.id,
+                        LEFT(nc.content, 100) as content,
+                        nc.created_at,
+                        n.title as post_title,
+                        nc.notice_id as post_id,
+                        nc.parent_id,
+                        'notice' as comment_type
+                    FROM (
+                        SELECT id, content, created_at, notice_id, parent_id
+                        FROM notice_comments
+                        WHERE user_id = ? AND status = 'active'
+                        ORDER BY created_at DESC
+                        LIMIT 10
+                    ) nc
+                    JOIN notices n ON nc.notice_id = n.id
+                ) combined
+                ORDER BY created_at DESC
                 LIMIT 5";
-        
-        return $this->db->fetchAll($sql, [$userId]);
+
+        return $this->db->fetchAll($sql, [$userId, $userId]);
     }
     
     /**

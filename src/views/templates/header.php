@@ -848,10 +848,19 @@
                         <i class="fas fa-envelope"></i>
                         <span>채팅</span>
                     </a>
+                    <?php
+                    // 기업 회원만 신청 관리 메뉴 표시 (자신의 강의/행사 신청 관리용)
+                    try {
+                        $currentUserRole = AuthMiddleware::getUserRole();
+                        if ($currentUserRole === 'ROLE_CORPORATE'): ?>
                     <a href="/registrations" class="dropdown-item">
                         <i class="fas fa-clipboard-list"></i>
                         <span>신청 관리</span>
                     </a>
+                    <?php endif;
+                    } catch (Exception $e) {
+                        // 권한 확인 실패 시 메뉴 표시 안함
+                    } ?>
                     
                     <?php 
                     // 관리자를 위한 관리자 대시보드 메뉴
@@ -1913,10 +1922,19 @@
                     <span>채팅</span>
                     ${badgeHtml}
                 </a>
+                <?php
+                // 기업 회원만 신청 관리 메뉴 표시 (모바일 메뉴용, 자신의 강의/행사 신청 관리용)
+                try {
+                    $currentUserRoleMobile = AuthMiddleware::getUserRole();
+                    if ($currentUserRoleMobile === 'ROLE_CORPORATE'): ?>
                 <a href="/registrations" class="dropdown-item">
                     <i class="fas fa-clipboard-list"></i>
                     <span>신청 관리</span>
                 </a>
+                <?php endif;
+                } catch (Exception $e) {
+                    // 권한 확인 실패 시 메뉴 표시 안함
+                } ?>
                 ${adminMenuHtml}
                 <div class="dropdown-divider"></div>
                 <a href="/auth/logout" class="dropdown-item logout-item">
