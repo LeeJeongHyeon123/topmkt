@@ -3,32 +3,31 @@
  * 인증 관련 컨트롤러
  */
 
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/helpers/SmsHelper.php';
 require_once SRC_PATH . '/helpers/JWTHelper.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/models/User.php';
 
-class AuthController {
+class AuthController extends BaseController {
     
     private $userModel;
     private $db;
     
     public function __construct() {
+        parent::__construct(); // BaseController의 생성자 호출
+
         // 세션이 시작되지 않았으면 시작
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         // CSRF 토큰 생성
         if (!isset($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
-        
-        // 데이터베이스 연결 초기화 (싱글톤 패턴 사용)
-        require_once SRC_PATH . '/config/database.php';
-        $this->db = Database::getInstance();
-        
-        // User 모델 초기화
+
+        // User 모델 초기화 (데이터베이스는 BaseController에서 이미 초기화됨)
         $this->userModel = new User();
     }
     

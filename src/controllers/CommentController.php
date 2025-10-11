@@ -3,14 +3,16 @@
  * 댓글 관련 컨트롤러
  */
 
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/Comment.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
-class CommentController {
+class CommentController extends BaseController {
     private $commentModel;
-    
+
     public function __construct() {
+        parent::__construct(); // BaseController의 생성자 호출
         $this->commentModel = new Comment();
     }
     

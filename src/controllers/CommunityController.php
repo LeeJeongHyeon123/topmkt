@@ -3,7 +3,7 @@
  * 커뮤니티 게시판 컨트롤러
  */
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/Post.php';
 require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
@@ -13,14 +13,12 @@ require_once SRC_PATH . '/helpers/PerformanceDebugger.php';
 require_once SRC_PATH . '/helpers/WebLogger.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
-class CommunityController {
-    private $db;
+class CommunityController extends BaseController {
     private $postModel;
     private $userModel;
-    
+
     public function __construct() {
-        // 데이터베이스 연결 초기화
-        $this->db = Database::getInstance();
+        parent::__construct(); // BaseController의 생성자 호출
         $this->postModel = new Post();
         $this->userModel = new User();
     }

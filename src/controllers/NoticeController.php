@@ -4,7 +4,7 @@
  * 기존 CommunityController 패턴을 준수하여 개발
  */
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/Notice.php';
 require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
@@ -15,14 +15,12 @@ require_once SRC_PATH . '/helpers/WebLogger.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
-class NoticeController {
-    private $db;
+class NoticeController extends BaseController {
     private $noticeModel;
     private $userModel;
     
     public function __construct() {
-        // 데이터베이스 연결 초기화
-        $this->db = Database::getInstance();
+        parent::__construct(); // BaseController의 생성자 호출
         $this->noticeModel = new Notice();
         $this->userModel = new User();
     }

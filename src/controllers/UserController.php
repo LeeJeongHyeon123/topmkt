@@ -3,6 +3,7 @@
  * 사용자 관련 컨트롤러
  */
 
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/models/UserOptimized.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
@@ -10,11 +11,12 @@ require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/config/upload.php';
 
-class UserController {
+class UserController extends BaseController {
     private $userModel;
     private $userOptimized;
-    
+
     public function __construct() {
+        parent::__construct(); // BaseController의 생성자 호출
         $this->userModel = new User();
         $this->userOptimized = new UserOptimized();
     }
