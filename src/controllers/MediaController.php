@@ -4,18 +4,16 @@
  * 리치 텍스트 에디터 이미지 업로드 처리
  */
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
-require_once SRC_PATH . '/config/upload.php';
 
-class MediaController {
+class MediaController extends BaseController {
     private $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    private $maxFileSize; // 공통 설정에서 가져옴
     private $uploadBasePath;
-    
+
     public function __construct() {
+        parent::__construct(); // BaseController의 생성자 호출
         $this->uploadBasePath = ROOT_PATH . '/public/assets/uploads';
-        $this->maxFileSize = UploadConfig::getMaxFileSize(); // 공통 설정에서 가져옴 (30MB)
     }
     
     /**

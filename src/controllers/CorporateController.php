@@ -9,21 +9,19 @@ if (!defined('SRC_PATH')) {
     define('SRC_PATH', dirname(__DIR__));
 }
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/Corporate.php';
 require_once SRC_PATH . '/helpers/CorporateFileUpload.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
-require_once SRC_PATH . '/config/upload.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
 use App\Helpers\ValidationHelper;
 
-class CorporateController {
+class CorporateController extends BaseController {
     private $corporateModel;
-    private $db;
     
     public function __construct() {
-        $this->db = Database::getInstance();
+        parent::__construct(); // BaseController의 생성자 호출
         $this->corporateModel = new Corporate();
         
         // CSRF 토큰 생성

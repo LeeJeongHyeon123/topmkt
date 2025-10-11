@@ -1,4 +1,6 @@
 <?php
+
+require_once SRC_PATH . '/controllers/BaseController.php';
 /**
  * 신청 대기 알림 컨트롤러
  * 강의/행사 신청 대기 건수를 확인하고 알림을 제공
@@ -8,11 +10,11 @@ require_once SRC_PATH . '/config/database.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 
-class RegistrationNotificationController {
+class RegistrationNotificationController extends BaseController {
     private $db;
     
     public function __construct() {
-        $this->db = Database::getInstance();
+        parent::__construct(); // BaseController의 생성자 호출$this->db = Database::getInstance();
     }
     
     /**

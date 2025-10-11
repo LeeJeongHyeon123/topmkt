@@ -4,7 +4,9 @@
  * 메인 페이지의 데이터를 처리하고 뷰를 렌더링합니다.
  */
 
-class HomeController
+require_once SRC_PATH . '/controllers/BaseController.php';
+
+class HomeController extends BaseController
 {
     /**
      * 메인 페이지를 렌더링합니다.

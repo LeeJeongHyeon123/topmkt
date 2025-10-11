@@ -1,4 +1,6 @@
 <?php
+
+require_once SRC_PATH . '/controllers/BaseController.php';
 /**
  * 공지사항 댓글 관련 컨트롤러
  * 기존 CommentController를 기반으로 notice_comments 테이블 사용
@@ -8,11 +10,11 @@ require_once SRC_PATH . '/models/NoticeComment.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
-class NoticeCommentController {
+class NoticeCommentController extends BaseController {
     private $commentModel;
     
     public function __construct() {
-        $this->commentModel = new NoticeComment();
+        parent::__construct(); // BaseController의 생성자 호출$this->commentModel = new NoticeComment();
     }
     
     /**

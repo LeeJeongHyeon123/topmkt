@@ -1,9 +1,11 @@
 <?php
+
+require_once SRC_PATH . '/controllers/BaseController.php';
 /**
  * 테스트 컨트롤러
  */
 
-class TestController {
+class TestController extends BaseController {
     
     /**
      * 테스트1 페이지

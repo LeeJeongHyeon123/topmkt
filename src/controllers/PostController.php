@@ -1,10 +1,12 @@
 <?php
+
+require_once SRC_PATH . '/controllers/BaseController.php';
 /**
  * 게시글 관련 컨트롤러
  */
 namespace App\Controllers;
 
-class PostController {
+class PostController extends BaseController {
     /**
      * 게시글 목록 페이지 (메인 페이지)
      */

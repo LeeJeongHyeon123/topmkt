@@ -1,10 +1,12 @@
 <?php
+
+require_once SRC_PATH . '/controllers/BaseController.php';
 /**
  * Sample Controller
  * 불매 알림 페이지 컨트롤러
  */
 
-class SampleController {
+class SampleController extends BaseController {
     /**
      * 불매 알림 페이지 표시
      */
