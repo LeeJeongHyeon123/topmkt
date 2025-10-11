@@ -1054,9 +1054,63 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         document.body.style.overflow = 'hidden';
-        
+
         // 편집 모달 초기화 완료
-        
+
+        // 전화번호 자동 포맷팅 설정
+        const phoneInput = document.getElementById('edit_phone');
+        if (phoneInput) {
+            // 하이픈 자동 삽입 (input 이벤트)
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value;
+                let cursorPosition = e.target.selectionStart;
+
+                // 숫자만 추출
+                const numbers = value.replace(/[^\d]/g, '');
+
+                // 입력이 비어있으면 빈 문자열 반환
+                if (numbers.length === 0) {
+                    e.target.value = '';
+                    return;
+                }
+
+                // 전화번호 포맷팅 (010 형식만 지원)
+                let formatted = '';
+
+                if (numbers.length <= 3) {
+                    formatted = numbers;
+                } else if (numbers.length <= 7) {
+                    formatted = numbers.substring(0, 3) + '-' + numbers.substring(3);
+                } else {
+                    formatted = numbers.substring(0, 3) + '-' + numbers.substring(3, 7) + '-' + numbers.substring(7, 11);
+                }
+
+                // 포맷팅된 값 적용
+                e.target.value = formatted;
+
+                // 커서 위치 조정 (하이픈이 추가된 경우 커서 위치 보정)
+                const diff = formatted.length - value.length;
+                if (diff > 0) {
+                    e.target.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
+                } else {
+                    e.target.setSelectionRange(cursorPosition, cursorPosition);
+                }
+            });
+
+            // 010-으로 시작하는지 검증 (blur 이벤트)
+            phoneInput.addEventListener('blur', function(e) {
+                const value = e.target.value.trim();
+
+                // 값이 있고, 010-으로 시작하지 않으면 에러 표시
+                if (value && !value.startsWith('010-')) {
+                    Toast.error('❌ 전화번호는 010-으로 시작해야 합니다');
+                    e.target.focus();
+                }
+            });
+
+            console.log('✅ 전화번호 자동 포맷팅 및 검증 설정 완료');
+        }
+
         console.log('✅ 편집 모달 생성 완료');
     }
     
