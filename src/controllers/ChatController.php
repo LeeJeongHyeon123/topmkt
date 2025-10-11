@@ -4,12 +4,13 @@
  * Firebase Realtime Database 기반 실시간 채팅 기능 관리
  */
 
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
-class ChatController {
+class ChatController extends BaseController {
     private $userModel;
     
     public function __construct() {

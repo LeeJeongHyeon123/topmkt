@@ -4,26 +4,24 @@
  * 강의/행사 일정 관리 기능
  */
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/config/upload.php';
 
-class LectureController {
-    private $db;
+class LectureController extends BaseController {
     private $userModel;
-    
+
     public function __construct() {
+        parent::__construct(); // BaseController의 생성자 호출
         try {
-            $this->db = Database::getInstance();
             $this->userModel = new User();
         } catch (Exception $e) {
             error_log("LectureController 초기화 오류: " . $e->getMessage());
             // 오류 발생 시 기본 페이지로 리다이렉트
-            header('Location: /?error=db_connection');
-            exit;
+            $this->redirect('/?error=db_connection');
         }
     }
     

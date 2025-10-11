@@ -4,7 +4,7 @@
  * 관리자 페이지 전용 컨트롤러
  */
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 
 // WebLogger 로드 (v4.0.0 통합 로깅 시스템)
@@ -12,11 +12,9 @@ if (file_exists(SRC_PATH . '/helpers/WebLogger.php')) {
     require_once SRC_PATH . '/helpers/WebLogger.php';
 }
 
-class AdminController {
-    private $db;
-    
+class AdminController extends BaseController {
     public function __construct() {
-        $this->db = Database::getInstance();
+        parent::__construct(); // BaseController의 생성자 호출
         
         // 관리자 권한 체크
         $this->checkAdminAccess();

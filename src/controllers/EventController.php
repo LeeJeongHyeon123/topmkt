@@ -4,7 +4,7 @@
  * 행사 일정 관리 기능 (강의 시스템 확장)
  */
 
-require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
@@ -15,10 +15,8 @@ require_once SRC_PATH . '/config/upload.php';
 require_once SRC_PATH . '/helpers/FirebaseHelper.php';
 
 class EventController extends LectureController {
-    private $db;
-    private $userModel;
-    
     public function __construct() {
+        parent::__construct(); // LectureController의 생성자 호출
         try {
             // WebLogger 초기화
             WebLogger::init([
