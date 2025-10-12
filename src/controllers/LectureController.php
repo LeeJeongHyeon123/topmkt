@@ -61,8 +61,10 @@ class LectureController extends BaseController {
             // 해당 월의 강의 목록 조회
             $lectures = $this->getLecturesByMonth($year, $month);
             
-            // 카테고리 목록 조회  
-            $categories = $this->getCategories();
+            // 카테고리 목록 조회 (캐싱 적용)
+            $categories = CacheHelper::remember('lecture_categories', 3600, function() {
+                return $this->getCategories();
+            });
             
             // 뷰 데이터 준비
             $viewData = [
@@ -72,8 +74,12 @@ class LectureController extends BaseController {
                 'currentMonth' => $month,
                 'view' => $view,
                 'calendarData' => $this->generateCalendarData($year, $month, $lectures),
-                'todayLectures' => $this->getTodayLectures(),
-                'upcomingLectures' => $this->getUpcomingLectures(5)
+                'todayLectures' => CacheHelper::remember('today_lectures_' . date('Y-m-d'), 1800, function() {
+                    return $this->getTodayLectures();
+                }),
+                'upcomingLectures' => CacheHelper::remember('upcoming_lectures_5', 1800, function() {
+                    return $this->getUpcomingLectures(5);
+                })
             ];
             
             // 헤더 데이터

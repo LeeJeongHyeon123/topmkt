@@ -1,79 +1,76 @@
--- 커뮤니티 게시판 성능 최적화를 위한 인덱스 생성
--- 실행 명령어: SOURCE /var/www/html/topmkt/optimize_database_indexes.sql;
+-- 탑마케팅 데이터베이스 인덱스 최적화 스크립트
 
--- 현재 인덱스 상태 확인
-SELECT 
-    TABLE_NAME,
-    INDEX_NAME,
-    COLUMN_NAME,
-    INDEX_TYPE
-FROM information_schema.STATISTICS 
-WHERE TABLE_SCHEMA = DATABASE() 
-  AND TABLE_NAME IN ('posts', 'users', 'comments')
-ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX;
+-- users 테이블 인덱스 추가/최적화
+ALTER TABLE users ADD INDEX IF NOT EXISTS idx_users_role_status (role, status);
+ALTER TABLE users ADD INDEX IF NOT EXISTS idx_users_phone_email (phone, email);
+ALTER TABLE users ADD INDEX IF NOT EXISTS idx_users_last_login (last_login);
 
--- posts 테이블 최적화 인덱스
--- 1. 게시글 목록 조회 최적화 (created_at DESC + status)
-CREATE INDEX IF NOT EXISTS idx_posts_list_performance 
-ON posts (status, created_at DESC);
+-- lectures 테이블 인덱스 추가/최적화
+ALTER TABLE lectures ADD INDEX IF NOT EXISTS idx_lectures_user_status_date (user_id, status, start_date);
+ALTER TABLE lectures ADD INDEX IF NOT EXISTS idx_lectures_category_date (category, start_date);
+ALTER TABLE lectures ADD INDEX IF NOT EXISTS idx_lectures_organizer_status (organizer_id, status);
 
--- 2. 검색 기능 최적화 (title, content 검색)
-CREATE INDEX IF NOT EXISTS idx_posts_search_title 
-ON posts (title);
+-- lecture_registrations 테이블 인덱스 추가/최적화
+ALTER TABLE lecture_registrations ADD INDEX IF NOT EXISTS idx_registrations_user_status (user_id, status);
+ALTER TABLE lecture_registrations ADD INDEX IF NOT EXISTS idx_registrations_lecture_status (lecture_id, status);
+ALTER TABLE lecture_registrations ADD INDEX IF NOT EXISTS idx_registrations_date_status (registration_date, status);
+ALTER TABLE lecture_registrations ADD INDEX IF NOT EXISTS idx_registrations_waiting (is_waiting_list, status, waiting_order);
 
-CREATE INDEX IF NOT EXISTS idx_posts_search_content 
-ON posts (content(100)); -- content의 첫 100자만 인덱싱
+-- posts 테이블 인덱스 추가/최적화
+ALTER TABLE posts ADD INDEX IF NOT EXISTS idx_posts_user_status (user_id, status);
+ALTER TABLE posts ADD INDEX IF NOT EXISTS idx_posts_created_status (created_at, status);
+ALTER TABLE posts ADD INDEX IF NOT EXISTS idx_posts_category (category_id);
 
--- 3. 작성자별 게시글 조회 최적화
-CREATE INDEX IF NOT EXISTS idx_posts_user_created 
-ON posts (user_id, created_at DESC);
+-- comments 테이블 인덱스 추가/최적화
+ALTER TABLE comments ADD INDEX IF NOT EXISTS idx_comments_post_status (post_id, status);
+ALTER TABLE comments ADD INDEX IF NOT EXISTS idx_comments_user_status (user_id, status);
+ALTER TABLE comments ADD INDEX IF NOT EXISTS idx_comments_created_status (created_at, status);
 
--- 4. 통계 조회 최적화
-CREATE INDEX IF NOT EXISTS idx_posts_stats 
-ON posts (view_count, like_count, comment_count);
+-- notices 테이블 인덱스 추가/최적화
+ALTER TABLE notices ADD INDEX IF NOT EXISTS idx_notices_user_status (user_id, status);
+ALTER TABLE notices ADD INDEX IF NOT EXISTS idx_notices_created_status (created_at, status);
+ALTER TABLE notices ADD INDEX IF NOT EXISTS idx_notices_view_count (view_count);
 
--- users 테이블 최적화 인덱스
--- 1. 닉네임 검색 최적화
-CREATE INDEX IF NOT EXISTS idx_users_nickname 
-ON users (nickname);
+-- events 테이블 인덱스 추가/최적화
+ALTER TABLE events ADD INDEX IF NOT EXISTS idx_events_user_status (user_id, status);
+ALTER TABLE events ADD INDEX IF NOT EXISTS idx_events_start_date (start_date);
+ALTER TABLE events ADD INDEX IF NOT EXISTS idx_events_category (category_id);
 
--- 2. 프로필 이미지 조회 최적화
-CREATE INDEX IF NOT EXISTS idx_users_profile 
-ON users (id, nickname, profile_image);
+-- event_registrations 테이블 인덱스 추가/최적화
+ALTER TABLE event_registrations ADD INDEX IF NOT EXISTS idx_event_reg_user_status (user_id, status);
+ALTER TABLE event_registrations ADD INDEX IF NOT EXISTS idx_event_reg_event_status (event_id, status);
 
--- comments 테이블 최적화 인덱스
--- 1. 게시글별 댓글 조회 최적화
-CREATE INDEX IF NOT EXISTS idx_comments_post_performance 
-ON comments (post_id, status, created_at DESC);
+-- company_profiles 테이블 인덱스 추가/최적화
+ALTER TABLE company_profiles ADD INDEX IF NOT EXISTS idx_company_profiles_user_status (user_id, status);
+ALTER TABLE company_profiles ADD INDEX IF NOT EXISTS idx_company_profiles_status_created (status, created_at);
 
--- 2. 대댓글 조회 최적화
-CREATE INDEX IF NOT EXISTS idx_comments_parent_performance 
-ON comments (parent_id, status, created_at);
+-- user_sessions 테이블 인덱스 추가/최적화
+ALTER TABLE user_sessions ADD INDEX IF NOT EXISTS idx_user_sessions_user_activity (user_id, last_activity);
+ALTER TABLE user_sessions ADD INDEX IF NOT EXISTS idx_user_sessions_activity (last_activity);
 
--- 3. 사용자별 댓글 조회 최적화
-CREATE INDEX IF NOT EXISTS idx_comments_user_performance 
-ON comments (user_id, status, created_at DESC);
+-- user_logs 테이블 인덱스 추가/최적화
+ALTER TABLE user_logs ADD INDEX IF NOT EXISTS idx_user_logs_user_action (user_id, action);
+ALTER TABLE user_logs ADD INDEX IF NOT EXISTS idx_user_logs_action_date (action, created_at);
 
--- 복합 인덱스로 JOIN 성능 향상
--- posts와 users 조인 최적화
-CREATE INDEX IF NOT EXISTS idx_posts_join_optimization 
-ON posts (user_id, status, created_at DESC, id);
+-- settings 테이블 인덱스 추가/최적화
+ALTER TABLE settings ADD INDEX IF NOT EXISTS idx_settings_key_type (key_name, type);
 
--- 인덱스 생성 완료 후 통계 업데이트
-ANALYZE TABLE posts;
-ANALYZE TABLE users; 
-ANALYZE TABLE comments;
+-- 복합 인덱스 성능 최적화 확인 쿼리
+EXPLAIN SELECT u.id, u.nickname, u.email, u.phone, u.status, u.role
+FROM users u
+WHERE u.status = 'active' AND u.role = 'ROLE_CORPORATE';
 
--- 최종 인덱스 확인
-SELECT 
-    TABLE_NAME,
-    INDEX_NAME,
-    COLUMN_NAME,
-    CARDINALITY,
-    INDEX_TYPE
-FROM information_schema.STATISTICS 
-WHERE TABLE_SCHEMA = DATABASE() 
-  AND TABLE_NAME IN ('posts', 'users', 'comments')
-ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX;
+EXPLAIN SELECT l.id, l.title, l.start_date, l.status, l.category
+FROM lectures l
+WHERE l.status = 'published' AND l.start_date >= CURDATE()
+ORDER BY l.start_date ASC;
 
-SELECT '데이터베이스 인덱스 최적화 완료!' AS message;
+EXPLAIN SELECT lr.id, lr.lecture_id, lr.user_id, lr.status, lr.registration_date
+FROM lecture_registrations lr
+WHERE lr.lecture_id = 1 AND lr.status = 'approved'
+ORDER BY lr.registration_date DESC;
+
+-- 인덱스 사용 통계 확인
+SHOW INDEX FROM users;
+SHOW INDEX FROM lectures;
+SHOW INDEX FROM lecture_registrations;
