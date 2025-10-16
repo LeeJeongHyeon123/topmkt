@@ -215,7 +215,116 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.58.0 ~ v3.84.0)
+## 최근 주요 작업 (v3.58.0 ~ v3.86.0)
+
+### v3.86.0 - FCM 앱 푸시 알림 설정 시스템 구축 (2025-10-16) 🔔
+**Firebase Cloud Messaging 기반 사용자별 알림 설정 관리 시스템 완성**
+
+**구현 범위**:
+- ✅ 사용자별 알림 설정 관리 (5가지 알림 타입)
+- ✅ 전체 알림 ON/OFF 마스터 스위치
+- ✅ 개별 알림 세부 제어
+- ✅ 반응형 UI (768px, 480px breakpoints)
+- ✅ 헤더 메뉴 통합 (모바일/PC)
+- ✅ 완전한 QA 가이드 문서화
+
+**알림 타입 (5가지)**:
+1. **댓글, 대댓글 알림** - 내 게시글에 댓글/대댓글 작성 시
+2. **좋아요 알림** - 내 게시글에 좋아요 클릭 시
+3. **신규 강의, 행사 알림** - 새로운 강의/행사 등록 시
+4. **신청 승인, 거절 알림** - 강의/행사 신청 결과 알림
+5. **공지사항 알림** - 새로운 공지사항 등록 시
+
+**데이터베이스 설계**:
+```sql
+CREATE TABLE `notification_settings` (
+    `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT(11) NOT NULL UNIQUE,
+    `all_notifications` TINYINT(1) DEFAULT 1,
+    `comments_enabled` TINYINT(1) DEFAULT 1,
+    `likes_enabled` TINYINT(1) DEFAULT 1,
+    `lectures_events_enabled` TINYINT(1) DEFAULT 1,
+    `registration_enabled` TINYINT(1) DEFAULT 1,
+    `notices_enabled` TINYINT(1) DEFAULT 1,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB CHARSET=utf8mb4;
+```
+
+**백엔드 구현**:
+- **Model**: `/src/models/NotificationSettings.php`
+  - 자동 기본 설정 생성 (모든 알림 ON)
+  - 트랜잭션 기반 안전한 업데이트
+  - 대량 처리 지원 (getBulkSettings, getEnabledUserIds)
+  - CASCADE DELETE로 사용자 삭제 시 자동 정리
+- **Controller**: `/src/controllers/NotificationSettingsController.php`
+  - RESTful API 엔드포인트 (GET, PUT, POST)
+  - CSRF 토큰 검증
+  - 인증 미들웨어 통합
+  - 상세 로깅 및 에러 처리
+
+**프론트엔드 구현**:
+- **페이지**: `/src/views/notifications/settings.php`
+  - 그라디언트 헤더 (#667eea ~ #764ba2)
+  - 6개 Toggle Switch (전체 알림 + 5개 개별)
+  - 전체 알림 OFF 시 개별 토글 자동 비활성화
+  - 저장/취소 버튼 (하단 배치)
+  - ApiClient, Toast, Loading 컴포넌트 활용
+- **디자인 특징**:
+  - 최대 너비 800px 중앙 정렬
+  - 반응형 (모바일에서 세로 레이아웃)
+  - 안내 메시지 박스 (사용법 설명)
+  - 일관된 UI/UX (user/edit.php 패턴 준수)
+
+**API 엔드포인트**:
+1. `GET /notifications/settings` - 설정 페이지 렌더링
+2. `GET /api/notifications/settings` - 현재 설정 조회
+3. `PUT /api/notifications/settings` - 설정 일괄 저장
+4. `POST /api/notifications/toggle-all` - 전체 알림 ON/OFF
+5. `GET /api/notifications/check/{type}/{id}` - 특정 알림 활성화 확인
+
+**헤더 메뉴 통합**:
+- 모바일 메뉴: 프로필 → 채팅 → **알림 설정** (신규)
+- PC 드롭다운: 프로필 → 채팅 → **알림 설정** (신규)
+- 아이콘: `fas fa-bell`
+
+**보안 및 검증**:
+- ✅ AuthMiddleware 인증 필수
+- ✅ CSRF 토큰 검증 (모든 POST/PUT 요청)
+- ✅ Foreign Key Constraint (CASCADE DELETE)
+- ✅ 입력 검증 (boolean 타입 강제 변환)
+- ✅ SQL Injection 방어 (Prepared Statements)
+
+**QA 문서**:
+- `/var/www/html/topmkt/QA_NOTIFICATION_SETTINGS.md`
+- 10개 섹션 완전 커버:
+  1. 페이지 접근 테스트
+  2. UI/UX 테스트 (3가지 화면 크기)
+  3. 기능 테스트 (설정 로드, 토글, 저장)
+  4. API 테스트 (curl 예제 포함)
+  5. 에러 처리 테스트
+  6. 데이터베이스 검증
+  7. 보안 테스트
+  8. 성능 테스트
+  9. 크로스 브라우저 테스트
+  10. 접근성 테스트
+
+**기술 스택**:
+- Backend: PHP 8.x, MySQL, MVC 패턴
+- Frontend: Vanilla JS, CSS Grid/Flexbox
+- 컴포넌트: ApiClient, Toast, Loading, CSRF 토큰
+- 보안: AuthMiddleware, CSRF Protection, Foreign Keys
+
+**향후 확장 가능성**:
+- FCM 푸시 전송 로직 통합 (Model 메서드 준비 완료)
+- 알림 히스토리 기능 추가
+- 알림 타입별 세부 설정 (시간대, 빈도 등)
+- 이메일/SMS 알림 옵션 추가
+
+**결과**:
+- 완전한 사용자 중심 알림 제어 시스템 구축
+- FCM 푸시 알림 전송 준비 완료
+- 확장 가능한 아키텍처 구현
+- 프로덕션 배포 준비 완료
 
 ### v3.81.0 - 프로덕션 환경 완료: 수동으로 모든 console 로그 안전하게 제거 (2025-10-16) 🎉
 **사용자 요청으로 꼼꼼한 수동 제거 방식으로 완벽한 console 로그 제거 완료**
