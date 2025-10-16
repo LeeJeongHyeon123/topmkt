@@ -55,9 +55,4 @@ window.validateImageFile = function(file) {
 
     return true;
 };
-
-// 디버깅용 정보 출력
-    maxFileSizeMB: window.TOPMKT_UPLOAD_CONFIG.maxFileSizeMB + 'MB',
-    allowedExtensions: window.TOPMKT_UPLOAD_CONFIG.allowedImageExtensions
-});
 </script>
