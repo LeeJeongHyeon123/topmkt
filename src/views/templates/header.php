@@ -201,7 +201,7 @@
                 * .header-content .header-left {
                     margin-left: 0 !important;
                     flex: 0 0 auto !important;
-                    order: 1 !important;
+                    order: -1 !important;
                 }
             `;
             document.head.insertBefore(style, document.head.firstChild);
@@ -245,7 +245,7 @@
         * header .header-left,
         * .header-content .header-left {
             flex: 0 0 auto !important;
-            order: 1 !important;
+            order: -1 !important;
             position: relative !important;
             transform: none !important;
             left: auto !important;
@@ -287,7 +287,7 @@
             html body header .header-left,
             html body .header-content .header-left {
                 flex: 0 0 auto !important;
-                order: 1 !important;
+                order: -1 !important;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
@@ -399,7 +399,7 @@
         <div class="container" style="overflow: visible !important; position: relative;">
             <div class="header-content" style="display: flex !important; justify-content: flex-start !important; align-items: center !important; width: 100% !important; padding: 15px 20px 15px 20px !important; overflow: visible !important; flex-direction: row !important; flex-wrap: nowrap !important; box-sizing: border-box !important; gap: 20px !important;">
                 <!-- 로고 -->
-                <div class="header-left" style="flex: 0 0 auto !important; order: 1 !important; position: relative !important; transform: none !important; left: auto !important; right: auto !important; margin-left: 0 !important; margin-right: 0 !important; width: auto !important; min-width: 0 !important; max-width: none !important; box-sizing: border-box !important;">
+                <div class="header-left" style="flex: 0 0 auto !important; order: -1 !important; position: relative !important; transform: none !important; left: auto !important; right: auto !important; margin-left: 0 !important; margin-right: 0 !important; width: auto !important; min-width: 0 !important; max-width: none !important; box-sizing: border-box !important;">
                     <h1 class="logo">
                         <a href="/" class="logo-link">
                             <div class="logo-icon">
@@ -744,7 +744,7 @@
 
                     .header-left,
                     header .header-left {
-                        order: 1 !important;
+                        order: -1 !important;
                         flex: 0 0 auto !important; /* 로고가 좌측에 고정되도록 설정 */
                     }
 
@@ -753,7 +753,7 @@
                         .header-left,
                         header .header-left,
                         .header-content .header-left {
-                            order: 1 !important;
+                            order: -1 !important;
                             flex: 0 0 auto !important;
                             position: relative !important;
                             transform: none !important;
@@ -768,7 +768,7 @@
                         html body header .header-left,
                         html body .header-content .header-left {
                             flex: 0 0 auto !important;
-                            order: 1 !important;
+                            order: -1 !important;
                             position: relative !important;
                             transform: none !important;
                             left: auto !important;
@@ -1927,7 +1927,7 @@
                         // 모든 가능한 스타일 속성 강제 설정
                         const logoStyles = {
                             'flex': '0 0 auto',
-                            'order': '1',
+                            'order': '-1',
                             'position': 'relative',
                             'transform': 'none',
                             'left': 'auto',
@@ -1940,7 +1940,7 @@
                             headerLeft.style.setProperty(property, value, 'important');
                         });
 
-                        console.log('🔒 로고 위치 보호 적용 완료');
+                        console.log('🔒 로고 위치 보호 적용 완료 (order: -1)');
                     }
 
                     // 햄버거 메뉴 강제 표시
@@ -2302,81 +2302,9 @@
         // - 모든 가능한 셀렉터로 지속적 검증
         // - 더 자주 그리고 광범위하게 확인
         // ============================================================
-        (function() {
-            'use strict';
-
-            var verificationInterval;
-
-            function verifyLogoPosition() {
-                var selectors = [
-                    '.header-content',
-                    'header .header-content',
-                    '.main-header .header-content',
-                    'html body .header-content',
-                    'html body header .header-content',
-                    'html body .main-header .header-content'
-                ];
-
-                var allCorrect = true;
-
-                selectors.forEach(function(selector) {
-                    var elements = document.querySelectorAll(selector);
-                    elements.forEach(function(element) {
-                        var computed = window.getComputedStyle(element);
-                        if (computed.justifyContent !== 'space-between' ||
-                            computed.display !== 'flex' ||
-                            computed.alignItems !== 'center') {
-                            console.warn('⚠️ 헤더 레이아웃 검증 실패:', selector, {
-                                justifyContent: computed.justifyContent,
-                                display: computed.display,
-                                alignItems: computed.alignItems
-                            });
-                            allCorrect = false;
-                        }
-                    });
-                });
-
-                if (allCorrect) {
-                    console.log('✅ 헤더 로고 위치 검증 성공 - 모든 요소가 올바른 위치에 있습니다');
-                }
-
-                return allCorrect;
-            }
-
-            function startVerification() {
-                // 즉시 검증
-                verifyLogoPosition();
-
-                // 100ms 간격으로 10초간 지속 검증 (초기 로딩 안정화)
-                var count = 0;
-                verificationInterval = setInterval(function() {
-                    verifyLogoPosition();
-                    count++;
-                    if (count >= 100) { // 10초 후 중단
-                        clearInterval(verificationInterval);
-                    }
-                }, 100);
-
-                // 30초 후 최종 검증
-                setTimeout(function() {
-                    clearInterval(verificationInterval);
-                    console.log('🔍 최종 헤더 레이아웃 검증 완료');
-                    verifyLogoPosition();
-                }, 30000);
-            }
-
-            // DOM 준비 완료 시 시작
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', startVerification, { once: true });
-            } else {
-                startVerification();
-            }
-
-            // 페이지 로드 완료 후 최종 검증
-            window.addEventListener('load', function() {
-                setTimeout(verifyLogoPosition, 100); // 로드 완료 후 약간의 지연
-            }, { once: true });
-        })();
+        // ✅ v3.83.0: 헤더 로고 위치 수정 완료
+        // 검증 시스템 제거 - 로고 위치가 order: -1로 영구 고정되었으므로 불필요
+        console.log('✅ 헤더 로고 위치 수정 완료 (v3.83.0) - order: -1로 좌측 고정');
 
     } // 🚀 v3.64.0: headerMobileMenuInitialized 플래그 종료
     </script> 
