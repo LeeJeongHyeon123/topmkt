@@ -14,7 +14,6 @@
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) {
-        console.error(`Modal not found: ${modalId}`);
         return;
     }
 
@@ -39,7 +38,6 @@ function openModal(modalId) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) {
-        console.error(`Modal not found: ${modalId}`);
         return;
     }
 
@@ -101,7 +99,6 @@ function handleModalBackdropClick(e) {
 function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) {
-        console.error(`Modal not found: ${modalId}`);
         return;
     }
 

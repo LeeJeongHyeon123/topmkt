@@ -39,7 +39,6 @@ function testLectureUpdate() {
         category: 'marketing'
     };
     
-    console.log('전송할 데이터:', testData);
     
     fetch('/lectures/162/update', {
         method: 'PUT',
@@ -49,16 +48,12 @@ function testLectureUpdate() {
         body: JSON.stringify(testData)
     })
     .then(response => {
-        console.log('응답 상태:', response.status);
-        console.log('응답 헤더:', response.headers);
         return response.json();
     })
     .then(data => {
-        console.log('응답 데이터:', data);
         document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
     })
     .catch(error => {
-        console.error('오류:', error);
         document.getElementById('result').innerHTML = '<p style="color: red;">오류: ' + error.message + '</p>';
     });
 }
@@ -83,22 +78,18 @@ function testFormDataUpdate() {
     formData.append('registration_fee', '0');
     formData.append('category', 'marketing');
     
-    console.log('FormData 전송');
     
     fetch('/lectures/162/update', {
         method: 'POST', // FormData는 POST로 보내고 _method로 PUT 지정
         body: formData
     })
     .then(response => {
-        console.log('응답 상태:', response.status);
         return response.json();
     })
     .then(data => {
-        console.log('응답 데이터:', data);
         document.getElementById('result2').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
     })
     .catch(error => {
-        console.error('오류:', error);
         document.getElementById('result2').innerHTML = '<p style="color: red;">오류: ' + error.message + '</p>';
     });
 }

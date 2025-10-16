@@ -22,7 +22,6 @@ function initializeRegistrationRealtimeNotifications() {
     const roleElement = document.querySelector('meta[name="user-role"]');
     
     if (!userElement || !roleElement) {
-        console.log('🔔 Registration Firebase: 사용자 정보 없음');
         return;
     }
     
@@ -32,11 +31,9 @@ function initializeRegistrationRealtimeNotifications() {
     // 기업 회원만 알림 활성화
     if (!RegistrationRealtimeNotifications.currentUserId || 
         RegistrationRealtimeNotifications.userRole !== 'ROLE_CORP') {
-        console.log('🔔 Registration Firebase: 기업 회원이 아님');
         return;
     }
     
-    console.log('🔔 Firebase 실시간 신청 알림 시스템 초기화 - 사용자 ID:', RegistrationRealtimeNotifications.currentUserId);
     
     // Firebase 초기화
     initializeFirebaseForRegistrations();
@@ -51,7 +48,6 @@ function initializeFirebaseForRegistrations() {
         RegistrationRealtimeNotifications.firebaseApp = firebase.apps[0];
         RegistrationRealtimeNotifications.database = firebase.database();
         
-        console.log('🔔 Firebase 앱 재사용 성공');
         setupRegistrationRealtimeListeners();
         
     } else {
@@ -73,15 +69,12 @@ function initializeFirebaseForRegistrations() {
                 }
                 RegistrationRealtimeNotifications.database = firebase.database();
                 
-                console.log('🔔 Firebase 초기화 성공');
                 setupRegistrationRealtimeListeners();
                 
             } else {
-                console.error('🔔 Firebase 설정 가져오기 실패:', data);
             }
         })
         .catch(error => {
-            console.error('🔔 Firebase 초기화 오류:', error);
         });
     }
 }
@@ -92,20 +85,17 @@ function initializeFirebaseForRegistrations() {
 function setupRegistrationRealtimeListeners() {
     if (!RegistrationRealtimeNotifications.database || 
         !RegistrationRealtimeNotifications.currentUserId) {
-        console.error('🔔 Firebase 데이터베이스 또는 사용자 ID가 없음');
         return;
     }
     
     const userId = RegistrationRealtimeNotifications.currentUserId;
     const pendingRef = RegistrationRealtimeNotifications.database.ref(`pendingRegistrations/${userId}`);
     
-    console.log('🔔 Firebase 리스너 설정 중:', `pendingRegistrations/${userId}`);
     
     // 실시간 리스너 설정
     pendingRef.on('value', (snapshot) => {
         const data = snapshot.val();
         
-        console.log('🔔 Firebase 데이터 수신:', data);
         
         if (data && data.count > 0) {
             showRealtimePendingAlert(data.count, data.message, data.details);
@@ -113,13 +103,11 @@ function setupRegistrationRealtimeListeners() {
             hideRealtimePendingAlert();
         }
     }, (error) => {
-        console.error('🔔 Firebase 리스너 오류:', error);
     });
     
     RegistrationRealtimeNotifications.pendingRef = pendingRef;
     RegistrationRealtimeNotifications.initialized = true;
     
-    console.log('🔔 Firebase 실시간 리스너 설정 완료');
 }
 
 /**
@@ -129,7 +117,6 @@ function showRealtimePendingAlert(count, message, details) {
     // 기존 알림 제거
     hideRealtimePendingAlert();
     
-    console.log(`🔔 실시간 알림 표시: ${count}개 대기 중`, details);
     
     // 상세 메시지 구성
     let detailMessage = '';
@@ -329,7 +316,6 @@ function cleanupRegistrationRealtimeNotifications() {
     hideRealtimePendingAlert();
     RegistrationRealtimeNotifications.initialized = false;
     
-    console.log('🔔 Firebase 실시간 알림 시스템 정리 완료');
 }
 
 // 페이지 로드 시 초기화
@@ -349,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // 15초 후 포기
         setTimeout(() => {
             clearInterval(checkFirebase);
-            console.warn('🔔 Firebase SDK 로드 타임아웃');
         }, 15000);
     }
 });

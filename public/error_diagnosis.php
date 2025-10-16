@@ -335,7 +335,6 @@ setTimeout(function() {
 
 // 에러 발생 시 자동 대안 제시
 window.addEventListener('error', function(e) {
-    console.error('JavaScript 에러 감지:', e.message);
     document.body.insertAdjacentHTML('beforeend', 
         '<div style="position: fixed; top: 10px; right: 10px; background: #ff4040; color: #fff; padding: 15px; border-radius: 8px; z-index: 9999;">' +
         '🚨 JavaScript 오류 감지<br>' +

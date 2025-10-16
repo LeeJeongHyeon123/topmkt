@@ -179,7 +179,6 @@
         showFieldError(field, message) {
             const element = typeof field === 'string' ? document.querySelector(field) : field;
             if (!element) {
-                console.warn('FormValidator: 필드를 찾을 수 없습니다:', field);
                 return;
             }
 
@@ -230,7 +229,6 @@
         showFormErrors(errors, formSelector = '#registrationForm') {
             const form = document.querySelector(formSelector);
             if (!form) {
-                console.warn('FormValidator: 폼을 찾을 수 없습니다:', formSelector);
                 return;
             }
 
@@ -330,7 +328,7 @@
     // 전역 인스턴스 생성
     window.FormValidator = new FormValidator();
 
-    console.log('✅ FormValidator 클래스 로드 완료 (v3.41.0)');
+
 
 })(window);
 </script>

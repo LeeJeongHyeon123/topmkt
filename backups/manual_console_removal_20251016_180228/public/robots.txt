@@ -1,0 +1,42 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /src/
+Disallow: /config/
+Disallow: /tests/
+Disallow: *.sql
+Disallow: *.log
+Disallow: /auth/logout
+Disallow: /corp/apply
+Disallow: /corp/status
+Disallow: /corp/edit
+
+# Crawl-delay in seconds
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://www.topmktx.com/sitemap.xml
+
+# Special rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Yandex
+Allow: /
+Crawl-delay: 2
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /

@@ -578,7 +578,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             Toast.error('네트워크 오류가 발생했습니다.');
         })
         .finally(() => {

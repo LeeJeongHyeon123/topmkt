@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 느린 코드 찾기</title>
+</head>
+<body>
+    <h1>🔍 강의 210 페이지로 리다이렉트 중...</h1>
+    <p>Performance API로 느린 코드를 측정합니다.</p>
+
+    <script>
+        // Performance Observer로 Long Task 감지
+        if ('PerformanceObserver' in window) {
+            const observer = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                    console.error('🐌 Long Task 발견!', {
+                        duration: entry.duration + 'ms',
+                        startTime: entry.startTime,
+                        name: entry.name,
+                        attribution: entry.attribution
+                    });
+
+                    if (entry.duration > 1000) {
+                        alert(`🚨 매우 느린 작업 발견!\n시간: ${entry.duration.toFixed(0)}ms\n콘솔을 확인하세요.`);
+                    }
+                }
+            });
+
+            observer.observe({ entryTypes: ['longtask'] });
+            console.log('✅ Long Task Observer 시작됨');
+        }
+
+        // 3초 후 강의 페이지로 이동
+        setTimeout(() => {
+            window.location.href = '/lectures/210';
+        }, 3000);
+    </script>
+</body>
+</html>

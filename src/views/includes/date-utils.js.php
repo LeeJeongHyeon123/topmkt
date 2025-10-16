@@ -39,7 +39,6 @@
 
             // Invalid Date 체크
             if (isNaN(date.getTime())) {
-                console.warn('⚠️ formatDate: Invalid date:', dateString);
                 return nullText;
             }
 
@@ -55,7 +54,6 @@
 
             return dateStr;
         } catch (error) {
-            console.error('❌ formatDate 오류:', error);
             return nullText;
         }
     };
@@ -86,7 +84,6 @@
 
             // Invalid Date 체크
             if (isNaN(date.getTime())) {
-                console.warn('⚠️ formatDateTime: Invalid date:', dateString);
                 return nullText;
             }
 
@@ -104,7 +101,6 @@
 
             return date.toLocaleString('ko-KR', formatOptions);
         } catch (error) {
-            console.error('❌ formatDateTime 오류:', error);
             return nullText;
         }
     };
@@ -134,7 +130,6 @@
 
             return `${year}-${month}-${day}`;
         } catch (error) {
-            console.error('❌ formatDateSimple 오류:', error);
             return '';
         }
     };
@@ -178,13 +173,11 @@
                 return formatDate(dateString);
             }
         } catch (error) {
-            console.error('❌ formatRelativeTime 오류:', error);
             return formatDate(dateString);
         }
     };
 
     // 초기화 로그
-    console.log('✅ DateUtils 유틸리티 로드 완료');
 
 })();
 </script>

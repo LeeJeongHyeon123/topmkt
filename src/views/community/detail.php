@@ -631,7 +631,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const backToListBtn = document.getElementById('backToListBtn');
     const targetUrl = '<?= htmlspecialchars($listUrl ?? "/community") ?>';
     
-    console.log('🔍 [DEBUG] 목록 버튼 이벤트 리스너 등록:', targetUrl);
     
     if (backToListBtn) {
         // 기존 onclick 이벤트 제거
@@ -642,24 +641,20 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             e.stopPropagation();
             
-            console.log('🔍 [DEBUG] 목록 버튼 클릭됨 - 이동할 URL:', targetUrl);
-            console.log('🔍 [DEBUG] 현재 URL:', window.location.href);
             
             // 즉시 이동
             window.location.href = targetUrl;
         });
         
-        console.log('✅ 목록 버튼 이벤트 리스너 등록 완료');
     } else {
-        console.error('❌ 목록 버튼을 찾을 수 없습니다');
     }
 });
 </script>
 
 <!-- DEBUG: listUrl 변수 상태 확인 -->
 <script>
-console.log('🔍 [DEBUG] PHP listUrl 변수:', '<?= htmlspecialchars($listUrl ?? "NOT SET") ?>');
-console.log('🔍 [DEBUG] 현재 페이지에서 listUrl 존재 여부:', <?= isset($listUrl) ? 'true' : 'false' ?>);
+
+
 </script>
 
 <!-- 기존 프로필 이미지 모달 HTML 제거됨 - profile-modal.js 통합 시스템 사용 -->
@@ -676,10 +671,7 @@ console.log('🔍 [DEBUG] 현재 페이지에서 listUrl 존재 여부:', <?= is
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 게시글 상세보기 페이지 로드 완료');
-    console.log('📝 게시글 ID:', <?= $post['id'] ?>);
-    console.log('👤 작성자:', '<?= addslashes(htmlspecialchars($post['author_name'] ?? $post['nickname'] ?? '익명')) ?>');
-    console.log('🔑 소유자 여부:', <?= $isOwner ? 'true' : 'false' ?>);
+
     
     const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
     const isOwner = <?= $isOwner ? 'true' : 'false' ?>;
@@ -689,35 +681,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const likeBtn = document.getElementById('likeBtn');
     if (likeBtn && isLoggedIn) {
         likeBtn.addEventListener('click', function() {
-            console.log('좋아요 버튼 클릭됨'); // 디버깅용
+ // 디버깅용
             
             // 로딩 상태 표시
             const originalText = this.innerHTML;
-            console.log('원본 버튼 텍스트:', originalText); // 디버깅용
+ // 디버깅용
             this.disabled = true;
             this.innerHTML = '🔄 처리 중...';
             
             // CSRF 토큰 가져오기
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            console.log('API 호출:', `/api/posts/${postId}/like`); // 디버깅용
-
-            // v3.42.0: ApiClient 사용
-            ApiClient.post(`/api/posts/${postId}/like`, {}, { noLoading: true })
-            .then(data => {
-                console.log('좋아요 API 응답:', data); // 디버깅용
-                
-                if (data.status === 'success' && data.data) {
-                    console.log('좋아요 응답 성공:', data.data.action, '좋아요 수:', data.data.like_count); // 디버깅용
-                    
-                    // 좋아요 상태에 따라 버튼 텍스트 및 스타일 변경
-                    if (data.data.action === 'liked') {
-                        this.innerHTML = '❤️ 좋아요 ' + data.data.like_count;
                         this.classList.add('liked');
-                        console.log('좋아요 추가됨 - 버튼에 liked 클래스 추가'); // 디버깅용
+ // 디버깅용
                     } else if (data.data.action === 'unliked') {
                         this.innerHTML = '🤍 좋아요 ' + data.data.like_count;
                         this.classList.remove('liked');
-                        console.log('좋아요 취소됨 - 버튼에서 liked 클래스 제거'); // 디버깅용
+ // 디버깅용
                     }
                     
                     // 통계 업데이트 - 좋아요 수 표시하는 모든 요소 찾기
@@ -728,15 +707,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
                     
-                    console.log('UI 업데이트 완료'); // 디버깅용
+ // 디버깅용
                 } else {
-                    console.error('좋아요 API 오류:', data); // 디버깅용
+ // 디버깅용
                     Toast.error(data.message || '좋아요 처리 중 오류가 발생했습니다.');
                     this.innerHTML = originalText;
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 this.innerHTML = originalText;
             })
@@ -756,7 +734,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: '<?= htmlspecialchars($post['title']) ?>',
                     text: '탑마케팅 커뮤니티의 게시글을 확인해보세요!',
                     url: window.location.href
-                }).catch(console.error);
+
             } else {
                 // 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
                 copyToClipboard(window.location.href, {
@@ -795,7 +773,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 deleteBtn.disabled = false;
                 deleteBtn.innerHTML = '🗑️ 삭제';

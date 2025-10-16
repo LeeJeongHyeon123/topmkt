@@ -1,0 +1,51 @@
+RewriteEngine On
+
+# 파일이나 디렉토리가 존재하지 않으면 index.php로 라우팅
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# HTTPS 강제 (선택사항 - 프로덕션에서 사용)
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 보안 헤더
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options SAMEORIGIN
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # reCAPTCHA v3, Google 서비스, Font Awesome, Quill.js, 네이버 클라우드 플랫폼 Maps API를 위한 완전한 CSP 헤더
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.google-analytics.com https://ssl.google-analytics.com https://cdn.quilljs.com https://cdn.jsdelivr.net https://openapi.map.naver.com https://oapi.map.naver.com https://nrbe.pstatic.net https://navermaps.github.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.quilljs.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: https://nrbe.pstatic.net https://ssl.pstatic.net https://map-phinf.pstatic.net; connect-src 'self' https://www.google.com https://www.gstatic.com https://recaptcha.google.com https://www.google-analytics.com https://openapi.map.naver.com https://oapi.map.naver.com https://nrbe.pstatic.net https://navermaps.github.io https://kr-col-ext.nelo.navercorp.com https://naveropenapi.apigw.ntruss.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.recaptcha.net https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com"
+</IfModule>
+
+# 파일 접근 제한
+<Files "*.md">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files ".env">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# PHP 에러 표시 비활성화 (프로덕션)
+php_flag display_errors On
+php_flag log_errors On
+
+# 파일 업로드 크기 제한
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+
+# 세션 보안 설정
+php_flag session.cookie_httponly On
+php_flag session.cookie_secure Off
+php_value session.cookie_samesite Strict 
+# 세션 수명 설정 (30일)
+php_value session.gc_maxlifetime 2592000
+php_value session.gc_probability 1
+php_value session.gc_divisor 100
+

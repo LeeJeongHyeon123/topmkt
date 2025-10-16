@@ -491,22 +491,18 @@ function setupEventListeners() {
 // 사용자 통계 로드
 async function loadUserStats() {
     try {
-        console.log('📊 통계 로딩 시작...');
 
         // v3.63.0: ApiClient 사용
         const data = await ApiClient.get('/admin/getUserStats', { noLoading: true });
-        console.log('📊 받은 데이터:', data);
         
         if (data.success && data.stats) {
             document.getElementById('totalUsers').textContent = data.stats.total_users || 0;
             document.getElementById('todaySignups').textContent = data.stats.today_signups || 0;
             document.getElementById('activeUsers').textContent = data.stats.active_users || 0;
-            console.log('✅ 통계 로딩 성공');
         } else {
             throw new Error(data.error || '통계 데이터가 없습니다');
         }
     } catch (error) {
-        console.error('❌ 통계 로드 오류:', error);
         document.getElementById('totalUsers').textContent = '오류';
         document.getElementById('todaySignups').textContent = '오류';
         document.getElementById('activeUsers').textContent = '오류';
@@ -540,11 +536,9 @@ async function loadUsersData() {
             renderUsersTable(data.data.users);
             renderPagination(data.data);
         } else {
-            console.error('데이터 로드 실패:', data.message);
             document.getElementById('noDataMessage').style.display = 'block';
         }
     } catch (error) {
-        console.error('사용자 데이터 로드 오류:', error);
         document.getElementById('noDataMessage').style.display = 'block';
     } finally {
         isLoading = false;
@@ -631,11 +625,9 @@ async function viewUserDetail(userId) {
         document.getElementById('userDetailContent').innerHTML = 
             '<div class="loading-indicator"><div class="spinner"></div><p>사용자 정보를 불러오는 중...</p></div>';
         
-        console.log('👤 사용자 ID ' + userId + ' 상세 정보 로딩 시작...');
 
         // v3.63.0: ApiClient 사용
         const data = await ApiClient.get('/admin/users/' + userId + '/detail', { noLoading: true });
-        console.log('👤 받은 사용자 데이터:', data);
         
         if (data.error) {
             throw new Error(data.error);
@@ -645,7 +637,6 @@ async function viewUserDetail(userId) {
         renderUserDetail(data.data || data);
         
     } catch (error) {
-        console.error('❌ 사용자 상세 정보 로드 오류:', error);
         document.getElementById('userDetailContent').innerHTML = 
             '<div class="no-data-message"><p>❌ 사용자 정보를 불러올 수 없습니다</p><p><strong>오류:</strong> ' + error.message + '</p></div>';
     }

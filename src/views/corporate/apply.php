@@ -710,17 +710,14 @@ document.addEventListener('DOMContentLoaded', function() {
             noErrorToast: true
         })
         .then(data => {
-            console.log('[CORP_APPLY] 응답 수신:', data);
 
             if (data.success || data.data?.success) {
-                console.log('[CORP_APPLY] 성공 응답, /corp/status로 이동');
                 window.location.href = '/corp/status';
             } else {
                 throw new Error(data.message || '서버 오류가 발생했습니다');
             }
         })
         .catch(error => {
-            console.error('[CORP_APPLY] Fetch 오류:', error);
             Toast.error('신청 처리 중 오류가 발생했습니다. 다시 시도해주세요.\n오류: ' + error.message);
             
             // 버튼 원상복구

@@ -94,7 +94,6 @@ function setupFormMethodOverride() {
                         }
                     })
                     .catch(error => {
-                        console.error('요청 실패:', error);
                         alert('요청을 처리하는 중에 오류가 발생했습니다.');
                     });
                 }
@@ -169,7 +168,6 @@ function setupCommentEdit() {
                     commentItem.querySelector('.comment-actions').style.display = 'block';
                 })
                 .catch(error => {
-                    console.error('요청 실패:', error);
                     alert('댓글을 수정하는 중에 오류가 발생했습니다.');
                 });
             });

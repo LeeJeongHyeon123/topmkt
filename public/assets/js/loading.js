@@ -136,7 +136,6 @@ class TopMarketingLoader {
     show() {
         // 🚫 외부 프로토콜 클릭 직후에는 로딩 UI 표시 안 함
         if (window.lastExternalProtocolClick && (Date.now() - window.lastExternalProtocolClick < 1000)) {
-            console.log('🚫 최근 외부 프로토콜 클릭으로 인한 로딩 UI 표시 무시');
             return;
         }
         
@@ -308,7 +307,6 @@ let topMarketingLoader;
 
 // DOM 로드 완료 시 추가 설정 - 개선된 버전
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Loading.js 초기화 시작');
     
     // 이미 처리된 링크 추적
     const processedLinks = new Set();
@@ -324,7 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 newLinksCount++;
                 
                 link.addEventListener('click', function(e) {
-                    console.log('🚫 외부 프로토콜 링크 클릭 - 로딩 UI 완전 차단:', this.href);
                     
                     // 전역 타임스탬프 기록 (다른 이벤트 리스너들이 참조할 수 있도록)
                     window.lastExternalProtocolClick = Date.now();
@@ -334,14 +331,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // 추가 안전장치: 로딩이 이미 표시되어 있다면 숨김
                     if (topMarketingLoader && topMarketingLoader.isLoading) {
-                        console.log('🔄 기존 로딩 UI 강제 종료');
                         topMarketingLoader.hide();
                     }
                     
                     // 잠시 후 로딩 UI가 뜨려고 하는 것도 방지
                     setTimeout(() => {
                         if (topMarketingLoader && topMarketingLoader.isLoading) {
-                            console.log('🔄 지연된 로딩 UI도 강제 종료');
                             topMarketingLoader.hide();
                         }
                     }, 100);
@@ -351,7 +346,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (newLinksCount > 0) {
-            console.log('🔗 새로운 외부 프로토콜 링크 보호:', newLinksCount + '개');
         }
     }
     
@@ -365,7 +359,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (clickedElement.tagName === 'A') {
             const href = clickedElement.getAttribute('href') || clickedElement.href || '';
             if (href.match(/^(tel|mailto|sms|skype|whatsapp):/i)) {
-                console.log('🚫 클릭 이벤트에서 외부 프로토콜 감지 - 로딩 UI 스킵:', href);
                 return;
             }
         }
@@ -375,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const linkHref = link.getAttribute('href') || link.href || '';
         if (linkHref.match(/^(tel|mailto|sms|skype|whatsapp):/i)) {
-            console.log('🚫 closest 검색에서 외부 프로토콜 감지 - 로딩 UI 스킵:', linkHref);
             return;
         }
         
@@ -389,12 +381,10 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const linkUrl = new URL(link.href);
             if (linkUrl.hostname === window.location.hostname) {
-                console.log('✅ 내부 링크 확인됨 - 로딩 UI 표시:', link.href);
                 topMarketingLoader.show();
                 topMarketingLoader.setMessage('페이지를 이동하는 중...');
             }
         } catch (error) {
-            console.log('❌ URL 파싱 오류:', error);
         }
     });
     
@@ -406,7 +396,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    console.log('🎯 Loading.js 초기화 완료 - 외부 프로토콜 링크 보호 활성화');
 });
 
 // 페이지 로드 이벤트 처리
@@ -478,40 +467,27 @@ window.fetch = function(...args) {
     // 🔍 요청 정보 로깅
     const [url, options] = args;
     if (url && url.includes && url.includes("previous-registration")) {
-        console.log("🚀 [FETCH DEBUG] 요청 시작:", url);
-        console.log("🚀 [FETCH DEBUG] 요청 옵션:", options);
     }
     
     return originalFetch.apply(this, args)
         .then(response => {
             // 🔍 응답 정보 상세 로깅
             if (url && url.includes && url.includes("previous-registration")) {
-                console.log("📥 [FETCH DEBUG] 응답 수신:");
-                console.log("  - URL:", response.url);
-                console.log("  - Status:", response.status);
-                console.log("  - StatusText:", response.statusText);
-                console.log("  - OK:", response.ok);
-                console.log("  - Headers:", Object.fromEntries(response.headers));
+
                 
                 // 응답 내용 미리보기 (클론해서 원본 손상 방지)
                 if (response.headers.get("content-type")?.includes("application/json")) {
                     response.clone().json().then(data => {
-                        console.log("📦 [FETCH DEBUG] JSON 응답:", data);
                     }).catch(e => {
-                        console.log("❌ [FETCH DEBUG] JSON 파싱 실패:", e);
                     });
                 }
                 
                 // 404 특별 처리
                 if (response.status === 404) {
-                    console.error("🚨 [FETCH DEBUG] 실제 404 오류 확인!");
-                    console.log("🔍 [FETCH DEBUG] 404 원인 분석 필요");
                 } else if (response.status === 401) {
-                    console.log("🔐 [FETCH DEBUG] 401 인증 오류 (정상)");
+
                 } else if (response.status >= 200 && response.status < 300) {
-                    console.log("✅ [FETCH DEBUG] 성공 응답");
                 } else {
-                    console.log("⚠️ [FETCH DEBUG] 기타 응답:", response.status);
                 }
             }
             
@@ -520,9 +496,6 @@ window.fetch = function(...args) {
         .catch(error => {
             // 🔍 네트워크 오류 상세 로깅
             if (url && url.includes && url.includes("previous-registration")) {
-                console.error("💥 [FETCH DEBUG] 네트워크 오류:", error);
-                console.log("🔍 [FETCH DEBUG] 오류 타입:", error.name);
-                console.log("🔍 [FETCH DEBUG] 오류 메시지:", error.message);
             }
             throw error;
         })
@@ -541,7 +514,6 @@ window.fetch = function(...args) {
 
 // 🔥 Ultra Think Mode: 수동 테스트 함수
 window.testPreviousRegistration = function() {
-    console.log("🧪 [TEST] 수동 API 테스트 시작");
     
     return fetch("/api/events/198/previous-registration", {
         method: "GET",
@@ -551,18 +523,13 @@ window.testPreviousRegistration = function() {
         }
     })
     .then(response => {
-        console.log("🧪 [TEST] 응답 받음:", response.status);
         return response.json();
     })
     .then(data => {
-        console.log("🧪 [TEST] 최종 데이터:", data);
         return data;
     })
     .catch(error => {
-        console.error("🧪 [TEST] 오류:", error);
         throw error;
     });
 };
 
-console.log("🔥 Ultra Think Mode: Enhanced Fetch Wrapper 로드 완료!");
-console.log("📋 사용법: testPreviousRegistration() 함수로 수동 테스트 가능");

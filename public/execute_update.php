@@ -91,7 +91,6 @@ h2, h3 {
 // 자동으로 업데이트 완료 후 페이지를 새로고침하여 결과 확인
 setTimeout(function() {
     if (document.querySelector('.f0fff4')) {
-        console.log('✅ 86번 강의 업데이트 완료!');
     }
 }, 1000);
 </script>

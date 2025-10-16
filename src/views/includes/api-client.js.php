@@ -141,7 +141,6 @@
                 try {
                     modifiedConfig = await interceptor(modifiedConfig);
                 } catch (error) {
-                    console.error('❌ 요청 인터셉터 오류:', error);
                 }
             }
 
@@ -160,7 +159,6 @@
                 try {
                     modifiedResponse = await interceptor(modifiedResponse);
                 } catch (error) {
-                    console.error('❌ 응답 인터셉터 오류:', error);
                 }
             }
 
@@ -410,7 +408,7 @@
     // 전역 인스턴스 생성
     window.ApiClient = new ApiClient();
 
-    console.log('✅ ApiClient 클래스 로드 완료 (v3.42.0)');
+
 
 })(window);
 </script>

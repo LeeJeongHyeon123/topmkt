@@ -974,12 +974,10 @@ window.initEventVenueMap = function() {
     try {
         // 네이버 지도 API 사용 가능 여부 확인
         if (!checkNaverMapsAPI()) {
-            console.warn('🗺️ 네이버 지도 API를 사용할 수 없습니다.');
             showEventMapFallback();
             return;
         }
         
-        console.log('🗺️ 행사장 지도 초기화 시작');
         
         // 지도 중심 좌표
         var center = new naver.maps.LatLng(<?= floatval($eventCoords['lat']) ?>, <?= floatval($eventCoords['lng']) ?>);
@@ -1047,7 +1045,6 @@ window.initEventVenueMap = function() {
                     infoWindow.open(map, marker);
                 }
             } catch (error) {
-                console.error('🗺️ 정보창 토글 오류:', error);
             }
         });
         
@@ -1056,14 +1053,11 @@ window.initEventVenueMap = function() {
             try {
                 infoWindow.open(map, marker);
             } catch (error) {
-                console.error('🗺️ 초기 정보창 표시 오류:', error);
             }
         }, 500);
         
-        console.log('🗺️ 행사장 지도 초기화 완료');
 
     } catch (error) {
-        console.error('🗺️ 행사장 지도 초기화 오류:', error);
         Toast.warning('지도를 불러올 수 없어 텍스트로 표시합니다.');
         showEventMapFallback();
     }
@@ -1072,7 +1066,6 @@ window.initEventVenueMap = function() {
 // API 로드 실패시 fallback
 window.addEventListener('error', function(e) {
     if (e.filename && e.filename.includes('maps.js')) {
-        console.warn('🗺️ 네이버 지도 API 로드 실패:', e.message);
         showEventMapFallback();
     }
 });
@@ -1080,7 +1073,6 @@ window.addEventListener('error', function(e) {
 // DOM 로드 후 지도 초기화 (callback 방식이므로 자동 호출됨)
 document.addEventListener('DOMContentLoaded', function() {
     // API가 callback으로 자동 호출되므로 별도 초기화 불필요
-    console.log('🗺️ DOM 로드 완료 - API callback 대기 중');
 });
 </script>
 <?php endif; ?>
@@ -1146,12 +1138,11 @@ async function checkEventRegistrationStatus() {
             const registration = result.data.registration;
             updateEventRegistrationUI(registration.status, registration);
         } else {
-            console.log('📊 등록 상태 정보 없음:', result.message || '알 수 없는 오류');
             // 신청 안함 상태로 UI 초기화
             updateEventRegistrationUI('none', null);
         }
     } catch (error) {
-        console.log('ℹ️ 행사 신청 상태 확인 실패 (정상):', error.message);
+
         // 오류 시에도 기본 상태로 초기화
         updateEventRegistrationUI('none', null);
     }
@@ -1349,7 +1340,6 @@ async function registerEvent() {
         document.body.style.overflow = 'hidden';
 
     } catch (error) {
-        console.error('행사 신청 모달 열기 오류:', error);
         Toast.error('행사 신청 준비 중 오류가 발생했습니다.');
     }
 }
@@ -1363,7 +1353,6 @@ async function redirectToLogin() {
 
 // 사용자 정보 및 이전 신청 데이터 로드
 async function loadEventUserInfo() {
-    console.log('📝 행사 신청: 사용자 정보 로드 시작...');
 
     try {
         // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
@@ -1372,14 +1361,11 @@ async function loadEventUserInfo() {
         try {
             const userData = await ApiClient.get('/auth/me', { noLoading: true, noErrorToast: true });
             if (userData.success && userData.user) {
-                console.log('✅ 행사 신청: 사용자 정보 자동 입력 시작');
                 fillEventUserInfo(userData.user);
                 userInfo = userData.user;
             } else {
-                console.log('❌ 행사 신청: 사용자 정보 구조 오류', userData);
             }
         } catch (error) {
-            console.log('❌ 행사 신청: 사용자 정보 로드 실패:', error.message);
         }
 
         // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
@@ -1396,20 +1382,16 @@ async function loadEventUserInfo() {
                 fillEventRegistrationForm(prevData.data);
                 previousRegistration = prevData.data;
             } else if (prevData.data === null) {
-                console.log('📝 이전 신청 데이터 없음:', prevData.message);
             }
         } catch (error) {
-            console.log('ℹ️ 이전 신청 내역 없음');
         }
     } catch (error) {
-        console.error('사용자 정보 로드 오류:', error);
         Toast.error('사용자 정보를 불러올 수 없습니다.\n수동으로 입력해주세요.');
     }
 }
 
 // 사용자 정보로 폼 채우기
 function fillEventUserInfo(userData) {
-    console.log('🔧 행사 신청: 폼 자동 채우기 실행', userData);
 
     const nameField = document.getElementById('event_participant_name');
     const emailField = document.getElementById('event_participant_email');
@@ -1417,23 +1399,17 @@ function fillEventUserInfo(userData) {
 
     if (nameField) {
         nameField.value = userData.nickname || '';
-        console.log('✅ 이름 필드 채움:', userData.nickname);
     } else {
-        console.log('❌ 이름 필드 없음: event_participant_name');
     }
 
     if (emailField) {
         emailField.value = userData.email || '';
-        console.log('✅ 이메일 필드 채움:', userData.email);
     } else {
-        console.log('❌ 이메일 필드 없음: event_participant_email');
     }
 
     if (phoneField) {
         phoneField.value = userData.phone || '';
-        console.log('✅ 전화번호 필드 채움:', userData.phone);
     } else {
-        console.log('❌ 전화번호 필드 없음: event_participant_phone');
     }
 }
 
@@ -1513,7 +1489,6 @@ async function submitEventRegistration() {
             }
         }
     } catch (error) {
-        console.error('행사 신청 제출 오류:', error);
         Toast.error('행사 신청 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
@@ -1542,7 +1517,6 @@ async function cancelEventRegistration() {
             Toast.error('❌ ' + (result.message || '신청 취소 중 오류가 발생했습니다.'));
         }
     } catch (error) {
-        console.error('행사 신청 취소 오류:', error);
         Toast.error('신청 취소 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
@@ -1644,14 +1618,12 @@ function openEventImageModal(index) {
 
 // 강사 이미지 모달 열기
 function openInstructorImageModal(imageSrc, instructorName) {
-    console.log('강사 이미지 모달 열기:', imageSrc, instructorName);
     
     const modal = document.getElementById('instructorImageModal');
     const modalImage = document.getElementById('instructorModalImage');
     const modalName = document.getElementById('instructorModalName');
     
     if (!modal || !modalImage || !modalName) {
-        console.error('강사 이미지 모달 요소를 찾을 수 없습니다.');
         Toast.warning('이미지 모달을 표시할 수 없습니다.');
         return;
     }
@@ -1727,9 +1699,7 @@ function shareEventContent() {
                 text: eventDescription,
                 url: eventUrl
             }).then(() => {
-                console.log('공유 성공');
             }).catch((error) => {
-                console.log('공유 실패:', error);
                 fallbackShare(eventTitle, eventUrl);
             });
         } else {
@@ -1737,7 +1707,6 @@ function shareEventContent() {
             fallbackShare(eventTitle, eventUrl);
         }
     } catch (error) {
-        console.error('공유 기능 오류:', error);
         Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
@@ -1872,14 +1841,6 @@ async function confirmDeleteEvent(eventId) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     // 디버깅 정보 출력
-    console.log('=== 행사 삭제 디버깅 시작 ===');
-    console.log('행사 ID:', eventId);
-    console.log('CSRF 토큰:', csrfToken);
-    console.log('요청 URL:', `/events/${eventId}/delete`);
-    console.log('요청 데이터:', {
-        csrf_token: csrfToken,
-        confirm_delete: true
-    });
 
     // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
     ApiClient.post(`/events/${eventId}/delete`,
@@ -1890,8 +1851,6 @@ async function confirmDeleteEvent(eventId) {
         { noLoading: true } // 버튼 상태로 로딩 표시
     )
     .then(result => {
-        console.log('=== 응답 데이터 ===');
-        console.log('응답 데이터:', result);
 
         if (result.success) {
             Toast.success('✅ 행사가 성공적으로 삭제되었습니다.');
@@ -1902,7 +1861,6 @@ async function confirmDeleteEvent(eventId) {
                 window.location.href = '/events';
             }
         } else {
-            console.error('행사 삭제 실패:', result.message);
             Toast.error('❌ 행사 삭제에 실패했습니다: ' + result.message);
 
             // 버튼 상태 복원
@@ -1911,7 +1869,6 @@ async function confirmDeleteEvent(eventId) {
         }
     })
     .catch(error => {
-        console.error('네트워크 오류:', error);
         Toast.error('행사 삭제 중 네트워크 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
 
         // 버튼 상태 복원

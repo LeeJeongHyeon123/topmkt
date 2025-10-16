@@ -189,15 +189,12 @@ if (file_exists($styleFile)) {
 <script>
 // 🌟 ULTRA THINK 모드 - 간단한 JavaScript v4.0
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎉 행사 일정 페이지 로드 완료');
-    console.log('📊 이번 달 행사 수:', <?= count($events ?? []) ?>);
-    console.log('📄 현재 뷰:', '<?= $view ?>');
+
 
     // ✅ CSS로 완전 해결됨 - JavaScript 강제 수정 불필요
 
     // 🎯 뷰 전환 설정
     document.body.setAttribute('data-view', '<?= $view ?>');
-    console.log('🔧 뷰 설정 완료:', '<?= $view ?>');
 
     // Grid 레이아웃은 CSS에서 자동 처리됨
 
@@ -247,7 +244,6 @@ function showDayEvents(date, day, events) {
         const modalBody = document.getElementById('modalBody');
         
         if (!modal || !modalTitle || !modalSubtitle || !modalBody) {
-            console.error('모달 요소를 찾을 수 없습니다');
             return;
         }
         
@@ -317,10 +313,8 @@ function showDayEvents(date, day, events) {
             }
         };
         
-        console.log(`📅 ${date} 일정 모달 표시 (${events.length}개)`);
         
     } catch (error) {
-        console.error('일정 모달 표시 오류:', error);
         Toast.error('일정을 불러오는 중 오류가 발생했습니다.');
     }
 }

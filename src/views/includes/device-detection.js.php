@@ -81,7 +81,6 @@ window.DeviceDetection = {
         document.cookie = cookieValue;
         
         if (this.config.debug) {
-            console.log(`🍪 쿠키 저장: ${this.current.width}px`);
         }
     },
     
@@ -101,7 +100,6 @@ window.DeviceDetection = {
                 // 디바이스 타입이 변경된 경우 페이지 새로고침 (옵션)
                 if (oldType !== this.current.type && this.shouldReloadOnDeviceChange()) {
                     if (this.config.debug) {
-                        console.log(`📱 디바이스 타입 변경: ${oldType} → ${this.current.type}, 페이지 새로고침`);
                     }
                     window.location.reload();
                 }
@@ -144,7 +142,6 @@ window.DeviceDetection = {
             const newUrl = window.location.pathname + '?' + urlParams.toString();
             
             if (this.config.debug) {
-                console.log('📱 모바일 감지: 목록형 뷰로 자동 전환');
             }
             
             window.location.href = newUrl;
@@ -178,16 +175,6 @@ window.DeviceDetection = {
      * 디버그 정보 출력
      */
     logDebugInfo: function() {
-        console.group('📱 Device Detection Debug');
-        console.log('화면 크기:', `${this.current.width}x${this.current.height}`);
-        console.log('디바이스 타입:', this.current.type);
-        console.log('분류:', {
-            모바일: this.current.isMobile,
-            태블릿: this.current.isTablet,
-            데스크톱: this.current.isDesktop
-        });
-        console.log('경계값:', this.config.breakpoints);
-        console.groupEnd();
     },
     
     /**

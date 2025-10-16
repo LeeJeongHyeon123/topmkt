@@ -1859,11 +1859,6 @@
     const isAdmin = <?= $isAdmin ? 'true' : 'false' ?>;
     
     // PHP에서 전달된 관리자 정보 디버깅
-    console.log('🔍 PHP 관리자 권한 체크 결과:', {
-        php_isAdmin: <?= json_encode($isAdmin ?? false) ?>,
-        php_currentRole: <?= json_encode($currentRole ?? 'UNKNOWN') ?>,
-        php_currentUserId: <?= json_encode($currentUserId ?? 0) ?>
-    });
 
     // 🚀 v3.64.0: 모바일 메뉴 초기화 중복 실행 방지 (3번 반복 → 1번만 실행)
     if (!window.headerMobileMenuInitialized) {
@@ -1940,7 +1935,7 @@
                             headerLeft.style.setProperty(property, value, 'important');
                         });
 
-                        console.log('🔒 로고 위치 보호 적용 완료 (order: -1)');
+
                     }
 
                     // 햄버거 메뉴 강제 표시
@@ -1983,7 +1978,7 @@
 
                 // 🚀 v3.64.0: 중복 로그 제거 (3번 반복 방지)
                 if (window.DEBUG_MODE) {
-                    console.log('📱 모바일 메뉴 모달 강제 닫힌 상태로 초기화 완료 (display: none 적용)');
+
                 }
             }
 
@@ -2019,12 +2014,10 @@
                     mobileMenuModal.style.removeProperty('height');
                     mobileMenuModal.classList.add('active');
                     document.body.style.overflow = 'hidden';
-                    console.log('📱 모바일 메뉴 열기 완료');
                 } else {
                     // 모달 닫기
                     mobileMenuModal.classList.remove('active');
                     document.body.style.overflow = '';
-                    console.log('📱 모바일 메뉴 닫기 완료');
                 }
 
                 // 햄버거 아이콘 X자 변환 애니메이션
@@ -2114,7 +2107,7 @@
                 mobileHamburger.classList.remove('active');
             }
 
-            console.log('📱 모바일 메뉴 닫기 완료 (display: none 적용)');
+
         }
         
         // 데스크톱 드롭다운 생성 함수
@@ -2304,7 +2297,7 @@
         // ============================================================
         // ✅ v3.83.0: 헤더 로고 위치 수정 완료
         // 검증 시스템 제거 - 로고 위치가 order: -1로 영구 고정되었으므로 불필요
-        console.log('✅ 헤더 로고 위치 수정 완료 (v3.83.0) - order: -1로 좌측 고정');
+
 
     } // 🚀 v3.64.0: headerMobileMenuInitialized 플래그 종료
     </script> 

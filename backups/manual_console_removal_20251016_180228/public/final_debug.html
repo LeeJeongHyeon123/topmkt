@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최종 UI 디버깅 가이드</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .step { margin: 30px 0; padding: 20px; border: 2px solid #007cba; border-radius: 8px; background: #f8f9fa; }
+        .step h3 { color: #007cba; margin-top: 0; }
+        .code { background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; font-family: 'Courier New', monospace; margin: 10px 0; overflow-x: auto; }
+        .important { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .result { background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .btn { background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn:hover { background: #005a87; }
+    </style>
+</head>
+<body>
+    <h1>🎯 최종 UI 디버깅 가이드</h1>
+    <p>단계별로 따라하면 반드시 문제를 찾을 수 있습니다.</p>
+
+    <div class="step">
+        <h3>1단계: 브라우저 캐시 완전 초기화</h3>
+        <p>가장 먼저 해야 할 일입니다.</p>
+        
+        <h4>Chrome/Edge:</h4>
+        <div class="code">
+Ctrl + Shift + Delete → "캐시된 이미지 및 파일" 체크 → "데이터 삭제"
+        </div>
+        
+        <h4>Firefox:</h4>
+        <div class="code">
+Ctrl + Shift + Delete → "캐시" 체크 → "지우기"
+        </div>
+        
+        <h4>또는 시크릿 모드:</h4>
+        <div class="code">
+Ctrl + Shift + N (Chrome) 또는 Ctrl + Shift + P (Firefox)
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>2단계: 페이지 방문 및 개발자 도구 열기</h3>
+        <ol>
+            <li><code>https://www.topmktx.com/lectures/3</code> 방문</li>
+            <li><strong>F12</strong> 또는 <strong>Ctrl+Shift+I</strong>로 개발자 도구 열기</li>
+            <li><strong>Console 탭</strong>에서 에러 확인</li>
+        </ol>
+        
+        <div class="important">
+            <strong>⚠️ 중요:</strong> Console에 빨간색 에러 메시지가 있으면 그것이 문제의 원인입니다!
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>3단계: CSS 파일 로드 확인</h3>
+        <p><strong>Network 탭</strong>에서 CSS 파일들이 제대로 로드되는지 확인:</p>
+        
+        <ol>
+            <li>Network 탭 클릭</li>
+            <li>페이지 새로고침 (F5)</li>
+            <li>CSS 필터 적용</li>
+            <li>다음 파일들이 <strong style="color: green;">200 OK</strong>인지 확인:
+                <ul>
+                    <li><code>base.css.php</code></li>
+                    <li><code>layout.css.php</code></li>
+                    <li><code>buttons.css.php</code></li>
+                    <li><code>main.css</code></li>
+                    <li><code>loading.css</code></li>
+                    <li><code>badges.css</code></li>
+                    <li><code>search-filter.css</code></li>
+                </ul>
+            </li>
+        </ol>
+        
+        <div class="result">
+            <strong>✅ 정상:</strong> 모든 파일이 200 OK, 초록색<br>
+            <strong>❌ 문제:</strong> 404, 500 에러 또는 빨간색 표시
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>4단계: DOM 요소 존재 확인</h3>
+        <p><strong>Elements 탭</strong>에서 다음 요소들이 존재하는지 확인:</p>
+        
+        <div class="code">
+&lt;div class="lecture-detail-container"&gt;
+  &lt;div class="lecture-header"&gt;
+    &lt;div class="lecture-banner"&gt;
+      &lt;div class="lecture-category"&gt;🏢 컨퍼런스&lt;/div&gt;
+      &lt;h1 class="lecture-title"&gt;글로벌 네트워크 마케팅 컨퍼런스 2025&lt;/h1&gt;
+      &lt;div class="lecture-meta-basic"&gt;
+        &lt;div class="meta-item"&gt;🟢 시작 : 2025년 08월 05일 09:00&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="lecture-content"&gt;
+    &lt;div class="lecture-main"&gt;...&lt;/div&gt;
+    &lt;div class="lecture-sidebar"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+        </div>
+        
+        <div class="result">
+            <strong>✅ 정상:</strong> 모든 요소가 HTML에 존재<br>
+            <strong>❌ 문제:</strong> 요소가 없거나 다른 구조
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>5단계: CSS 스타일 적용 확인</h3>
+        <p>Elements 탭에서 각 요소를 클릭한 후 <strong>Computed 탭</strong> 확인:</p>
+        
+        <div class="code">
+// .lecture-banner 클릭 후 Computed 탭에서 확인
+background: linear-gradient(135deg, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%)
+
+// .lecture-title 클릭 후 Computed 탭에서 확인  
+font-size: 40px
+font-weight: 700
+
+// .lecture-content 클릭 후 Computed 탭에서 확인
+display: flex
+        </div>
+        
+        <div class="result">
+            <strong>✅ 정상:</strong> 위 스타일들이 적용됨<br>
+            <strong>❌ 문제:</strong> 다른 값이 적용됨 또는 "not defined"
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>6단계: CSS 우선순위 분석</h3>
+        <p>요소 선택 후 <strong>Styles 탭</strong>에서 CSS 규칙 확인:</p>
+        
+        <div class="code">
+// .lecture-banner의 Styles 탭에서
+.lecture-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    padding: 80px 40px 40px 40px !important;
+    /* ... */
+}
+        </div>
+        
+        <div class="important">
+            <strong>⚠️ 체크사항:</strong><br>
+            - CSS 규칙이 취소선으로 그어져 있는가?<br>
+            - 더 높은 우선순위의 다른 규칙이 있는가?<br>
+            - !important가 제대로 적용되었는가?
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>7단계: JavaScript 스타일 변경 감지</h3>
+        <p>Console 탭에 다음 코드 실행:</p>
+        
+        <div class="code">
+// 스타일 변경 감지
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            console.log('🎭 스타일 변경:', mutation.target.className, mutation.target.getAttribute('style'));
+        }
+    });
+});
+
+// 강의 요소들 감시
+document.querySelectorAll('[class*="lecture"]').forEach(el => {
+    observer.observe(el, { attributes: true, attributeFilter: ['style'] });
+});
+
+console.log('👀 스타일 변경 감시 시작...');
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>8단계: 결과 보고</h3>
+        <p>위 단계들을 수행한 후 다음 정보를 알려주세요:</p>
+        
+        <div class="result">
+            <strong>📋 보고 양식:</strong><br><br>
+            
+            <strong>1. 브라우저:</strong> Chrome/Firefox/Edge 버전<br>
+            <strong>2. Console 에러:</strong> 있음/없음 (있으면 내용)<br>
+            <strong>3. Network 상태:</strong> 모든 CSS 200 OK?<br>
+            <strong>4. DOM 구조:</strong> 요소들 존재함?<br>
+            <strong>5. CSS 적용:</strong> 스타일들이 적용됨?<br>
+            <strong>6. 우선순위:</strong> CSS 규칙 취소선 여부<br>
+            <strong>7. 스크린샷:</strong> 현재 페이지 모습<br>
+            <strong>8. 기대 vs 실제:</strong> 어떻게 보여야 하는지 vs 실제로 어떻게 보이는지
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>9단계: 문제별 해결 방법</h3>
+        
+        <div class="error">
+            <strong>🚨 Console에 에러가 있으면:</strong><br>
+            → JavaScript 에러가 CSS 적용을 막고 있을 수 있음
+        </div>
+        
+        <div class="error">
+            <strong>🚨 CSS 파일이 404면:</strong><br>
+            → 서버 설정 문제 또는 파일 경로 문제
+        </div>
+        
+        <div class="error">
+            <strong>🚨 DOM 요소가 없으면:</strong><br>
+            → PHP/HTML 렌더링 문제
+        </div>
+        
+        <div class="error">
+            <strong>🚨 CSS 스타일이 적용되지 않으면:</strong><br>
+            → CSS 우선순위 문제 또는 구문 오류
+        </div>
+        
+        <div class="error">
+            <strong>🚨 스타일이 취소선으로 그어져 있으면:</strong><br>
+            → 다른 CSS 규칙이 우선 적용됨
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>최종 제안</h3>
+        <p>위 단계를 따라 결과를 알려주시면 정확한 원인을 파악하고 해결할 수 있습니다.</p>
+        
+        <button class="btn" onclick="openLecturesPage()">Lectures 페이지 열기</button>
+        <button class="btn" onclick="copyGuide()">이 가이드 복사</button>
+    </div>
+
+    <script>
+        function openLecturesPage() {
+            window.open('https://www.topmktx.com/lectures/3', '_blank');
+        }
+        
+        function copyGuide() {
+            const text = document.body.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('가이드가 클립보드에 복사되었습니다!');
+            });
+        }
+    </script>
+</body>
+</html>

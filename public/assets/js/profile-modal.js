@@ -38,7 +38,6 @@ class ProfileImageModal {
         this.bindEvents();
         this.initialized = true;
         
-        console.log('✅ ProfileImageModal 초기화 완료');
     }
 
     /**
@@ -100,20 +99,16 @@ class ProfileImageModal {
      */
     async show(userIdOrImageSrc, userName, isDirect = false) {
         if (!userIdOrImageSrc || !userName) {
-            console.error('❌ 사용자 ID/이미지 URL 또는 사용자 이름이 누락되었습니다.');
             return;
         }
 
         // 알려진 존재하지 않는 사용자 ID들 차단
         const invalidUserIds = []; // 데이터 수정 완료로 차단 목록 비움
         if (!isDirect && invalidUserIds.includes(parseInt(userIdOrImageSrc))) {
-            console.warn(`⚠️ 존재하지 않는 사용자 ID ${userIdOrImageSrc}에 대한 프로필 모달 요청 차단`);
             alert('이 사용자의 프로필 정보를 찾을 수 없습니다.');
             return;
         }
 
-        console.log(`🖼️ 프로필 모달 표시 시작: ${isDirect ? '직접' : 'API'} 모드`);
-        console.log(`👤 대상: ${userName} (${userIdOrImageSrc})`);
 
         try {
             if (isDirect) {
@@ -124,7 +119,6 @@ class ProfileImageModal {
                 await this.fetchAndShowImage(userIdOrImageSrc, userName);
             }
         } catch (error) {
-            console.error('❌ 프로필 모달 표시 오류:', error);
             this.showError('프로필 이미지를 불러올 수 없습니다.');
         }
     }
@@ -141,7 +135,6 @@ class ProfileImageModal {
             return;
         }
 
-        console.log(`🖼️ 직접 이미지 표시: ${imageSrc}`);
 
         // 모달 열기 및 사용자 이름 설정
         this.modalUserName.textContent = userName + '의 프로필';
@@ -158,7 +151,6 @@ class ProfileImageModal {
      * @param {string} userName - 사용자 이름
      */
     async fetchAndShowImage(userId, userName) {
-        console.log(`🌐 API 호출 시작: /api/users/${userId}/profile-image`);
 
         // 모달 열기 및 로딩 상태 표시
         this.modalUserName.textContent = userName + '의 프로필';
@@ -170,7 +162,6 @@ class ProfileImageModal {
             const fetchFunction = typeof chatFetch !== 'undefined' ? chatFetch : fetch;
             
             const response = await fetchFunction(`/api/users/${userId}/profile-image`);
-            console.log(`📊 API 응답 상태: ${response.status}`);
 
             if (!response.ok) {
                 if (response.status === 404) {
@@ -180,11 +171,9 @@ class ProfileImageModal {
             }
 
             const data = await response.json();
-            console.log('📦 API 응답 데이터:', data);
 
             // 안전한 응답 파싱 (data.data || data 패턴)
             const imageData = this.parseApiResponse(data);
-            console.log('🔍 파싱된 이미지 데이터:', imageData);
 
             const originalImage = imageData.original_image;
             if (!originalImage) {
@@ -196,7 +185,6 @@ class ProfileImageModal {
             this.loadAndDisplayImage(originalImage);
 
         } catch (error) {
-            console.error('❌ API 호출 오류:', error);
             this.hideSpinner();
             this.showError('프로필 이미지를 불러오는 중 오류가 발생했습니다.');
         }
@@ -219,18 +207,15 @@ class ProfileImageModal {
      * @param {string} imageSrc - 이미지 URL
      */
     loadAndDisplayImage(imageSrc) {
-        console.log(`🖼️ 이미지 로딩 시작: ${imageSrc}`);
 
         const img = new Image();
         
         img.onload = () => {
-            console.log('✅ 이미지 로딩 완료');
             this.modalImage.src = imageSrc;
             this.modalImage.style.display = 'block';
         };
         
         img.onerror = () => {
-            console.error('❌ 이미지 로딩 실패');
             this.showError('이미지를 로딩할 수 없습니다.');
         };
         
@@ -290,7 +275,6 @@ class ProfileImageModal {
             // ESC 키 이벤트 추가
             document.addEventListener('keydown', this.escKeyHandler);
             
-            console.log('✅ 프로필 모달 열림');
         }
     }
 
@@ -311,7 +295,6 @@ class ProfileImageModal {
                 this.modalImage.src = '';
             }
             
-            console.log('✅ 프로필 모달 닫힘');
         }
     }
 
@@ -352,4 +335,3 @@ window.closeProfileImageModal = () => {
     return window.profileModal.closeProfileImageModal();
 };
 
-console.log('🎉 ProfileImageModal 글로벌 로딩 완료');

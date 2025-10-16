@@ -107,7 +107,6 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         Toast.error('댓글 작성 중 오류가 발생했습니다.');
     })
     .finally(() => {

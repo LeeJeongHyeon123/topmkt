@@ -332,7 +332,7 @@ if (file_exists($styleFile)) {
                                      class="instructor-avatar clickable-image instructor-avatar-img"
                                      loading="lazy"
                                      decoding="async"
-                                     onerror="console.error('강사 이미지 로딩 실패:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex'; Toast.warning('강사 이미지를 불러올 수 없습니다.');"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; Toast.warning('강사 이미지를 불러올 수 없습니다.');"
                                      data-instructor-src="<?= htmlspecialchars($imagePath) ?>"
                                      data-instructor-alt="<?= htmlspecialchars($name) ?> 강사님"
                                      title="<?= htmlspecialchars($name) ?> 강사님 (클릭하면 크게 볼 수 있습니다)">
@@ -535,12 +535,11 @@ if (file_exists($styleFile)) {
                                     try {
                                         // 네이버 지도 API 사용 가능 여부 확인
                                         if (!checkNaverMapsAPI()) {
-                                            console.warn('🗺️ 네이버 지도 API를 사용할 수 없습니다.');
                                             showMapFallback_<?= $lecture['id'] ?>();
                                             return;
                                         }
                                         
-                                        console.log('🗺️ 네이버 지도 (강의 <?= $lecture['id'] ?>) 초기화 시작');
+
                                         
                                         // 지도 중심 좌표
                                         var center = new naver.maps.LatLng(<?= floatval($defaultCoords['lat']) ?>, <?= floatval($defaultCoords['lng']) ?>);
@@ -612,7 +611,6 @@ if (file_exists($styleFile)) {
                                                     infoWindow.open(map, marker);
                                                 }
                                             } catch (e) {
-                                                console.warn('마커 클릭 이벤트 오류:', e);
                                             }
                                         });
                                         
@@ -621,7 +619,6 @@ if (file_exists($styleFile)) {
                                             try {
                                                 infoWindow.close();
                                             } catch (e) {
-                                                console.warn('지도 클릭 이벤트 오류:', e);
                                             }
                                         });
                                         
@@ -630,14 +627,12 @@ if (file_exists($styleFile)) {
                                             try {
                                                 infoWindow.open(map, marker);
                                             } catch (e) {
-                                                console.warn('정보창 자동 열기 오류:', e);
                                             }
                                         }, 1500);
                                         
-                                        console.log('✅ 네이버 지도 (강의 <?= $lecture['id'] ?>) 초기화 완료');
+
                                         
                                     } catch (error) {
-                                        console.error('❌ 네이버 지도 초기화 실패:', error);
                                         Toast.warning('지도를 불러올 수 없어 텍스트로 표시합니다.');
                                         showMapFallback_<?= $lecture['id'] ?>();
                                     }
@@ -648,7 +643,6 @@ if (file_exists($styleFile)) {
                                     // 3초 후에도 네이버 지도 API가 로드되지 않으면 대체 UI 표시
                                     setTimeout(function() {
                                         if (!checkNaverMapsAPI()) {
-                                            console.warn('🗺️ 네이버 지도 API 로딩 타임아웃');
                                             showMapFallback_<?= $lecture['id'] ?>();
                                         }
                                     }, 3000);
@@ -657,7 +651,6 @@ if (file_exists($styleFile)) {
                                 // 전역 오류 핸들러
                                 window.addEventListener('error', function(e) {
                                     if (e.filename && e.filename.includes('maps.js')) {
-                                        console.error('네이버 지도 스크립트 오류:', e.message);
                                         Toast.warning('지도를 불러올 수 없어 텍스트로 표시합니다.');
                                         showMapFallback_<?= $lecture['id'] ?>();
                                     }
@@ -895,13 +888,7 @@ if (file_exists($styleFile)) {
 <script>
 // 전역 오류 핸들러 추가
 window.addEventListener('error', function(event) {
-    console.error('JavaScript 오류 감지:', {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        error: event.error
-    });
+    // JavaScript 오류 자동 처리
 });
 
 // 안전한 함수 실행 헬퍼
@@ -909,15 +896,12 @@ function safeExecute(fn, context) {
     try {
         return fn.call(context);
     } catch (error) {
-        console.warn('함수 실행 중 오류:', error);
         return null;
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📅 강의 상세 페이지 로드 완료');
-    console.log('📊 강의 ID:', <?= $lecture['id'] ?>);
-    console.log('👥 신청자 수:', <?= count($registrations ?? []) ?>);
+
     
     // 강의 상세 관련 전역 객체 정의
     if (typeof window.lectureDetail === 'undefined') {
@@ -944,13 +928,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 🚀 v3.64.0: 메모리 누수 방지 - { once: true } 옵션으로 이벤트 리스너 자동 제거
             img.addEventListener('load', function() {
-                console.log('✅ 강사 이미지 ' + (index + 1) + ' 로딩 성공:', this.src);
+
                 this.parentElement.classList.remove('loading');
                 this.style.opacity = '1';
             }, { once: true });
 
             img.addEventListener('error', function() {
-                console.warn('❌ 강사 이미지 ' + (index + 1) + ' 로딩 실패:', this.src);
+
                 this.parentElement.classList.remove('loading');
                 this.parentElement.classList.add('error');
 
@@ -967,7 +951,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (img.complete && img.naturalHeight !== 0) {
                 img.parentElement.classList.remove('loading');
                 img.style.opacity = '1';
-                console.log('✅ 강사 이미지 ' + (index + 1) + ' 캐시에서 로드됨:', img.src);
+
             }
         });
         
@@ -981,7 +965,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const icalBtn = document.querySelector('a[download]');
     if (icalBtn) {
         icalBtn.addEventListener('click', function() {
-            console.log('📅 iCal 파일 다운로드 시작');
         }, { once: true });
     }
     
@@ -1270,9 +1253,7 @@ function shareContent() {
                 text: lectureDescription,
                 url: lectureUrl
             }).then(() => {
-                console.log('공유 성공');
             }).catch((error) => {
-                console.log('공유 실패:', error);
                 fallbackShare(lectureTitle, lectureUrl);
             });
         } else {
@@ -1280,7 +1261,6 @@ function shareContent() {
             fallbackShare(lectureTitle, lectureUrl);
         }
     } catch (error) {
-        console.error('공유 기능 오류:', error);
         Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
@@ -1366,38 +1346,26 @@ function openInstructorImageModal(imageSrc, imageAlt) {
 
 // 상태 메시지 표시 함수 (함수 호출 전에 정의)
 function showLectureStatusMessage(statusClass, iconClass, title, description) {
-    console.log('🎯 showLectureStatusMessage 호출됨');
-    console.log('📊 파라미터:', { statusClass, iconClass, title, description });
     
     const statusMessage = document.getElementById('lecture-status-message');
     const statusTitle = document.getElementById('lecture-status-title');
     const statusDescription = document.getElementById('lecture-status-description');
     const statusIcon = statusMessage?.querySelector('.status-icon i');
     
-    console.log('🔍 showLectureStatusMessage DOM 요소:');
-    console.log('- statusMessage:', statusMessage);
-    console.log('- statusTitle:', statusTitle);
-    console.log('- statusDescription:', statusDescription);
-    console.log('- statusIcon:', statusIcon);
     
     if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
-        console.error('❌ showLectureStatusMessage: 필수 DOM 요소 누락!');
         Toast.warning('페이지 요소를 불러오는 중 오류가 발생했습니다.');
         return;
     }
     
-    console.log('🎨 스타일 적용 시작...');
     statusMessage.className = 'lecture-status-message ' + statusClass;
     statusMessage.style.display = 'block';
     statusIcon.className = 'fas ' + iconClass;
     statusTitle.textContent = title;
     statusDescription.textContent = description;
     
-    console.log('✅ 스타일 적용 완료:');
-    console.log('- className:', statusMessage.className);
-    console.log('- display:', statusMessage.style.display);
-    console.log('- 최종 표시 여부:', getComputedStyle(statusMessage).display);
-    console.log('- 위치 정보:', statusMessage.getBoundingClientRect());
+
+
 }
 
 // 상태 메시지 숨김 함수
@@ -1414,21 +1382,15 @@ function hideLectureStatusMessage() {
 
 // 페이지 로드 시 신청 상태 확인
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 페이지 로드 완료');
-    console.log('👤 로그인 상태:', <?= $isLoggedIn ? 'true' : 'false' ?>);
-    console.log('✏️ 편집 권한:', <?= $canEdit ? 'true' : 'false' ?>);
     
     // 모든 경우에 정적 버튼 정리 먼저 실행
     const staticButtons = document.querySelectorAll('.btn-register');
-    console.log('🧹 정적 버튼 정리:', staticButtons.length + '개 발견');
     
     // 로그인된 사용자에게만 API 호출
     const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
     if (isLoggedIn) {
-        console.log('✅ 로그인 사용자 - 신청 상태 확인 API 호출');
         checkRegistrationStatus();
     } else {
-        console.log('🔑 비로그인 사용자 - API 호출 생략');
     }
 });
 
@@ -1436,33 +1398,25 @@ document.addEventListener('DOMContentLoaded', function() {
 // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
 async function checkRegistrationStatus() {
     try {
-        console.log('🔍 신청 상태 확인 시작...');
 
         const result = await ApiClient.get('/api/lectures/<?= $lecture["id"] ?>/registration-status', {
             noLoading: true,
             noErrorToast: true
         });
 
-        console.log('📋 신청 상태 데이터:', result);
 
         if (result.success && result.data) {
-            console.log('✅ API 성공 응답, data 사용');
             updateRegistrationUI(result.data);
         } else {
-            console.log('ℹ️ API 응답 오류 또는 비로그인 상태:', result);
         }
     } catch (error) {
-        console.log('ℹ️ 신청 상태 확인 실패 (정상):', error.message);
+
         // 비로그인 사용자는 메시지 표시하지 않음
     }
 }
 
 // 신청 UI 업데이트
 function updateRegistrationUI(data) {
-    console.log('🔄 updateRegistrationUI 호출됨');
-    console.log('📦 전체 data:', data);
-    console.log('📦 data.lecture_info:', data.lecture_info);
-    console.log('📦 data.registration:', data.registration);
     
     const actionsContainer = document.getElementById('registration-actions');
     if (!actionsContainer) return;
@@ -1476,13 +1430,10 @@ function updateRegistrationUI(data) {
     
     if (data.registration) {
         // 이미 신청한 경우
-        console.log('👤 이미 신청한 사용자');
         const registration = data.registration;
         updateRegistrationStatusUI(registration, isLectureStarted);
     } else {
         // 신청하지 않은 경우
-        console.log('🆕 신청하지 않은 사용자');
-        console.log('🔗 data.lecture_info를 showRegistrationButton에 전달');
         showRegistrationButton(data.lecture_info, isLectureStarted);
     }
 }
@@ -1603,18 +1554,12 @@ function updateRegistrationStatusUI(registration, isLectureStarted) {
 
 // 신청 버튼 표시
 function showRegistrationButton(lectureInfo, isLectureStarted) {
-    console.log('🎯 showRegistrationButton 호출됨');
-    console.log('📋 lectureInfo:', lectureInfo);
-    console.log('📋 lectureInfo 타입:', typeof lectureInfo);
-    console.log('📋 lectureInfo.registration_end_date:', lectureInfo?.registration_end_date);
-    console.log('📋 lectureInfo의 모든 키:', lectureInfo ? Object.keys(lectureInfo) : 'null');
-    console.log('⏰ isLectureStarted:', isLectureStarted);
+
     
     // 디버그 모드 확인
     const debugContainer = document.getElementById('registration-actions-debug');
     const actionsContainer = debugContainer || document.getElementById('registration-actions');
     if (!actionsContainer) {
-        console.error('❌ registration-actions 컨테이너를 찾을 수 없습니다');
         Toast.error('신청 버튼을 표시할 수 없습니다.\n페이지를 새로고침해주세요.');
         return;
     }
@@ -1656,7 +1601,6 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     
     // lectureInfo 유효성 검사
     if (!lectureInfo || typeof lectureInfo !== 'object') {
-        console.error('❌ lectureInfo가 유효하지 않습니다:', lectureInfo);
         Toast.error('강의 정보를 불러올 수 없습니다.');
         showDefaultRegistrationButton();
         return;
@@ -1711,12 +1655,10 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
 
 // 기본 신청 버튼 표시 (오류 시)
 function showDefaultRegistrationButton() {
-    console.log('🔄 기본 신청 버튼 표시 중...');
     
     // 편집 권한이 있는 사용자는 신청 버튼이 필요하지 않음
     const canEdit = <?= $canEdit ? 'true' : 'false' ?>;
     if (canEdit) {
-        console.log('ℹ️ 편집 권한이 있는 사용자이므로 신청 버튼을 표시하지 않습니다');
         return;
     }
     
@@ -1724,30 +1666,24 @@ function showDefaultRegistrationButton() {
     const debugContainer = document.getElementById('registration-actions-debug');
     const actionsContainer = debugContainer || document.getElementById('registration-actions');
     if (!actionsContainer) {
-        console.error('❌ registration-actions 컨테이너를 찾을 수 없습니다');
         Toast.error('신청 버튼을 표시할 수 없습니다.\n페이지를 새로고침해주세요.');
-        console.log('🔍 로그인 상태:', <?= $isLoggedIn ? 'true' : 'false' ?>);
-        console.log('✏️ 편집 권한:', canEdit);
         return;
     }
     
     actionsContainer.innerHTML = '<button class="btn btn-primary" onclick="showRegistrationModal()">🚀 지금 신청하기</button>';
     
-    console.log('✅ 기본 신청 버튼 표시 완료');
 }
 
 // 신청 모달 표시
 function showRegistrationModal() {
-    console.log('🚀 showRegistrationModal() 호출됨');
+
     
     const modal = document.getElementById('registrationModal');
     if (!modal) {
-        console.error('❌ 신청 모달 요소를 찾을 수 없습니다');
         Toast.error('신청 모달을 로드할 수 없습니다. 페이지를 새로고침해주세요.');
         return;
     }
     
-    console.log('✅ 모달 요소 발견, 표시 중...');
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
     
@@ -1759,10 +1695,8 @@ function showRegistrationModal() {
     
     // 사용자 정보 자동 입력 (비동기, 오류가 있어도 모달은 표시)
     loadUserInfo().catch(error => {
-        console.warn('⚠️ 사용자 정보 로드 실패:', error);
     });
     
-    console.log('✅ 모달 표시 완료');
 }
 
 // 신청 모달 닫기
@@ -1805,7 +1739,6 @@ function resetRegistrationForm() {
 // 사용자 정보 자동 입력
 // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
 async function loadUserInfo() {
-    console.log('📝 사용자 정보 및 이전 신청 내역 로드 시작...');
 
     try {
         // 사용자 기본 정보 로드
@@ -1814,10 +1747,9 @@ async function loadUserInfo() {
             const userData = await ApiClient.get('/auth/me', { noLoading: true, noErrorToast: true });
             if (userData.success) {
                 userInfo = userData.user || userData.data;
-                console.log('👤 로드된 사용자 정보 전체:', JSON.stringify(userInfo, null, 2));
+
             }
         } catch (error) {
-            console.log('❌ 사용자 정보 로드 실패:', error.message);
         }
 
         // 이전 신청 내역 로드 (취소된 것 포함)
@@ -1830,24 +1762,20 @@ async function loadUserInfo() {
 
             if (regData.success && regData.data) {
                 previousRegistration = regData.data;
-                console.log('📋 이전 신청 내역 발견:', previousRegistration);
             }
         } catch (error) {
-            console.log('ℹ️ 이전 신청 내역 없음');
         }
 
         // 폼 필드 자동 채우기
         fillRegistrationForm(userInfo, previousRegistration);
 
     } catch (error) {
-        console.error('정보 로드 오류:', error);
         Toast.error('사용자 정보를 불러올 수 없습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
 
 // 신청 폼 자동 채우기
 function fillRegistrationForm(userInfo, previousRegistration) {
-    console.log('📝 폼 자동 채우기 시작...');
     
     // 폼 요소들 가져오기
     const participantName = document.getElementById('participant_name');
@@ -1862,30 +1790,21 @@ function fillRegistrationForm(userInfo, previousRegistration) {
     
     // 1단계: 사용자 계정 기본 정보로 채우기
     if (userInfo) {
-        console.log('✅ 사용자 기본 정보로 채우기:', userInfo.nickname);
-        console.log('📧 사용자 이메일 데이터:', userInfo.email);
-        console.log('📱 사용자 전화번호 데이터:', userInfo.phone);
-        console.log('🔍 이메일 필드 요소:', participantEmail);
         
         if (participantName && userInfo.nickname) {
             participantName.value = userInfo.nickname;
-            console.log('✅ 이름 자동 입력 완료:', userInfo.nickname);
         }
         if (participantEmail && userInfo.email) {
             participantEmail.value = userInfo.email;
-            console.log('✅ 이메일 자동 입력 완료:', userInfo.email);
         } else {
-            console.log('❌ 이메일 자동 입력 실패 - participantEmail:', !!participantEmail, 'userInfo.email:', userInfo.email);
         }
         if (participantPhone && userInfo.phone) {
             participantPhone.value = userInfo.phone;
-            console.log('✅ 전화번호 자동 입력 완료:', userInfo.phone);
         }
     }
     
     // 2단계: 이전 신청 내역으로 덮어쓰기 (더 상세한 정보)
     if (previousRegistration) {
-        console.log('📋 이전 신청 내역으로 폼 자동 채우기');
         
         if (previousRegistration.participant_name && participantName) {
             participantName.value = previousRegistration.participant_name;
@@ -1912,7 +1831,6 @@ function fillRegistrationForm(userInfo, previousRegistration) {
             specialRequests.value = previousRegistration.special_requests;
         }
         
-        console.log('✅ 이전 신청 내역으로 폼 자동 채우기 완료');
     }
 }
 
@@ -1965,7 +1883,6 @@ async function submitRegistration() {
         }
         
     } catch (error) {
-        console.error('신청 제출 오류:', error);
         Toast.error('❌ 신청 처리 중 오류가 발생했습니다.');
     } finally {
         // 버튼 복구
@@ -2087,7 +2004,6 @@ async function cancelRegistration() {
             Toast.error('❌ 신청 취소에 실패했습니다.\n\n' + (result.message || '알 수 없는 오류'));
         }
     } catch (error) {
-        console.error('신청 취소 오류:', error);
         Toast.error('신청 취소 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
     }
 }
@@ -2124,16 +2040,6 @@ async function confirmDeleteLecture(lectureId) {
     // CSRF 토큰 가져오기
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-    // 디버깅 정보 출력
-    console.log('=== 강의 삭제 디버깅 시작 ===');
-    console.log('강의 ID:', lectureId);
-    console.log('CSRF 토큰:', csrfToken);
-    console.log('요청 URL:', '/lectures/' + lectureId + '/delete');
-    console.log('요청 데이터:', {
-        csrf_token: csrfToken,
-        confirm_delete: true
-    });
-
     // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
     ApiClient.post('/lectures/' + lectureId + '/delete',
         {
@@ -2143,11 +2049,8 @@ async function confirmDeleteLecture(lectureId) {
         { noLoading: true } // 버튼 상태로 로딩 표시
     )
     .then(result => {
-        console.log('=== 응답 데이터 ===');
-        console.log('응답 데이터:', result);
 
         if (result.success) {
-            console.log('✅ 강의 삭제 성공');
             Toast.success('✅ 강의가 성공적으로 삭제되었습니다.');
             // 이전 페이지로 돌아가기 (또는 강의 목록으로)
             if (document.referrer && document.referrer !== window.location.href) {
@@ -2156,7 +2059,6 @@ async function confirmDeleteLecture(lectureId) {
                 window.location.href = '/lectures';
             }
         } else {
-            console.error('❌ 강의 삭제 실패:', result);
             Toast.error('❌ 강의 삭제에 실패했습니다.\n\n오류: ' + result.message);
             // 버튼 복구
             deleteBtn.innerHTML = originalText;
@@ -2164,9 +2066,6 @@ async function confirmDeleteLecture(lectureId) {
         }
     })
     .catch(error => {
-        console.error('=== 강의 삭제 오류 ===');
-        console.error('오류 객체:', error);
-        console.error('오류 메시지:', error.message);
         Toast.error('강의 삭제 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
         // 버튼 복구
         deleteBtn.innerHTML = originalText;
@@ -2344,22 +2243,14 @@ if (!window.registrationModalKeydownRegistered) {
 
 // 강의 신청 상태 메시지 업데이트 함수
 function updateLectureStatusMessage(registration) {
-    console.log('🚨 updateLectureStatusMessage 호출됨');
-    console.log('📋 registration 데이터:', registration);
     
     const statusMessage = document.getElementById('lecture-status-message');
     const statusTitle = document.getElementById('lecture-status-title');
     const statusDescription = document.getElementById('lecture-status-description');
     const statusIcon = statusMessage?.querySelector('.status-icon i');
     
-    console.log('🔍 DOM 요소 확인:');
-    console.log('- statusMessage:', statusMessage);
-    console.log('- statusTitle:', statusTitle);
-    console.log('- statusDescription:', statusDescription);
-    console.log('- statusIcon:', statusIcon);
     
     if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) {
-        console.error('❌ 필수 DOM 요소가 누락됨!');
         Toast.warning('페이지 요소를 불러오는 중 오류가 발생했습니다.');
         return;
     }
@@ -2369,47 +2260,37 @@ function updateLectureStatusMessage(registration) {
     statusMessage.style.display = 'none';
     
     if (!registration) {
-        console.log('⚠️ registration이 null이므로 메시지 숨김');
         hideLectureStatusMessage();
         return;
     }
     
-    console.log('📊 registration.status:', registration.status);
-    console.log('📝 registration.admin_notes:', registration.admin_notes);
     
     switch (registration.status) {
         case 'pending':
-            console.log('⏳ pending 상태 처리');
             showLectureStatusMessage('pending', 'fa-clock', '신청 검토 중입니다', 
                 '신청이 접수되었습니다. 승인 결과를 기다려주세요.');
             break;
             
         case 'approved':
-            console.log('✅ approved 상태 처리');
             const approvedMessage = registration.admin_notes || '신청이 승인되었습니다. 강의에 참석해주세요.';
             showLectureStatusMessage('approved', 'fa-check-circle', '신청이 승인되었습니다', approvedMessage);
             break;
             
         case 'waiting':
-            console.log('⏰ waiting 상태 처리');
             showLectureStatusMessage('waiting', 'fa-hourglass-half', '대기열 ' + registration.waiting_order + '번입니다', 
                 '정원이 초과되어 대기열에 등록되었습니다. 승인 시 알림을 드리겠습니다.');
             break;
             
         case 'rejected':
-            console.log('❌ rejected 상태 처리 시작');
             const rejectedMessage = registration.admin_notes || '신청이 거절되었습니다. 다시 신청하실 수 있습니다.';
-            console.log('📝 거절 메시지:', rejectedMessage);
             showLectureStatusMessage('rejected', 'fa-times-circle', '신청이 거절되었습니다', rejectedMessage);
             break;
             
         case 'cancelled':
-            console.log('⭕ cancelled 상태 처리');
             hideLectureStatusMessage();
             break;
             
         default:
-            console.log('❓ 알 수 없는 상태:', registration.status);
             hideLectureStatusMessage();
     }
 }
@@ -2422,7 +2303,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // 로그인 버튼인 경우에는 기본 동작을 유지 (로그인 페이지로 이동)
             const href = this.getAttribute('href');
             if (href && href.includes('/auth/login')) {
-                console.log('🔑 로그인 버튼 클릭 - 기본 동작 유지');
                 return; // 기본 동작을 허용
             }
 

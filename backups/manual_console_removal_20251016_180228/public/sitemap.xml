@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- 메인 페이지 -->
+    <url>
+        <loc>https://www.topmktx.com/</loc>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 커뮤니티 -->
+    <url>
+        <loc>https://www.topmktx.com/community</loc>
+        <changefreq>hourly</changefreq>
+        <priority>0.9</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 강의 일정 -->
+    <url>
+        <loc>https://www.topmktx.com/lectures</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 행사 일정 -->
+    <url>
+        <loc>https://www.topmktx.com/events</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 로그인 -->
+    <url>
+        <loc>https://www.topmktx.com/auth/login</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 회원가입 -->
+    <url>
+        <loc>https://www.topmktx.com/auth/signup</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 이용약관 -->
+    <url>
+        <loc>https://www.topmktx.com/terms</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 개인정보처리방침 -->
+    <url>
+        <loc>https://www.topmktx.com/privacy</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+    
+    <!-- 기업회원 안내 -->
+    <url>
+        <loc>https://www.topmktx.com/corp/info</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+        <lastmod>2025-01-15</lastmod>
+    </url>
+</urlset>

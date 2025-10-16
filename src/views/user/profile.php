@@ -1265,9 +1265,7 @@ function shareContent() {
                 text: profileDescription,
                 url: profileUrl
             }).then(() => {
-                console.log('공유 성공');
             }).catch((error) => {
-                console.log('공유 실패:', error);
                 fallbackShare(profileTitle, profileUrl);
             });
         } else {
@@ -1275,7 +1273,6 @@ function shareContent() {
             fallbackShare(profileTitle, profileUrl);
         }
     } catch (error) {
-        console.error('공유 기능 오류:', error);
         Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
@@ -1382,22 +1379,12 @@ function showShareModal(title, url) {
             const resourceTime = safeCalc(timing.loadEventEnd, timing.domContentLoadedEventEnd);
             const totalTime = safeCalc(timing.loadEventEnd, timing.navigationStart);
 
-            console.log('🚀 프로필 페이지 성능 분석 (v3.66.0)');
-            console.log('👤 사용자:', '<?= htmlspecialchars($user['nickname'] ?? '') ?>');
-            console.log('📊 통계:', <?= json_encode($stats) ?>);
-            console.log('');
-            console.log('⏱️ 로딩 시간 분석:');
-            console.log('├─ DNS 조회:', dnsTime + 'ms');
-            console.log('├─ TCP 연결:', tcpTime + 'ms');
-            console.log('├─ 서버 응답:', serverTime + 'ms', serverTime > 1000 ? '⚠️ 느림!' : '✅');
-            console.log('├─ DOM 생성:', domTime + 'ms');
-            console.log('├─ 리소스 로딩:', resourceTime + 'ms');
-            console.log('└─ 총 로딩 시간:', totalTime + 'ms');
+
+
+
 
             // 리소스별 로딩 시간
             const resources = performance.getEntriesByType('resource');
-            console.log('');
-            console.log('📁 리소스 로딩 시간:');
 
             let slowResources = [];
             resources.forEach(function(resource) {
@@ -1414,31 +1401,23 @@ function showShareModal(title, url) {
             // 느린 리소스 상위 10개
             slowResources.sort((a, b) => b.time - a.time);
             slowResources.slice(0, 10).forEach(function(resource, index) {
-                console.log(`${index + 1}. ${resource.name} (${resource.type}): ${resource.time}ms`);
             });
 
             // 메모리 사용량 (가능한 경우)
             if (performance.memory) {
-                console.log('');
-                console.log('💾 메모리 사용량:');
-                console.log('├─ 사용 중:', Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB');
-                console.log('├─ 할당됨:', Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + 'MB');
-                console.log('└─ 한계:', Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024) + 'MB');
+
+
+
             }
 
             // 성능 경고 (서버 응답 시간 기준)
             if (serverTime > 2000) {
-                console.warn('🐌 서버 응답이 2초 이상 걸렸습니다! 캐시를 확인하세요.');
             } else if (serverTime > 1000) {
-                console.warn('⚠️ 서버 응답이 1초 이상 걸렸습니다.');
             }
 
             if (totalTime > 3000) {
-                console.warn('🐌 전체 페이지 로딩이 3초 이상 걸렸습니다!');
             } else if (totalTime > 1500) {
-                console.warn('⚠️ 전체 페이지 로딩이 1.5초 이상 걸렸습니다.');
             } else {
-                console.log('✅ 페이지 로딩 속도 양호');
             }
         }, 100); // 100ms 지연으로 모든 타이밍 값이 설정되도록 보장
     });
@@ -1446,7 +1425,6 @@ function showShareModal(title, url) {
     // DOM 준비 완료 시간
     document.addEventListener('DOMContentLoaded', function() {
         const domReadyTime = performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart;
-        console.log('📄 DOM 준비 완료:', domReadyTime + 'ms');
     });
 })();
 </script>

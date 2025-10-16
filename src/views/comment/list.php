@@ -786,18 +786,15 @@ function submitComment(event) {
         { noLoading: true } // 버튼 상태로 로딩 표시
     )
     .then(result => {
-        console.log('댓글 작성 응답:', result);
 
         if (result.success) {
             // 페이지 새로고침으로 댓글 목록 업데이트
-            console.log('댓글 작성 성공, 페이지 새로고침');
             location.reload();
         } else {
             Toast.error(result.message || '댓글 작성에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('댓글 작성 오류:', error);
         // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     })
     .finally(() => {
@@ -851,17 +848,14 @@ function submitReply(parentId) {
         { noLoading: true } // 버튼 상태로 로딩 표시
     )
     .then(result => {
-        console.log('답글 작성 응답:', result);
 
         if (result.success) {
-            console.log('답글 작성 성공, 페이지 새로고침');
             location.reload();
         } else {
             Toast.error(result.message || '답글 작성에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('답글 작성 오류:', error);
         // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     })
     .finally(() => {
@@ -1008,17 +1002,14 @@ function updateComment(commentId) {
         { noLoading: true } // 버튼 상태로 로딩 표시
     )
     .then(result => {
-        console.log('댓글 수정 응답:', result);
 
         if (result.success) {
-            console.log('댓글 수정 성공, 페이지 새로고침');
             location.reload();
         } else {
             Toast.error(result.message || '댓글 수정에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('댓글 수정 오류:', error);
         // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     })
     .finally(() => {
@@ -1039,17 +1030,14 @@ async function deleteComment(commentId) {
     // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.delete)
     ApiClient.delete(`/api/comments/${commentId}`, { noLoading: true })
     .then(result => {
-        console.log('댓글 삭제 응답:', result);
 
         if (result.success) {
-            console.log('댓글 삭제 성공, 페이지 새로고침');
             location.reload();
         } else {
             Toast.error(result.message || '댓글 삭제에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('댓글 삭제 오류:', error);
         // ApiClient가 이미 Toast 표시했으므로 추가 표시 불필요
     });
 }

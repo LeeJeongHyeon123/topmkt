@@ -71,7 +71,6 @@ window.EditChecker = {
         })
         .catch(error => {
             this.hideLoading();
-            console.error('수정 가능 여부 체크 오류:', error);
             this.showAlert('서버와 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'NETWORK_ERROR');
         });
     },
@@ -88,11 +87,6 @@ window.EditChecker = {
 
         // 디버깅 정보 (개발 환경에서만)
         if (console && data) {
-            console.group('🚫 수정 차단 정보');
-            console.log('메시지:', message);
-            console.log('코드:', code);
-            console.log('데이터:', data);
-            console.groupEnd();
         }
     },
 
@@ -148,7 +142,6 @@ window.EditChecker = {
 
         // 🚀 v3.64.0: 성능 최적화 - 디버그 모드에서만 로그 출력
         if (window.DEBUG_MODE) {
-            console.log('✅ EditChecker: 수정 버튼 이벤트 리스너 적용 완료');
         }
     }
 };
@@ -165,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // MutationObserver는 성능 문제로 비활성화됨
 // 필요시 window.enableEditCheckObserver()로 활성화 가능
 window.enableEditCheckObserver = function() {
-    console.log('🔍 EditChecker MutationObserver 활성화');
 
     let editCheckTimeout;
     const observer = new MutationObserver(function(mutations) {
@@ -201,4 +193,3 @@ window.enableEditCheckObserver = function() {
     });
 };
 
-console.log('🚀 EditChecker 로드 완료');

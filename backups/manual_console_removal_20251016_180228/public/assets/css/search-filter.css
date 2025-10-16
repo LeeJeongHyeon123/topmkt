@@ -1,0 +1,417 @@
+/**
+ * SearchFilter Component CSS
+ * v3.37.0 - 검색/필터 시스템 완전 컴포넌트화
+ *
+ * Ultra Think 모드로 33개 파일의 검색/필터 패턴 분석 후 통합
+ *
+ * 지원 레이아웃:
+ * - inline: 모든 요소 한 줄 (기본)
+ * - grid-2: 2열 그리드
+ * - grid-3: 3열 그리드
+ * - grid-4: 4열 그리드 (admin 페이지용)
+ */
+
+/* ==================== 컨테이너 ==================== */
+.search-filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* ==================== 헤더 (접기/펼치기) ==================== */
+.search-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-filter-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0;
+}
+
+.search-filter-toggle {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.search-filter-toggle:hover {
+    background-color: #f7fafc;
+}
+
+.search-filter-toggle .toggle-icon {
+    transition: transform 0.2s;
+}
+
+/* ==================== 폼 래퍼 ==================== */
+.search-filter-form,
+.search-filter-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ==================== 필터 그리드 레이아웃 ==================== */
+.search-filter-grid {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+/* Inline 레이아웃 (기본 - PC에서 필터와 검색 모두 한 줄) */
+.search-filter-inline-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.search-filter-inline-row .search-filter-input,
+.search-filter-inline-row select {
+    width: 150px;
+    flex-shrink: 0;
+}
+
+.search-filter-inline-row .search-filter-search-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-filter-inline-row .search-filter-submit,
+.search-filter-inline-row .search-filter-reset {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Grid-2 레이아웃 (2열) */
+.search-filter-grid.layout-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* Grid-3 레이아웃 (3열) */
+.search-filter-grid.layout-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Grid-4 레이아웃 (4열 - admin용) */
+.search-filter-grid.layout-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ==================== 필터 그룹 ==================== */
+.search-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-filter-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+/* ==================== 입력 필드 ==================== */
+.search-filter-input {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+    width: 100%;
+    box-sizing: border-box !important;
+}
+
+.search-filter-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-filter-input:hover {
+    border-color: #cbd5e0;
+}
+
+/* Select 필드 특별 스타일 */
+.search-filter-input[type="select"],
+.search-filter-input select {
+    cursor: pointer;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+/* Date 필드 */
+.search-filter-input[type="date"] {
+    cursor: pointer;
+}
+
+/* Number 필드 */
+.search-filter-input[type="number"] {
+    text-align: left;
+}
+
+/* ==================== 검색 행 ==================== */
+.search-filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-filter-search-input {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    flex: 1;
+    transition: all 0.2s;
+    min-width: 300px;
+    box-sizing: border-box !important;
+}
+
+.search-filter-search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ==================== 버튼 ==================== */
+.search-filter-submit,
+.search-filter-reset {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.search-filter-submit {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.search-filter-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.search-filter-reset {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.search-filter-reset:hover {
+    background: #e9ecef;
+}
+
+/* ==================== 반응형 ==================== */
+
+/* 태블릿 (768px 이하) */
+@media (max-width: 768px) {
+    .search-filter-section {
+        padding: 16px;
+    }
+
+    /* 모든 그리드를 2열로 축소 */
+    .search-filter-grid.layout-grid-3,
+    .search-filter-grid.layout-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Inline 레이아웃을 세로 배치 */
+    .search-filter-inline-row {
+        flex-direction: column;
+        align-items: stretch;
+        flex-wrap: nowrap;
+    }
+
+    .search-filter-inline-row .search-filter-input,
+    .search-filter-inline-row select,
+    .search-filter-inline-row .search-filter-search-input {
+        width: 100%;
+    }
+
+    .search-filter-inline-row .search-filter-submit,
+    .search-filter-inline-row .search-filter-reset {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* 검색 행을 세로 배치 */
+    .search-filter-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-filter-search-input {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .search-filter-submit,
+    .search-filter-reset {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* 모바일 (480px 이하) */
+@media (max-width: 480px) {
+    .search-filter-section {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    /* 모든 그리드를 1열로 */
+    .search-filter-grid.layout-grid-2,
+    .search-filter-grid.layout-grid-3,
+    .search-filter-grid.layout-grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .search-filter-header {
+        margin-bottom: 12px;
+    }
+
+    .search-filter-title {
+        font-size: 14px;
+    }
+
+    .search-filter-toggle {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .search-filter-input,
+    .search-filter-search-input {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .search-filter-label {
+        font-size: 12px;
+    }
+
+    .search-filter-submit,
+    .search-filter-reset {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* ==================== 다크모드 지원 ==================== */
+@media (prefers-color-scheme: dark) {
+    .search-filter-section {
+        background: #1a202c;
+        border-color: #2d3748;
+    }
+
+    .search-filter-title {
+        color: #e2e8f0;
+    }
+
+    .search-filter-toggle {
+        color: #667eea;
+    }
+
+    .search-filter-toggle:hover {
+        background-color: #2d3748;
+    }
+
+    .search-filter-label {
+        color: #a0aec0;
+    }
+
+    .search-filter-input,
+    .search-filter-search-input {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .search-filter-input:focus,
+    .search-filter-search-input:focus {
+        border-color: #667eea;
+        background: #2d3748;
+    }
+
+    .search-filter-input:hover,
+    .search-filter-search-input:hover {
+        border-color: #4a5568;
+    }
+
+    .search-filter-reset {
+        background: #2d3748;
+        color: #a0aec0;
+        border-color: #4a5568;
+    }
+
+    .search-filter-reset:hover {
+        background: #4a5568;
+    }
+}
+
+/* ==================== 애니메이션 ==================== */
+.search-filter-content {
+    transition: all 0.3s ease;
+}
+
+.search-filter-input,
+.search-filter-search-input {
+    transition: all 0.2s ease;
+}
+
+/* ==================== 접근성 ==================== */
+.search-filter-input:focus-visible,
+.search-filter-search-input:focus-visible,
+.search-filter-submit:focus-visible,
+.search-filter-reset:focus-visible,
+.search-filter-toggle:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* ==================== 프린트 스타일 ==================== */
+@media print {
+    .search-filter-section {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .search-filter-header {
+        display: none;
+    }
+
+    .search-filter-submit,
+    .search-filter-reset {
+        display: none;
+    }
+}

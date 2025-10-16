@@ -259,9 +259,7 @@ class ProfileImageHelper {
         // 프로필 이미지 모달 초기화 확인
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof window.profileModal === 'undefined') {
-                console.warn('⚠️ ProfileImageModal이 로드되지 않았습니다. profile-modal.js를 확인하세요.');
             } else {
-                console.log('✅ ProfileImageModal 준비 완료');
             }
         });
         </script>

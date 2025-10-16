@@ -74,7 +74,6 @@ try {
     // JavaScript에서도 설정할 수 있도록
     echo "<script>
         document.cookie = 'auth_token={$token}; path=/; max-age=86400; samesite=lax';
-        console.log('🍪 JavaScript 쿠키 설정:', document.cookie);
     </script>";
     
     // 세션에도 설정 (호환성)

@@ -1433,7 +1433,6 @@ class MultiStepPasswordResetManager {
                 this.showAlert(data.error || data.message || '오류가 발생했습니다.', 'error');
             }
         } catch (error) {
-            console.error('Step 1 Error:', error);
             this.showAlert('네트워크 오류가 발생했습니다.', 'error');
         } finally {
             Loading.button(this.step1Button, false);
@@ -1474,7 +1473,6 @@ class MultiStepPasswordResetManager {
                 this.showAlert(data.error || data.message || '인증 코드가 올바르지 않습니다.', 'error');
             }
         } catch (error) {
-            console.error('Step 2 Error:', error);
             this.showAlert('네트워크 오류가 발생했습니다.', 'error');
         } finally {
             Loading.button(this.step2Button, false);
@@ -1518,7 +1516,6 @@ class MultiStepPasswordResetManager {
                 this.showAlert(data.error || data.message || '비밀번호 재설정에 실패했습니다.', 'error');
             }
         } catch (error) {
-            console.error('Step 3 Error:', error);
             this.showAlert('네트워크 오류가 발생했습니다.', 'error');
         } finally {
             Loading.button(this.step3Button, false);
@@ -1526,7 +1523,6 @@ class MultiStepPasswordResetManager {
     }
 
     goToStep(step) {
-        console.log('🔄 단계 전환:', this.currentStep, '→', step);
         
         this.currentStep = step;
         this.updateProgress(step);
@@ -1539,14 +1535,11 @@ class MultiStepPasswordResetManager {
         
         // 대상 단계 폼만 표시 (progress-step는 CSS로만 제어)
         const targetForm = document.querySelector(`.form-step[data-step="${step}"]`);
-        console.log('🎯 대상 폼 요소:', targetForm);
         
         if (targetForm) {
             targetForm.style.display = 'block';
             targetForm.classList.add('active');
-            console.log('✅ 단계', step, '폼 활성화 완료');
         } else {
-            console.error('❌ 단계', step, '폼을 찾을 수 없음');
         }
         
         // 추가: 강제로 인라인 스타일 제거 (CSS 우선순위 문제 해결)
@@ -1555,14 +1548,12 @@ class MultiStepPasswordResetManager {
             if (step2Form) {
                 step2Form.style.removeProperty('display');
                 step2Form.style.display = 'block';
-                console.log('🔧 2단계 폼 강제 표시 적용');
             }
         } else if (step === 3) {
             const step3Form = document.getElementById('step3Form');
             if (step3Form) {
                 step3Form.style.removeProperty('display');
                 step3Form.style.display = 'block';
-                console.log('🔧 3단계 폼 강제 표시 적용');
                 
                 // 3단계로 이동할 때 hidden 필드에 필요한 데이터 설정
                 const finalPhoneInput = document.getElementById('final_phone');
@@ -1573,7 +1564,6 @@ class MultiStepPasswordResetManager {
                 if (finalPhoneInput) finalPhoneInput.value = phoneValue;
                 if (finalCodeInput) finalCodeInput.value = codeValue;
                 
-                console.log('📱 3단계 hidden 필드 설정:', { phone: phoneValue, code: codeValue });
             }
         }
     }
@@ -1666,7 +1656,6 @@ class MultiStepPasswordResetManager {
         const eyeIcon = document.getElementById(inputId + '_eye');
         
         if (!input || !eyeIcon) {
-            console.error('❌ 비밀번호 필드 또는 아이콘을 찾을 수 없음:', inputId);
             return;
         }
         
@@ -1689,7 +1678,6 @@ function togglePasswordVisibility(inputId) {
     if (window.multiStepPasswordReset) {
         window.multiStepPasswordReset.togglePasswordVisibility(inputId);
     } else {
-        console.error('❌ MultiStepPasswordResetManager가 초기화되지 않았습니다');
     }
 }
 

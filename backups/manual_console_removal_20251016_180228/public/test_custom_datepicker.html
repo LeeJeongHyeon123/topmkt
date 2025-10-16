@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커스텀 날짜 선택기 테스트</title>
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .date-filter-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .date-filter label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4a5568;
+            white-space: nowrap;
+        }
+
+        .date-input {
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background: white;
+            color: #2d3748;
+            transition: border-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Flatpickr 커스터마이징 */
+        .flatpickr-calendar {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+            border-radius: 12px !important;
+            border: 1px solid #e2e8f0 !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+
+        .flatpickr-calendar .flatpickr-months {
+            background: #667eea !important;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 15px 20px !important;
+        }
+
+        .flatpickr-calendar .flatpickr-month {
+            color: white !important;
+        }
+
+        .flatpickr-calendar .flatpickr-prev-month,
+        .flatpickr-calendar .flatpickr-next-month {
+            fill: white !important;
+        }
+
+        .flatpickr-calendar .flatpickr-current-month {
+            color: white !important;
+        }
+
+        .flatpickr-calendar .flatpickr-weekday {
+            color: #718096 !important;
+            font-weight: 600 !important;
+            font-size: 0.8rem !important;
+        }
+
+        .flatpickr-calendar .flatpickr-day {
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+        }
+
+        .flatpickr-calendar .flatpickr-day:hover {
+            background: #667eea !important;
+            color: white !important;
+        }
+
+        .flatpickr-calendar .flatpickr-day.selected {
+            background: #667eea !important;
+            border-color: #667eea !important;
+        }
+
+        .flatpickr-calendar .flatpickr-day.today {
+            background: #48bb78 !important;
+            color: white !important;
+            border-color: #48bb78 !important;
+        }
+
+        /* 커스텀 버튼 스타일 */
+        .flatpickr-custom-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .flatpickr-today-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .flatpickr-today-btn:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .flatpickr-apply-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .flatpickr-apply-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e0;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .result h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .result-item {
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 커스텀 날짜 선택기 테스트</h1>
+        <p style="text-align: center; color: #718096; margin-bottom: 30px;">
+            "삭제" 버튼 제거, "오늘" 버튼 이동, "적용" 버튼 추가 확인
+        </p>
+
+        <div class="date-filter-container">
+            <div class="date-filter">
+                <label for="startDate">시작일:</label>
+                <input type="text" id="startDate" class="date-input" placeholder="날짜 선택">
+                <label for="endDate">종료일:</label>
+                <input type="text" id="endDate" class="date-input" placeholder="날짜 선택">
+                <button onclick="applyDateFilter()" class="btn btn-primary">필터 적용</button>
+                <button onclick="resetDateFilter()" class="btn btn-outline">초기화</button>
+            </div>
+        </div>
+
+        <div class="result">
+            <h2>🔍 테스트 결과</h2>
+            <div class="result-item"><strong>시작일:</strong> <span id="startResult">선택되지 않음</span></div>
+            <div class="result-item"><strong>종료일:</strong> <span id="endResult">선택되지 않음</span></div>
+            <div class="result-item"><strong>상태:</strong> <span id="statusResult">대기중</span></div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #e6fffa; border-radius: 8px; border: 1px solid #81e6d9;">
+            <h3 style="color: #234e52; margin-bottom: 15px;">✅ 확인사항</h3>
+            <ul style="color: #2d3748; margin: 0; padding-left: 20px;">
+                <li>달력에 "삭제" 버튼이 없어야 함</li>
+                <li>"오늘" 버튼이 왼쪽(기존 삭제 버튼 위치)에 있어야 함</li>
+                <li>"적용" 버튼이 오른쪽(기존 오늘 버튼 위치)에 있어야 함</li>
+                <li>한국어 로케일이 적용되어야 함</li>
+                <li>보라색 테마가 적용되어야 함</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Flatpickr 인스턴스를 저장할 변수
+        let startDatePicker, endDatePicker;
+
+        // 날짜 필터 기능
+        function applyDateFilter() {
+            const startDate = startDatePicker.selectedDates[0];
+            const endDate = endDatePicker.selectedDates[0];
+
+            if (!startDate || !endDate) {
+                alert('시작일과 종료일을 모두 선택해주세요.');
+                return;
+            }
+
+            if (startDate > endDate) {
+                alert('시작일이 종료일보다 늦을 수 없습니다.');
+                return;
+            }
+
+            // 결과 표시
+            document.getElementById('startResult').textContent = startDatePicker.formatDate(startDate, 'Y-m-d');
+            document.getElementById('endResult').textContent = endDatePicker.formatDate(endDate, 'Y-m-d');
+            document.getElementById('statusResult').textContent = '✅ 필터 적용됨';
+        }
+
+        function resetDateFilter() {
+            // 달력 초기화
+            startDatePicker.clear();
+            endDatePicker.clear();
+
+            // 결과 초기화
+            document.getElementById('startResult').textContent = '선택되지 않음';
+            document.getElementById('endResult').textContent = '선택되지 않음';
+            document.getElementById('statusResult').textContent = '🔄 초기화됨';
+        }
+
+        // 커스텀 버튼 생성 함수
+        function createCustomButtons(picker) {
+            return {
+                onReady: function() {
+                    // 기존 버튼들 숨기기/제거
+                    const clearButton = picker.calendarContainer.querySelector('.flatpickr-clear');
+                    if (clearButton) {
+                        clearButton.style.display = 'none';
+                    }
+
+                    // 커스텀 버튼 컨테이너 생성
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'flatpickr-custom-buttons';
+
+                    // 오늘 버튼 (왼쪽에 위치 - 기존 삭제 버튼 자리)
+                    const todayBtn = document.createElement('button');
+                    todayBtn.className = 'flatpickr-today-btn';
+                    todayBtn.textContent = '오늘';
+                    todayBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        picker.setDate(new Date());
+                    });
+
+                    // 적용 버튼 (오른쪽에 위치 - 기존 오늘 버튼 자리)
+                    const applyBtn = document.createElement('button');
+                    applyBtn.className = 'flatpickr-apply-btn';
+                    applyBtn.textContent = '적용';
+                    applyBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        picker.close();
+                    });
+
+                    buttonContainer.appendChild(todayBtn);
+                    buttonContainer.appendChild(applyBtn);
+                    picker.calendarContainer.appendChild(buttonContainer);
+                }
+            };
+        }
+
+        // 페이지 로드 시 Flatpickr 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 기본값: 최근 1개월
+            const today = new Date();
+            const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+            // 시작일 Flatpickr 초기화
+            startDatePicker = flatpickr('#startDate', {
+                locale: 'ko',
+                dateFormat: 'Y-m-d',
+                defaultDate: oneMonthAgo,
+                onReady: function() {
+                    const buttons = createCustomButtons(this);
+                    buttons.onReady.call(this);
+                },
+                onChange: function(selectedDates, dateStr) {
+                    // 종료일의 최소값을 시작일로 설정
+                    if (endDatePicker) {
+                        endDatePicker.set('minDate', dateStr);
+                    }
+
+                    // 결과 업데이트
+                    if (selectedDates[0]) {
+                        document.getElementById('startResult').textContent = this.formatDate(selectedDates[0], 'Y-m-d');
+                    }
+                }
+            });
+
+            // 종료일 Flatpickr 초기화
+            endDatePicker = flatpickr('#endDate', {
+                locale: 'ko',
+                dateFormat: 'Y-m-d',
+                defaultDate: today,
+                minDate: oneMonthAgo,
+                onReady: function() {
+                    const buttons = createCustomButtons(this);
+                    buttons.onReady.call(this);
+                },
+                onChange: function(selectedDates, dateStr) {
+                    // 시작일의 최대값을 종료일로 설정
+                    if (startDatePicker) {
+                        startDatePicker.set('maxDate', dateStr);
+                    }
+
+                    // 결과 업데이트
+                    if (selectedDates[0]) {
+                        document.getElementById('endResult').textContent = this.formatDate(selectedDates[0], 'Y-m-d');
+                    }
+                }
+            });
+
+            // 초기값 표시
+            document.getElementById('startResult').textContent = startDatePicker.formatDate(oneMonthAgo, 'Y-m-d');
+            document.getElementById('endResult').textContent = endDatePicker.formatDate(today, 'Y-m-d');
+            document.getElementById('statusResult').textContent = '📅 초기값 설정됨';
+        });
+    </script>
+</body>
+</html>

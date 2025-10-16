@@ -437,7 +437,6 @@
                 const data = JSON.parse(event.data);
                 
                 if (data.type === 'FCM_TOKEN') {
-                    console.log('📱 앱에서 받은 푸시 토큰:', data.token);
                     
                     // 로컬 스토리지에 저장
                     localStorage.setItem('app_push_token', data.token);
@@ -451,21 +450,18 @@
                         noErrorToast: true // 푸시 토큰 저장 실패는 사용자에게 표시하지 않음
                     })
                     .then(result => {
-                        console.log('✅ 푸시 토큰 서버 저장 성공:', result);
                     })
                     .catch(err => {
-                        console.error('❌ 푸시 토큰 저장 실패 (무시):', err);
+
                         // 푸시 토큰 저장 실패는 치명적이지 않으므로 무시
                     });
                 }
             } catch (e) {
-                console.error('메시지 파싱 실패:', e);
             }
         });
 
         // 앱에 푸시 토큰 요청
         if (window.ReactNativeWebView) {
-            console.log('🔗 React Native WebView 감지됨');
             window.ReactNativeWebView.postMessage(JSON.stringify({
                 type: 'REQUEST_PUSH_TOKEN'
             }));

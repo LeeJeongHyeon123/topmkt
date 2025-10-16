@@ -593,12 +593,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const isFeaturedValue = '0';
         
         // 🔍 디버깅: 전송될 데이터 확인
-        console.log('📝 폼 제출 데이터:', {
-            title: titleValue,
-            titleLength: titleValue.trim().length,
-            content: contentValue,
-            contentLength: contentValue.trim().length,
-            contentTextOnly: quill ? quill.getText().trim() : contentValue.trim(),
             is_featured: isFeaturedValue,
             removedImages: removedImages
         });
@@ -662,7 +656,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 Toast.error(result.message || '수정 중 오류가 발생했습니다.');
             }
         } catch (error) {
-            console.error('수정 오류:', error);
             Toast.error('네트워크 오류가 발생했습니다.');
         } finally {
             submitBtn.classList.remove('loading');
@@ -675,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 🚀 Ultra Think v3.13.0: Quill 커스텀 이미지 핸들러 (MediaController 연동) + 20개 제한
 function quillImageHandler() {
-    console.log('📷 이미지 업로드 버튼 클릭됨 (notices/edit.php)');
+
     
     // 현재 이미지 개수 확인 (20개 제한)
     const currentImages = quill.container.querySelectorAll('img').length;
@@ -745,10 +738,8 @@ function uploadImageToQuill(file) {
             // 이미지 카운터 업데이트
             updateImageCounter();
             
-            console.log('✅ Quill 이미지 업로드 성공:', data.data.url);
         } else {
             Toast.error('이미지 업로드 실패: ' + data.message);
-            console.error('❌ Quill 이미지 업로드 실패:', data.message);
         }
     })
     .catch(error => {
@@ -756,13 +747,11 @@ function uploadImageToQuill(file) {
         quill.deleteText(range.index, '이미지 업로드 중...'.length);
         
         Toast.error('이미지 업로드 중 오류가 발생했습니다.');
-        console.error('❌ Quill 이미지 업로드 오류:', error);
     });
 }
 
 // 🚀 Ultra Think: Quill 에디터 초기화 함수
 function initializeQuillEditor() {
-    console.log('📝 Quill 에디터 초기화 중...');
     
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
@@ -795,7 +784,7 @@ function initializeQuillEditor() {
         tempDiv.innerHTML = existingContent;
         quill.root.innerHTML = tempDiv.innerHTML;
         
-        console.log('✅ 기존 내용 로드 완료:', tempDiv.textContent.substring(0, 50) + '...');
+
     }
 
     // 이미지 카운터 업데이트 함수
@@ -819,7 +808,6 @@ function initializeQuillEditor() {
                 imageCounter.style.fontWeight = '500';
             }
             
-            console.log(`📷 이미지 카운터 업데이트: ${currentImages}/20`);
         }
     }
 
@@ -830,7 +818,6 @@ function initializeQuillEditor() {
         // 이미지 개수 확인 및 초과분 제거
         const currentImages = quill.container.querySelectorAll('img').length;
         if (currentImages > 20) {
-            console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
             const images = quill.container.querySelectorAll('img');
             for (let i = 20; i < images.length; i++) {
                 images[i].remove();
@@ -845,7 +832,7 @@ function initializeQuillEditor() {
     // 초기 이미지 카운터 업데이트
     setTimeout(updateImageCounter, 500);
 
-    console.log('✅ Quill 에디터 초기화 완료 (이미지 제한 시스템 포함)');
+
 }
 
 // 🚀 v3.27.0: 공통 업로드 설정 사용 (upload-config.js.php에서 제공)
@@ -854,5 +841,4 @@ function initializeQuillEditor() {
 // - window.getFileSizeErrorMessage()
 // - window.validateImageExtension()
 
-console.log('✅ 공통 업로드 설정 로드 완료 - 최대 파일 크기: ' + window.TOPMKT_UPLOAD_CONFIG.maxFileSizeMB + 'MB');
 </script>

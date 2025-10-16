@@ -1,0 +1,321 @@
+/**
+ * 프로필 이미지 모달 통합 CSS 컴포넌트
+ * 
+ * 기존 7개 파일에서 중복되던 프로필 이미지 모달 스타일을 통합하여
+ * 일관된 디자인과 UX를 제공합니다.
+ * 
+ * 주요 기능:
+ * - 프로필 이미지 클릭 효과
+ * - 모달 오버레이 및 컨텐츠 스타일
+ * - 로딩 스피너 애니메이션
+ * - 반응형 디자인
+ * - 부드러운 애니메이션 효과
+ * 
+ * @version 1.0.0
+ * @author Claude (Anthropic)  
+ * @date 2025-08-11
+ */
+
+/* ============================================
+   프로필 이미지 클릭 가능 스타일
+   ============================================ */
+
+.profile-image-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 50%;
+}
+
+.profile-image-clickable:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   프로필 이미지 모달 메인 컨테이너
+   ============================================ */
+
+.profile-image-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 10000;
+    opacity: 0;
+    animation: modalFadeIn 0.3s ease forwards;
+}
+
+.profile-image-modal.show {
+    opacity: 1;
+}
+
+/* ============================================
+   모달 컨텐츠 컨테이너
+   ============================================ */
+
+.profile-image-modal .modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 90vw;
+    max-height: 95vh;
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease forwards;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    height: auto;
+}
+
+/* ============================================
+   모달 헤더
+   ============================================ */
+
+.profile-image-modal .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    flex-shrink: 0;
+}
+
+.profile-image-modal .modal-header h3 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* ============================================
+   모달 닫기 버튼
+   ============================================ */
+
+.profile-image-modal .modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #718096;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.profile-image-modal .modal-close:hover {
+    background: #e2e8f0;
+    color: #2d3748;
+}
+
+/* ============================================
+   모달 바디 (이미지 컨테이너)
+   ============================================ */
+
+.profile-image-modal .modal-body {
+    padding: 24px;
+    text-align: center;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 200px;
+}
+
+.profile-image-modal .modal-body img {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    max-width: 90vw;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    border-radius: 12px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ============================================
+   로딩 스피너 스타일
+   ============================================ */
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #718096;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #3182ce;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+.spinner-container p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+/* ============================================
+   애니메이션 정의
+   ============================================ */
+
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0; 
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+@keyframes modalSlideIn {
+    from { 
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+    }
+    to { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% { 
+        transform: rotate(0deg); 
+    }
+    100% { 
+        transform: rotate(360deg); 
+    }
+}
+
+/* ============================================
+   반응형 디자인 (모바일)
+   ============================================ */
+
+@media (max-width: 768px) {
+    .profile-image-modal .modal-content {
+        min-width: 300px;
+        max-width: 98vw;
+        max-height: 98vh;
+        margin: 10px;
+    }
+    
+    .profile-image-modal .modal-body {
+        padding: 16px;
+        max-height: calc(98vh - 60px);
+    }
+    
+    .profile-image-modal .modal-body img {
+        max-width: calc(98vw - 50px);
+        max-height: calc(98vh - 120px);
+    }
+    
+    .profile-image-modal .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .profile-image-modal .modal-header h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* ============================================
+   다크 모드 대응 (미래 확장성)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+    .profile-image-modal .modal-content {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .profile-image-modal .modal-header {
+        background: #4a5568;
+        border-bottom-color: #4a5568;
+    }
+    
+    .profile-image-modal .modal-header h3 {
+        color: #e2e8f0;
+    }
+    
+    .profile-image-modal .modal-body {
+        background: #2d3748;
+    }
+    
+    .profile-image-modal .modal-close {
+        color: #a0aec0;
+    }
+    
+    .profile-image-modal .modal-close:hover {
+        background: #4a5568;
+        color: #e2e8f0;
+    }
+}
+
+/* ============================================
+   접근성 개선
+   ============================================ */
+
+.profile-image-modal .modal-close:focus {
+    outline: 2px solid #3182ce;
+    outline-offset: 2px;
+}
+
+.profile-image-clickable:focus {
+    outline: 2px solid #3182ce;
+    outline-offset: 2px;
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+    .profile-image-modal {
+        background: rgba(0, 0, 0, 0.95);
+    }
+    
+    .profile-image-modal .modal-content {
+        border: 2px solid #000;
+    }
+    
+    .profile-image-clickable:hover {
+        border: 2px solid #000;
+    }
+}
+
+/* 움직임 감소 선호 사용자 대응 */
+@media (prefers-reduced-motion: reduce) {
+    .profile-image-modal,
+    .profile-image-modal .modal-content,
+    .profile-image-clickable,
+    .profile-image-modal .modal-body img {
+        animation: none;
+        transition: none;
+    }
+    
+    .spinner {
+        animation: none;
+        border-top-color: transparent;
+    }
+}

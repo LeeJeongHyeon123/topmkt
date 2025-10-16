@@ -886,21 +886,18 @@ body {
 document.addEventListener('DOMContentLoaded', function() {
     const loadStartTime = performance.now();
     
-    console.log('📢 공지사항 게시판 로드 완료');
-    console.log('📊 공지사항 수:', <?= count($notices ?? []) ?>);
-    console.log('📄 현재 페이지:', <?= isset($currentPage) ? $currentPage : 1 ?>);
-    console.log('📄 총 페이지:', <?= isset($totalPages) ? $totalPages : 1 ?>);
+
+
+
     <?php if (!empty($search)): ?>
-    console.log('🔍 검색어:', '<?= addslashes($search) ?>');
-    console.log('⚡ 검색 시간:', '<?= $searchTime ?>ms');
+
     <?php endif; ?>
     <?php if (!empty($company)): ?>
-    console.log('🏢 선택된 기업:', '<?= addslashes($selectedCompany['company_name'] ?? '') ?>');
+
     <?php endif; ?>
     
     const loadEndTime = performance.now();
     const loadTime = Math.round(loadEndTime - loadStartTime);
-    console.log(`⚡ 페이지 렌더링 완료: ${loadTime}ms`);
     
     // 검색 폼 기능
     const searchInput = document.querySelector('#searchInput');

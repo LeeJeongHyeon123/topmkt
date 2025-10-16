@@ -18,11 +18,10 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('세션 갱신 성공:', new Date().toLocaleTimeString());
+
             }
         })
         .catch(error => {
-            console.error('세션 갱신 실패:', error);
         });
     }
     
@@ -32,7 +31,6 @@
     function startKeepAlive() {
         if (!intervalId) {
             intervalId = setInterval(keepAlive, INTERVAL);
-            console.log('세션 유지 시작');
         }
     }
     
@@ -40,7 +38,6 @@
         if (intervalId) {
             clearInterval(intervalId);
             intervalId = null;
-            console.log('세션 유지 중지');
         }
     }
     

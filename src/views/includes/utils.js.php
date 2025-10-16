@@ -45,7 +45,7 @@
     };
 
     // 초기화 로그
-    console.log('✅ Utils 유틸리티 로드 완료 (formatNumber, formatPhone)');
+
 
 })();
 </script>

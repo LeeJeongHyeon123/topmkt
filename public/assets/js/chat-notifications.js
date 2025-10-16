@@ -229,7 +229,6 @@ async function getRoomPartnerInfo(roomId, roomData) {
 
         // 디버깅용 로그 (개발 시에만)
         if (!data.nickname) {
-            console.warn('채팅 알림: 닉네임을 찾을 수 없음', { result, data, partnerId });
         }
 
         return {
@@ -239,7 +238,6 @@ async function getRoomPartnerInfo(roomId, roomData) {
             profileThumb: data.thumb_image || data.profile_image || null
         };
     } catch (error) {
-        console.warn('채팅 알림: API 호출 실패', error, partnerId);
         return {
             name: '알 수 없음',
             userId: partnerId,
@@ -253,7 +251,6 @@ async function getRoomPartnerInfo(roomId, roomData) {
  * 채팅 알림 표시 (프로필 이미지 포함)
  */
 function showChatNotification(senderName, message, roomId, profileImageUrl = null) {
-    console.log('🔔 채팅 알림 표시 시도:', { senderName, message, roomId, profileImageUrl });
 
     // 기존 채팅 알림 제거
     const existingAlert = document.querySelector('.alert.chat-notification');
@@ -300,7 +297,6 @@ function showChatNotification(senderName, message, roomId, profileImageUrl = nul
     const notification = alertElement.firstElementChild;
     document.body.appendChild(notification);
 
-    console.log('✅ 채팅 알림 DOM에 추가됨:', notification);
 
     // 7초 후 자동 제거 (프로필 이미지 있으니 조금 더 길게)
     setTimeout(() => {
@@ -309,7 +305,6 @@ function showChatNotification(senderName, message, roomId, profileImageUrl = nul
             alert.style.opacity = '0';
             setTimeout(() => {
                 alert.remove();
-                console.log('🗑️ 채팅 알림 자동 제거됨');
             }, 300);
         }
     }, 7000);

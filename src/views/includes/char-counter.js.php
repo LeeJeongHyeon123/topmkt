@@ -24,7 +24,6 @@ class CharacterCounter {
             : counterElement;
 
         if (!this.input || !this.counter) {
-            console.error('❌ CharacterCounter: 요소를 찾을 수 없습니다', {inputElement, counterElement});
             return;
         }
 
@@ -54,10 +53,6 @@ class CharacterCounter {
         // 입력 이벤트 리스너 등록
         this.input.addEventListener('input', () => this.updateCounter());
 
-        console.log('✅ CharacterCounter 초기화 완료:', {
-            input: this.input.id || this.input.name,
-            maxLength: this.maxLength
-        });
     }
 
     /**
@@ -178,7 +173,6 @@ class CharacterCounter {
             }
         });
 
-        console.log(`✅ CharacterCounter 자동 초기화 완료: ${counters.length}개`);
         return counters;
     }
 }
@@ -189,5 +183,5 @@ window.CharacterCounter = CharacterCounter;
 // DOM 로드 완료 시 자동 초기화 (선택사항)
 // document.addEventListener('DOMContentLoaded', () => CharacterCounter.autoInit());
 
-console.log('🚀 TOPMKT CharacterCounter 로드됨 (v3.29.0)');
+
 </script>

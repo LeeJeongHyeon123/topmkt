@@ -97,11 +97,9 @@
                 } else {
                     showResult('api-result', `❌ ${description}: ${data.message} (${data.code})`, 'error');
                 }
-                console.log('API 응답:', data);
             })
             .catch(error => {
                 showResult('api-result', `🚨 ${description}: 네트워크 오류 - ${error.message}`, 'error');
-                console.error('API 오류:', error);
             });
         }
 
@@ -141,14 +139,8 @@
         EditChecker.showAlert = function(message, code, data) {
             // 원래 alert 대신 결과창에 표시
             showResult('js-result', `🚫 ${message} (${code})`, 'error');
-            console.group('🚫 수정 차단 정보');
-            console.log('메시지:', message);
-            console.log('코드:', code);
-            console.log('데이터:', data);
-            console.groupEnd();
         };
 
-        console.log('🧪 테스트 페이지 로드 완료');
     </script>
 </body>
 </html>

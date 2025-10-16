@@ -53,7 +53,6 @@ class JWTAuth {
             this.checkTokenStatus();
         });
         
-        console.log('JWT Auth initialized');
     }
     
     /**
@@ -113,7 +112,6 @@ class JWTAuth {
             }
             
         } catch (error) {
-            console.error('Token status check failed:', error);
         }
         
         return false;
@@ -135,7 +133,6 @@ class JWTAuth {
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
-                    console.log('Token refreshed successfully');
                     this.tokenExpiryWarning = false; // 경고 리셋
                     
                     // 토큰 갱신 성공 이벤트 발생
@@ -151,7 +148,6 @@ class JWTAuth {
             }
             
         } catch (error) {
-            console.error('Token refresh failed:', error);
         }
         
         return false;
@@ -161,7 +157,6 @@ class JWTAuth {
      * 토큰 만료 처리
      */
     async handleTokenExpiry() {
-        console.log('Token expired or not found');
         
         // 갱신 및 하트비트 중지
         this.stopTokenRefresh();
@@ -175,7 +170,6 @@ class JWTAuth {
         const isAuthPage = currentUrl.startsWith('/auth/');
         
         if (!isAuthPage) {
-            console.log('Redirecting to login');
             localStorage.setItem('jwt_redirect_after_login', currentUrl);
             window.location.href = '/auth/login';
         }
@@ -186,7 +180,6 @@ class JWTAuth {
      */
     showTokenExpiryWarning(expiresIn) {
         const minutes = Math.floor(expiresIn / (60 * 1000));
-        console.warn(`Token expires in ${minutes} minutes`);
     }
     
     /**
@@ -259,13 +252,11 @@ class JWTAuth {
             });
             
             if (response.ok) {
-                console.log('Heartbeat sent successfully');
             } else if (response.status === 401) {
                 // 인증 실패시 토큰 만료 처리
                 await this.handleTokenExpiry();
             }
         } catch (error) {
-            console.error('Heartbeat failed:', error);
         }
     }
     
@@ -273,7 +264,6 @@ class JWTAuth {
      * 로그인 성공 시 호출
      */
     onLoginSuccess() {
-        console.log('Login successful, starting JWT auth');
         
         // 토큰 관리 시작
         this.startTokenRefresh();
@@ -291,7 +281,6 @@ class JWTAuth {
      * 로그아웃 시 호출
      */
     onLogout() {
-        console.log('Logout, stopping JWT auth');
         
         // 모든 인터벌 중지
         this.stopTokenRefresh();
@@ -340,11 +329,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // JWT 이벤트 리스너 등록
     document.addEventListener('jwt:tokenRefreshed', function(event) {
-        console.log('JWT token refreshed:', event.detail);
     });
     
     document.addEventListener('jwt:tokenExpired', function(event) {
-        console.log('JWT token expired');
         // 필요시 추가 처리
     });
 });
@@ -372,4 +359,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('JWT Auth script loaded');

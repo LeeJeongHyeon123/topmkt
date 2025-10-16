@@ -116,7 +116,7 @@ try {
             echo "<div class='instructor-image-container' onclick='alert(\"이미지 업로드 기능 테스트\")'>";
             
             if ($exists) {
-                echo "<img src='" . htmlspecialchars($imagePath) . "' alt='강사 이미지' onload='console.log(\"✅ 강사 이미지 로드 성공\")' onerror='console.log(\"❌ 강사 이미지 로드 실패\")'>";
+                echo "<img src='" . htmlspecialchars($imagePath) . "' alt='강사 이미지' onload='' onerror=''>";
             } else {
                 echo "<div class='instructor-image-placeholder'>";
                 echo "<div style='font-size: 2rem; margin-bottom: 5px;'>👤</div>";

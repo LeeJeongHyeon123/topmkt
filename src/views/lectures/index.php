@@ -1713,13 +1713,7 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📅 강의 일정 페이지 로드 완료');
-    console.log('📊 이번 달 강의 수:', <?= count($lectures ?? []) ?>);
-    console.log('📄 현재 뷰:', '<?= $view ?>');
-    
-    // 디바이스 감지는 header.php에서 자동으로 처리됩니다.
-    console.log(`📐 현재 디바이스: ${window.DeviceDetection?.utils?.getDeviceType() || 'unknown'}, 뷰: <?= $view ?>`);
-    
+
     // 캘린더 강의 아이템 호버 효과
     const lectureItems = document.querySelectorAll('.lecture-item');
     lectureItems.forEach(item => {
@@ -1769,12 +1763,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 전역 오류 핸들러
     window.addEventListener('error', function(event) {
         if (event.filename && event.filename.includes('lectures')) {
-            console.warn('🚀 강의 일정 페이지 JavaScript 오류 감지:', {
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno
-            });
             event.preventDefault();
         }
     });
@@ -1791,7 +1779,6 @@ function showDayLectures(date, day, lectures) {
         const modalBody = document.getElementById('modalBody');
         
         if (!modal || !modalTitle || !modalSubtitle || !modalBody) {
-            console.error('모달 요소를 찾을 수 없습니다');
             return;
         }
         
@@ -1862,18 +1849,15 @@ function showDayLectures(date, day, lectures) {
         // 모달 표시
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
-        
+
         // 모달 외부 클릭 시 닫기
         modal.onclick = function(event) {
             if (event.target === modal) {
                 closeDayLecturesModal();
             }
         };
-        
-        console.log(`📅 ${date} 일정 모달 표시 (${lectures.length}개)`);
-        
+
     } catch (error) {
-        console.error('일정 모달 표시 오류:', error);
         Toast.error('일정을 불러오는 중 오류가 발생했습니다.');
     }
 }

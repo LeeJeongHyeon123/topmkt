@@ -1207,7 +1207,6 @@ function renderComment($comment, $currentUserId, $depth = 0, $parentComment = nu
 <script>
 // 공지사항 상세보기 페이지 JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📢 공지사항 상세보기 페이지 로드 완료');
     
     // 페이지 조회수 증가 (비동기)
     updateViewCount();
@@ -1222,7 +1221,6 @@ function updateViewCount() {
     ApiClient.post(`/api/notices/${noticeId}/view`, {
         csrf_token: '<?= $_SESSION['csrf_token'] ?>'
     }, { noLoading: true, noErrorToast: true }).catch(error => {
-        console.warn('조회수 업데이트 실패:', error);
     });
 }
 
@@ -1266,7 +1264,6 @@ function submitComment() {
         }
     })
     .catch(error => {
-        console.error('댓글 작성 오류:', error);
         Toast.error('댓글 작성 중 오류가 발생했습니다: ' + error.message);
     });
 }
@@ -1328,7 +1325,6 @@ function submitReply(parentId) {
         }
     })
     .catch(error => {
-        console.error('답글 작성 오류:', error);
         Toast.error('답글 작성 중 오류가 발생했습니다: ' + error.message);
     });
 }
@@ -1374,7 +1370,6 @@ function updateComment(commentId) {
         }
     })
     .catch(error => {
-        console.error('댓글 수정 오류:', error);
         Toast.error('댓글 수정 중 오류가 발생했습니다: ' + error.message);
     });
 }
@@ -1397,7 +1392,6 @@ async function deleteComment(commentId) {
         }
     })
     .catch(error => {
-        console.error('댓글 삭제 오류:', error);
         Toast.error('댓글 삭제 중 오류가 발생했습니다: ' + error.message);
     });
 }
@@ -1421,7 +1415,6 @@ async function deleteNotice(noticeId) {
         }
     })
     .catch(error => {
-        console.error('삭제 오류:', error);
         Toast.error('삭제 중 오류가 발생했습니다: ' + error.message);
     });
 }
@@ -1441,10 +1434,8 @@ function shareContent() {
                 title: title,
                 url: url
             }).then(() => {
-                console.log('공유 성공');
             }).catch((error) => {
                 if (error.name !== 'AbortError') {
-                    console.log('공유 실패:', error);
                     // 공유 실패 시 폴백 사용
                     fallbackShare(title, url);
                 }
@@ -1454,7 +1445,6 @@ function shareContent() {
             fallbackShare(title, url);
         }
     } catch (error) {
-        console.error('공유 기능 오류:', error);
         Toast.error('공유 기능에 오류가 발생했습니다.');
     }
 }
@@ -1566,7 +1556,6 @@ function openImageModal(imagePath) {
         img.style.maxWidth = 'none';
         img.style.maxHeight = 'none';
         
-        console.log(`이미지 크기 조정: ${naturalWidth}x${naturalHeight} → ${finalWidth}x${finalHeight} (비율: ${ratio.toFixed(2)})`);
     };
     
     // 모달 배경 클릭시 닫기
@@ -1606,7 +1595,6 @@ function openImageModal(imagePath) {
             modalImage.style.width = finalWidth + 'px';
             modalImage.style.height = finalHeight + 'px';
             
-            console.log(`리사이즈 시 이미지 크기 재조정: ${finalWidth}x${finalHeight}`);
         }
     };
     window.addEventListener('resize', modalEventHandlers.resize);

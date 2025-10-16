@@ -79,7 +79,7 @@ echo "  body: JSON.stringify({\n";
 echo "    lecture_id: {$lectureId},\n";
 echo "    instructors_json: " . json_encode($instructorsJson) . "\n";
 echo "  })\n";
-echo "}).then(r => r.json()).then(console.log);\n";
+\n";
 echo "</pre>";
 
 echo "<h2>5. 디버그 정보</h2>";

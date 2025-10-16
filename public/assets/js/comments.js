@@ -34,7 +34,6 @@ function loadComments() {
         }
     })
     .catch(error => {
-        console.error('Error loading comments:', error);
     });
 }
 
@@ -180,7 +179,6 @@ function submitComment() {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         alert('댓글 작성 중 오류가 발생했습니다.');
     });
 }
@@ -249,7 +247,6 @@ function submitReply(parentId) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         alert('답글 작성 중 오류가 발생했습니다.');
     });
 }
@@ -318,7 +315,6 @@ function updateComment(commentId) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         alert('댓글 수정 중 오류가 발생했습니다.');
     });
 }
@@ -351,7 +347,6 @@ function deleteComment(commentId) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         alert('댓글 삭제 중 오류가 발생했습니다.');
     });
 }

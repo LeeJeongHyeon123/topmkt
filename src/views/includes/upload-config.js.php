@@ -57,8 +57,6 @@ window.validateImageFile = function(file) {
 };
 
 // 디버깅용 정보 출력
-console.log('🚀 TOPMKT 업로드 설정 로드됨:', {
-    maxFileSize: window.formatFileSize(window.TOPMKT_UPLOAD_CONFIG.maxFileSize),
     maxFileSizeMB: window.TOPMKT_UPLOAD_CONFIG.maxFileSizeMB + 'MB',
     allowedExtensions: window.TOPMKT_UPLOAD_CONFIG.allowedImageExtensions
 });

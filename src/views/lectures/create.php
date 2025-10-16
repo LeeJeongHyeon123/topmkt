@@ -472,7 +472,6 @@ function removeExistingImage(imageIndex, imageElement) {
         // 다른 이미지들의 인덱스 업데이트
         updateImageIndexes();
     } else {
-        console.error('currentImageData가 배열이 아닙니다:', currentImageData);
         Toast.error('이미지 삭제 중 오류가 발생했습니다.');
     }
 }
@@ -494,11 +493,9 @@ function updateImageListOnServer(updatedImageData) {
             Toast.success('이미지가 삭제되었습니다.');
         } else {
             Toast.error(data.message || '이미지 삭제 중 오류가 발생했습니다.');
-            console.error('서버 오류:', data);
         }
     })
     .catch(error => {
-        console.error('이미지 업데이트 오류:', error);
         if (error.message.includes('JSON')) {
             Toast.error('서버 응답 오류입니다. 페이지를 새로고침하고 다시 시도해주세요.');
         } else {
@@ -557,7 +554,6 @@ async function updateLectureImagesDisplay(updatedImages) {
     
     const imagePreviewContainer = document.getElementById('lectureImagePreview');
     if (!imagePreviewContainer) {
-        console.error('lectureImagePreview 컨테이너를 찾을 수 없음');
         Toast.warning('이미지 미리보기 영역을 찾을 수 없습니다.');
         return;
     }
@@ -630,7 +626,6 @@ function handleInstructorImage(index, input) {
         const fileInput = document.querySelector(`#instructor_image_${index}`);
         // console.log(`찾은 파일 입력 요소:`, fileInput);
         if (!fileInput) {
-            console.error(`강사 이미지 입력 요소를 찾을 수 없습니다: #instructor_image_${index}`);
             Toast.warning(`강사 ${index}의 이미지 입력 요소를 찾을 수 없습니다.`);
             return;
         }
@@ -641,7 +636,6 @@ function handleInstructorImage(index, input) {
         // console.log(`찾은 업로드 div:`, uploadDiv);
         // console.log(`찾은 컨테이너:`, container);
         if (!container) {
-            console.error('이미지 컨테이너를 찾을 수 없습니다');
             Toast.warning('이미지 컨테이너를 찾을 수 없습니다.');
             return;
         }
@@ -928,7 +922,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // console.log('calculateDuration 호출됨:', { startDate, endDate, startTime, endTime });
         
         if (!durationText) {
-            console.error('duration-text 요소를 찾을 수 없습니다');
             Toast.warning('기간 표시 영역을 찾을 수 없습니다.');
             return;
         }
@@ -1015,9 +1008,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // console.log('소요시간 계산 이벤트 리스너 등록 완료');
     } else {
-        console.error('날짜/시간 입력 요소를 찾을 수 없습니다:', {
-            startDateElement, endDateElement, startTimeElement, endTimeElement
-        });
         Toast.warning('날짜/시간 입력 요소를 찾을 수 없습니다.');
     }
     
@@ -1931,7 +1921,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('폼 제출 오류:', error);
             const baseErrorMessage = isEditMode ? '강의 수정 중 오류가 발생했습니다.' : '강의 등록 중 오류가 발생했습니다.';
             Toast.error(baseErrorMessage + '\n잠시 후 다시 시도해주세요.');
             showLoading(false);
@@ -2057,7 +2046,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const fileInput = document.querySelector(`#instructor_image_${index}`);
         if (!fileInput) {
-            console.error(`강사 이미지 입력 요소를 찾을 수 없습니다: #instructor_image_${index}`);
             Toast.warning(`강사 ${index}의 이미지 입력 요소를 찾을 수 없습니다.`);
             return;
         }
@@ -2065,7 +2053,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const uploadDiv = fileInput.closest('.instructor-image-upload');
         const container = uploadDiv ? uploadDiv.querySelector('.instructor-image-container') : null;
         if (!container) {
-            console.error('이미지 컨테이너를 찾을 수 없습니다');
             Toast.warning('이미지 컨테이너를 찾을 수 없습니다.');
             return;
         }
@@ -2090,7 +2077,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 이미지 로드 실패 시 기본 이미지로 대체
         img.onerror = function() {
-            console.warn(`강사 이미지 로드 실패: ${imagePath}, 기본 이미지로 대체`);
             this.src = '<?= DEFAULT_AVATAR_PATH ?>';
         };
         
@@ -2307,7 +2293,6 @@ document.head.appendChild(Object.assign(document.createElement('script'), {
         // console.log('카카오 주소 검색 API 로드 완료');
     },
     onerror: function() {
-        console.error('카카오 주소 검색 API 로드 실패');
         Toast.warning('주소 검색 기능을 불러오지 못했습니다.\n페이지를 새로고침해주세요.');
     }
 }));
@@ -2364,23 +2349,16 @@ function getCoordinates(address) {
                     const addressField = document.getElementById('venue_address');
                     addressField.style.backgroundColor = '#f0fdf4';
                     addressField.style.borderColor = '#22c55e';
-                    
-                    console.log('정확한 좌표 설정 완료:', {
-                        address: address,
-                        latitude: lat,
-                        longitude: lng
-                    });
+
                     return;
                 }
             }
             
             // API 실패 시 지역 기반 근사 좌표 사용
-            console.warn('네이버 Geocoding 실패, 지역 기반 좌표 사용');
             setRegionBasedCoordinates(address);
         });
     } else {
         // 네이버 Maps API가 로드되지 않은 경우 지역 기반 근사 좌표 사용
-        console.warn('네이버 Maps API 미로드, 지역 기반 좌표 사용');
         setRegionBasedCoordinates(address);
     }
     
@@ -2432,7 +2410,6 @@ function setRegionBasedCoordinates(address) {
             document.getElementById('venue_latitude').value = coords.lat;
             document.getElementById('venue_longitude').value = coords.lng;
             
-            console.log(`지역 기반 좌표 설정: ${region}`, coords);
             
             // 근사 좌표 시각적 피드백 (주황색)
             const addressField = document.getElementById('venue_address');
@@ -2447,7 +2424,7 @@ function setRegionBasedCoordinates(address) {
     document.getElementById('venue_latitude').value = 37.5665;
     document.getElementById('venue_longitude').value = 126.9780;
     
-    console.log('기본 좌표 설정 (서울시청)');
+
     
     // 기본 좌표 시각적 피드백 (회색)
     const addressField = document.getElementById('venue_address');
@@ -2459,7 +2436,6 @@ function setRegionBasedCoordinates(address) {
 function initializeCoordinates() {
     const addressField = document.getElementById('venue_address');
     if (addressField && addressField.value) {
-        console.log('기존 주소로 좌표 설정 시도:', addressField.value);
         getCoordinates(addressField.value);
     }
 }
@@ -2467,11 +2443,9 @@ function initializeCoordinates() {
 // 페이지 로드 후 네이버 지도 API 로딩
 document.addEventListener('DOMContentLoaded', function() {
     loadNaverMapsAPI().then(() => {
-        console.log('네이버 지도 API 로딩 완료');
         // 좌표 설정이 필요한 경우 여기서 실행
         initializeCoordinates();
     }).catch(error => {
-        console.error('네이버 지도 API 로딩 실패:', error);
         Toast.warning('지도 기능을 불러오지 못했습니다.\n주소 검색은 정상 작동합니다.');
         // API 로딩 실패해도 주소 검색은 동작하도록
         initializeCoordinates();
@@ -2483,12 +2457,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // 수정 모드 데이터 초기화
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Edit mode initialization started');
     
     // 강사 데이터 초기화
     <?php if (!empty($lecture['instructors'])): ?>
         const instructors = <?= json_encode($lecture['instructors'], JSON_UNESCAPED_UNICODE) ?>;
-        console.log('Instructors data:', instructors);
         
         // 추가 강사가 있는 경우 폼 필드 직접 생성
         if (instructors.length > 1) {
@@ -2563,7 +2535,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         };
                         img.onerror = function() {
                             // 이미지가 존재하지 않으면 로그만 남기고 넘어감
-                            console.warn(`강사 ${index} 이미지 파일 없음: ${instructor.image_url}`);
                         };
                         img.src = instructor.image_url;
                     }, 300);
@@ -2575,7 +2546,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 강의 이미지 초기화
     <?php if (!empty($lecture['images'])): ?>
         const lectureImages = <?= json_encode($lecture['images'], JSON_UNESCAPED_UNICODE) ?>;
-        console.log('Lecture images data:', lectureImages);
         currentImageData = lectureImages;
         
         // 기존 이미지 UI 표시
@@ -2592,7 +2562,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (typeof calculateDuration === 'function') {
                     calculateDuration();
                 } else {
-                    console.log('Duration calculation will be handled by form events');
                 }
             }, 1000);
         }
@@ -2662,7 +2631,6 @@ function createAdditionalInstructorField(container, index) {
 
 // 강사 이미지 직접 로드 함수 (edit mode 전용)
 function loadInstructorImageDirect(index, imageUrl) {
-    console.log(`loadInstructorImageDirect 시작: index=${index}, imageUrl=${imageUrl}`);
     
     // 다양한 방식으로 컨테이너 찾기
     let container = null;
@@ -2672,21 +2640,18 @@ function loadInstructorImageDirect(index, imageUrl) {
     if (fileInput) {
         const uploadDiv = fileInput.closest('.instructor-image-upload');
         container = uploadDiv ? uploadDiv.querySelector('.instructor-image-container') : null;
-        console.log(`방법 1로 찾은 컨테이너 (index ${index}):`, container);
     }
-    
+
     // 방법 2: 직접 컨테이너 찾기
     if (!container) {
         container = document.querySelector(`[data-instructor-index="${index}"] .instructor-image-container`);
-        console.log(`방법 2로 찾은 컨테이너 (index ${index}):`, container);
     }
-    
+
     // 방법 3: nth-child 선택자 사용
     if (!container) {
         const instructorItems = document.querySelectorAll('.instructor-item');
         if (instructorItems[index]) {
             container = instructorItems[index].querySelector('.instructor-image-container');
-            console.log(`방법 3로 찾은 컨테이너 (index ${index}):`, container);
         }
     }
     
@@ -2712,7 +2677,6 @@ function loadInstructorImageDirect(index, imageUrl) {
         
         // 이미지 로드 실패 시 기본 이미지로 대체
         img.onerror = function() {
-            console.warn(`강사 이미지 로드 실패: ${imageUrl}, 기본 이미지로 대체`);
             this.src = '<?= DEFAULT_AVATAR_PATH ?>';
         };
         
@@ -2733,14 +2697,8 @@ function loadInstructorImageDirect(index, imageUrl) {
         container.appendChild(img);
         container.classList.add('has-image');
         
-        console.log(`강사 ${index} 이미지 로딩 성공:`, imageUrl);
     } else {
-        console.error(`강사 ${index}의 이미지 컨테이너를 찾을 수 없습니다`);
         Toast.warning(`강사 ${index}의 이미지 컨테이너를 찾을 수 없습니다.`);
-
-        // 디버깅: 현재 DOM 구조 출력
-        console.log('현재 강사 아이템들:', document.querySelectorAll('.instructor-item'));
-        console.log(`instructor_image_${index} 요소:`, document.querySelector(`#instructor_image_${index}`));
     }
 }
 
@@ -2748,11 +2706,9 @@ function loadInstructorImageDirect(index, imageUrl) {
 function displayExistingImages(images) {
     const container = document.getElementById('lectureImagePreview');
     if (!container) {
-        console.warn('Lecture image preview container not found');
         return;
     }
     
-    console.log('Displaying existing images:', images);
     
     images.forEach((image, index) => {
         const imageItem = document.createElement('div');
@@ -2935,7 +2891,6 @@ function enableImageSorting() {
 setTimeout(function() {
     if (typeof updateInstructorButtons === 'function') {
         updateInstructorButtons();
-        console.log('Edit mode: Instructor buttons updated');
     }
 }, 100);
 

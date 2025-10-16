@@ -8,7 +8,7 @@
     'use strict';
     
     // 원본 console.error 저장
-    const originalConsoleError = console.error;
+
     
     // 억제할 에러 패턴들
     const suppressedErrors = [
@@ -68,5 +68,4 @@
         }
     });
     
-    console.log('🛡️ 브라우저 확장 프로그램 에러 억제기 활성화됨');
 })();

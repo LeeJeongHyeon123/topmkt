@@ -810,7 +810,6 @@ async function loadUserStats() {
             document.getElementById("pending-users").textContent = formatNumber(stats.by_status?.pending || 0);
         }
     } catch (error) {
-        console.error("통계 로드 실패:", error);
         Toast.error('통계 데이터를 불러올 수 없습니다.\n페이지를 새로고침해주세요.');
     }
 }
@@ -844,7 +843,6 @@ async function loadUsersData(page = 1) {
             throw new Error(data.message || "데이터 로드 실패");
         }
     } catch (error) {
-        console.error("사용자 데이터 로드 실패:", error);
         Toast.error('사용자 데이터를 불러올 수 없습니다.\n잠시 후 다시 시도해주세요.');
         tableContainer.innerHTML = `
             <div class="empty-state">
@@ -1157,7 +1155,6 @@ async function executeBulkAction() {
             throw new Error(data.message || "벌크 작업 실패");
         }
     } catch (error) {
-        console.error("벌크 작업 실패:", error);
         Toast.error("작업 실행에 실패했습니다: " + error.message);
     }
 }
@@ -1211,7 +1208,6 @@ async function viewUserDetail(userId) {
             throw new Error(data.message || "사용자 정보 로드 실패");
         }
     } catch (error) {
-        console.error("사용자 상세보기 실패:", error);
         Toast.error("사용자 정보를 불러올 수 없습니다: " + error.message);
     }
 }
@@ -1249,7 +1245,6 @@ async function updateUserStatus() {
             throw new Error(data.message || "상태 변경 실패");
         }
     } catch (error) {
-        console.error("상태 변경 실패:", error);
         Toast.error("상태 변경에 실패했습니다: " + error.message);
     }
 }
@@ -1287,7 +1282,6 @@ async function updateUserRole() {
             throw new Error(data.message || "권한 변경 실패");
         }
     } catch (error) {
-        console.error("권한 변경 실패:", error);
         Toast.error("권한 변경에 실패했습니다: " + error.message);
     }
 }
@@ -1321,7 +1315,6 @@ async function sendNotification() {
             throw new Error(data.message || "알림 발송 실패");
         }
     } catch (error) {
-        console.error("알림 발송 실패:", error);
         Toast.error("알림 발송에 실패했습니다: " + error.message);
     }
 }
@@ -1332,7 +1325,6 @@ async function exportUsers() {
         const params = new URLSearchParams(currentFilters);
         window.open(`/admin/users/export?${params}`, "_blank");
     } catch (error) {
-        console.error("내보내기 실패:", error);
         Toast.error("데이터 내보내기에 실패했습니다: " + error.message);
     }
 }

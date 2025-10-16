@@ -793,7 +793,6 @@ document.getElementById('confirmStatusBtn').addEventListener('click', async func
         }
         
     } catch (error) {
-        console.error('상태 변경 오류:', error);
         // 네트워크 오류와 기타 오류를 구분
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
             Toast.error('❌ 네트워크 연결을 확인해주세요.');

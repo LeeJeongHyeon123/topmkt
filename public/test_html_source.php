@@ -18,8 +18,6 @@ $content = '<div class="test-content"><h1>Test Content</h1></div>';
 
 $additional_scripts = <<<'SCRIPTS'
 <script>
-console.log('📄 [Test Page] Additional scripts loaded');
-console.log('🔍 [Test Page] ApiClient available:', typeof window.ApiClient);
 </script>
 SCRIPTS;
 

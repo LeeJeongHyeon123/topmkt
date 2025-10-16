@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 메모리 프로파일러 - 강의 상세 페이지</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            margin: 0;
+        }
+        .panel {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #4ec9b0;
+            margin-top: 0;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #3e3e42;
+        }
+        .metric-name {
+            color: #9cdcfe;
+        }
+        .metric-value {
+            color: #ce9178;
+            font-weight: bold;
+        }
+        .good { color: #4ec9b0 !important; }
+        .warning { color: #dcdcaa !important; }
+        .bad { color: #f48771 !important; }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        .code {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .chart {
+            height: 200px;
+            background: #1e1e1e;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 메모리 프로파일러 - 탑마케팅</h1>
+
+    <div class="panel">
+        <h2>📊 실시간 메모리 모니터링</h2>
+        <button onclick="startMonitoring()">🔄 모니터링 시작</button>
+        <button onclick="stopMonitoring()">⏸️ 모니터링 정지</button>
+        <button onclick="takeSnapshot()">📸 스냅샷 찍기</button>
+        <button onclick="forceGC()">🗑️ 가비지 컬렉션 (Chrome 전용)</button>
+        <div id="memory-results"></div>
+        <div id="memory-chart" class="chart"></div>
+    </div>
+
+    <div class="panel">
+        <h2>🔍 이벤트 리스너 탐지</h2>
+        <button onclick="detectEventListeners()">🕵️ 이벤트 리스너 찾기</button>
+        <div id="listener-results"></div>
+    </div>
+
+    <div class="panel">
+        <h2>🎯 DOM 노드 분석</h2>
+        <button onclick="analyzeDOMNodes()">🌳 DOM 트리 분석</button>
+        <div id="dom-results"></div>
+    </div>
+
+    <div class="panel">
+        <h2>🚀 메모리 누수 테스트</h2>
+        <button onclick="testMemoryLeak()">🧪 메모리 누수 시뮬레이션</button>
+        <button onclick="window.location.href='/lectures/210'">📄 강의 210 페이지로 이동</button>
+        <div class="code" id="test-results">
+테스트 시나리오:
+1. 이 페이지에서 메모리 측정
+2. 강의 210 페이지로 이동
+3. 다시 돌아와서 메모리 측정
+4. 메모리 증가량 확인
+
+Chrome DevTools에서:
+- Performance 탭 → Memory 체크 → Record
+- 강의 페이지 들어가기
+- 다시 나오기
+- Stop
+- Memory 그래프 확인
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>💡 메모리 누수 원인 체크리스트</h2>
+        <div class="metric">
+            <span class="metric-name">✅ 전역 변수 누적</span>
+            <span class="metric-value" id="check-global">확인 필요</span>
+        </div>
+        <div class="metric">
+            <span class="metric-name">✅ 이벤트 리스너 미제거</span>
+            <span class="metric-value" id="check-listener">확인 필요</span>
+        </div>
+        <div class="metric">
+            <span class="metric-name">✅ setInterval/setTimeout 미정리</span>
+            <span class="metric-value" id="check-timer">확인 필요</span>
+        </div>
+        <div class="metric">
+            <span class="metric-name">✅ 클로저에 큰 객체 보관</span>
+            <span class="metric-value" id="check-closure">확인 필요</span>
+        </div>
+        <div class="metric">
+            <span class="metric-name">✅ DOM 요소 참조 유지</span>
+            <span class="metric-value" id="check-dom-ref">확인 필요</span>
+        </div>
+    </div>
+
+    <script>
+        let monitoringInterval = null;
+        let memorySnapshots = [];
+        let chartData = [];
+
+        function startMonitoring() {
+            if (monitoringInterval) {
+                console.log('이미 모니터링 중입니다.');
+                return;
+            }
+
+            const results = document.getElementById('memory-results');
+            results.innerHTML = '<p style="color: #dcdcaa;">메모리 모니터링 시작...</p>';
+
+            monitoringInterval = setInterval(() => {
+                if (performance.memory) {
+                    const usedMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+                    const totalMB = (performance.memory.totalJSHeapSize / 1024 / 1024).toFixed(2);
+                    const limitMB = (performance.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2);
+
+                    const color = usedMB < 50 ? 'good' : usedMB < 100 ? 'warning' : 'bad';
+
+                    let html = '<div style="margin-top: 20px;">';
+                    html += `
+                        <div class="metric">
+                            <span class="metric-name">사용 중 메모리</span>
+                            <span class="metric-value ${color}">${usedMB} MB</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-name">전체 힙 크기</span>
+                            <span class="metric-value">${totalMB} MB</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-name">최대 힙 크기</span>
+                            <span class="metric-value">${limitMB} MB</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-name">사용률</span>
+                            <span class="metric-value ${color}">${((usedMB / limitMB) * 100).toFixed(1)}%</span>
+                        </div>
+                    `;
+                    html += '</div>';
+
+                    results.innerHTML = html;
+
+                    // 차트 데이터 추가
+                    chartData.push({
+                        time: new Date().toLocaleTimeString(),
+                        memory: parseFloat(usedMB)
+                    });
+
+                    // 최근 20개만 유지
+                    if (chartData.length > 20) {
+                        chartData.shift();
+                    }
+
+                    updateChart();
+                } else {
+                    results.innerHTML = '<p style="color: #f48771;">❌ Chrome에서만 사용 가능합니다.</p>';
+                }
+            }, 1000);
+
+            console.log('✅ 모니터링 시작됨');
+        }
+
+        function stopMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+                console.log('⏸️ 모니터링 정지됨');
+            }
+        }
+
+        function takeSnapshot() {
+            if (performance.memory) {
+                const snapshot = {
+                    time: new Date().toLocaleString(),
+                    usedMB: (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2),
+                    totalMB: (performance.memory.totalJSHeapSize / 1024 / 1024).toFixed(2)
+                };
+
+                memorySnapshots.push(snapshot);
+
+                console.log('📸 스냅샷 저장:', snapshot);
+                alert(`📸 스냅샷 저장됨\n시간: ${snapshot.time}\n메모리: ${snapshot.usedMB} MB`);
+            }
+        }
+
+        function forceGC() {
+            if (window.gc) {
+                window.gc();
+                console.log('🗑️ 가비지 컬렉션 실행됨');
+                alert('🗑️ 가비지 컬렉션 실행됨 (Chrome --expose-gc 플래그 필요)');
+            } else {
+                alert('❌ Chrome에서 --expose-gc 플래그로 실행해야 합니다.\n\nChrome 실행 방법:\nchrome.exe --expose-gc');
+            }
+        }
+
+        function detectEventListeners() {
+            const results = document.getElementById('listener-results');
+
+            let html = '<div style="margin-top: 20px;">';
+            html += '<div class="code">';
+            html += '이벤트 리스너 탐지 결과:\n\n';
+
+            // DOMContentLoaded 리스너 확인
+            const domReadyListeners = window.addEventListener.toString().match(/DOMContentLoaded/g);
+            html += `DOMContentLoaded 리스너: ${domReadyListeners ? domReadyListeners.length : 0}개\n`;
+
+            // 전역 이벤트 리스너
+            const eventTypes = ['click', 'load', 'error', 'keydown', 'mouseenter', 'mouseleave'];
+            eventTypes.forEach(type => {
+                const listeners = document.querySelectorAll(`[on${type}]`).length;
+                html += `${type} 리스너 (인라인): ${listeners}개\n`;
+            });
+
+            // 총 DOM 요소 수
+            const totalElements = document.querySelectorAll('*').length;
+            html += `\n총 DOM 요소 수: ${totalElements}개\n`;
+
+            html += '</div>';
+            html += '</div>';
+
+            results.innerHTML = html;
+        }
+
+        function analyzeDOMNodes() {
+            const results = document.getElementById('dom-results');
+
+            let html = '<div style="margin-top: 20px;">';
+            html += '<div class="code">';
+            html += 'DOM 트리 분석 결과:\n\n';
+
+            const allElements = document.querySelectorAll('*');
+            html += `총 DOM 노드 수: ${allElements.length}개\n`;
+
+            // 태그별 통계
+            const tagCounts = {};
+            allElements.forEach(el => {
+                const tag = el.tagName.toLowerCase();
+                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            });
+
+            html += '\n상위 10개 태그:\n';
+            Object.entries(tagCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10)
+                .forEach(([tag, count]) => {
+                    html += `  ${tag}: ${count}개\n`;
+                });
+
+            // 스크립트 태그
+            const scripts = document.querySelectorAll('script');
+            html += `\n<script> 태그: ${scripts.length}개\n`;
+
+            let totalScriptSize = 0;
+            scripts.forEach(script => {
+                if (script.textContent) {
+                    totalScriptSize += script.textContent.length;
+                }
+            });
+            html += `총 인라인 스크립트 크기: ${(totalScriptSize / 1024).toFixed(2)} KB\n`;
+
+            html += '</div>';
+            html += '</div>';
+
+            results.innerHTML = html;
+        }
+
+        function testMemoryLeak() {
+            const results = document.getElementById('test-results');
+
+            console.log('🧪 메모리 누수 시뮬레이션 시작');
+
+            // 의도적으로 메모리 누수 생성 (테스트용)
+            const leakyArray = [];
+            for (let i = 0; i < 10000; i++) {
+                leakyArray.push(new Array(1000).fill('메모리 누수 테스트'));
+            }
+
+            // 전역 변수로 저장 (누수!)
+            window.testLeakyData = leakyArray;
+
+            const beforeMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+
+            setTimeout(() => {
+                const afterMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+                const diff = (afterMB - beforeMB).toFixed(2);
+
+                results.innerHTML = `
+메모리 누수 시뮬레이션 완료!
+
+테스트 전: ${beforeMB} MB
+테스트 후: ${afterMB} MB
+증가량: ${diff} MB
+
+⚠️ window.testLeakyData 변수를 삭제하려면:
+delete window.testLeakyData;
+                `.trim();
+
+                console.log('🧪 메모리 누수 시뮬레이션 완료:', diff, 'MB 증가');
+            }, 100);
+        }
+
+        function updateChart() {
+            const chartEl = document.getElementById('memory-chart');
+            if (chartData.length === 0) return;
+
+            const maxMemory = Math.max(...chartData.map(d => d.memory));
+            const minMemory = Math.min(...chartData.map(d => d.memory));
+
+            let html = '<svg width="100%" height="200">';
+
+            // 배경 그리드
+            html += '<line x1="0" y1="100" x2="100%" y2="100" stroke="#3e3e42" stroke-width="1"/>';
+
+            // 데이터 라인
+            const points = chartData.map((d, i) => {
+                const x = (i / (chartData.length - 1)) * 100;
+                const y = 180 - ((d.memory - minMemory) / (maxMemory - minMemory)) * 160;
+                return `${x}%,${y}`;
+            }).join(' ');
+
+            html += `<polyline points="${points}" fill="none" stroke="#4ec9b0" stroke-width="2"/>`;
+
+            // 라벨
+            html += `<text x="5" y="20" fill="#9cdcfe" font-size="12">최대: ${maxMemory.toFixed(2)} MB</text>`;
+            html += `<text x="5" y="190" fill="#9cdcfe" font-size="12">최소: ${minMemory.toFixed(2)} MB</text>`;
+
+            html += '</svg>';
+
+            chartEl.innerHTML = html;
+        }
+
+        // 페이지 로드 시 자동 분석
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                detectEventListeners();
+                analyzeDOMNodes();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

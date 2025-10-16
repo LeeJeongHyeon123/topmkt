@@ -542,7 +542,6 @@ const maxFileSize = <?= UploadConfig::MAX_FILE_SIZE ?>;
 let isFormSubmitted = false; // 폼 제출 상태 추적
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📢 공지사항 작성 페이지 초기화');
     
     // Quill 에디터 초기화
     initializeEditor();
@@ -618,13 +617,11 @@ function uploadImageToQuill(file) {
             quill.insertEmbed(range.index, 'image', data.data.url, 'user');
             quill.setSelection(range.index + 1, 0);  // 커서를 이미지 다음으로 이동
             
-            console.log('✅ Quill 이미지 업로드 성공:', data.data.url);
             
             // 이미지 카운터 업데이트
             updateImageCounter();
         } else {
             Toast.error('이미지 업로드 실패: ' + data.message);
-            console.error('❌ Quill 이미지 업로드 실패:', data.message);
         }
     })
     .catch(error => {
@@ -632,7 +629,6 @@ function uploadImageToQuill(file) {
         quill.deleteText(range.index, '이미지 업로드 중...'.length);
         
         Toast.error('이미지 업로드 중 오류가 발생했습니다.');
-        console.error('❌ Quill 이미지 업로드 오류:', error);
     });
 }
 
@@ -661,7 +657,6 @@ function updateImageCounter() {
     imageCounter.className = `char-counter ${counterClass}`;
     imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
     
-    console.log(`📊 이미지 카운터 업데이트: ${currentImages}/${maxImages}`);
 }
 
 // Quill 에디터 초기화
@@ -703,7 +698,6 @@ function initializeEditor() {
         
         // 20개 초과 시 초과분 제거
         if (currentImages > 20) {
-            console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
             const images = document.getElementById('editor-container').querySelectorAll('img');
             for (let i = 20; i < images.length; i++) {
                 images[i].remove();
@@ -718,7 +712,6 @@ function initializeEditor() {
     // 초기 이미지 카운터 설정
     setTimeout(updateImageCounter, 500);
 
-    console.log('✅ Quill 에디터 초기화 완료');
 }
 
 // 폼 이벤트 설정
@@ -747,7 +740,6 @@ function setupFormEvents() {
     // 초기 폼 유효성 검사
     validateForm();
     
-    console.log('✅ 폼 이벤트 설정 완료');
 }
 
 // 이미지 업로드 기능 설정
@@ -782,7 +774,6 @@ function setupImageUpload() {
         handleImageFiles(Array.from(e.target.files));
     });
     
-    console.log('✅ 이미지 업로드 기능 설정 완료');
 }
 
 // 이미지 파일 처리
@@ -852,7 +843,6 @@ function uploadImage(file) {
     })
     .catch(error => {
         progressEl.style.display = 'none';
-        console.error('업로드 오류:', error);
         Toast.error('이미지 업로드 중 오류가 발생했습니다.');
     });
 }
@@ -892,7 +882,6 @@ async function removeImage(button, imageId) {
     updateImageCount();
     
     // 참고: 서버에서 임시 파일 자동 정리됨 (DELETE 엔드포인트 없음)
-    console.log('이미지 제거됨:', imageId);
 }
 
 // 이미지 개수 업데이트
@@ -922,7 +911,6 @@ function validateForm() {
                    content.length >= 3 && 
                    content.length <= 10000;
     
-    console.log('🔍 폼 검증:', { title: title.length, content: content.length, isValid });
     
     submitBtn.disabled = !isValid;
     
@@ -958,7 +946,6 @@ function submitForm() {
     const url = <?= $isEdit ? "'/api/notices/' + " . ($notice['id'] ?? 'null') : "'/api/notices'" ?>;
     const method = <?= $isEdit ? "'PUT'" : "'POST'" ?>;
     
-    console.log('🚀 폼 제출 정보:', { url, method, isEdit: <?= $isEdit ? 'true' : 'false' ?> });
 
     // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
     const apiCall = method === 'PUT'
@@ -978,7 +965,6 @@ function submitForm() {
         }
     })
     .catch(error => {
-        console.error('제출 오류:', error);
         Toast.error('저장 중 오류가 발생했습니다: ' + error.message);
     })
     .finally(() => {
@@ -1009,7 +995,6 @@ async function deleteNotice(noticeId) {
         }
     })
     .catch(error => {
-        console.error('삭제 오류:', error);
         Toast.error('삭제 중 오류가 발생했습니다: ' + error.message);
     });
 }
@@ -1036,7 +1021,6 @@ window.addEventListener('beforeunload', function(e) {
 window.addEventListener('focus', function() {
     // 사용자가 confirm에서 취소하고 페이지로 돌아온 경우 로딩 UI 숨김
     if (window.topMarketingLoader && window.topMarketingLoader.isLoading) {
-        console.log('🔄 페이지 포커스 복구 - 로딩 UI 정리');
         window.topMarketingLoader.hide();
     }
 });
@@ -1044,7 +1028,6 @@ window.addEventListener('focus', function() {
 // 🚀 Ultra Think: 페이지 가시성 변경 시에도 로딩 UI 정리
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden && window.topMarketingLoader && window.topMarketingLoader.isLoading) {
-        console.log('🔄 페이지 가시성 복구 - 로딩 UI 정리');
         window.topMarketingLoader.hide();
     }
 });

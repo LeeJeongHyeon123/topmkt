@@ -656,7 +656,6 @@ if (!isset($_SESSION['csrf_token'])) {
         }
     });
 
-    console.log('✅ 이미지 input accept 속성 동적 설정 완료:', acceptValue);
 })();
 
 // Quill 에디터 초기화
@@ -690,7 +689,7 @@ const quill = new Quill('#description-editor', {
 
 // 커스텀 이미지 핸들러 함수 (20개 제한)
 function quillImageHandler() {
-    console.log('📷 이미지 업로드 버튼 클릭됨 (events/edit.php)');
+
     
     // 현재 이미지 개수 확인
     const currentImages = quill.container.querySelectorAll('img').length;
@@ -729,13 +728,11 @@ function quillImageHandler() {
         
         const range = quill.getSelection();
         if (!range) {
-            console.error('❌ Quill 에디터 선택 범위를 가져올 수 없습니다.');
             Toast.warning('에디터에서 커서 위치를 찾을 수 없습니다.\n에디터를 클릭한 후 다시 시도해주세요.');
             return;
         }
         
         // 업로드 중 표시
-        console.log('📤 이미지 업로드 시작...');
         quill.insertText(range.index, '이미지 업로드 중...', 'italic', true);
         let loadingTextInserted = true;
         
@@ -749,7 +746,6 @@ function quillImageHandler() {
                 noLoading: true
             });
 
-            console.log('📦 응답 데이터:', result);
             
             // 업로드 중 텍스트 제거
             if (loadingTextInserted) {
@@ -761,7 +757,6 @@ function quillImageHandler() {
                 // 이미지 삽입
                 quill.insertEmbed(range.index, 'image', result.data.url);
                 quill.setSelection(range.index + 1);
-                console.log('✅ 이미지 업로드 성공:', result.data.url);
                 
                 // 이미지 카운터 업데이트
                 updateImageCounter();
@@ -770,14 +765,12 @@ function quillImageHandler() {
             }
             
         } catch (error) {
-            console.error('❌ 이미지 업로드 오류:', error);
             
             // 업로드 중 텍스트 제거 (오류 발생 시)
             if (loadingTextInserted && range && typeof quill !== 'undefined' && quill) {
                 try {
                     quill.deleteText(range.index, '이미지 업로드 중...'.length);
                 } catch (deleteError) {
-                    console.error('로딩 텍스트 제거 실패:', deleteError);
                 }
             }
             
@@ -812,7 +805,6 @@ function updateImageCounter() {
             imageCounter.style.fontWeight = '500';
         }
         
-        console.log(`📷 이미지 카운터 업데이트: ${currentImages}/20`);
     }
 }
 
@@ -820,7 +812,6 @@ function updateImageCounter() {
 quill.on('text-change', function(delta, oldDelta, source) {
     const currentImages = quill.container.querySelectorAll('img').length;
     if (currentImages > 20) {
-        console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
         const images = quill.container.querySelectorAll('img');
         for (let i = 20; i < images.length; i++) {
             images[i].remove();
@@ -1023,7 +1014,6 @@ document.getElementById('eventEditForm').addEventListener('submit', function(e) 
         }
     })
     .catch(error => {
-        console.error('오류:', error);
         Toast.error('행사 수정 중 오류가 발생했습니다.');
         
         // 버튼 상태 복원

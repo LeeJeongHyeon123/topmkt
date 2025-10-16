@@ -180,8 +180,6 @@ let chatRooms = {};
 let users = {};
 let currentPartnerUserId = null;
 
-console.log('🔥 Firebase 채팅 초기화됨');
-console.log('👤 현재 사용자:', currentUser);
 
 /**
  * 전역 fetch 인터셉터 비활성화
@@ -190,7 +188,6 @@ function disableFetchInterceptor() {
     // 원본 fetch가 이미 저장되어 있다면 복원
     if (window.originalFetch) {
         window.fetch = window.originalFetch;
-        console.log('🔇 채팅 페이지: 전역 fetch 로딩 인터셉터 비활성화');
     }
 }
 
@@ -205,14 +202,12 @@ function chatFetch(url, options = {}) {
  * 채팅 리스너 정리 함수
  */
 function cleanupChatListeners() {
-    console.log('🧹 채팅 리스너 정리 중...');
     
     // 채팅방 목록 리스너 제거
     if (window.chatRoomsListener) {
         const userRoomsRef = database.ref(`userRooms/${currentUserId}`);
         userRoomsRef.off('value', window.chatRoomsListener);
         window.chatRoomsListener = null;
-        console.log('✅ 채팅방 목록 리스너 제거됨');
     }
     
     // 개별 채팅방 리스너 제거
@@ -220,7 +215,6 @@ function cleanupChatListeners() {
         Object.keys(window.roomListeners).forEach(roomId => {
             const roomRef = database.ref(`chatRooms/${roomId}`);
             roomRef.off('value', window.roomListeners[roomId]);
-            console.log(`✅ 채팅방 ${roomId} 리스너 제거됨`);
         });
         window.roomListeners = {};
     }
@@ -230,7 +224,6 @@ function cleanupChatListeners() {
         const messagesRef = database.ref(`messages/${activeRoomId}`);
         messagesRef.off('value', window.currentMessageListener);
         window.currentMessageListener = null;
-        console.log('✅ 메시지 리스너 제거됨');
     }
 }
 
@@ -255,10 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const userName = profileImage.getAttribute('data-user-name');
             
             if (userId && userName && typeof window.profileModal !== 'undefined') {
-                console.log('🖼️ 채팅 페이지 프로필 이미지 클릭:', { userId, userName });
                 window.profileModal.show(userId, userName, false);
             } else {
-                console.warn('⚠️ 프로필 이미지 클릭 실패:', { userId, userName, profileModal: typeof window.profileModal });
             }
         }
     });
@@ -274,20 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (roomItem) {
             const roomId = roomItem.getAttribute('data-room-id');
-            console.log(`🎯 채팅방 영역 클릭 감지: ${roomId}`, {
-                target: target,
-                roomItem: roomItem,
-                targetTag: target.tagName,
-                targetClass: target.className,
-                targetId: target.id
-            });
         } else if (target.closest('#chatRoomsList')) {
-            console.log(`🎯 채팅방 목록 영역 클릭 (채팅방 아이템 아님):`, {
-                target: target,
-                targetTag: target.tagName,
-                targetClass: target.className,
-                targetId: target.id
-            });
         }
     }, true); // capture 단계에서 캐치
     
@@ -299,7 +277,6 @@ document.addEventListener('DOMContentLoaded', function() {
  * 채팅 초기화
  */
 function initializeChat() {
-    console.log('📱 채팅 초기화 시작');
     
     // 채팅 페이지에서는 전역 로딩 인터셉터 비활성화
     disableFetchInterceptor();
@@ -381,7 +358,6 @@ function setUserOnlineStatus(isOnline) {
  * 채팅방 목록 로드
  */
 function loadChatRooms() {
-    console.log('📂 채팅방 목록 로드 중...');
     
     const userRoomsRef = database.ref(`userRooms/${currentUserId}`);
     
@@ -406,11 +382,9 @@ function loadChatRooms() {
         if (window.lastRoomIds && 
             window.lastRoomIds.length === currentRoomIds.length &&
             window.lastRoomIds.every(id => currentRoomIds.includes(id))) {
-            console.log('📂 채팅방 목록 변경 없음 - 업데이트 건너뜀');
             return;
         }
         
-        console.log('📂 채팅방 목록 업데이트됨:', currentRoomIds);
         window.lastRoomIds = [...currentRoomIds]; // 현재 상태 저장
         
         if (currentRoomIds.length === 0) {
@@ -441,11 +415,9 @@ function loadChatRooms() {
  * 채팅방 정보 로드
  */
 function loadChatRoomInfo(roomId) {
-    console.log(`🔄 채팅방 정보 로드 시작: ${roomId}`);
     
     // 이미 로드된 채팅방이면 렌더링만 수행
     if (chatRooms[roomId]) {
-        console.log(`📂 채팅방 ${roomId} 캐시에서 로드됨`);
         renderChatRoomItem(roomId, chatRooms[roomId]);
         return;
     }
@@ -465,23 +437,19 @@ function loadChatRoomInfo(roomId) {
     // 새로운 리스너 생성 및 저장
     window.roomListeners[roomId] = function(snapshot) {
         const roomData = snapshot.val();
-        console.log(`📊 채팅방 ${roomId} Firebase 데이터:`, roomData);
         
         if (!roomData) {
-            console.error(`❌ 채팅방 ${roomId}의 데이터가 Firebase에 존재하지 않음`);
             Toast.error('채팅방을 불러올 수 없습니다.\n페이지를 새로고침해주세요.');
             return;
         }
         
         chatRooms[roomId] = roomData;
-        console.log(`✅ 채팅방 ${roomId} 로컬 캐시에 저장됨`);
-        console.log(`📋 현재 전체 chatRooms:`, Object.keys(chatRooms));
+
         
         renderChatRoomItem(roomId, roomData);
     };
     
     roomRef.on('value', window.roomListeners[roomId], function(error) {
-        console.error(`❌ 채팅방 ${roomId} 로드 실패:`, error);
         Toast.error('채팅방 연결에 실패했습니다.\n잠시 후 다시 시도해주세요.');
     });
 }
@@ -510,23 +478,16 @@ function renderChatRoomItem(roomId, roomData) {
         
         // 클릭 이벤트 등록 with 디버깅 - 여러 이벤트로 시도
         const clickHandler = (e) => {
-            console.log(`🖱️ 채팅방 클릭됨: ${roomId}`);
-            console.log('🖱️ 클릭된 요소:', e.target);
-            console.log('🖱️ 현재 요소:', e.currentTarget);
-            console.log('🖱️ 요소 클래스:', e.currentTarget.className);
-            console.log('🖱️ data-room-id:', e.currentTarget.getAttribute('data-room-id'));
+
             
             // roomId 특수문자 검사
             if (roomId.includes('-') || roomId.includes('_')) {
-                console.log(`⚠️ 특수문자 포함 roomId 감지: ${roomId}`);
             }
             
             // 채팅방 데이터 존재 여부 확인
             if (chatRooms[roomId]) {
-                console.log(`✅ 채팅방 데이터 존재: ${roomId}`, chatRooms[roomId]);
             } else {
-                console.log(`❌ 채팅방 데이터 없음: ${roomId}`);
-                console.log('📋 현재 chatRooms:', Object.keys(chatRooms));
+
             }
             
             // 이벤트 전파 방지 (중복 실행 방지)
@@ -543,16 +504,8 @@ function renderChatRoomItem(roomId, roomData) {
         
         // 🔥 최신 메시지 순서로 삽입 위치 결정
         insertChatRoomAtCorrectPosition(roomsListContainer, roomItem, roomData);
-        console.log(`✅ 채팅방 아이템 생성 및 클릭 이벤트 등록 (최신순 정렬): ${roomId}`);
         
         // 디버깅: 요소 클릭 가능 여부 확인
-        console.log(`🔍 채팅방 ${roomId} 요소 상태:`, {
-            display: roomItem.style.display,
-            visibility: roomItem.style.visibility,
-            pointerEvents: window.getComputedStyle(roomItem).pointerEvents,
-            zIndex: window.getComputedStyle(roomItem).zIndex,
-            position: window.getComputedStyle(roomItem).position
-        });
         
         // 추가 디버깅: 겹치는 요소 확인
         setTimeout(() => {
@@ -561,22 +514,12 @@ function renderChatRoomItem(roomId, roomData) {
             const centerY = rect.y + rect.height / 2;
             const topElement = document.elementFromPoint(centerX, centerY);
             
-            console.log(`🎯 채팅방 ${roomId} 중앙 좌표 (${Math.round(centerX)}, ${Math.round(centerY)})에서 감지된 최상위 요소:`, {
-                expected: roomItem,
-                actual: topElement,
-                isExpected: topElement === roomItem,
-                topElementTag: topElement?.tagName,
-                topElementClass: topElement?.className,
-                topElementId: topElement?.id
-            });
             
             if (topElement !== roomItem) {
-                console.warn(`⚠️ 채팅방 ${roomId}이 다른 요소에 가려져 있습니다!`, topElement);
                 
                 // 가리는 요소의 z-index를 낮춰보기
                 if (topElement && topElement.style) {
                     const currentZIndex = window.getComputedStyle(topElement).zIndex;
-                    console.log(`🔧 가리는 요소의 z-index: ${currentZIndex}`);
                 }
             }
         }, 1000);
@@ -603,26 +546,21 @@ function renderChatRoomItem(roomId, roomData) {
                 roomName = users[otherUserId].nickname || '사용자';
                 avatarText = roomName.substring(0, 1).toUpperCase();
                 partnerImage = users[otherUserId].profile_image || users[otherUserId].profile_image_thumb;
-                console.log(`📸 기존 프로필 사용: ${roomName}, 이미지: ${partnerImage ? '있음' : '없음'}`);
             } else {
                 // 🔥 실제로 필요한 정보가 없는 경우에만 로드 (근본 원인 해결)
                 // 탈퇴한 회원인 경우 추가 로드 방지
                 const isDeletedUser = users[otherUserId] && (users[otherUserId].is_deleted || users[otherUserId].status === 'deleted');
                 if (isDeletedUser) {
-                    console.log(`🚫 사용자 ${otherUserId}는 탈퇴한 회원으로 프로필 로드 스킵`);
                 }
                 if (!roomItem.dataset.loadingUser && shouldRefreshProfile && !isDeletedUser) {
                     roomItem.dataset.loadingUser = 'true';
-                    console.log(`🔄 사용자 ${otherUserId} 프로필 정보 로드 시작 (필수 정보 누락)`);
 
                     loadUserInfo(otherUserId).then(() => {
                         // 로딩 플래그 제거
                         delete roomItem.dataset.loadingUser;
-                        console.log(`✅ 사용자 ${otherUserId} 프로필 정보 로드 완료:`, users[otherUserId]);
                         // 새로운 정보로 채팅방 아이템 업데이트
                         renderChatRoomItem(roomId, roomData);
                     }).catch((error) => {
-                        console.error(`❌ 사용자 ${otherUserId} 프로필 로드 실패:`, error);
                         Toast.warning('사용자 프로필을 불러올 수 없습니다.');
                         delete roomItem.dataset.loadingUser;
                     });
@@ -702,47 +640,23 @@ function renderChatRoomItem(roomId, roomData) {
 
     // 🔥 room-name 디버깅 로그 추가
     setTimeout(() => {
-        console.log(`🔍 ===== room-name 디버깅 (${roomId}) =====`);
-        console.log(`📝 설정된 roomName: "${roomName}"`);
 
         const roomNameElement = roomItem.querySelector('.room-name');
         if (roomNameElement) {
-            console.log(`✅ room-name 요소 발견`);
-            console.log(`📝 실제 textContent: "${roomNameElement.textContent}"`);
-            console.log(`📝 innerHTML: "${roomNameElement.innerHTML}"`);
 
             const style = window.getComputedStyle(roomNameElement);
             const rect = roomNameElement.getBoundingClientRect();
 
-            console.log(`📊 CSS 스타일 상태:`);
-            console.log(`  - display: ${style.display}`);
-            console.log(`  - visibility: ${style.visibility}`);
-            console.log(`  - opacity: ${style.opacity}`);
-            console.log(`  - color: ${style.color}`);
-            console.log(`  - font-size: ${style.fontSize}`);
-            console.log(`  - max-width: ${style.maxWidth}`);
-            console.log(`  - width: ${style.width}`);
-            console.log(`  - height: ${style.height}`);
-            console.log(`  - overflow: ${style.overflow}`);
-            console.log(`  - white-space: ${style.whiteSpace}`);
-            console.log(`  - text-overflow: ${style.textOverflow}`);
 
-            console.log(`📏 요소 크기 및 위치:`);
-            console.log(`  - 크기: ${rect.width}px × ${rect.height}px`);
-            console.log(`  - 위치: (${Math.round(rect.x)}, ${Math.round(rect.y)})`);
 
             const isVisible = rect.width > 0 && rect.height > 0 &&
                              style.display !== 'none' &&
                              style.visibility !== 'hidden' &&
                              parseFloat(style.opacity) > 0;
-            console.log(`🎯 실제 표시 여부: ${isVisible ? '✅ 보임' : '❌ 안보임'}`);
 
             // 🔥 디버깅 완료 - 강제 스타일 제거됨
         } else {
-            console.log(`❌ room-name 요소를 찾을 수 없음!`);
-            console.log(`📋 roomItem.innerHTML:`, roomItem.innerHTML);
         }
-        console.log(`🔍 ===== 디버깅 완료 =====`);
     }, 100);
 
     // 마지막 메시지 업데이트
@@ -789,7 +703,6 @@ function insertChatRoomAtCorrectPosition(container, roomItem, roomData) {
         container.insertBefore(roomItem, existingItems[insertIndex]);
     }
 
-    console.log(`🔄 채팅방 정렬: ${roomItem.getAttribute('data-room-id')} -> 위치 ${insertIndex} (lastMessageTime: ${currentTime})`);
 }
 
 /**
@@ -812,13 +725,9 @@ function repositionExistingChatRoom(roomId, roomData) {
  * 채팅방 열기
  */
 function openChatRoom(roomId, retryCount = 0) {
-    console.log(`💬 채팅방 열기: ${roomId} (시도 횟수: ${retryCount})`);
-    console.log(`📊 현재 chatRooms 데이터:`, chatRooms);
-    console.log(`🔍 요청된 채팅방 ID: ${roomId}`);
 
     // 무한 루프 방지: 최대 3번까지만 재시도
     if (retryCount >= 3) {
-        console.error('❌ 최대 재시도 횟수 초과. 채팅방 열기를 포기합니다:', roomId);
         Toast.error('채팅방을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
         return;
     }
@@ -826,27 +735,21 @@ function openChatRoom(roomId, retryCount = 0) {
     activeRoomId = roomId;
     const roomData = chatRooms[roomId];
 
-    console.log(`📂 해당 채팅방 데이터:`, roomData);
 
     if (!roomData) {
-        console.error('❌ 채팅방 데이터를 찾을 수 없습니다:', roomId);
-        console.error('📋 사용 가능한 채팅방 목록:', Object.keys(chatRooms));
+
         Toast.error('채팅방을 찾을 수 없습니다.\n목록에서 다시 선택해주세요.');
 
         // Firebase에서 직접 데이터 가져오기 시도
-        console.log('🔄 Firebase에서 직접 채팅방 데이터 로드 시도...');
         const roomRef = database.ref(`chatRooms/${roomId}`);
         roomRef.once('value', function(snapshot) {
             const firebaseRoomData = snapshot.val();
-            console.log('🔥 Firebase에서 가져온 데이터:', firebaseRoomData);
 
             if (firebaseRoomData) {
-                console.log('✅ Firebase에 데이터가 존재함. 로컬 캐시 업데이트 중...');
                 chatRooms[roomId] = firebaseRoomData;
                 // 재귀 호출 시 retryCount 증가
                 openChatRoom(roomId, retryCount + 1);
             } else {
-                console.error('❌ Firebase에도 채팅방이 존재하지 않음');
                 Toast.error('채팅방을 찾을 수 없습니다.');
             }
         });
@@ -863,28 +766,21 @@ function openChatRoom(roomId, retryCount = 0) {
     });
     
     // 채팅 UI 표시
-    console.log('🖥️ UI 요소 상태 변경 중...');
     
     const chatWelcome = document.getElementById('chatWelcome');
     const activeChatArea = document.getElementById('activeChatArea');
     
-    console.log('📋 chatWelcome 요소:', chatWelcome);
-    console.log('📋 activeChatArea 요소:', activeChatArea);
     
     if (chatWelcome) {
         chatWelcome.style.display = 'none';
-        console.log('✅ chatWelcome 숨김 처리됨');
     } else {
-        console.error('❌ chatWelcome 요소를 찾을 수 없음');
     }
     
     if (activeChatArea) {
         activeChatArea.style.display = 'flex';
         activeChatArea.style.flexDirection = 'column';
         activeChatArea.style.height = '100%';
-        console.log('✅ activeChatArea 표시 처리됨');
     } else {
-        console.error('❌ activeChatArea 요소를 찾을 수 없음');
     }
     
     // 채팅 상대 정보 설정
@@ -901,7 +797,6 @@ function openChatRoom(roomId, retryCount = 0) {
         const chatLayout = document.querySelector('.chat-layout');
         if (chatLayout) {
             chatLayout.classList.add('chat-active');
-            console.log('📱 모바일: 채팅창 모드로 전환');
         }
     }
 }
@@ -910,7 +805,6 @@ function openChatRoom(roomId, retryCount = 0) {
  * 채팅 헤더 업데이트
  */
 function updateChatHeader(roomData) {
-    console.log('🎨 채팅 헤더 업데이트:', roomData);
     
     let partnerName = roomData.name || '채팅방';
     let partnerImage = null;
@@ -918,23 +812,17 @@ function updateChatHeader(roomData) {
     // 1:1 채팅인 경우 상대방 정보로 설정
     if (roomData.type === 'private' && roomData.participants) {
         const otherUserId = Object.keys(roomData.participants).find(id => id != currentUserId);
-        console.log(`👤 상대방 사용자 ID: ${otherUserId}`);
-        console.log(`👤 현재 사용자 ID: ${currentUserId}`);
-        console.log(`📋 현재 users 객체:`, users);
         
         if (otherUserId) {
             currentPartnerUserId = otherUserId; // 현재 상대방 ID 저장
             
             // 사용자 정보가 없으면 비동기로 가져오기
             if (!users[otherUserId]) {
-                console.log(`🔄 사용자 ${otherUserId} 정보 로드 필요`);
                 loadUserInfo(otherUserId).then(() => {
-                    console.log(`✅ 사용자 ${otherUserId} 정보 로드 완료:`, users[otherUserId]);
                     // 무한 루프 방지: 사용자 정보가 실제로 로드된 경우에만 재호출
                     if (users[otherUserId]) {
                         updateChatHeader(roomData);
                     } else {
-                        console.warn(`⚠️ 사용자 ${otherUserId} 정보 로드 실패 - 기본값 사용`);
                         // 기본값으로 폴백
                         users[otherUserId] = {
                             id: otherUserId,
@@ -944,7 +832,6 @@ function updateChatHeader(roomData) {
                         updateChatHeader(roomData);
                     }
                 }).catch(error => {
-                    console.error(`❌ 사용자 ${otherUserId} 정보 로드 오류:`, error);
                     Toast.warning('사용자 정보를 불러올 수 없습니다.');
                     // 에러 시 기본값으로 폴백
                     users[otherUserId] = {
@@ -958,11 +845,8 @@ function updateChatHeader(roomData) {
             }
             
             if (users[otherUserId]) {
-                console.log(`👤 사용자 ${otherUserId} 정보 사용:`, users[otherUserId]);
                 partnerName = users[otherUserId].nickname || '사용자';
                 partnerImage = users[otherUserId].profile_image || users[otherUserId].profile_image_thumb;
-                console.log(`👤 설정된 상대방 이름: ${partnerName}`);
-                console.log(`🖼️ 설정된 상대방 이미지: ${partnerImage || '없음'}`);
             }
         }
         
@@ -975,83 +859,44 @@ function updateChatHeader(roomData) {
     }
     
     // 🔍 닉네임 설정 디버깅 시작
-    console.log("🔍 ===== 채팅방 닉네임 디버깅 시작 =====");
 
     // 1. 기본 정보 확인
-    console.log("📍 1. 기본 정보");
-    console.log("현재 활성 채팅방 ID:", activeRoomId);
-    console.log("현재 사용자 ID:", currentUserId);
-    console.log("대화 상대 사용자 ID:", currentPartnerUserId);
-    console.log("설정하려는 닉네임:", partnerName);
 
     // 2. HTML 요소 상태 확인 (설정 전)
-    console.log("\n📍 2. HTML 요소 상태 (설정 전)");
+
     const nameElement = document.getElementById('chatPartnerName');
     if (nameElement) {
-        console.log("요소 존재:", true);
-        console.log("설정 전 텍스트 내용:", `"${nameElement.textContent}"`);
-        console.log("innerHTML:", nameElement.innerHTML);
-        console.log("부모 요소:", nameElement.parentElement);
 
         // CSS 스타일 확인
         const rect = nameElement.getBoundingClientRect();
         const computedStyle = window.getComputedStyle(nameElement);
-        console.log("요소 크기:", `${rect.width}px × ${rect.height}px`);
-        console.log("요소 위치:", `(${Math.round(rect.x)}, ${Math.round(rect.y)})`);
-        console.log("display:", computedStyle.display);
-        console.log("visibility:", computedStyle.visibility);
-        console.log("opacity:", computedStyle.opacity);
-        console.log("color:", computedStyle.color);
-        console.log("font-size:", computedStyle.fontSize);
-        console.log("font-weight:", computedStyle.fontWeight);
     } else {
-        console.log("❌ chatPartnerName 요소를 찾을 수 없음!");
     }
 
     // 3. 사용자 정보 확인
-    console.log("\n📍 3. 사용자 정보 상태");
-    console.log("전체 users 객체:", users);
     if (currentPartnerUserId) {
-        console.log(`상대방(${currentPartnerUserId}) 정보:`, users[currentPartnerUserId]);
         if (users[currentPartnerUserId]) {
-            console.log("상대방 닉네임:", users[currentPartnerUserId].nickname);
-            console.log("상대방 프로필 이미지:", users[currentPartnerUserId].profile_image);
         }
     }
 
     // 4. 채팅방 데이터 확인
-    console.log("\n📍 4. 채팅방 데이터");
     if (activeRoomId && chatRooms[activeRoomId]) {
-        console.log("현재 채팅방 데이터:", chatRooms[activeRoomId]);
         const participantIds = Object.keys(chatRooms[activeRoomId].participants || {});
-        console.log("참여자 ID들:", participantIds);
         const otherUserId = participantIds.find(id => id != currentUserId);
-        console.log("계산된 상대방 ID:", otherUserId);
     }
 
     // 5. 실제 DOM 설정
-    console.log("\n📍 5. DOM 텍스트 설정 실행");
     document.getElementById('chatPartnerName').textContent = partnerName;
 
     // 6. 설정 후 상태 확인
-    console.log("\n📍 6. 설정 후 상태 확인");
     const afterSetText = document.getElementById('chatPartnerName').textContent;
-    console.log("설정 후 텍스트 내용:", `"${afterSetText}"`);
-    console.log("설정 성공 여부:", afterSetText === partnerName);
 
     // 7. 0.5초 후 다시 확인 (다른 코드에 의한 덮어쓰기 감지)
     setTimeout(() => {
-        console.log("\n📍 7. 0.5초 후 재확인");
         const delayedText = document.getElementById('chatPartnerName').textContent;
-        console.log("0.5초 후 텍스트:", `"${delayedText}"`);
         if (delayedText !== partnerName) {
-            console.log("⚠️ 다른 코드에 의해 텍스트가 변경됨!");
-            console.log("원래 설정값:", partnerName);
-            console.log("현재 값:", delayedText);
         } else {
-            console.log("✅ 텍스트가 정상적으로 유지됨");
         }
-        console.log("🔍 ===== 디버깅 완료 =====");
     }, 500);
     
     // 프로필 이미지 설정
@@ -1082,11 +927,9 @@ function updateChatHeader(roomData) {
  * 메시지 로드
  */
 function loadMessages(roomId) {
-    console.log(`📨 메시지 로드 시작: ${roomId}`);
     
     const messagesContainer = document.getElementById('chatMessages');
     if (!messagesContainer) {
-        console.error('❌ 메시지 컨테이너를 찾을 수 없음');
         return;
     }
     
@@ -1095,7 +938,6 @@ function loadMessages(roomId) {
     // 실용적인 메시지 로딩 수 (성능과 사용성의 균형)
     const messagesRef = database.ref(`messages/${roomId}`).limitToLast(50);
     
-    console.log(`🔗 Firebase 리스너 설정: messages/${roomId}`);
     
     // 기존 메시지 리스너 제거
     if (window.currentMessageListener) {
@@ -1106,16 +948,14 @@ function loadMessages(roomId) {
     
     // 새로운 리스너 생성 및 저장
     window.currentMessageListener = function(snapshot) {
-        console.log(`📥 메시지 데이터 수신:`, snapshot.val());
+
         const messages = snapshot.val() || {};
-        console.log(`📊 메시지 개수: ${Object.keys(messages).length}`);
         
         renderMessages(messages);
         scrollToBottom();
     };
     
     messagesRef.on('value', window.currentMessageListener, function(error) {
-        console.error('❌ 메시지 로드 실패:', error);
         Toast.error('메시지를 불러올 수 없습니다.\n연결 상태를 확인해주세요.');
         messagesContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">메시지를 불러올 수 없습니다.</div>';
     });
@@ -1125,23 +965,18 @@ function loadMessages(roomId) {
  * 메시지 렌더링
  */
 function renderMessages(messages) {
-    console.log('🎨 메시지 렌더링 시작:', messages);
     
     const messagesContainer = document.getElementById('chatMessages');
-    console.log('📋 메시지 컨테이너:', messagesContainer);
     
     if (!messagesContainer) {
-        console.error('❌ 메시지 컨테이너를 찾을 수 없음');
         return;
     }
     
     messagesContainer.innerHTML = '';
     
     const messageCount = Object.keys(messages).length;
-    console.log(`📊 렌더링할 메시지 개수: ${messageCount}`);
     
     if (messageCount === 0) {
-        console.log('💬 빈 채팅방 - 안내 메시지 표시');
         
         const emptyMessage = `
             <div style="text-align: center; padding: 40px 20px; color: #718096;">
@@ -1151,8 +986,6 @@ function renderMessages(messages) {
         `;
         
         messagesContainer.innerHTML = emptyMessage;
-        console.log('✅ 빈 채팅방 안내 메시지 설정 완료');
-        console.log('📝 설정된 HTML:', emptyMessage);
         return;
     }
     
@@ -1260,15 +1093,12 @@ function sendMessage() {
 
                     // 비활성 상태인 참여자가 있다면 userRooms에 다시 추가
                     if (participant.status === 'inactive' && participantId !== currentUserId) {
-                        console.log(`🔄 비활성 참여자 ${participantId}의 채팅방 목록 복구 중...`);
 
                         database.ref(`userRooms/${participantId}/${activeRoomId}`).set({
                             joinedAt: participant.joinedAt || firebase.database.ServerValue.TIMESTAMP,
                             lastReadTime: Date.now()
                         }).then(() => {
-                            console.log(`✅ 참여자 ${participantId}의 채팅방 목록 복구 완료`);
                         }).catch((error) => {
-                            console.error(`❌ 참여자 ${participantId}의 채팅방 목록 복구 실패:`, error);
                             Toast.warning('채팅방 목록 동기화에 실패했습니다.');
                         });
                     }
@@ -1284,10 +1114,8 @@ function sendMessage() {
             sendBtn.disabled = false;
             input.focus();
 
-            console.log('✅ 메시지 전송 완료');
         })
         .catch((error) => {
-            console.error('❌ 메시지 전송 실패:', error);
             Toast.error('메시지 전송에 실패했습니다.');
             sendBtn.disabled = false;
         });
@@ -1375,7 +1203,6 @@ function searchUsers(query = null) {
             }
         })
         .catch(error => {
-            console.error('사용자 검색 오류:', error);
             Toast.error('사용자 검색에 실패했습니다.\n잠시 후 다시 시도해주세요.');
             usersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #e53e3e;">검색 중 오류가 발생했습니다.</div>';
         });
@@ -1450,7 +1277,6 @@ function renderUsersList(usersList) {
  * 사용자와 채팅 시작
  */
 function startChatWithUser(user) {
-    console.log('💬 채팅 시작:', user);
 
     // 탈퇴한 회원과는 채팅 시작 불가 (추가 안전성 검사)
     if (user.is_deleted || user.status === 'deleted') {
@@ -1484,8 +1310,6 @@ function findExistingPrivateRoom(userId) {
                 participantIds.includes(currentUserId.toString()) &&
                 participantIds.includes(userId.toString())) {
 
-                console.log(`🔍 기존 채팅방 발견: ${roomId}`);
-                console.log(`📋 참여자 정보:`, room.participants);
 
                 // 🔥 비활성 참여자가 있어도 기존 채팅방으로 인식
                 // 나간 사용자의 상태를 다시 활성화
@@ -1493,7 +1317,6 @@ function findExistingPrivateRoom(userId) {
                 const otherParticipant = room.participants[userId];
 
                 if (myParticipant && myParticipant.status === 'inactive') {
-                    console.log(`🔄 내 참여자 상태 재활성화 중...`);
                     database.ref(`chatRooms/${roomId}/participants/${currentUserId}`).update({
                         status: 'active',
                         rejoinedAt: firebase.database.ServerValue.TIMESTAMP
@@ -1501,7 +1324,6 @@ function findExistingPrivateRoom(userId) {
                 }
 
                 if (otherParticipant && otherParticipant.status === 'inactive') {
-                    console.log(`🔄 상대방 참여자 상태 재활성화 중...`);
                     database.ref(`chatRooms/${roomId}/participants/${userId}`).update({
                         status: 'active',
                         rejoinedAt: firebase.database.ServerValue.TIMESTAMP
@@ -1544,7 +1366,6 @@ function createPrivateChatRoom(user) {
     const participantIds = [currentUserId, user.id].sort((a, b) => a - b);
     const roomId = `room_${participantIds[0]}_${participantIds[1]}`;
 
-    console.log(`🔍 채팅방 ID 생성: ${roomId} (사용자: ${currentUserId}, 상대방: ${user.id})`);
 
     // Firebase에 채팅방 생성 (기존 방이 있으면 업데이트, 없으면 생성)
     const roomRef = database.ref(`chatRooms/${roomId}`);
@@ -1555,7 +1376,6 @@ function createPrivateChatRoom(user) {
             const existingRoom = snapshot.val();
 
             if (existingRoom) {
-                console.log(`✅ 기존 채팅방 발견: ${roomId}`, existingRoom);
 
                 // 기존 방의 참여자 상태를 활성으로 업데이트
                 const participantsRef = database.ref(`chatRooms/${roomId}/participants`);
@@ -1570,7 +1390,6 @@ function createPrivateChatRoom(user) {
                     })
                 ]);
             } else {
-                console.log(`🆕 새 채팅방 생성: ${roomId}`);
 
                 // 새 채팅방 생성
                 return roomRef.set(roomData);
@@ -1602,7 +1421,6 @@ function createPrivateChatRoom(user) {
             ]);
         })
         .then(() => {
-            console.log('✅ 채팅방 설정 완료:', roomId);
             
             // 생성된 채팅방 열기
             setTimeout(() => {
@@ -1611,7 +1429,6 @@ function createPrivateChatRoom(user) {
             }, 500);
         })
         .catch((error) => {
-            console.error('❌ 채팅방 생성 실패:', error);
             Toast.error('채팅방 생성에 실패했습니다.');
         });
 }
@@ -1922,7 +1739,6 @@ function closeInactiveRoomModal() {
  */
 async function reactivateChatRoom(roomId) {
     try {
-        console.log(`🔄 채팅방 다시 활성화 시도: ${roomId}`);
 
         // 현재 채팅방의 상대방 찾기
         const currentRoom = chatRooms[roomId];
@@ -1963,7 +1779,6 @@ async function reactivateChatRoom(roomId) {
             })
         ]);
 
-        console.log(`✅ 채팅방 다시 활성화 완료: ${roomId}`);
 
         // 모달 닫기
         closeInactiveRoomModal();
@@ -1974,7 +1789,6 @@ async function reactivateChatRoom(roomId) {
         Toast.success('대화가 다시 활성화되었습니다!');
 
     } catch (error) {
-        console.error('❌ 채팅방 다시 활성화 실패:', error);
         Toast.error('대화 활성화에 실패했습니다.');
     }
 }
@@ -1990,12 +1804,10 @@ async function leaveChatRoom() {
 
     if (await Modal.confirm('채팅방을 나가시겠습니까? 메시지를 보내면 대화가 다시 활성화됩니다.')) {
         try {
-            console.log(`🚪 채팅방 나가기 시작: 사용자 ${currentUserId}, 채팅방 ${activeRoomId}`);
 
             // 현재 채팅방의 상대방 찾기
             const currentRoom = chatRooms[activeRoomId];
             if (!currentRoom || !currentRoom.participants) {
-                console.error('❌ 채팅방 정보를 찾을 수 없습니다');
                 Toast.error('채팅방 정보를 찾을 수 없습니다.');
                 return;
             }
@@ -2004,12 +1816,10 @@ async function leaveChatRoom() {
             const otherParticipantId = participantIds.find(id => id != currentUserId);
 
             if (!otherParticipantId) {
-                console.error('❌ 상대방 참가자를 찾을 수 없습니다');
                 Toast.error('채팅방 정보를 찾을 수 없습니다.');
                 return;
             }
 
-            console.log(`👥 채팅방 참가자: ${currentUserId} (나), ${otherParticipantId} (상대방)`);
 
             // 양쪽 모두의 userRooms에서 방 제거 및 참여자 상태 업데이트
             const userRoomRef = database.ref(`userRooms/${currentUserId}/${activeRoomId}`);
@@ -2032,7 +1842,6 @@ async function leaveChatRoom() {
                 })
             ])
             .then(() => {
-                console.log('✅ 채팅방을 나갔습니다.');
                 
                 // 채팅방 데이터 제거
                 delete chatRooms[activeRoomId];
@@ -2048,7 +1857,6 @@ async function leaveChatRoom() {
                 }
                 if (roomItem) {
                     roomItem.remove();
-                    console.log('✅ 사이드바에서 채팅방 아이템 제거됨');
                 }
                 
                 // UI 초기화
@@ -2069,11 +1877,9 @@ async function leaveChatRoom() {
                 Toast.success('채팅방을 나갔습니다.');
             })
             .catch((error) => {
-                console.error('❌ 채팅방 나가기 실패:', error);
                 Toast.error('채팅방 나가기에 실패했습니다.');
             });
         } catch (error) {
-            console.error('❌ 채팅방 나가기 오류:', error);
             Toast.error('오류가 발생했습니다.');
         }
     }
@@ -2157,20 +1963,15 @@ async function loadUserInfo(userId) {
     }
     
     try {
-        console.log(`🌐 API 호출 시작: /api/users/${userId}/profile-image`);
         const response = await chatFetch(`/api/users/${userId}/profile-image`);
-        console.log(`📊 API 응답 상태: ${response.status}`);
         
         if (!response.ok) {
-            console.error(`❌ API 응답 오류: ${response.status} ${response.statusText}`);
             const errorText = await response.text();
-            console.error(`❌ 오류 내용: ${errorText}`);
             Toast.error('사용자 정보를 불러올 수 없습니다.');
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const response_data = await response.json();
-        console.log(`📋 API 응답 데이터:`, response_data);
         
         // ResponseHelper의 구조에 맞게 data 필드에서 실제 데이터 추출
         const data = response_data.data || response_data;
@@ -2189,10 +1990,7 @@ async function loadUserInfo(userId) {
                 status: imageData.status
             };
 
-            console.log('✅ 사용자 정보 로드됨:', users[userId]);
         } else {
-            console.warn(`⚠️ API 응답에 user_id가 없음:`, data);
-            console.warn(`🔍 전체 응답 구조:`, response_data);
 
             // 폴백: 기본 사용자 정보 생성하여 무한 루프 방지
             users[userId] = {
@@ -2201,12 +1999,10 @@ async function loadUserInfo(userId) {
                 profile_image: null,
                 is_deleted: false
             };
-            console.warn(`🔄 기본 사용자 정보로 폴백 처리됨:`, users[userId]);
         }
         
         return Promise.resolve();
     } catch (error) {
-        console.error('❌ 사용자 정보 로드 실패:', error);
         Toast.warning('사용자 정보를 불러올 수 없습니다.');
         return Promise.reject(error);
     }
@@ -2221,14 +2017,12 @@ function handleUrlHash() {
     
     if (hash && hash.startsWith('#room-')) {
         const roomId = hash.substring(6); // #room- 제거
-        console.log(`🔗 URL 해시로 채팅방 열기 요청: ${roomId}`);
         
         // 채팅방 목록이 로드될 때까지 대기 후 해당 방 열기
         let tryCount = 0;
         const maxTries = 10; // 최대 10번 시도 (10초)
         const tryOpenRoom = () => {
             tryCount++;
-            console.log(`🔄 채팅방 열기 시도 중... (${tryCount}/${maxTries})`);
 
             if (chatRooms[roomId]) {
                 openChatRoom(roomId);
@@ -2238,7 +2032,6 @@ function handleUrlHash() {
                 // 1초 후 재시도 (최대 10번)
                 setTimeout(tryOpenRoom, 1000);
             } else {
-                console.error('❌ 최대 시도 횟수 초과. 채팅방을 찾을 수 없습니다:', roomId);
                 Toast.error('채팅방을 찾을 수 없습니다. 채팅방 목록을 확인해주세요.');
                 history.replaceState(null, null, '/chat');
             }
@@ -2247,7 +2040,6 @@ function handleUrlHash() {
         setTimeout(tryOpenRoom, 2000); // 2초 후 첫 시도
     } else if (hash && hash.startsWith('#user-')) {
         const userId = hash.substring(6); // #user- 제거
-        console.log(`🔗 URL 해시로 사용자와 채팅 시작 요청: ${userId}`);
         
         // 사용자 정보 로드 후 채팅 시작
         const tryStartChatWithUser = () => {
@@ -2255,15 +2047,12 @@ function handleUrlHash() {
             const existingRoomId = findExistingPrivateRoom(userId);
             
             if (existingRoomId) {
-                console.log(`🔗 기존 채팅방 발견: ${existingRoomId}`);
                 openChatRoom(existingRoomId);
                 history.replaceState(null, null, '/chat');
             } else {
                 // 사용자 정보를 가져와서 새 채팅방 생성
-                console.log(`🔗 사용자 정보 조회 중: ${userId}`);
                 loadUserInfo(userId).then(() => {
                     if (users[userId]) {
-                        console.log(`🔗 사용자 정보 로드 완료, 채팅방 생성 중:`, users[userId]);
                         createPrivateChatRoom(users[userId]);
                         history.replaceState(null, null, '/chat');
                     } else {
@@ -2279,23 +2068,19 @@ function handleUrlHash() {
                                         profile_image: imageData.original_image
                                     };
                                     users[userId] = user;
-                                    console.log(`🔗 API로 사용자 정보 로드 완료, 채팅방 생성 중:`, user);
                                     createPrivateChatRoom(user);
                                     history.replaceState(null, null, '/chat');
                                 } else {
-                                    console.error('🔗 사용자 정보를 찾을 수 없습니다.');
                                     Toast.error('사용자 정보를 찾을 수 없습니다.');
                                     history.replaceState(null, null, '/chat');
                                 }
                             })
                             .catch(error => {
-                                console.error('🔗 사용자 정보 조회 실패:', error);
                                 Toast.error('사용자 정보를 불러오는 중 오류가 발생했습니다.');
                                 history.replaceState(null, null, '/chat');
                             });
                     }
                 }).catch(error => {
-                    console.error('🔗 사용자 정보 로드 실패:', error);
                     Toast.error('사용자 정보를 불러오는 중 오류가 발생했습니다.');
                     history.replaceState(null, null, '/chat');
                 });
@@ -2307,7 +2092,6 @@ function handleUrlHash() {
         const maxWaits = 20; // 최대 20번 대기 (10초)
         const waitForChatRoomsLoad = () => {
             waitCount++;
-            console.log(`⏳ 채팅방 목록 로드 대기 중... (${waitCount}/${maxWaits})`);
 
             // 채팅방 목록이 로드되었는지 확인 (빈 객체도 로드된 것으로 간주)
             if (typeof chatRooms === 'object') {
@@ -2315,7 +2099,6 @@ function handleUrlHash() {
             } else if (waitCount < maxWaits) {
                 setTimeout(waitForChatRoomsLoad, 500);
             } else {
-                console.error('❌ 채팅방 목록 로드 대기 시간 초과');
                 Toast.error('채팅방 목록을 불러오는 중 시간이 초과되었습니다. 페이지를 새로고침해주세요.');
                 history.replaceState(null, null, '/chat');
             }
@@ -2335,7 +2118,6 @@ function toggleMobileChatSidebar() {
     const overlay = document.getElementById('mobile-sidebar-overlay');
 
     if (!sidebar) {
-        console.error('채팅 사이드바를 찾을 수 없습니다.');
         return;
     }
 
@@ -2409,7 +2191,6 @@ function toggleMobileChatSidebar() {
         document.addEventListener('keydown', handleEscKey);
     }
 
-    console.log('📱 모바일 사이드바 토글:', !isVisible ? '열림' : '닫힘');
 }
 
 /**
@@ -2430,14 +2211,12 @@ document.addEventListener('click', function(e) {
  * 모바일에서 채팅방 목록으로 돌아가기
  */
 function backToChatList() {
-    console.log('📱 채팅방 목록으로 돌아가기');
 
     // 모바일에서만 동작
     if (window.innerWidth <= 768) {
         const chatLayout = document.querySelector('.chat-layout');
         if (chatLayout) {
             chatLayout.classList.remove('chat-active');
-            console.log('📱 모바일: 채팅방 목록 모드로 전환');
         }
 
         // 활성 채팅방 해제
@@ -2449,7 +2228,6 @@ function backToChatList() {
             item.classList.remove('active');
         });
 
-        console.log('✅ 채팅방 목록으로 성공적으로 돌아감');
     }
 }
 

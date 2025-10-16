@@ -48,14 +48,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     <?php require_once SRC_PATH . '/views/includes/utils.js.php'; ?>
 
     <script>
-    console.log('✅ [Admin Users Direct] 모든 컴포넌트 로드 완료:', {
-        Toast: typeof window.Toast,
-        Loading: typeof window.Loading,
-        ApiClient: typeof window.ApiClient,
-        DateUtils: typeof window.DateUtils,
-        formatNumber: typeof window.formatNumber,
-        formatPhone: typeof window.formatPhone
-    });
     </script>
 </head>
 <body class="admin-page">
@@ -708,12 +700,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     // 사용자 통계 로드
     async function loadUserStats() {
         try {
-            console.log('📊 통계 로딩 시작...');
 
             // v3.42.0: ApiClient 사용
             const data = await ApiClient.get('/admin/getUserStats', { noLoading: true });
 
-            console.log('📊 받은 데이터:', data);
 
             // ApiClient가 정규화한 응답 구조: {success, data, message}
             if (data.success && data.data) {
@@ -721,12 +711,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 document.getElementById('totalUsers').textContent = stats.total_users || 0;
                 document.getElementById('todaySignups').textContent = stats.today_signups || 0;
                 document.getElementById('activeUsers').textContent = stats.active_users || 0;
-                console.log('✅ 통계 로딩 성공:', stats);
             } else {
                 throw new Error(data.message || '통계 데이터가 없습니다');
             }
         } catch (error) {
-            console.error('❌ 통계 로드 오류:', error);
             document.getElementById('totalUsers').textContent = '오류';
             document.getElementById('todaySignups').textContent = '오류';
             document.getElementById('activeUsers').textContent = '오류';
@@ -760,11 +748,9 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 renderUsersTable(data.data.users);
                 renderPagination(data.data);
             } else {
-                console.error('데이터 로드 실패:', data.message);
                 document.getElementById('noDataMessage').style.display = 'block';
             }
         } catch (error) {
-            console.error('사용자 데이터 로드 오류:', error);
             document.getElementById('noDataMessage').style.display = 'block';
         } finally {
             isLoading = false;
@@ -853,12 +839,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
             document.getElementById('userDetailContent').innerHTML = 
                 '<div class="loading-indicator"><div class="spinner"></div><p>사용자 정보를 불러오는 중...</p></div>';
             
-            console.log('👤 사용자 ID ' + userId + ' 상세 정보 로딩 시작...');
 
             // v3.42.0: ApiClient 사용
             const data = await ApiClient.get('/admin/users/' + userId + '/detail', { noLoading: true });
 
-            console.log('👤 받은 사용자 데이터:', data);
             
             if (data.error) {
                 throw new Error(data.error);
@@ -868,7 +852,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
             renderUserDetail(data.data || data);
             
         } catch (error) {
-            console.error('❌ 사용자 상세 정보 로드 오류:', error);
             document.getElementById('userDetailContent').innerHTML = 
                 '<div class="no-data-message"><p>❌ 사용자 정보를 불러올 수 없습니다</p><p><strong>오류:</strong> ' + error.message + '</p></div>';
         }
@@ -957,12 +940,11 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
 
     // 사용자 편집 모달 열기
     function editUser(userId) {
-        console.log('🖊️ 사용자 편집 모달 열기:', userId);
 
         // v3.42.0: ApiClient 사용
         ApiClient.get(`/admin/users/${userId}/detail`, { noLoading: true })
             .then(data => {
-                console.log('📊 API 응답 데이터:', data); // 디버깅용
+ // 디버깅용
                 if (data.success) {
                     // getUserDetail API는 data.data 형태로 사용자 정보를 반환
                     showEditUserModal(data.data);
@@ -971,7 +953,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 }
             })
             .catch(error => {
-                console.error('사용자 정보 조회 오류:', error);
                 Toast.error('사용자 정보를 불러오는 중 오류가 발생했습니다.');
             });
     }
@@ -1108,10 +1089,8 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 }
             });
 
-            console.log('✅ 전화번호 자동 포맷팅 및 검증 설정 완료');
         }
 
-        console.log('✅ 편집 모달 생성 완료');
     }
     
     // 사용자 편집 폼 제출
@@ -1135,7 +1114,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         }
         
         
-        console.log('📤 사용자 편집 요청 전송:', userId);
 
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
         ApiClient.post(`/admin/users/${userId}/edit`, formData, {
@@ -1148,7 +1126,7 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 
                 // 변경 사항이 있다면 표시
                 if (data.changes && data.changes.length > 0) {
-                    console.log('📝 변경 사항:', data.changes.join(', '));
+
                 }
                 
                 closeEditUserModal();
@@ -1162,7 +1140,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
             }
         })
         .catch(error => {
-            console.error('편집 요청 오류:', error);
             Toast.error('편집 중 오류가 발생했습니다.');
         })
         .finally(() => {
@@ -1178,7 +1155,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         if (modal) {
             modal.remove();
             document.body.style.overflow = '';
-            console.log('✅ 편집 모달 닫기 완료');
         }
     }
 
@@ -1234,15 +1210,12 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
 
     // 프로필 이미지 모달 안전한 열기 함수
     function openProfileImageModal(imageSrc, userName) {
-        console.log('🖼️ 프로필 이미지 모달 열기 시도:', imageSrc, userName);
         
         if (typeof window.profileModal !== 'undefined' && window.profileModal.show) {
             // ProfileImageModal이 정상 로드된 경우
-            console.log('✅ ProfileImageModal 사용');
             window.profileModal.show(imageSrc, userName, true);
         } else {
             // ProfileImageModal이 로드되지 않은 경우 fallback
-            console.log('⚠️ ProfileImageModal 없음, fallback 모달 생성');
             createFallbackProfileModal(imageSrc, userName);
         }
     }
@@ -1266,7 +1239,7 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 <div class="modal-body">
                     <img src="${imageSrc}" alt="${userName}님의 프로필 이미지" 
                          onerror="this.src='/assets/uploads/default-avatar.png'"
-                         onload="console.log('✅ 완전 CSS 클래스 기반 이미지 로드 완료')">
+                         onload="">
                 </div>
             </div>
         </div>
@@ -1298,7 +1271,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         // 스크롤 방지
         document.body.style.overflow = 'hidden';
         
-        console.log('✅ 정상 스타일 Fallback 프로필 모달 생성 완료');
     }
 
     // Fallback 모달 닫기
@@ -1323,7 +1295,6 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
 
     // 사용자 프로필 페이지로 이동
     function viewUserProfile(userId) {
-        console.log('👤 사용자 프로필 페이지로 이동:', userId);
         
         // 프로필 페이지 URL 생성
         const profileUrl = `/profile/${userId}`;

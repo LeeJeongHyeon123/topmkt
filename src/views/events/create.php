@@ -80,7 +80,6 @@ function loadNaverMapsAPI() {
 
 // 네이버 Maps API를 통한 정확한 좌표 설정 (강의 등록과 동일)
 window.getCoordinates = function(address) {
-    console.log('네이버 API로 주소 좌표 계산 시작:', address);
     
     if (!address) {
         document.getElementById('venue_latitude').value = '';
@@ -112,11 +111,6 @@ window.getCoordinates = function(address) {
                         addressField.style.borderColor = '#22c55e';
                     }
                     
-                    console.log('네이버 API 좌표 설정 완료:', {
-                        address: address,
-                        latitude: lat,
-                        longitude: lng
-                    });
                     
                     updateCoordinateStatus('✅ 주소 위치가 정상적으로 설정되었습니다', true);
                     return;
@@ -124,7 +118,6 @@ window.getCoordinates = function(address) {
             }
             
             // API 실패 시 fallback 좌표 시스템
-            console.error('네이버 Geocoding API 실패, fallback 좌표 적용');
             Toast.info('정확한 좌표를 가져올 수 없어 근사 좌표를 사용합니다.');
             
             // 지역별 근사 좌표 fallback 시스템
@@ -133,12 +126,6 @@ window.getCoordinates = function(address) {
                 document.getElementById('venue_latitude').value = regionCoordinates.lat;
                 document.getElementById('venue_longitude').value = regionCoordinates.lng;
                 
-                console.log('Fallback 좌표 적용:', {
-                    address: address,
-                    region: regionCoordinates.region,
-                    latitude: regionCoordinates.lat,
-                    longitude: regionCoordinates.lng
-                });
                 
                 // 성공 시각적 피드백
                 const addressField = document.getElementById('venue_address');
@@ -166,7 +153,6 @@ window.getCoordinates = function(address) {
         });
     } else {
         // 네이버 Maps API가 로드되지 않은 경우
-        console.error('네이버 Maps API가 로드되지 않았습니다');
         updateCoordinateStatus('❌ 지도 API 로드 실패', false);
         Toast.error('지도 서비스를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
     }
@@ -184,9 +170,7 @@ function updateCoordinateStatus(status, isSuccess = false) {
 // 페이지 로드 후 네이버 지도 API 로딩
 document.addEventListener('DOMContentLoaded', function() {
     loadNaverMapsAPI().then(() => {
-        console.log('네이버 Maps API 로딩 완료');
     }).catch(error => {
-        console.error('네이버 Maps API 로딩 실패:', error);
         Toast.warning('지도 기능을 불러올 수 없습니다.\n주소 검색은 정상 작동합니다.');
         updateCoordinateStatus('❌ 지도 API 로딩 실패', false);
     });

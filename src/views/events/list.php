@@ -317,7 +317,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // 768px에서 강제 오버플로우 수정 (Ultra 강화 버전)
 if (window.innerWidth <= 768) {
     function forceNoOverflow() {
-        console.log('🔧 오버플로우 강제 수정 시작');
         let fixCount = 0;
 
         // 모든 요소 검사
@@ -335,7 +334,6 @@ if (window.innerWidth <= 768) {
                     el.style.setProperty('min-width', 'auto', 'important');
                 }
 
-                console.log('❌ 오버플로우 수정:', el.tagName, el.className, 'right:', rect.right);
                 fixCount++;
             }
         });
@@ -346,7 +344,6 @@ if (window.innerWidth <= 768) {
         document.body.style.setProperty('max-width', '100vw', 'important');
         document.body.style.setProperty('overflow-x', 'hidden', 'important');
 
-        console.log(`✅ 오버플로우 수정 완료: ${fixCount}개 요소 수정`);
     }
 
     // 페이지 로드 후 여러 번 실행 (더 자주)
@@ -1163,11 +1160,9 @@ if (window.innerWidth <= 768) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎉 행사 일정 목록 페이지 로드 완료');
 
     // JavaScript 임시 제거 - CSS로 근본 해결 필요
-    console.log('📊 이번 달 행사 수:', <?= count($events ?? []) ?>);
-    console.log('📄 현재 뷰:', '<?= $view ?>');
+
 
     // 🚨 FORCE CENTER ALIGNMENT - JavaScript 강제 적용
     const monthNavigation = document.querySelector('.month-navigation');
@@ -1176,7 +1171,6 @@ document.addEventListener('DOMContentLoaded', function() {
         monthNavigation.style.setProperty('display', 'flex', 'important');
         monthNavigation.style.setProperty('align-items', 'center', 'important');
         monthNavigation.style.setProperty('gap', '20px', 'important');
-        console.log('🔧 월 네비게이션 강제 중앙정렬 적용 완료');
     }
 
     // 행사 일정 관련 전역 객체 정의
@@ -1231,22 +1225,19 @@ if (window.innerWidth <= 768) {
     function preventOverflowOnly() {
         // JavaScript에서는 오버플로우 방지만 처리하고 정렬은 CSS에 맡김
         document.body.style.overflowX = 'hidden';
-        console.log('✅ 오버플로우 방지만 적용 (정렬은 CSS가 담당)');
+
     }
 
     // 오버플로우 방지만 적용 (정렬은 CSS가 처리)
     preventOverflowOnly();
 
-    console.log('📱 768px 오버플로우 방지 적용');
 }
 
 // 🎯 event-card 경계선 강제 추가 - 즉시 적용
 function addEventCardBorders() {
-    console.log('🔧 event-card 경계선 강제 추가 시작');
 
     // 모든 event-card 찾아서 경계선 추가
     const eventCards = document.querySelectorAll('.event-card');
-    console.log('발견된 event-card 개수:', eventCards.length);
 
     eventCards.forEach((card, index) => {
         // 강력한 경계선 스타일 적용 + 우측 라인 보호
@@ -1260,10 +1251,8 @@ function addEventCardBorders() {
 
         // 호버 효과 제거 - 사용자 요청
 
-        console.log(`✅ event-card ${index + 1} 경계선 및 우측 라인 보호 완료`);
     });
 
-    console.log('🎨 모든 event-card 경계선 적용 완료');
 }
 
 // DOM 로드 완료 후 즉시 실행

@@ -39,14 +39,6 @@
     <?php require_once SRC_PATH . '/views/includes/utils.js.php'; ?>
 
     <script>
-    console.log('✅ [Admin Layout HEAD] 모든 컴포넌트 로드 완료:', {
-        Toast: typeof window.Toast,
-        Loading: typeof window.Loading,
-        ApiClient: typeof window.ApiClient,
-        DateUtils: typeof window.DateUtils,
-        formatNumber: typeof window.formatNumber,
-        formatPhone: typeof window.formatPhone
-    });
     </script>
 </head>
 <body class="admin-page">
@@ -92,12 +84,9 @@
     <!-- 페이지별 추가 스크립트 (필수 컴포넌트는 HEAD에서 이미 로드됨) -->
     <?php if (isset($additional_scripts)): ?>
         <script>
-        console.log('📄 [Admin Layout BODY] 페이지 스크립트 로드 시작...');
-        console.log('🔍 [Admin Layout BODY] ApiClient 사용 가능 여부:', typeof window.ApiClient);
         </script>
         <?= $additional_scripts ?>
         <script>
-        console.log('✅ [Admin Layout BODY] 페이지 스크립트 로드 완료');
         </script>
     <?php endif; ?>
 </body>

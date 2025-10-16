@@ -1,0 +1,148 @@
+/* 🚀 탑마케팅 로딩 UI - 심플 버전 */
+
+/* 로딩 오버레이 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6); /* 투명한 어두운 배경 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+    backdrop-filter: blur(5px);
+}
+
+.loading-overlay.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* 메인 로딩 컨테이너 */
+.loading-container {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    max-width: 400px;
+    width: 90%;
+}
+
+/* 로딩 아이콘 */
+.loading-icon {
+    position: relative;
+    margin-bottom: 30px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rocket-main {
+    font-size: 3rem;
+    color: #3b82f6;
+    display: inline-block;
+    animation: gentleFloat 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
+    position: relative;
+    z-index: 2;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 3px solid rgba(59, 130, 246, 0.1);
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* 부드러운 떠다니는 애니메이션 */
+@keyframes gentleFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* 회전 애니메이션 */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 로딩 메시지 */
+.loading-stage {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 진행률 바 */
+.progress-container {
+    width: 100%;
+    max-width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .loading-container {
+        max-width: 90%;
+    }
+    
+    .rocket-main {
+        font-size: 2.5rem;
+    }
+    
+    .loading-spinner {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .loading-stage {
+        font-size: 0.9rem;
+    }
+}
+
+/* 로딩 단계 표시 */
+.loading-stage {
+    color: #ffffff;
+    font-size: 0.9rem;
+    margin-top: 15px;
+    opacity: 1;
+    animation: stageFade 1s ease-in-out infinite alternate;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+

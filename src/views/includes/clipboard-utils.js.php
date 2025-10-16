@@ -69,17 +69,15 @@
                     if (!config.noToast && window.Toast) {
                         Toast.success(config.successMessage);
                     }
-                    console.log('📋 클립보드 복사 성공 (Clipboard API):', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+
                 })
                 .catch((err) => {
-                    console.error('❌ Clipboard API 복사 실패, 폴백 시도:', err);
                     // Clipboard API 실패 시 폴백으로 시도
                     return fallbackCopy(text, config);
                 });
         }
 
         // 구형 브라우저: 폴백 메서드 사용
-        console.warn('⚠️ Clipboard API 미지원, 폴백 메서드 사용');
         return fallbackCopy(text, config);
     };
 
@@ -138,7 +136,7 @@
                     if (!config.noToast && window.Toast) {
                         Toast.success(config.successMessage);
                     }
-                    console.log('📋 클립보드 복사 성공 (폴백 메서드):', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+
                     resolve();
                 } else {
                     throw new Error('execCommand 복사 실패');
@@ -148,7 +146,6 @@
                 if (!config.noToast && window.Toast) {
                     Toast.error(config.errorMessage);
                 }
-                console.error('❌ 폴백 복사 실패:', err);
                 reject(err);
             }
         });
@@ -172,11 +169,10 @@
         if (navigator.clipboard && navigator.clipboard.readText) {
             return navigator.clipboard.readText()
                 .then((text) => {
-                    console.log('📋 클립보드 읽기 성공:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+
                     return text;
                 })
                 .catch((err) => {
-                    console.error('❌ 클립보드 읽기 실패:', err);
                     if (window.Toast) {
                         Toast.error('클립보드 읽기 권한이 필요합니다');
                     }
@@ -184,7 +180,6 @@
                 });
         } else {
             const error = new Error('Clipboard API 미지원 (읽기 불가)');
-            console.error('❌ Clipboard API 미지원');
             if (window.Toast) {
                 Toast.error('이 브라우저는 클립보드 읽기를 지원하지 않습니다');
             }
@@ -199,6 +194,6 @@
         isSupported: window.isClipboardSupported
     };
 
-    console.log('✅ ClipboardUtils 로드 완료 (v3.65.0)');
+
 })();
 </script>

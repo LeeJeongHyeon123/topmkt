@@ -573,18 +573,15 @@ body {
 document.addEventListener('DOMContentLoaded', function() {
     const loadStartTime = performance.now();
     
-    console.log('📋 커뮤니티 게시판 로드 완료');
-    console.log('📊 게시글 수:', <?= count($posts ?? []) ?>);
-    console.log('📄 현재 페이지:', <?= isset($currentPage) ? $currentPage : 1 ?>);
-    console.log('📄 총 페이지:', <?= isset($totalPages) ? $totalPages : 1 ?>);
+
+
+
     <?php if (!empty($search)): ?>
-    console.log('🔍 검색어:', '<?= addslashes($search) ?>');
-    console.log('⚡ 검색 시간:', '<?= $searchTime ?>ms');
+
     <?php endif; ?>
     
     const loadEndTime = performance.now();
     const loadTime = Math.round(loadEndTime - loadStartTime);
-    console.log(`⚡ 페이지 렌더링 완료: ${loadTime}ms`);
     
     // 검색 폼 향상된 기능
     const searchInput = document.querySelector('#searchInput');
@@ -679,7 +676,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     searchBtn.style.transform = 'none';
                 }
                 
-                console.log('🔍 검색 완료: 입력 필드 상태 정상화');
             }
         }, 1000);
         <?php endif; ?>
@@ -723,19 +719,12 @@ document.addEventListener('DOMContentLoaded', function() {
     requiredElements.forEach(selector => {
         const elements = document.querySelectorAll(selector);
         if (elements.length === 0) {
-            console.log(`🚀 요소 없음: ${selector} (정상 - 빈 게시판일 수 있음)`);
         }
     });
     
     // 전역 오류 핸들러 (커뮤니티 페이지 전용)
     window.addEventListener('error', function(event) {
         if (event.filename && event.filename.includes('community')) {
-            console.warn('🚀 커뮤니티 페이지 JavaScript 오류 감지:', {
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno
-            });
             
             // 사용자에게는 오류를 표시하지 않고 조용히 처리
             event.preventDefault();

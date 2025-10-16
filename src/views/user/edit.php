@@ -976,7 +976,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 20개 초과 시 초과분 제거
         if (currentImages > 20) {
-            console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
             const images = quill.container.querySelectorAll('img');
             for (let i = 20; i < images.length; i++) {
                 images[i].remove();
@@ -1037,7 +1036,6 @@ document.addEventListener('DOMContentLoaded', function() {
         imageCounter.className = `char-counter ${counterClass}`;
         imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
         
-        console.log(`📊 이미지 카운터 업데이트: ${currentImages}/${maxImages}`);
     }
     
     updateBioCounter();
@@ -1114,15 +1112,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         
         // 크롭된 이미지가 있으면 FormData에 추가
-        console.log('🔍 croppedImageBlob 상태 확인:', croppedImageBlob);
-        console.log('🔍 window.croppedImageBlob 상태 확인:', window.croppedImageBlob);
         
         const imageBlob = croppedImageBlob || window.croppedImageBlob;
         if (imageBlob) {
-            console.log('📎 크롭된 이미지를 FormData에 추가:', imageBlob);
             formData.append('profile_image', imageBlob, 'profile_image.jpg');
         } else {
-            console.log('❌ 크롭된 이미지 없음');
         }
         
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
@@ -1131,7 +1125,6 @@ document.addEventListener('DOMContentLoaded', function() {
             noLoading: true
         })
         .then(data => {
-            console.log('📋 서버 응답 데이터:', data);
             if (data.error) {
                 Toast.error(data.error);
             } else {
@@ -1144,7 +1137,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             Toast.error('프로필 업데이트 중 오류가 발생했습니다.');
         })
         .finally(() => {
@@ -1156,13 +1148,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 프로필 이미지 업로드
     function uploadProfileImage(blob) {
-        console.log('🔄 이미지 업로드 함수 호출됨', blob);
         
         const imageFormData = new FormData();
         imageFormData.append('profile_image', blob, 'profile_image.jpg');
         imageFormData.append('csrf_token', form.csrf_token.value);
         
-        console.log('📤 서버로 이미지 전송 시작');
 
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
         ApiClient.post('/profile/upload-image', imageFormData, {
@@ -1170,7 +1160,6 @@ document.addEventListener('DOMContentLoaded', function() {
             noLoading: true
         })
         .then(data => {
-            console.log('📋 서버 응답 데이터:', data);
             if (data.error) {
                 Toast.error('이미지 업로드 실패: ' + data.error);
             } else {
@@ -1183,12 +1172,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('❌ Image upload error:', error);
             Toast.error('이미지 업로드 중 오류가 발생했습니다.');
         });
     }
     
-    console.log('🔧 프로필 편집 페이지 로드 완료');
 });
 
 // 이미지 크롭 모달 관련 함수들
@@ -1253,11 +1240,8 @@ function applyCrop() {
     
     // 캔버스를 Blob으로 변환
     canvas.toBlob(function(blob) {
-        console.log('✂️ 이미지 크롭 완료, Blob 생성됨:', blob);
         croppedImageBlob = blob;
         window.croppedImageBlob = blob; // window 객체에도 저장
-        console.log('💾 전역 변수에 저장됨:', croppedImageBlob);
-        console.log('💾 window 객체에도 저장됨:', window.croppedImageBlob);
         
         // 미리보기 업데이트
         const imagePreview = document.getElementById('image-preview');
@@ -1299,7 +1283,6 @@ if (window.getImageAcceptAttribute) {
     const profileImageInput = document.getElementById('profile-image');
     if (profileImageInput) {
         profileImageInput.accept = window.getImageAcceptAttribute();
-        console.log('✅ 프로필 이미지 input accept 속성 동적 설정 완료:', profileImageInput.accept);
     }
 }
 
@@ -1327,7 +1310,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.showPicker();
                 } catch (error) {
                     // showPicker가 실패할 경우 기본 동작
-                    console.log('showPicker failed, using default behavior');
                 }
             }
         });
@@ -1341,7 +1323,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         this.showPicker();
                     }, 50);
                 } catch (error) {
-                    console.log('showPicker on focus failed');
                 }
             }
         });
@@ -1357,7 +1338,6 @@ async function openDatePicker() {
             try {
                 dateInput.showPicker();
             } catch (error) {
-                console.log('openDatePicker failed, using focus');
             }
         }
     }
@@ -1496,7 +1476,7 @@ async function confirmDeleteAccount() {
         csrf_token: '<?php echo $_SESSION['csrf_token']; ?>'
     }, { noLoading: true })
     .then(data => {
-        console.log('서버 응답:', data); // 디버깅용
+ // 디버깅용
 
         // ResponseHelper 응답 구조에 맞게 수정
         const result = data.data || data;
@@ -1519,7 +1499,6 @@ async function confirmDeleteAccount() {
         }
     })
     .catch(error => {
-        console.error('회원탈퇴 오류:', error);
         Toast.error('회원탈퇴 처리 중 오류가 발생했습니다.');
         Loading.button(deleteBtn, false);
     });
