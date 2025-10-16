@@ -571,6 +571,25 @@
                             order: 1 !important;
                             flex: 0 0 auto !important;
                             position: relative !important;
+                            transform: none !important;
+                            left: auto !important;
+                            right: auto !important;
+                            margin-left: 0 !important;
+                            margin-right: auto !important;
+                        }
+
+                        /* 최상위 우선순위로 모바일에서도 로고 위치 보호 */
+                        html body .header-left,
+                        html body header .header-left,
+                        html body .header-content .header-left {
+                            flex: 0 0 auto !important;
+                            order: 1 !important;
+                            position: relative !important;
+                            transform: none !important;
+                            left: auto !important;
+                            right: auto !important;
+                            margin-left: 0 !important;
+                            margin-right: auto !important;
                         }
                     }
 
@@ -1372,15 +1391,28 @@
         z-index: 9997 !important; /* 로고 영역 전체에 높은 z-index 적용 */
         order: 1 !important; /* 항상 첫 번째 순서로 유지 */
         min-width: 0 !important; /* flex-shrink 방지 */
+        transform: none !important; /* 변환 방지 */
+        left: auto !important; /* 위치 고정 */
+        right: auto !important; /* 위치 고정 */
+        margin-left: 0 !important; /* 마진 초기화 */
+        margin-right: auto !important; /* 마진 초기화 */
     }
 
-    /* 로고 위치 강제 보호 - JavaScript 변경 방지 */
+    /* 최상위 우선순위로 로고 위치 강제 보호 - JavaScript 변경 방지 */
+    html body .header-left,
+    html body header .header-left,
+    html body .header-content .header-left,
     .header-left,
     header .header-left,
     .header-content .header-left {
         flex: 0 0 auto !important;
         order: 1 !important;
         position: relative !important;
+        transform: none !important;
+        left: auto !important;
+        right: auto !important;
+        margin-left: 0 !important;
+        margin-right: auto !important;
     }
     
     .main-nav {
@@ -1739,9 +1771,23 @@
 
                     // 로고 위치 강제 보호 (JavaScript 변경 방지)
                     if (headerLeft) {
-                        headerLeft.style.setProperty('flex', '0 0 auto', 'important');
-                        headerLeft.style.setProperty('order', '1', 'important');
-                        headerLeft.style.setProperty('position', 'relative', 'important');
+                        // 모든 가능한 스타일 속성 강제 설정
+                        const logoStyles = {
+                            'flex': '0 0 auto',
+                            'order': '1',
+                            'position': 'relative',
+                            'transform': 'none',
+                            'left': 'auto',
+                            'right': 'auto',
+                            'margin-left': '0',
+                            'margin-right': 'auto'
+                        };
+
+                        Object.entries(logoStyles).forEach(([property, value]) => {
+                            headerLeft.style.setProperty(property, value, 'important');
+                        });
+
+                        console.log('🔒 로고 위치 보호 적용 완료');
                     }
 
                     // 햄버거 메뉴 강제 표시
@@ -2097,5 +2143,99 @@
             }
         });
         }, { once: true }); // 🚀 v3.64.0: DOMContentLoaded 중복 실행 방지
+
+        // 🚀 헤더 로고 위치 지속적 보호 시스템 (강화 버전)
+        (function() {
+            'use strict';
+
+            let logoProtectionInterval;
+            const originalFlex = '0 0 auto';
+            const originalOrder = '1';
+
+            function checkAndFixLogoPosition() {
+                const headerLeft = document.querySelector('.header-left');
+                if (!headerLeft) return;
+
+                const currentFlex = window.getComputedStyle(headerLeft).flex;
+                const currentOrder = window.getComputedStyle(headerLeft).order;
+
+                // 위치가 변경되었는지 확인
+                if (currentFlex !== originalFlex || currentOrder !== originalOrder) {
+                    console.log('🔧 로고 위치 변경 감지 - 복구 실행');
+
+                    // 모든 가능한 스타일 속성 강제 복구
+                    const logoStyles = {
+                        'flex': '0 0 auto',
+                        'order': '1',
+                        'position': 'relative',
+                        'transform': 'none',
+                        'left': 'auto',
+                        'right': 'auto',
+                        'margin-left': '0',
+                        'margin-right': 'auto'
+                    };
+
+                    Object.entries(logoStyles).forEach(([property, value]) => {
+                        headerLeft.style.setProperty(property, value, 'important');
+                    });
+
+                    // 헤더 컨테이너도 보호
+                    const headerContent = document.querySelector('.header-content');
+                    if (headerContent) {
+                        headerContent.style.setProperty('display', 'flex', 'important');
+                        headerContent.style.setProperty('justify-content', 'space-between', 'important');
+                        headerContent.style.setProperty('align-items', 'center', 'important');
+                        headerContent.style.setProperty('width', '100%', 'important');
+                    }
+                }
+            }
+
+            function startLogoProtection() {
+                console.log('🛡️ 로고 위치 보호 시스템 시작');
+
+                // 100ms마다 위치 확인 및 복구
+                logoProtectionInterval = setInterval(checkAndFixLogoPosition, 100);
+
+                // 30초 후 자동 중단 (성능 최적화)
+                setTimeout(() => {
+                    if (logoProtectionInterval) {
+                        clearInterval(logoProtectionInterval);
+                        console.log('✅ 로고 위치 보호 시스템 종료');
+                    }
+                }, 30000);
+            }
+
+            // 즉시 시작
+            startLogoProtection();
+
+            // DOM 변경 이벤트 감지 (강화 버전)
+            if (window.MutationObserver) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                            // 스타일 변경 감지 시 즉시 확인
+                            setTimeout(checkAndFixLogoPosition, 10);
+                        }
+                    });
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
+
+                console.log('🔍 DOM 변경 감지 시스템 활성화');
+            }
+
+            // 페이지 완전 로드 후 최종 확인
+            window.addEventListener('load', () => {
+                setTimeout(checkAndFixLogoPosition, 100);
+                console.log('✅ 페이지 로드 완료 - 로고 위치 최종 확인');
+            });
+
+        })(); // 즉시 실행
+
     } // 🚀 v3.64.0: headerMobileMenuInitialized 플래그 종료
     </script> 
