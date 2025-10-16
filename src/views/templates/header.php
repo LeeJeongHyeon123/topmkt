@@ -1068,6 +1068,10 @@
                         <i class="fas fa-envelope"></i>
                         <span>채팅</span>
                     </a>
+                    <a href="/notifications/settings" class="dropdown-item">
+                        <i class="fas fa-bell"></i>
+                        <span>알림 설정</span>
+                    </a>
                     <?php
                     // 기업 회원만 신청 관리 메뉴 표시 (자신의 강의/행사 신청 관리용)
                     try {
@@ -2155,6 +2159,10 @@
                     <i class="fas fa-envelope"></i>
                     <span>채팅</span>
                     ${badgeHtml}
+                </a>
+                <a href="/notifications/settings" class="dropdown-item">
+                    <i class="fas fa-bell"></i>
+                    <span>알림 설정</span>
                 </a>
                 <?php
                 // 기업 회원만 신청 관리 메뉴 표시 (모바일 메뉴용, 자신의 강의/행사 신청 관리용)
