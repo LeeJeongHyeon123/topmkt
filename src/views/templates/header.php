@@ -563,6 +563,17 @@
                         flex: 0 0 auto !important; /* 로고가 좌측에 고정되도록 설정 */
                     }
 
+                    /* 모든 미디어 쿼리에서 로고 위치 강제 보호 */
+                    @media (max-width: 900px) {
+                        .header-left,
+                        header .header-left,
+                        .header-content .header-left {
+                            order: 1 !important;
+                            flex: 0 0 auto !important;
+                            position: relative !important;
+                        }
+                    }
+
                     /* 812×858 사이즈 타겟 특별 처리 */
                     @media (width: 812px) and (height: 858px) {
                         .main-nav, .user-menu, .nav-auth {
@@ -1356,9 +1367,20 @@
     }
     
     .header-left {
-        flex: 0 0 auto;
-        position: relative;
+        flex: 0 0 auto !important;
+        position: relative !important;
         z-index: 9997 !important; /* 로고 영역 전체에 높은 z-index 적용 */
+        order: 1 !important; /* 항상 첫 번째 순서로 유지 */
+        min-width: 0 !important; /* flex-shrink 방지 */
+    }
+
+    /* 로고 위치 강제 보호 - JavaScript 변경 방지 */
+    .header-left,
+    header .header-left,
+    .header-content .header-left {
+        flex: 0 0 auto !important;
+        order: 1 !important;
+        position: relative !important;
     }
     
     .main-nav {
@@ -1706,11 +1728,20 @@
 
                     // 헤더 레이아웃 보호를 위한 추가 규칙 적용
                     const headerContent = document.querySelector('.header-content');
+                    const headerLeft = document.querySelector('.header-left');
+
                     if (headerContent) {
                         headerContent.style.setProperty('display', 'flex', 'important');
                         headerContent.style.setProperty('justify-content', 'space-between', 'important');
                         headerContent.style.setProperty('align-items', 'center', 'important');
                         headerContent.style.setProperty('width', '100%', 'important');
+                    }
+
+                    // 로고 위치 강제 보호 (JavaScript 변경 방지)
+                    if (headerLeft) {
+                        headerLeft.style.setProperty('flex', '0 0 auto', 'important');
+                        headerLeft.style.setProperty('order', '1', 'important');
+                        headerLeft.style.setProperty('position', 'relative', 'important');
                     }
 
                     // 햄버거 메뉴 강제 표시
