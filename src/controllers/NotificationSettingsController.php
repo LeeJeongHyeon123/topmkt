@@ -31,7 +31,7 @@ class NotificationSettingsController extends BaseController
             return;
         }
 
-        $userId = AuthMiddleware::getUserId();
+        $userId = AuthMiddleware::getCurrentUserId();
 
         // 사용자 정보 조회
         require_once SRC_PATH . '/models/User.php';
@@ -64,7 +64,7 @@ class NotificationSettingsController extends BaseController
                 return $this->error('로그인이 필요합니다.', 401);
             }
 
-            $userId = AuthMiddleware::getUserId();
+            $userId = AuthMiddleware::getCurrentUserId();
 
             // 알림 설정 조회
             $settings = $this->notificationSettings->getSettings($userId);
@@ -93,7 +93,7 @@ class NotificationSettingsController extends BaseController
                 return $this->error('로그인이 필요합니다.', 401);
             }
 
-            $userId = AuthMiddleware::getUserId();
+            $userId = AuthMiddleware::getCurrentUserId();
 
             // 요청 데이터 파싱
             $input = json_decode(file_get_contents('php://input'), true);
@@ -160,7 +160,7 @@ class NotificationSettingsController extends BaseController
                 return $this->error('로그인이 필요합니다.', 401);
             }
 
-            $userId = AuthMiddleware::getUserId();
+            $userId = AuthMiddleware::getCurrentUserId();
 
             // 요청 데이터 파싱
             $input = json_decode(file_get_contents('php://input'), true);
@@ -205,7 +205,7 @@ class NotificationSettingsController extends BaseController
     public function checkNotification($type, $targetUserId = null)
     {
         try {
-            $userId = $targetUserId ?? AuthMiddleware::getUserId();
+            $userId = $targetUserId ?? AuthMiddleware::getCurrentUserId();
 
             if (!$userId) {
                 return $this->error('사용자 ID가 필요합니다.', 400);

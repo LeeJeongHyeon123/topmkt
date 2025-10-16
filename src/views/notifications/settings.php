@@ -18,6 +18,7 @@
     color: white;
     padding: 40px 30px;
     border-radius: 16px;
+    margin-top: 60px;
     margin-bottom: 30px;
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
@@ -283,6 +284,10 @@
 }
 
 @media (max-width: 480px) {
+    .notification-settings-container {
+        padding: 12px;
+    }
+
     .notification-settings-header h1 {
         font-size: 22px;
     }
@@ -470,18 +475,57 @@
 // CSRF 토큰 가져오기
 const csrfToken = '<?php echo $_SESSION['csrf_token'] ?? ''; ?>';
 
-// 초기화
-document.addEventListener('DOMContentLoaded', async () => {
+/**
+ * 컴포넌트 로드 대기 함수 (개선 버전)
+ */
+function waitForComponents() {
+    return new Promise((resolve) => {
+        let attempts = 0;
+        const maxAttempts = 100; // 5초 최대 대기 (50ms * 100)
+
+        const checkComponents = () => {
+            attempts++;
+
+            if (typeof window.Loading !== 'undefined' &&
+                typeof window.Toast !== 'undefined' &&
+                typeof window.ApiClient !== 'undefined') {
+                resolve(true);
+            } else if (attempts >= maxAttempts) {
+                console.error('컴포넌트 로드 타임아웃');
+                resolve(false);
+            } else {
+                setTimeout(checkComponents, 50);
+            }
+        };
+        checkComponents();
+    });
+}
+
+// 초기화 - window.onload 사용 (모든 리소스 로드 완료 후)
+window.addEventListener('load', async () => {
+    // 컴포넌트 로드 대기
+    const componentsReady = await waitForComponents();
+
+    if (!componentsReady) {
+        console.error('필수 컴포넌트를 로드할 수 없습니다.');
+        alert('페이지 로딩 중 오류가 발생했습니다. 페이지를 새로고침해주세요.');
+        return;
+    }
+
     // 현재 설정 로드
     await loadSettings();
 
     // 전체 알림 토글 이벤트
     const allNotificationsToggle = document.getElementById('allNotifications');
-    allNotificationsToggle.addEventListener('change', handleMasterToggle);
+    if (allNotificationsToggle) {
+        allNotificationsToggle.addEventListener('change', handleMasterToggle);
+    }
 
     // 폼 제출 이벤트
     const form = document.getElementById('notificationSettingsForm');
-    form.addEventListener('submit', handleSubmit);
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
+    }
 });
 
 /**
@@ -489,27 +533,53 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadSettings() {
     try {
-        Loading.show('설정을 불러오는 중...');
+        // Loading 컴포넌트가 있을 때만 사용
+        if (typeof window.Loading !== 'undefined' && window.Loading.show) {
+            window.Loading.show('설정을 불러오는 중...');
+        }
 
-        const response = await ApiClient.get('/api/notifications/settings');
+        const response = await window.ApiClient.get('/api/notifications/settings');
 
         if (response.success && response.data) {
             // 폼에 값 채우기
-            document.getElementById('allNotifications').checked = Boolean(response.data.all_notifications);
-            document.getElementById('commentsEnabled').checked = Boolean(response.data.comments_enabled);
-            document.getElementById('likesEnabled').checked = Boolean(response.data.likes_enabled);
-            document.getElementById('lecturesEventsEnabled').checked = Boolean(response.data.lectures_events_enabled);
-            document.getElementById('registrationEnabled').checked = Boolean(response.data.registration_enabled);
-            document.getElementById('noticesEnabled').checked = Boolean(response.data.notices_enabled);
+            const allNotifications = document.getElementById('allNotifications');
+            const commentsEnabled = document.getElementById('commentsEnabled');
+            const likesEnabled = document.getElementById('likesEnabled');
+            const lecturesEventsEnabled = document.getElementById('lecturesEventsEnabled');
+            const registrationEnabled = document.getElementById('registrationEnabled');
+            const noticesEnabled = document.getElementById('noticesEnabled');
+
+            if (allNotifications) allNotifications.checked = Boolean(response.data.all_notifications);
+            if (commentsEnabled) commentsEnabled.checked = Boolean(response.data.comments_enabled);
+            if (likesEnabled) likesEnabled.checked = Boolean(response.data.likes_enabled);
+            if (lecturesEventsEnabled) lecturesEventsEnabled.checked = Boolean(response.data.lectures_events_enabled);
+            if (registrationEnabled) registrationEnabled.checked = Boolean(response.data.registration_enabled);
+            if (noticesEnabled) noticesEnabled.checked = Boolean(response.data.notices_enabled);
 
             // 전체 알림이 꺼져 있으면 개별 토글 비활성화
-            handleMasterToggle({ target: document.getElementById('allNotifications') });
+            if (allNotifications) {
+                handleMasterToggle({ target: allNotifications });
+            }
         }
 
-        Loading.hide();
+        // Loading 컴포넌트가 있을 때만 사용
+        if (typeof window.Loading !== 'undefined' && window.Loading.hide) {
+            window.Loading.hide();
+        }
     } catch (error) {
-        Loading.hide();
-        Toast.error('설정을 불러오는데 실패했습니다.');
+        console.error('설정 로드 오류:', error);
+
+        // Loading 컴포넌트가 있을 때만 사용
+        if (typeof window.Loading !== 'undefined' && window.Loading.hide) {
+            window.Loading.hide();
+        }
+
+        // Toast 컴포넌트가 있을 때만 사용
+        if (typeof window.Toast !== 'undefined' && window.Toast.error) {
+            window.Toast.error('설정을 불러오는데 실패했습니다.');
+        } else {
+            alert('설정을 불러오는데 실패했습니다.');
+        }
     }
 }
 
@@ -530,7 +600,15 @@ function handleMasterToggle(event) {
 
     individualToggles.forEach(id => {
         const toggle = document.getElementById(id);
-        toggle.disabled = !isEnabled;
+
+        if (isEnabled) {
+            // 전체 알림 ON: 모든 개별 알림도 ON + 활성화
+            toggle.checked = true;
+            toggle.disabled = false;
+        } else {
+            // 전체 알림 OFF: 개별 알림은 비활성화만 (checked 값 유지)
+            toggle.disabled = true;
+        }
 
         // 시각적 피드백
         const item = toggle.closest('.notification-item');
@@ -549,7 +627,10 @@ async function handleSubmit(event) {
     event.preventDefault();
 
     try {
-        Loading.show('저장 중...');
+        // Loading 컴포넌트가 있을 때만 사용
+        if (typeof window.Loading !== 'undefined' && window.Loading.show) {
+            window.Loading.show('저장 중...');
+        }
 
         // 폼 데이터 수집
         const formData = {
@@ -562,23 +643,47 @@ async function handleSubmit(event) {
             notices_enabled: document.getElementById('noticesEnabled').checked
         };
 
-        const response = await ApiClient.put('/api/notifications/settings', formData);
+        const response = await window.ApiClient.put('/api/notifications/settings', formData);
 
-        Loading.hide();
+        // Loading 컴포넌트가 있을 때만 사용
+        if (typeof window.Loading !== 'undefined' && window.Loading.hide) {
+            window.Loading.hide();
+        }
 
         if (response.success) {
-            Toast.success('알림 설정이 저장되었습니다.');
+            // Toast 컴포넌트가 있을 때만 사용
+            if (typeof window.Toast !== 'undefined' && window.Toast.success) {
+                window.Toast.success('알림 설정이 저장되었습니다.');
+            } else {
+                alert('알림 설정이 저장되었습니다.');
+            }
 
             // 1초 후 새로고침
             setTimeout(() => {
                 window.location.reload();
             }, 1000);
         } else {
-            Toast.error(response.message || '저장에 실패했습니다.');
+            // Toast 컴포넌트가 있을 때만 사용
+            if (typeof window.Toast !== 'undefined' && window.Toast.error) {
+                window.Toast.error(response.message || '저장에 실패했습니다.');
+            } else {
+                alert(response.message || '저장에 실패했습니다.');
+            }
         }
     } catch (error) {
-        Loading.hide();
-        Toast.error('저장 중 오류가 발생했습니다.');
+        console.error('설정 저장 오류:', error);
+
+        // Loading 컴포넌트가 있을 때만 사용
+        if (typeof window.Loading !== 'undefined' && window.Loading.hide) {
+            window.Loading.hide();
+        }
+
+        // Toast 컴포넌트가 있을 때만 사용
+        if (typeof window.Toast !== 'undefined' && window.Toast.error) {
+            window.Toast.error('저장 중 오류가 발생했습니다.');
+        } else {
+            alert('저장 중 오류가 발생했습니다.');
+        }
     }
 }
 </script>
