@@ -10,10 +10,9 @@ require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/models/User.php';
 
 class AuthController extends BaseController {
-    
+
     private $userModel;
-    private $db;
-    
+
     public function __construct() {
         parent::__construct(); // BaseController의 생성자 호출
 
