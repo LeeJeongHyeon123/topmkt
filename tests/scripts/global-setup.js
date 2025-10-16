@@ -48,3 +48,5 @@ module.exports = async (config) => {
 
   console.log('🎯 글로벌 셋업 완료');
 };
+
+

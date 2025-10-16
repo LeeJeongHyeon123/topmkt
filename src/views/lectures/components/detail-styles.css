@@ -1,12 +1,35 @@
 /* 강의 상세 페이지 스타일 */
 .lecture-detail-container {
-    max-width: 1600px;
+    max-width: 1650px; /* 사이드바 확장으로 인해 최대 너비 약간 증가 */
     margin: 0 auto;
     padding: 20px;
     min-height: calc(100vh - 200px);
     /* 헤더 겹침 방지: 고정 헤더 높이만큼 상단 여백 추가 */
     margin-top: 30px; /* 데스크톱: 헤더와 적절한 간격 유지 */
     padding-top: 20px;
+    overflow-x: hidden !important; /* 가로 스크롤 방지 - 최우선 */
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+
+/* 전역 텍스트 오버플로우 방지 - 최우선 규칙 */
+.lecture-detail-container * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.lecture-detail-container div,
+.lecture-detail-container span,
+.lecture-detail-container p,
+.lecture-detail-container h1,
+.lecture-detail-container h2,
+.lecture-detail-container h3,
+.lecture-detail-container h4,
+.lecture-detail-container h5,
+.lecture-detail-container h6 {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: normal !important;
 }
 
 .lecture-header {
@@ -76,3 +99,1758 @@
 }
 
 /* 버튼 위치 수정 v2.0 - 2025-09-19 */
+.lecture-banner .lecture-actions {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    display: flex !important;
+    gap: 6px !important;
+    z-index: 100 !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    padding: 4px !important;
+    border-radius: 6px !important;
+}
+
+.lecture-actions .btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    font-weight: 500 !important;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    min-height: auto;
+    line-height: 1.2;
+}
+
+.btn-primary {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #38a169;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-edit {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btn-edit:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+/* 강의 액션 버튼들 전용 스타일 */
+.lecture-actions .btn-edit {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #4a5568 !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+}
+
+.lecture-actions .btn-edit:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    transform: translateY(-1px);
+}
+
+.lecture-actions .btn-danger {
+    background: rgba(229, 62, 62, 0.9) !important;
+    color: white !important;
+    border: 1px solid rgba(229, 62, 62, 0.9) !important;
+}
+
+.lecture-actions .btn-danger:hover {
+    background: rgba(229, 62, 62, 1) !important;
+    transform: translateY(-1px);
+}
+
+.lecture-actions .btn-secondary {
+    background: rgba(160, 174, 192, 0.9) !important;
+    color: white !important;
+    border: 1px solid rgba(160, 174, 192, 0.9) !important;
+}
+
+.lecture-actions .btn-secondary:hover {
+    background: rgba(160, 174, 192, 1) !important;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #e53e3e;
+    color: white;
+    border: 1px solid #c53030;
+}
+
+.btn-success {
+    background: #48bb78;
+    color: white;
+    border: 1px solid #38a169;
+}
+
+.btn-warning {
+    background: #ed8936;
+    color: white;
+    border: 1px solid #dd6b20;
+}
+
+.btn-info {
+    background: #4299e1;
+    color: white;
+    border: 1px solid #3182ce;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+/* 신청 액션 컨테이너 */
+#registration-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#registration-actions .btn {
+    white-space: nowrap;
+    min-width: 140px;
+}
+
+/* 신청 모달 스타일 */
+.registration-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.registration-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.registration-modal-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+}
+
+.registration-modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.registration-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.registration-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.registration-modal-body {
+    padding: 28px;
+}
+
+.form-section {
+    margin-bottom: 24px;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.form-group .required::after {
+    content: ' *';
+    color: #e53e3e;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: white;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group input.error,
+.form-group textarea.error,
+.form-group select.error {
+    border-color: #e53e3e;
+    background-color: #fed7d7;
+}
+
+.error-message {
+    color: #e53e3e;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+}
+
+.error-message.general-error {
+    background: #fed7d7;
+    border: 1px solid #e53e3e;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.registration-modal-footer {
+    padding: 20px 28px 28px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid #e2e8f0;
+}
+
+.registration-modal-footer .btn {
+    min-width: 120px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.registration-modal-footer .btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.registration-modal-footer .btn-primary:hover:not(:disabled) {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.registration-modal-footer .btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.registration-modal-footer .btn-secondary:hover {
+    background: #cbd5e0;
+}
+
+.registration-modal-footer .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 글자 수 카운터 스타일 */
+.char-counter {
+    text-align: right;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 4px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.char-counter span {
+    font-weight: 600;
+}
+
+/* 텍스트에어리어 스타일 개선 */
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .registration-modal-content {
+        width: 95%;
+        margin: 20px auto;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .registration-modal-header {
+        padding: 20px 24px 16px;
+    }
+    
+    .registration-modal-body {
+        padding: 24px 20px;
+    }
+    
+    .registration-modal-footer {
+        padding: 16px 20px 24px;
+        flex-direction: column;
+    }
+    
+    .registration-modal-footer .btn {
+        width: 100%;
+    }
+}
+
+.btn-danger:hover {
+    background: #c53030;
+    border-color: #9c1e1e;
+    transform: translateY(-1px);
+}
+
+/* 콘텐츠 레이아웃 */
+.lecture-content {
+    display: grid;
+    grid-template-columns: 1fr 350px; /* 메인:1fr, 사이드바:350px 고정 너비 (확장) */
+    gap: 20px;
+    overflow-x: hidden; /* 그리드 내 가로 스크롤 방지 */
+    box-sizing: border-box;
+}
+
+/* 768px 이하에서 단일 컬럼 강제 적용 */
+@media (max-width: 768px) {
+    .lecture-detail-container .lecture-content {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .lecture-detail-container .lecture-sidebar {
+        order: 10 !important;
+    }
+    
+    .lecture-detail-container .lecture-main {
+        order: 1 !important;
+    }
+}
+
+.lecture-main {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    min-width: 0; /* 그리드 공간을 제대로 차지하도록 설정 */
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    overflow-x: hidden; /* 메인 컨텐츠 내 가로 스크롤 방지 */
+}
+
+.lecture-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    min-width: 0; /* 플렉스 아이템이 그리드 공간을 제대로 차지하도록 설정 */
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    overflow-x: hidden; /* 사이드바 카드 내 가로 스크롤 방지 */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #667eea;
+}
+
+/* 강의 정보 섹션 */
+.info-section {
+    margin-bottom: 30px;
+    overflow-wrap: break-word; /* 텍스트가 컨테이너를 벗어나는 것 방지 */
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.description-content {
+    color: #4a5568;
+    line-height: 1.7;
+    font-size: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word; /* 긴 단어가 컨테이너를 벗어나는 것 방지 */
+    hyphens: auto; /* 하이픈 연결 추가 */
+    max-width: 100%; /* 명시적 최대 너비 설정 */
+}
+
+/* 강사 정보 개선 */
+.instructors-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.instructor-card {
+    background: #f8fafc;
+    padding: 25px;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.instructor-card:hover {
+    background: #edf2f7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.instructor-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #667eea;
+    flex-shrink: 0;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    aspect-ratio: 1 / 1;
+    display: block;
+}
+
+.instructor-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+
+.instructor-avatar.clickable-image {
+    cursor: pointer;
+}
+
+.instructor-avatar.clickable-image:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.instructor-avatar.placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: 80px;
+    height: 80px;
+    /* 🚀 v3.64.0: 메모리 누수 방지 - JavaScript → CSS 호버 효과 */
+    transition: all 0.3s ease;
+}
+
+.instructor-avatar.placeholder:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+
+/* 강사 이미지 원형 유지 강화 */
+.instructor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+}
+
+.instructor-avatar.placeholder::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(45deg, #48bb78, #38a169);
+    border-radius: 50%;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.instructor-avatar.placeholder::before {
+    content: '👨‍🏫';
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 이미지 로딩 상태 표시 */
+.instructor-avatar.loading {
+    position: relative;
+    opacity: 0.7;
+}
+
+.instructor-avatar.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 이미지 오류 상태 표시 */
+.instructor-avatar.error {
+    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    position: relative;
+}
+
+.instructor-avatar.error::before {
+    content: '⚠️';
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background: #fed7d7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    border: 2px solid white;
+}
+
+.instructor-content {
+    flex: 1;
+}
+
+.instructor-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.instructor-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.instructor-badge {
+    padding: 4px 8px;
+    background: #667eea;
+    color: white;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.instructor-title {
+    font-size: 1rem;
+    color: #4a5568;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.instructor-details {
+    color: #718096;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.instructor-experience {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+/* 레거시 지원 */
+.instructor-info {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+/* 일정 정보 */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.schedule-item {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+    background: #edf2f7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.schedule-label {
+    font-size: 0.9rem;
+    color: #718096;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.schedule-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    line-height: 1.3;
+}
+
+/* 위치 정보 */
+.location-info {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    color: #2d3748;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.location-type {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #667eea;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.location-details {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* 신청 정보 */
+.registration-info {
+    text-align: center;
+}
+
+.registration-status {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.registration-count {
+    color: #667eea;
+}
+
+.registration-deadline {
+    color: #e53e3e;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.registration-fee {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #48bb78;
+    margin-bottom: 20px;
+}
+
+.btn-register {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 1.1rem;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-register:disabled {
+    background: #a0aec0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 강의 신청 상태 메시지 스타일 (행사 페이지와 동일) */
+.lecture-status-message {
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lecture-status-message .status-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.lecture-status-message .status-icon {
+    font-size: 20px;
+    margin-top: 2px;
+    width: 24px;
+    text-align: center;
+}
+
+.lecture-status-message .status-text {
+    flex: 1;
+}
+
+.lecture-status-message .status-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.lecture-status-message .status-description {
+    font-size: 14px;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+/* 승인 상태 스타일 */
+.lecture-status-message.approved {
+    background: #f0f9ff;
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+.lecture-status-message.approved .status-icon {
+    color: #0ea5e9;
+}
+
+/* 거절 상태 스타일 */
+.lecture-status-message.rejected {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.lecture-status-message.rejected .status-icon {
+    color: #ef4444;
+}
+
+/* 대기 상태 스타일 */
+.lecture-status-message.pending {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.lecture-status-message.pending .status-icon {
+    color: #f59e0b;
+}
+
+/* 대기열 상태 스타일 */
+.lecture-status-message.waiting {
+    background: #f8fafc;
+    border-color: #64748b;
+    color: #475569;
+}
+
+.lecture-status-message.waiting .status-icon {
+    color: #64748b;
+}
+
+/* 참가자 목록 */
+.participants-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.participant-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.participant-avatar {
+    width: 32px;
+    height: 32px;
+    background: #667eea;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.participant-info {
+    flex: 1;
+}
+
+.participant-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.9rem;
+}
+
+.participant-date {
+    font-size: 0.8rem;
+    color: #718096;
+}
+
+/* 관련 강의 */
+.related-lectures {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-x: hidden !important; /* 관련 강의 컨테이너 내 가로 스크롤 방지 */
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* 관련 강의 제목 강제 오버플로우 방지 */
+.sidebar-card .related-lectures .related-lecture-item .related-lecture-title {
+    word-break: break-all !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+    max-width: 100% !important;
+    display: block !important;
+}
+
+.related-lecture-item {
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow-x: hidden !important; /* 관련 강의 아이템 내 가로 스크롤 방지 */
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    text-decoration: none;
+    color: inherit;
+    border-left: 4px solid #667eea;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+.related-lecture-item:hover {
+    background: #e2e8f0;
+    transform: translateX(4px);
+}
+
+.related-lecture-title {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+}
+
+.related-lecture-meta {
+    font-size: 0.8rem;
+    color: #718096;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 1024px) {
+    .lecture-content {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .lecture-sidebar {
+        order: 10 !important;
+    }
+}
+
+/* 포괄적 모바일 최적화 - 768px 이하 태블릿/모바일 */
+@media (max-width: 768px) {
+    /* 기본 컨테이너 최적화 */
+    .lecture-detail-container {
+        padding: 12px;
+        margin: 0;
+        /* 모바일 헤더 겹침 방지: 모바일 헤더 높이에 맞춰 조정 */
+        margin-top: 30px; /* 모바일: 헤더와 적절한 간격 유지 */
+        padding-top: 15px;
+    }
+    
+    /* 배너 영역 최적화 */
+    .lecture-banner {
+        padding: 51px 21px 30px 21px;
+        margin: 19px -1px 0 -1px;
+    }
+    
+    .lecture-title {
+        font-size: 24px !important; /* 2rem에서 24px로 명시적 설정 */
+        line-height: 1.3;
+        margin-bottom: 12px;
+    }
+    
+    .lecture-subtitle {
+        font-size: 16px !important;
+        line-height: 1.4;
+    }
+    
+    .lecture-category {
+        font-size: 14px !important;
+        padding: 8px 16px;
+    }
+    
+    /* 메타 정보 모바일 최적화 */
+    .lecture-meta-basic {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .meta-item {
+        font-size: 16px !important;
+        padding: 4px 0;
+    }
+    
+    .meta-icon {
+        font-size: 18px !important;
+    }
+    
+    /* 콘텐츠 레이아웃 단일 컬럼으로 변경 */
+    .lecture-content {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+    
+    /* 메인 콘텐츠 최적화 */
+    .lecture-main {
+        padding: 20px 16px;
+        margin-bottom: 15px;
+    }
+    
+    /* 사이드바를 하단으로 이동 */
+    .lecture-sidebar {
+        order: 10 !important;
+        margin-top: 15px;
+        padding: 16px;
+    }
+    
+    /* 사이드바 카드들 */
+    .sidebar-card {
+        padding: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .sidebar-card h3 {
+        font-size: 18px !important;
+        margin-bottom: 12px;
+    }
+    
+    /* 스케줄 그리드 */
+    .schedule-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .schedule-item {
+        padding: 16px;
+    }
+    
+    .schedule-date {
+        font-size: 16px !important;
+    }
+    
+    .schedule-time {
+        font-size: 14px !important;
+    }
+    
+    /* 강사 카드 모바일 최적화 */
+    .instructor-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+        padding: 20px 16px;
+    }
+    
+    .instructor-avatar {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+    }
+    
+    .instructor-name {
+        font-size: 18px !important;
+    }
+    
+    .instructor-title {
+        font-size: 14px !important;
+    }
+    
+    .instructor-header {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .instructor-experience {
+        text-align: left;
+    }
+    
+    /* 액션 버튼들 최적화 */
+    .lecture-banner .lecture-actions {
+        position: absolute !important;
+        top: 8px !important;
+        right: 8px !important;
+        justify-content: flex-end !important;
+        margin-top: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* 모든 버튼 터치 타겟 44px+ 확보 (강의 액션 버튼 제외) */
+    .btn:not(.lecture-actions .btn), button:not(.lecture-actions .btn),
+    .btn-primary:not(.lecture-actions .btn), .btn-secondary:not(.lecture-actions .btn),
+    .btn-register:not(.lecture-actions .btn), .btn-edit:not(.lecture-actions .btn),
+    .btn-danger:not(.lecture-actions .btn), .btn-success:not(.lecture-actions .btn),
+    a[class*="btn"]:not(.lecture-actions .btn), input[type="button"], input[type="submit"], [role="button"] {
+        min-height: 48px !important;
+        min-width: 48px !important;
+        padding: 12px 20px !important;
+        font-size: 16px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-radius: 8px;
+        touch-action: manipulation;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 강의 액션 버튼들은 모바일에서도 작게 유지 */
+    .lecture-actions .btn {
+        min-height: 28px !important;
+        max-height: 28px !important;
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        min-width: auto !important;
+    }
+    
+    /* 숨겨진 버튼들 강제 표시 */
+    .lecture-detail-container button[style*="display: none"],
+    .lecture-detail-container .btn[style*="display: none"] {
+        display: inline-flex !important;
+        visibility: visible !important;
+    }
+    
+    /* 모든 텍스트 최소 16px 확보 */
+    .lecture-description, .sidebar-card p, .schedule-item, .instructor-info {
+        font-size: 16px !important;
+        line-height: 1.5;
+    }
+    
+    /* 특정 작은 텍스트들 강제 확대 */
+    .lecture-detail-container p, 
+    .lecture-detail-container span,
+    .lecture-detail-container div:not(.lecture-title):not(.lecture-subtitle) {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+    }
+    
+    /* 이모지 영역 폰트 크기 강제 설정 */
+    .status-indicator, .capacity-indicator, .venue-indicator {
+        font-size: 16px !important;
+    }
+    
+    /* 참가자 목록 최적화 */
+    .participant-item {
+        padding: 12px 16px !important;
+        margin-bottom: 8px;
+    }
+    
+    .participant-name {
+        font-size: 16px !important;
+    }
+    
+    /* 관련 강의 목록 최적화 */
+    .related-lecture-item {
+        padding: 16px !important;
+        margin-bottom: 12px;
+    }
+    
+    .related-lecture-title {
+        font-size: 16px !important;
+        line-height: 1.4;
+    }
+    
+    /* 프로필 관련 버튼들 */
+    .btn-visit-profile, .btn-chat-author {
+        min-height: 44px !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+    }
+    
+    /* 수평 스크롤 완전 제거 */
+    * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* 이미지 반응형 처리 */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* 테이블 반응형 처리 */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* 소형 모바일 최적화 - 480px 이하 */
+@media (max-width: 480px) {
+    /* 컨테이너 여백 최소화 */
+    .lecture-detail-container {
+        padding: 8px;
+    }
+    
+    /* 배너 더 컴팩트하게 */
+    .lecture-banner {
+        padding: 46px 17px 24px 17px;
+        margin: 9px -1px 0 -1px;
+    }
+    
+    .lecture-title {
+        font-size: 20px !important;
+        line-height: 1.2;
+    }
+    
+    .lecture-subtitle {
+        font-size: 14px !important;
+    }
+    
+    /* 메인 콘텐츠 패딩 축소 */
+    .lecture-main {
+        padding: 16px 12px;
+    }
+    
+    .sidebar-card {
+        padding: 12px;
+    }
+    
+    /* 버튼 크기 조정 (여전히 44px+ 유지) */
+    .btn, .btn-register {
+        padding: 14px 16px !important;
+        font-size: 15px !important;
+        border-radius: 6px;
+    }
+    
+    /* 강사 아바타 크기 조정 */
+    .instructor-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* 스케줄 아이템 패딩 축소 */
+    .schedule-item {
+        padding: 12px;
+    }
+    
+    /* 텍스트 크기 세밀 조정 */
+    .meta-item {
+        font-size: 15px !important;
+    }
+    
+    .sidebar-card h3 {
+        font-size: 16px !important;
+    }
+    
+    /* 액션 영역 패딩 축소 */
+    .lecture-banner .lecture-actions {
+        position: absolute !important;
+        top: 6px !important;
+        right: 6px !important;
+        padding: 0 !important;
+        margin-top: 0 !important;
+    }
+}
+
+/* 강의 갤러리 스타일 */
+.lecture-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* 최소 크기 증가 */
+    gap: 16px; /* 간격 약간 증가 */
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    aspect-ratio: 16/9; /* 명확한 16:9 비율 유지 */
+    width: 100%;
+    max-width: 100%;
+}
+
+.gallery-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    font-weight: 600;
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+/* 이미지 모달 */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(4px);
+}
+
+.modal-image-content {
+    position: relative;
+    margin: auto;
+    display: block;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    object-fit: contain;
+    margin-top: 5vh;
+    border-radius: 8px;
+}
+
+.modal-image-close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.modal-image-close:hover {
+    color: #ccc;
+}
+
+.modal-image-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    font-size: 18px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-image-nav:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.modal-nav-prev {
+    left: 20px;
+}
+
+.modal-nav-next {
+    right: 20px;
+}
+
+.modal-nav-prev::before {
+    content: '‹';
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.modal-nav-next::before {
+    content: '›';
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.modal-image-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+/* 네이버 지도 스타일 */
+.naver-map-container {
+    margin-top: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* 네이버 지도 컨테이너 호버 효과 */
+.naver-map-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 199, 60, 0.15);
+    transition: box-shadow 0.3s ease;
+}
+
+/* 기존 프로필 이미지 모달 CSS 제거됨 - profile-modal.css 통합 시스템 사용 */
+
+/* 작성자 정보 카드 (컴팩트) */
+.author-info-card {
+    border-left: 3px solid #667eea;
+}
+
+.author-info-compact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.author-avatar-small {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.author-avatar-small:hover {
+    transform: scale(1.1);
+}
+
+.author-details-compact {
+    flex: 1;
+    min-width: 0;
+}
+
+.author-name-compact {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 2px;
+}
+
+.author-meta-compact {
+    font-size: 0.8rem;
+    color: #718096;
+    margin-bottom: 4px;
+}
+
+.author-bio-compact {
+    font-size: 0.8rem;
+    color: #4a5568;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* 프로필 방문 버튼 */
+.btn-visit-profile {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    justify-content: center;
+    height: 44px;
+    margin: 0;
+}
+
+.btn-visit-profile:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    text-decoration: none;
+}
+
+.btn-visit-profile i {
+    font-size: 0.875rem;
+}
+
+.btn-chat-author {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.btn-chat-author:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-chat-author i {
+    font-size: 0.875rem;
+}
+
+/* PC와 모바일 모든 화면 크기에서 화이트 배경 일관성 유지 */
+
+/* 글로벌 화이트 배경 강제 적용 */
+body {
+    background-color: white !important;
+}
+
+/* 모든 화면 크기에서 화이트 배경 유지 */
+.lecture-detail-container {
+    background: white !important;
+}
+
+.lecture-main, .sidebar-card {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* 강의 헤더는 투명 배경 유지 */
+.lecture-header {
+    background: transparent !important;
+}
+
+.schedule-item, .instructor-info, .participant-item, .related-lecture-item {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+    color: #333 !important;
+}
+
+.profile-image-modal .modal-content {
+    background: white !important;
+    color: #333 !important;
+}
+
+.profile-image-modal .modal-header {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+.profile-image-modal .modal-header h3 {
+    color: #2d3748 !important;
+}
+
+/* 모바일에서도 화이트 배경 강제 유지 */
+@media (max-width: 768px) {
+    body {
+        background-color: white !important;
+    }
+    
+    .lecture-detail-container {
+        background: white !important;
+    }
+    
+    .lecture-main, .sidebar-card {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+    }
+
+    .lecture-header {
+        background: transparent !important;
+    }
+    
+    .schedule-item, .instructor-info, .participant-item, .related-lecture-item {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+        color: #333 !important;
+    }
+}
+
+/* 다크모드 감지되어도 화이트 배경 강제 유지 */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: white !important;
+    }
+    
+    .lecture-detail-container {
+        background: white !important;
+    }
+    
+    .lecture-main, .sidebar-card {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+        color: #333 !important;
+    }
+
+    .lecture-header {
+        background: transparent !important;
+    }
+    
+    .schedule-item, .instructor-info, .participant-item, .related-lecture-item {
+        background: white !important;
+        border-color: #e2e8f0 !important;
+        color: #333 !important;
+    }
+    
+    
+    /* 텍스트 색상도 라이트 모드로 유지 */
+    .lecture-title, .lecture-subtitle, .lecture-description,
+    .schedule-date, .schedule-time, .instructor-name,
+    .instructor-title, .participant-name, .related-lecture-title {
+        color: #333 !important;
+    }
+    
+    .lecture-meta, .schedule-meta, .instructor-info-text {
+        color: #718096 !important;
+    }
+}

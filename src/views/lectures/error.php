@@ -152,13 +152,13 @@
         
         <div class="error-message">
             <h3>🚨 오류 메시지</h3>
-            <p><?= htmlspecialchars($error_message ?? '알 수 없는 오류가 발생했습니다.') ?></p>
+            <p><?= htmlspecialchars($errorMessage ?? '알 수 없는 오류가 발생했습니다.') ?></p>
         </div>
-        
-        <?php if (!empty($error_details)): ?>
+
+        <?php if (!empty($errorDetails)): ?>
         <div class="error-details">
             <strong>상세 오류 정보:</strong><br>
-            <?= htmlspecialchars($error_details) ?>
+            <?= htmlspecialchars($errorDetails) ?>
         </div>
         <?php endif; ?>
         

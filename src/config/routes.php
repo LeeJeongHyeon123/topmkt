@@ -345,22 +345,22 @@ class Router {
         }
         
         // 라우트 실행 로깅
-        file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "=== ROUTE EXECUTION ===\n", FILE_APPEND);
-        file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller: $controllerName\n", FILE_APPEND);
-        file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Action: $action\n", FILE_APPEND);
-        file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Path: $controllerPath\n", FILE_APPEND);
-        file_put_contents('./logs/topmkt_errors.log', "현재 작업 디렉토리: " . getcwd() . "\n", FILE_APPEND);
-        file_put_contents('./logs/topmkt_errors.log', "routes.php 파일 위치: " . __FILE__ . "\n", FILE_APPEND);
+        WebLogger::info('=== ROUTE EXECUTION ===', [
+            'controller' => $controllerName,
+            'action' => $action,
+            'path' => $controllerPath,
+            'cwd' => getcwd(),
+            'file' => __FILE__
+        ]);
         
         if (file_exists($controllerPath)) {
-            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller file exists\n", FILE_APPEND);
-            file_put_contents('./logs/topmkt_errors.log', "실제 require 파일: $controllerPath\n", FILE_APPEND);
+            WebLogger::info('Controller file exists', ['path' => $controllerPath]);
             require_once $controllerPath;
             if (class_exists($controllerName)) {
-                file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller class exists\n", FILE_APPEND);
+                WebLogger::info('Controller class exists', ['class' => $controllerName]);
                 $controller = new $controllerName();
                 if (method_exists($controller, $action)) {
-                    file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Method exists, calling $action\n", FILE_APPEND);
+                    WebLogger::info('Method exists, calling action', ['action' => $action]);
                     // 동적 라우트에서 파라미터 추출
                     $params = $this->extractRouteParams();
                     
@@ -371,48 +371,68 @@ class Router {
                     }
                     
                     if (!empty($params)) {
-                        file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Calling $action with params: " . json_encode($params) . "\n", FILE_APPEND);
+                        WebLogger::info('Calling action with params', ['action' => $action, 'params' => $params]);
                         
                         // 🚨 강제 예외 처리 추가
                         try {
                             $controller->$action(...$params);
                         } catch (Exception $e) {
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Exception in $action: " . $e->getMessage() . "\n", FILE_APPEND);
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Exception file: " . $e->getFile() . ":" . $e->getLine() . "\n", FILE_APPEND);
+                            WebLogger::error('Exception in action', [
+                                'action' => $action,
+                                'message' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine()
+                            ]);
                             throw $e;
                         } catch (Error $e) {
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Fatal Error in $action: " . $e->getMessage() . "\n", FILE_APPEND);
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Fatal Error file: " . $e->getFile() . ":" . $e->getLine() . "\n", FILE_APPEND);
+                            WebLogger::critical('Fatal Error in action', [
+                                'action' => $action,
+                                'message' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine()
+                            ]);
                             throw $e;
                         }
                     } else {
-                        file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Calling $action without params\n", FILE_APPEND);
-                        
+                        WebLogger::info('Calling action without params', ['action' => $action]);
+
                         // 🚨 강제 예외 처리 추가
                         try {
                             $controller->$action();
                         } catch (Exception $e) {
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Exception in $action (no params): " . $e->getMessage() . "\n", FILE_APPEND);
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Exception file: " . $e->getFile() . ":" . $e->getLine() . "\n", FILE_APPEND);
+                            WebLogger::error('Exception in action (no params)', [
+                                'action' => $action,
+                                'message' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine()
+                            ]);
                             throw $e;
                         } catch (Error $e) {
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Fatal Error in $action (no params): " . $e->getMessage() . "\n", FILE_APPEND);
-                            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "🚨 Fatal Error file: " . $e->getFile() . ":" . $e->getLine() . "\n", FILE_APPEND);
+                            WebLogger::critical('Fatal Error in action (no params)', [
+                                'action' => $action,
+                                'message' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine()
+                            ]);
                             throw $e;
                         }
                     }
                     return;
                 } else {
-                    file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Method $action not found in $controllerName\n", FILE_APPEND);
-                    error_log("Method $action not found in $controllerName");
+                    WebLogger::error('Method not found in controller', [
+                        'controller' => $controllerName,
+                        'action' => $action
+                    ]);
                 }
             } else {
-                file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller class $controllerName not found\n", FILE_APPEND);
-                error_log("Controller class $controllerName not found");
+                WebLogger::error('Controller class not found', [
+                    'controller' => $controllerName
+                ]);
             }
         } else {
-            file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "Controller file not found: $controllerPath\n", FILE_APPEND);
-            error_log("Controller file not found: $controllerPath");
+            WebLogger::error('Controller file not found', [
+                'path' => $controllerPath
+            ]);
         }
         
         // 컨트롤러 실행 실패 시 500 에러

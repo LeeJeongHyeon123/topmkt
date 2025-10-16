@@ -43,3 +43,5 @@ echo "input, textarea, select, [contenteditable] {\n    cursor: text !important;
 /* 텍스트 요소들은 기본 커서 */
 echo "p, span, div, h1, h2, h3, h4, h5, h6, label, td, th {\n    cursor: default !important;\n}\n";
 ?>
+
+

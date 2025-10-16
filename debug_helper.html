@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lectures UI 디버깅 도우미</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+        .warning { color: orange; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow: auto; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Lectures UI 디버깅 도우미</h1>
+    <p>이 페이지에서 lectures/3 UI 문제를 디버깅할 수 있습니다.</p>
+
+    <div class="debug-section">
+        <h2>1. 브라우저 정보</h2>
+        <button onclick="showBrowserInfo()">브라우저 정보 확인</button>
+        <div id="browser-info"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>2. CSS 파일 로드 상태</h2>
+        <button onclick="checkCSSLoading()">CSS 파일 상태 확인</button>
+        <div id="css-status"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>3. JavaScript 파일 로드 상태</h2>
+        <button onclick="checkJSLoading()">JS 파일 상태 확인</button>
+        <div id="js-status"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>4. DOM 요소 존재 확인</h2>
+        <button onclick="checkDOMElements()">DOM 요소 확인</button>
+        <div id="dom-status"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>5. CSS 스타일 적용 상태</h2>
+        <button onclick="checkCSSStyles()">CSS 스타일 확인</button>
+        <div id="style-status"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>6. 콘솔 로그 수집</h2>
+        <button onclick="startConsoleCapture()">콘솔 로그 캡처 시작</button>
+        <button onclick="stopConsoleCapture()">콘솔 로그 캡처 중지</button>
+        <div id="console-logs"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>7. 네트워크 요청 분석</h2>
+        <button onclick="checkNetworkRequests()">네트워크 요청 확인</button>
+        <div id="network-status"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>8. lectures/3 페이지 직접 테스트</h2>
+        <button onclick="testLecturesPage()">Lectures 페이지 테스트</button>
+        <div id="lectures-test"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>9. 전체 결과 복사</h2>
+        <button onclick="copyAllResults()">전체 결과 복사</button>
+        <textarea id="all-results" style="width: 100%; height: 200px; display: none;"></textarea>
+    </div>
+
+    <script>
+        // 브라우저 정보 확인
+        function showBrowserInfo() {
+            const info = document.getElementById('browser-info');
+            info.innerHTML = `
+                <h3>브라우저 정보:</h3>
+                <ul>
+                    <li><strong>User Agent:</strong> ${navigator.userAgent}</li>
+                    <li><strong>브라우저:</strong> ${getBrowserName()}</li>
+                    <li><strong>버전:</strong> ${getBrowserVersion()}</li>
+                    <li><strong>플랫폼:</strong> ${navigator.platform}</li>
+                    <li><strong>Cookies 활성화:</strong> ${navigator.cookieEnabled ? '예' : '아니오'}</li>
+                    <li><strong>JavaScript 활성화:</strong> 예</li>
+                    <li><strong>화면 크기:</strong> ${window.innerWidth}x${window.innerHeight}</li>
+                    <li><strong>색상 깊이:</strong> ${screen.colorDepth}bit</li>
+                </ul>
+            `;
+        }
+
+        function getBrowserName() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome')) return 'Chrome';
+            if (ua.includes('Firefox')) return 'Firefox';
+            if (ua.includes('Safari')) return 'Safari';
+            if (ua.includes('Edge')) return 'Edge';
+            return 'Unknown';
+        }
+
+        function getBrowserVersion() {
+            const ua = navigator.userAgent;
+            const match = ua.match(/(Chrome|Firefox|Safari|Edge)\/(\d+)/);
+            return match ? match[2] : 'Unknown';
+        }
+
+        // CSS 파일 로드 상태 확인
+        async function checkCSSLoading() {
+            const status = document.getElementById('css-status');
+            status.innerHTML = '<h3>CSS 파일 로드 상태 확인 중...</h3>';
+
+            const cssFiles = [
+                '//www.topmktx.com/assets/css/php/base.css.php',
+                '//www.topmktx.com/assets/css/php/layout.css.php',
+                '//www.topmktx.com/assets/css/php/buttons.css.php',
+                '//www.topmktx.com/assets/css/main.css',
+                '//www.topmktx.com/assets/css/loading.css',
+                '//www.topmktx.com/assets/css/badges.css',
+                '//www.topmktx.com/assets/css/search-filter.css'
+            ];
+
+            const results = [];
+            for (const url of cssFiles) {
+                try {
+                    const response = await fetch(url, { method: 'HEAD' });
+                    const statusCode = response.status;
+                    const contentType = response.headers.get('content-type') || 'unknown';
+                    
+                    const statusClass = statusCode === 200 ? 'success' : 'error';
+                    results.push(`<li class="${statusClass}">✅ ${url.split('/').pop()}: ${statusCode} (${contentType})</li>`);
+                } catch (error) {
+                    results.push(`<li class="error">❌ ${url.split('/').pop()}: 네트워크 오류 - ${error.message}</li>`);
+                }
+            }
+
+            status.innerHTML = `
+                <h3>CSS 파일 로드 상태:</h3>
+                <ul>${results.join('')}</ul>
+            `;
+        }
+
+        // JavaScript 파일 로드 상태 확인
+        async function checkJSLoading() {
+            const status = document.getElementById('js-status');
+            status.innerHTML = '<h3>JavaScript 파일 로드 상태 확인 중...</h3>';
+
+            const jsFiles = [
+                '//www.topmktx.com/assets/js/loading.js',
+                '//www.topmktx.com/assets/js/jwt-auth.js',
+                '//www.topmktx.com/assets/js/main.js'
+            ];
+
+            const results = [];
+            for (const url of jsFiles) {
+                try {
+                    const response = await fetch(url, { method: 'HEAD' });
+                    const statusCode = response.status;
+                    const contentType = response.headers.get('content-type') || 'unknown';
+                    
+                    const statusClass = statusCode === 200 ? 'success' : 'error';
+                    results.push(`<li class="${statusClass}">✅ ${url.split('/').pop()}: ${statusCode} (${contentType})</li>`);
+                } catch (error) {
+                    results.push(`<li class="error">❌ ${url.split('/').pop()}: 네트워크 오류 - ${error.message}</li>`);
+                }
+            }
+
+            status.innerHTML = `
+                <h3>JavaScript 파일 로드 상태:</h3>
+                <ul>${results.join('')}</ul>
+            `;
+        }
+
+        // DOM 요소 존재 확인
+        function checkDOMElements() {
+            const status = document.getElementById('dom-status');
+            
+            const elements = [
+                'body',
+                'head',
+                'header',
+                'main',
+                'footer',
+                '.lecture-detail-container',
+                '.lecture-header',
+                '.lecture-banner',
+                '.lecture-title',
+                '.lecture-content',
+                '.lecture-sidebar'
+            ];
+
+            const results = [];
+            elements.forEach(selector => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    results.push(`<li class="success">✅ ${selector}: 존재함</li>`);
+                } else {
+                    results.push(`<li class="error">❌ ${selector}: 찾을 수 없음</li>`);
+                }
+            });
+
+            status.innerHTML = `
+                <h3>DOM 요소 존재 확인:</h3>
+                <ul>${results.join('')}</ul>
+            `;
+        }
+
+        // CSS 스타일 적용 상태 확인
+        function checkCSSStyles() {
+            const status = document.getElementById('style-status');
+            
+            const styleChecks = [
+                { selector: 'body', property: 'background-color', expected: 'rgb(255, 255, 255)' },
+                { selector: '.lecture-detail-container', property: 'display', expected: 'block' },
+                { selector: '.lecture-banner', property: 'background-image', expected: /linear-gradient/ },
+                { selector: '.lecture-title', property: 'font-size', expected: '40px' },
+                { selector: 'header', property: 'background-color', expected: /rgba\(255, 255, 255, 0\.95\)/ }
+            ];
+
+            const results = [];
+            styleChecks.forEach(({ selector, property, expected }) => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    const computed = window.getComputedStyle(element);
+                    const value = computed[property];
+                    
+                    let isValid = true;
+                    if (expected instanceof RegExp) {
+                        isValid = expected.test(value);
+                    } else {
+                        isValid = value === expected;
+                    }
+                    
+                    const statusClass = isValid ? 'success' : 'warning';
+                    const statusIcon = isValid ? '✅' : '⚠️';
+                    
+                    results.push(`<li class="${statusClass}">${statusIcon} ${selector} ${property}: ${value} ${isValid ? '' : '(기대값: ' + expected + ')'}</li>`);
+                } else {
+                    results.push(`<li class="error">❌ ${selector}: 요소를 찾을 수 없음</li>`);
+                }
+            });
+
+            status.innerHTML = `
+                <h3>CSS 스타일 적용 상태:</h3>
+                <ul>${results.join('')}</ul>
+            `;
+        }
+
+        // 콘솔 로그 캡처
+        let consoleLogs = [];
+        let originalConsoleLog = console.log;
+        let originalConsoleError = console.error;
+        let originalConsoleWarn = console.warn;
+
+        function startConsoleCapture() {
+            consoleLogs = [];
+            
+            console.log = function(...args) {
+                consoleLogs.push({ level: 'log', message: args.join(' '), timestamp: new Date().toISOString() });
+                originalConsoleLog.apply(console, args);
+            };
+            
+            console.error = function(...args) {
+                consoleLogs.push({ level: 'error', message: args.join(' '), timestamp: new Date().toISOString() });
+                originalConsoleError.apply(console, args);
+            };
+            
+            console.warn = function(...args) {
+                consoleLogs.push({ level: 'warn', message: args.join(' '), timestamp: new Date().toISOString() });
+                originalConsoleWarn.apply(console, args);
+            };
+            
+            document.getElementById('console-logs').innerHTML = '<p class="success">콘솔 로그 캡처 시작됨</p>';
+        }
+
+        function stopConsoleCapture() {
+            console.log = originalConsoleLog;
+            console.error = originalConsoleError;
+            console.warn = originalConsoleWarn;
+            
+            const logsDiv = document.getElementById('console-logs');
+            if (consoleLogs.length > 0) {
+                const logHtml = consoleLogs.map(log => 
+                    `<div class="${log.level === 'error' ? 'error' : log.level === 'warn' ? 'warning' : ''}">
+                        [${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}
+                    </div>`
+                ).join('');
+                
+                logsDiv.innerHTML = `<h3>캡처된 콘솔 로그:</h3>${logHtml}`;
+            } else {
+                logsDiv.innerHTML = '<p>캡처된 로그가 없습니다.</p>';
+            }
+        }
+
+        // 네트워크 요청 분석
+        function checkNetworkRequests() {
+            const status = document.getElementById('network-status');
+            status.innerHTML = '<p>네트워크 요청 분석을 위해 F12 → Network 탭을 확인해주세요.</p>';
+        }
+
+        // lectures 페이지 직접 테스트
+        async function testLecturesPage() {
+            const testDiv = document.getElementById('lectures-test');
+            testDiv.innerHTML = '<h3>Lectures 페이지 테스트 중...</h3>';
+            
+            try {
+                // lectures 페이지로 이동
+                window.location.href = 'https://www.topmktx.com/lectures/3';
+            } catch (error) {
+                testDiv.innerHTML = `<h3 class="error">페이지 이동 중 오류: ${error.message}</h3>`;
+            }
+        }
+
+        // 전체 결과 복사
+        function copyAllResults() {
+            const allResults = {
+                timestamp: new Date().toISOString(),
+                browser: {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    screen: `${window.innerWidth}x${window.innerHeight}`
+                },
+                cssStatus: document.getElementById('css-status').innerText,
+                jsStatus: document.getElementById('js-status').innerText,
+                domStatus: document.getElementById('dom-status').innerText,
+                styleStatus: document.getElementById('style-status').innerText,
+                consoleLogs: consoleLogs,
+                pageUrl: window.location.href
+            };
+            
+            const textarea = document.getElementById('all-results');
+            textarea.value = JSON.stringify(allResults, null, 2);
+            textarea.style.display = 'block';
+            
+            textarea.select();
+            document.execCommand('copy');
+            
+            alert('결과가 클립보드에 복사되었습니다. 이 내용을 개발자에게 보내주세요.');
+        }
+
+        // 페이지 로드 시 기본 정보 표시
+        window.addEventListener('load', function() {
+            showBrowserInfo();
+        });
+    </script>
+</body>
+</html>

@@ -91,8 +91,9 @@ if (file_exists($styleFile)) {
                 <div class="form-group full-width">
                     <label for="description" class="form-label required">강의 설명</label>
                     <div class="input-with-counter">
-                        <textarea id="description" name="description" class="form-textarea"
-                                  placeholder="20자 이상 자세히 설명해주세요 (강의 내용, 목표, 대상자 등)" required><?= $isEditMode ? htmlspecialchars($lecture['description'] ?? '') : '' ?></textarea>
+                    <textarea id="description" name="description" class="form-textarea"
+                              placeholder="20자 이상 자세히 설명해주세요 (강의 내용, 목표, 대상자 등)"
+                              required maxlength="2000" oninput="limitTextLength(this, 2000)"><?= $isEditMode ? htmlspecialchars($lecture['description'] ?? '') : '' ?></textarea>
                         <div class="character-counter">
                             <span id="description-counter">0</span><span class="counter-limit">/2000자 (최소 20자)</span>
                         </div>
@@ -423,6 +424,36 @@ let currentImageData = [];
 let lectureImages = [];
 const maxLectureImages = 8;
 const isEditMode = <?= $isEditMode ? 'true' : 'false' ?>; // PHP에서 전달된 편집 모드 상태
+
+// 텍스트 길이 제한 함수 (전역 함수로 먼저 정의)
+function limitTextLength(element, maxLength) {
+    // 실제 글자 수 계산 (서버와 동일한 방식)
+    const textLength = element.value.length;
+
+    if (textLength > maxLength) {
+        // 정확한 위치에서 잘라내기
+        let truncatedText = '';
+        let currentLength = 0;
+
+        for (let i = 0; i < element.value.length && currentLength < maxLength; i++) {
+            const char = element.value[i];
+            truncatedText += char;
+            currentLength++;
+        }
+
+        element.value = truncatedText;
+
+        // 글자 수 카운터 업데이트 (존재하는 경우)
+        const counter = document.getElementById(element.id + '-counter');
+        if (counter) {
+            counter.textContent = maxLength;
+            const counterContainer = counter.parentElement;
+            counterContainer.className = 'character-counter error';
+        }
+        // 오류 메시지 표시
+        showError(element.id, `${maxLength}자 이하로 입력해주세요.`);
+    }
+}
 
 // 기존 이미지 삭제 함수 (전역 함수로 먼저 정의)
 function removeExistingImage(imageIndex, imageElement) {

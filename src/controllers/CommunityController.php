@@ -9,6 +9,7 @@ require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/helpers/SearchHelper.php';
+require_once SRC_PATH . '/helpers/CacheHelper.php';
 require_once SRC_PATH . '/helpers/PerformanceDebugger.php';
 require_once SRC_PATH . '/helpers/WebLogger.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';

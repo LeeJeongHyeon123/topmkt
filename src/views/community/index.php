@@ -47,8 +47,6 @@ if (file_exists($styleFile)) {
     echo file_get_contents($styleFile);
 }
 ?>
-</style>
-    }
     
     .btn {
         justify-content: center;

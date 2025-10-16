@@ -185,8 +185,7 @@
                 * .header-content,
                 * header .header-content,
                 * .main-header .header-content {
-                    justify-content: flex-start !important;
-                    gap: 20px !important;
+                    justify-content: space-between !important;
                     display: flex !important;
                     align-items: center !important;
                 }
@@ -226,8 +225,7 @@
         * .main-header .header-content {
             display: flex !important;
             align-items: center !important;
-            justify-content: flex-start !important;
-            gap: 20px !important;
+            justify-content: space-between !important;
             width: 100% !important;
             box-sizing: border-box !important;
             overflow: visible !important;
@@ -251,7 +249,7 @@
             left: auto !important;
             right: auto !important;
             margin-left: 0 !important;
-            margin-right: 0 !important;
+            margin-right: auto !important;
             width: auto !important;
             box-sizing: border-box !important;
         }
@@ -274,8 +272,7 @@
             html body .header-content,
             html body header .header-content,
             html body .main-header .header-content {
-                justify-content: flex-start !important;
-                gap: 20px !important;
+                justify-content: space-between !important;
                 display: flex !important;
                 align-items: center !important;
             }
@@ -289,7 +286,6 @@
                 flex: 0 0 auto !important;
                 order: 1 !important;
                 margin-left: 0 !important;
-                margin-right: 0 !important;
             }
         }
 
@@ -397,9 +393,9 @@
         </button>
         
         <div class="container" style="overflow: visible !important; position: relative;">
-            <div class="header-content" style="display: flex !important; justify-content: flex-start !important; align-items: center !important; width: 100% !important; padding: 15px 20px 15px 20px !important; overflow: visible !important; flex-direction: row !important; flex-wrap: nowrap !important; box-sizing: border-box !important; gap: 20px !important;">
+            <div class="header-content" style="display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; padding: 15px 20px 15px 20px !important; overflow: visible !important; flex-direction: row !important; flex-wrap: nowrap !important; box-sizing: border-box !important;">
                 <!-- 로고 -->
-                <div class="header-left" style="flex: 0 0 auto !important; order: 1 !important; position: relative !important; transform: none !important; left: auto !important; right: auto !important; margin-left: 0 !important; margin-right: 0 !important; width: auto !important; min-width: 0 !important; max-width: none !important; box-sizing: border-box !important;">
+                <div class="header-left" style="flex: 0 0 auto !important; order: 1 !important; position: relative !important; transform: none !important; left: auto !important; right: auto !important; margin-left: 0 !important; margin-right: auto !important; width: auto !important; min-width: 0 !important; max-width: none !important; box-sizing: border-box !important;">
                     <h1 class="logo">
                         <a href="/" class="logo-link">
                             <div class="logo-icon">
@@ -736,8 +732,7 @@
                     html body header .header-content,
                     html body .main-header .header-content {
                         display: flex !important;
-                        justify-content: flex-start !important; /* 로고 좌측 고정 - 중앙 이동 절대 방지 */
-                        gap: 20px !important;
+                        justify-content: space-between !important; /* 로고 좌측 고정 - 중앙 이동 절대 방지 */
                         align-items: center !important;
                         flex-wrap: nowrap !important;
                     }
@@ -760,7 +755,7 @@
                             left: auto !important;
                             right: auto !important;
                             margin-left: 0 !important;
-                            margin-right: 0 !important;
+                            margin-right: auto !important;
                         }
 
                         /* 최상위 우선순위로 모바일에서도 로고 위치 보호 */
@@ -774,7 +769,7 @@
                             left: auto !important;
                             right: auto !important;
                             margin-left: 0 !important;
-                            margin-right: 0 !important;
+                            margin-right: auto !important;
                         }
                     }
 
@@ -1916,10 +1911,9 @@
 
                     if (headerContent) {
                         headerContent.style.setProperty('display', 'flex', 'important');
-                        headerContent.style.setProperty('justify-content', 'flex-start', 'important');
+                        headerContent.style.setProperty('justify-content', 'space-between', 'important');
                         headerContent.style.setProperty('align-items', 'center', 'important');
                         headerContent.style.setProperty('width', '100%', 'important');
-                        headerContent.style.setProperty('gap', '20px', 'important');
                     }
 
                     // 로고 위치 강제 보호 (JavaScript 변경 방지)
@@ -1933,7 +1927,7 @@
                             'left': 'auto',
                             'right': 'auto',
                             'margin-left': '0',
-                            'margin-right': '0'
+                            'margin-right': 'auto'
                         };
 
                         Object.entries(logoStyles).forEach(([property, value]) => {
