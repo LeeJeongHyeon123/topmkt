@@ -57,21 +57,21 @@
     <link rel="canonical" href="<?= 'https://' . ($_SERVER['HTTP_HOST'] ?? 'www.topmktx.com') . ($_SERVER['REQUEST_URI'] ?? '/') ?>">
     
     <!-- 파비콘 - 모든 페이지 통일 -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20250609">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg?v=20250609">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png?v=20250609">
-    <link rel="shortcut icon" href="/favicon.ico?v=20250609">
+    <link rel="icon" type="image/x-icon" href="//www.topmktx.com/favicon.ico?v=20250609">
+    <link rel="icon" type="image/svg+xml" href="//www.topmktx.com/assets/images/favicon.svg?v=20250609">
+    <link rel="apple-touch-icon" sizes="180x180" href="//www.topmktx.com/assets/images/apple-touch-icon.png?v=20250609">
+    <link rel="shortcut icon" href="//www.topmktx.com/favicon.ico?v=20250609">
     
     <!-- CSS -->
     <!-- 컴포넌트 CSS 파일들 (PHP에서 직접 출력) -->
-    <link rel="stylesheet" href="/assets/css/php/base.css.php?v=<?= uniqid() ?>">
-    <link rel="stylesheet" href="/assets/css/php/layout.css.php?v=<?= uniqid() ?>">
-    <link rel="stylesheet" href="/assets/css/php/buttons.css.php?v=<?= uniqid() ?>">
-    <!-- 메인 CSS -->
-    <link rel="stylesheet" href="/assets/css/main.css?v=<?= uniqid() ?>">
-    <link rel="stylesheet" href="/assets/css/loading.css">
-    <link rel="stylesheet" href="/assets/css/badges.css"><!-- 🚀 v3.28.0: 통합 배지 시스템 -->
-    <link rel="stylesheet" href="/assets/css/search-filter.css"><!-- 🚀 v3.37.0: 검색/필터 컴포넌트 시스템 -->
+    <link rel="stylesheet" href="//www.topmktx.com/assets/css/php/base.css.php?v=<?= uniqid() ?>">
+    <link rel="stylesheet" href="//www.topmktx.com/assets/css/php/layout.css.php?v=<?= uniqid() ?>">
+    <link rel="stylesheet" href="//www.topmktx.com/assets/css/php/buttons.css.php?v=<?= uniqid() ?>">
+    <!-- 메인 CSS (강의 상세 스타일 포함) -->
+    <link rel="stylesheet" href="//www.topmktx.com/assets/css/main.css?v=<?= uniqid() ?>">
+    <link rel="stylesheet" href="//www.topmktx.com/assets/css/loading.css">
+    <link rel="stylesheet" href="//www.topmktx.com/assets/css/badges.css"><!-- 🚀 v3.28.0: 통합 배지 시스템 -->
+    <link rel="stylesheet" href="//www.topmktx.com/assets/css/search-filter.css"><!-- 🚀 v3.37.0: 검색/필터 컴포넌트 시스템 -->
     <!-- Font Awesome 6.4.0 with fallback for connection issues -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
@@ -109,9 +109,9 @@
     ?>
     
     <!-- JavaScript -->
-    <script src="/assets/js/loading.js?v=<?= time() ?>"></script>
-    <script src="/assets/js/jwt-auth.js" defer></script>
-    <script src="/assets/js/main.js" defer></script>
+    <script src="//www.topmktx.com/assets/js/loading.js?v=<?= time() ?>"></script>
+    <script src="//www.topmktx.com/assets/js/jwt-auth.js" defer></script>
+    <script src="//www.topmktx.com/assets/js/main.js" defer></script>
     
     <!-- 디바이스 감지 및 반응형 시스템 (모든 페이지 공통) -->
     <?php include SRC_PATH . '/views/includes/device-detection.js.php'; ?>
@@ -120,12 +120,12 @@
     <?php if (isset($currentUserId) && $currentUserId && $_SERVER['REQUEST_URI'] !== '/chat'): ?>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="/assets/js/chat-notifications.js"></script>
+    <script src="//www.topmktx.com/assets/js/chat-notifications.js"></script>
     <?php endif; ?>
     
     <!-- Firebase 실시간 신청 대기 알림 시스템 (기업 유저용) -->
     <?php if (isset($currentUserId) && $currentUserId): ?>
-    <script src="/assets/js/registration-notifications-realtime.js"></script>
+    <script src="//www.topmktx.com/assets/js/registration-notifications-realtime.js"></script>
     <?php endif; ?>
     
     <!-- 구조화 데이터 (JSON-LD) -->
@@ -560,7 +560,7 @@
                     .header-left,
                     header .header-left {
                         order: 1 !important;
-                        flex: 1 !important;
+                        flex: 0 0 auto !important; /* 로고가 좌측에 고정되도록 설정 */
                     }
 
                     /* 812×858 사이즈 타겟 특별 처리 */
