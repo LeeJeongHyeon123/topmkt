@@ -786,7 +786,7 @@
 /* 반응형 */
 @media (max-width: 768px) {
     .event-detail-container {
-        padding: 20px 10px;
+        padding: 15px 8px;
         /* 모바일 헤더 겹침 방지: 모바일 헤더 높이에 맞춰 조정 */
         margin-top: 85px; /* 모바일: 헤더 높이(70px) + 여유 공간(15px) */
         padding-top: 15px;
@@ -794,7 +794,7 @@
     
     .event-hero {
         margin-top: 0px;
-        padding: 40px 20px;
+        padding: 30px 12px;
     }
     
     .event-title {
@@ -842,9 +842,13 @@
     }
     
     .content-section {
-        padding: 20px;
+        padding: 15px 12px;
     }
-    
+
+    .info-card {
+        padding: 18px 12px;
+    }
+
     /* 모바일에서 관리 버튼 위치 조정 */
     .event-admin-actions {
         top: 15px;
