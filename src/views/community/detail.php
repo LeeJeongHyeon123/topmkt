@@ -744,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: '<?= htmlspecialchars($post['title']) ?>',
                     text: '탑마케팅 커뮤니티의 게시글을 확인해보세요!',
                     url: window.location.href
-
+                }).catch(() => {}); // 에러 무시
             } else {
                 // 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
                 copyToClipboard(window.location.href, {
