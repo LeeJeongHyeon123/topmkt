@@ -172,22 +172,60 @@
         <script>
         (function() {
             'use strict';
+            // 🚨 최상위 우선순위로 즉시 스타일 적용
             var style = document.createElement('style');
-            style.id = 'logo-position-immediate';
-            style.textContent = '.header-content{justify-content:space-between!important}.header-left{margin-left:0!important;flex:0 0 auto!important;order:1!important}';
+            style.id = 'logo-position-nuclear';
+            style.textContent = `
+                .header-content,
+                header .header-content,
+                .main-header .header-content,
+                html body .header-content,
+                html body header .header-content,
+                html body .main-header .header-content,
+                * .header-content,
+                * header .header-content,
+                * .main-header .header-content {
+                    justify-content: space-between !important;
+                    display: flex !important;
+                    align-items: center !important;
+                }
+                .header-left,
+                header .header-left,
+                .header-content .header-left,
+                html body .header-left,
+                html body header .header-left,
+                html body .header-content .header-left,
+                * .header-left,
+                * header .header-left,
+                * .header-content .header-left {
+                    margin-left: 0 !important;
+                    flex: 0 0 auto !important;
+                    order: 1 !important;
+                }
+            `;
             document.head.insertBefore(style, document.head.firstChild);
         })();
         </script>
         
         <style>
         /* ============================================================
-           기본 레이아웃 (모든 사이즈 공통)
+           헤더 로고 위치 최종 해결 시스템 v4.1
+           - 모든 가능한 충돌에 대비한 최상위 우선순위
            ============================================================ */
+
+        /* 🚨 최상위 우선순위: 모든 가능한 셀렉터로 헤더 보호 */
         .header-content,
         header .header-content,
-        .main-header .header-content {
+        .main-header .header-content,
+        html body .header-content,
+        html body header .header-content,
+        html body .main-header .header-content,
+        * .header-content,
+        * header .header-content,
+        * .main-header .header-content {
             display: flex !important;
             align-items: center !important;
+            justify-content: space-between !important;
             width: 100% !important;
             box-sizing: border-box !important;
             overflow: visible !important;
@@ -197,96 +235,106 @@
 
         .header-left,
         header .header-left,
-        .header-content .header-left {
+        .header-content .header-left,
+        html body .header-left,
+        html body header .header-left,
+        html body .header-content .header-left,
+        * .header-left,
+        * header .header-left,
+        * .header-content .header-left {
             flex: 0 0 auto !important;
             order: 1 !important;
             position: relative !important;
             transform: none !important;
             left: auto !important;
             right: auto !important;
+            margin-left: 0 !important;
             margin-right: auto !important;
             width: auto !important;
             box-sizing: border-box !important;
         }
 
         /* ============================================================
-           반응형 Breakpoints (SINGLE SOURCE OF TRUTH)
+           반응형 Breakpoints (모든 미디어 쿼리에서 최상위 우선순위 적용)
            ============================================================ */
-        
+
+        /* 🚨 모든 미디어 쿼리에서 최상위 우선순위로 헤더 보호 */
+        @media (min-width: 1920px),
+        @media (min-width: 1440px) and (max-width: 1919px),
+        @media (min-width: 1024px) and (max-width: 1439px),
+        @media (min-width: 768px) and (max-width: 1023px),
+        @media (min-width: 425px) and (max-width: 767px),
+        @media (min-width: 375px) and (max-width: 424px),
+        @media (max-width: 374px) {
+            .header-content,
+            header .header-content,
+            .main-header .header-content,
+            html body .header-content,
+            html body header .header-content,
+            html body .main-header .header-content {
+                justify-content: space-between !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            .header-left,
+            header .header-left,
+            .header-content .header-left,
+            html body .header-left,
+            html body header .header-left,
+            html body .header-content .header-left {
+                flex: 0 0 auto !important;
+                order: 1 !important;
+                margin-left: 0 !important;
+            }
+        }
+
         /* PC (1920px 이상) */
         @media (min-width: 1920px) {
             .header-content {
-                justify-content: space-between !important;
                 padding: 15px 40px !important;
-            }
-            .header-left {
-                margin-left: 0 !important;
             }
         }
 
         /* 큰 태블릿 (1440px ~ 1919px) */
         @media (min-width: 1440px) and (max-width: 1919px) {
             .header-content {
-                justify-content: space-between !important;
                 padding: 15px 30px !important;
-            }
-            .header-left {
-                margin-left: 0 !important;
             }
         }
 
         /* 태블릿 (1024px ~ 1439px) */
         @media (min-width: 1024px) and (max-width: 1439px) {
             .header-content {
-                justify-content: space-between !important;
                 padding: 15px 25px !important;
-            }
-            .header-left {
-                margin-left: 0 !important;
             }
         }
 
         /* 작은 태블릿 (768px ~ 1023px) */
         @media (min-width: 768px) and (max-width: 1023px) {
             .header-content {
-                justify-content: space-between !important;
                 padding: 12px 20px !important;
-            }
-            .header-left {
-                margin-left: 0 !important;
             }
         }
 
         /* 큰 모바일 (425px ~ 767px) */
         @media (min-width: 425px) and (max-width: 767px) {
             .header-content {
-                justify-content: space-between !important;
                 padding: 12px 15px !important;
-            }
-            .header-left {
-                margin-left: 0 !important;
             }
         }
 
         /* 모바일 (375px ~ 424px) */
         @media (min-width: 375px) and (max-width: 424px) {
             .header-content {
-                justify-content: space-between !important;
                 padding: 10px 12px !important;
-            }
-            .header-left {
-                margin-left: 0 !important;
             }
         }
 
         /* 작은 모바일 (320px ~ 374px) */
         @media (max-width: 374px) {
             .header-content {
-                justify-content: space-between !important;
                 padding: 10px 10px !important;
-            }
-            .header-left {
-                margin-left: 0 !important;
             }
         }
         </style>
@@ -2244,30 +2292,84 @@
         }, { once: true }); // 🚀 v3.64.0: DOMContentLoaded 중복 실행 방지
 
         // ============================================================
-        // 헤더 로고 위치 검증 시스템 v4.0 (SIMPLE & CLEAN)
-        // - CSS가 주요 작업을 수행하므로 JavaScript는 최소화
-        // - 페이지 로드 후 한 번만 검증
+        // 헤더 로고 위치 지속 검증 시스템 v4.1 (ENHANCED)
+        // - 모든 가능한 셀렉터로 지속적 검증
+        // - 더 자주 그리고 광범위하게 확인
         // ============================================================
         (function() {
             'use strict';
-            
+
+            var verificationInterval;
+
             function verifyLogoPosition() {
-                var headerContent = document.querySelector('.header-content');
-                if (headerContent) {
-                    var computed = window.getComputedStyle(headerContent);
-                    if (computed.justifyContent !== 'space-between') {
-                        console.warn('⚠️ 헤더 레이아웃 검증 실패. 외부 CSS 충돌 가능성.');
-                    }
+                var selectors = [
+                    '.header-content',
+                    'header .header-content',
+                    '.main-header .header-content',
+                    'html body .header-content',
+                    'html body header .header-content',
+                    'html body .main-header .header-content'
+                ];
+
+                var allCorrect = true;
+
+                selectors.forEach(function(selector) {
+                    var elements = document.querySelectorAll(selector);
+                    elements.forEach(function(element) {
+                        var computed = window.getComputedStyle(element);
+                        if (computed.justifyContent !== 'space-between' ||
+                            computed.display !== 'flex' ||
+                            computed.alignItems !== 'center') {
+                            console.warn('⚠️ 헤더 레이아웃 검증 실패:', selector, {
+                                justifyContent: computed.justifyContent,
+                                display: computed.display,
+                                alignItems: computed.alignItems
+                            });
+                            allCorrect = false;
+                        }
+                    });
+                });
+
+                if (allCorrect) {
+                    console.log('✅ 헤더 로고 위치 검증 성공 - 모든 요소가 올바른 위치에 있습니다');
                 }
+
+                return allCorrect;
             }
-            
-            // 페이지 로드 완료 후 검증
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', verifyLogoPosition, { once: true });
-            } else {
+
+            function startVerification() {
+                // 즉시 검증
                 verifyLogoPosition();
+
+                // 100ms 간격으로 10초간 지속 검증 (초기 로딩 안정화)
+                var count = 0;
+                verificationInterval = setInterval(function() {
+                    verifyLogoPosition();
+                    count++;
+                    if (count >= 100) { // 10초 후 중단
+                        clearInterval(verificationInterval);
+                    }
+                }, 100);
+
+                // 30초 후 최종 검증
+                setTimeout(function() {
+                    clearInterval(verificationInterval);
+                    console.log('🔍 최종 헤더 레이아웃 검증 완료');
+                    verifyLogoPosition();
+                }, 30000);
             }
-            window.addEventListener('load', verifyLogoPosition, { once: true });
+
+            // DOM 준비 완료 시 시작
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startVerification, { once: true });
+            } else {
+                startVerification();
+            }
+
+            // 페이지 로드 완료 후 최종 검증
+            window.addEventListener('load', function() {
+                setTimeout(verifyLogoPosition, 100); // 로드 완료 후 약간의 지연
+            }, { once: true });
         })();
 
     } // 🚀 v3.64.0: headerMobileMenuInitialized 플래그 종료
