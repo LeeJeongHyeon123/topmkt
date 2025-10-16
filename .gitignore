@@ -3,6 +3,10 @@
 .env.local
 .env.production
 
+# Firebase 서비스 계정 키 (민감 정보)
+config/firebase-service-account.json
+firebase-service-account.json
+
 # 로그 파일
 logs/
 *.log

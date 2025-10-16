@@ -32,7 +32,12 @@ define('SESSION_PREFIX', 'topmkt_');
 define('FIREBASE_API_KEY', '');
 define('FIREBASE_AUTH_DOMAIN', '');
 define('FIREBASE_DATABASE_URL', '');
-define('FIREBASE_PROJECT_ID', '');
+define('FIREBASE_PROJECT_ID', 'topmkt-832f2');
+
+// FCM (Firebase Cloud Messaging) V1 API 설정
+define('FCM_SERVICE_ACCOUNT_PATH', ROOT_PATH . '/config/firebase-service-account.json');
+define('FCM_API_URL_V1', 'https://fcm.googleapis.com/v1/projects/topmkt-832f2/messages:send');
+define('FCM_SCOPE', 'https://www.googleapis.com/auth/firebase.messaging');
 
 // 네이버 Maps API 설정
 define('NAVER_MAPS_CLIENT_ID', 'c5yj6m062z'); // 네이버 Maps API 클라이언트 ID
