@@ -8,6 +8,7 @@ require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
+require_once SRC_PATH . '/helpers/CacheHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/config/upload.php';
 
@@ -62,9 +63,9 @@ class LectureController extends BaseController {
             $lectures = $this->getLecturesByMonth($year, $month);
             
             // 카테고리 목록 조회 (캐싱 적용)
-            $categories = CacheHelper::remember('lecture_categories', 3600, function() {
+            $categories = CacheHelper::remember('lecture_categories', function() {
                 return $this->getCategories();
-            });
+            }, 3600);
             
             // 뷰 데이터 준비
             $viewData = [
@@ -74,12 +75,12 @@ class LectureController extends BaseController {
                 'currentMonth' => $month,
                 'view' => $view,
                 'calendarData' => $this->generateCalendarData($year, $month, $lectures),
-                'todayLectures' => CacheHelper::remember('today_lectures_' . date('Y-m-d'), 1800, function() {
+                'todayLectures' => CacheHelper::remember('today_lectures_' . date('Y-m-d'), function() {
                     return $this->getTodayLectures();
-                }),
-                'upcomingLectures' => CacheHelper::remember('upcoming_lectures_5', 1800, function() {
+                }, 1800),
+                'upcomingLectures' => CacheHelper::remember('upcoming_lectures_5', function() {
                     return $this->getUpcomingLectures(5);
-                })
+                }, 1800)
             ];
             
             // 헤더 데이터
@@ -613,9 +614,8 @@ class LectureController extends BaseController {
                 SELECT 
                     l.*,
                     u.nickname as organizer_name,
-                    CASE WHEN l.max_participants IS NULL THEN '무제한' 
-                         ELSE CONCAT(l.registration_count, '/', l.max_participants) 
-                    END as capacity_info,
+                    l.registration_count,
+                    l.max_participants,
                     CASE WHEN l.registration_deadline IS NULL OR l.registration_deadline > NOW() THEN 1 ELSE 0 END as can_register
                 FROM lectures l
                 JOIN users u ON l.user_id = u.id
@@ -708,9 +708,7 @@ class LectureController extends BaseController {
                 COALESCE(u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image,
                 u.bio as author_bio,
                 COUNT(DISTINCT CASE WHEN lr.status = 'approved' THEN lr.id END) as current_participants,
-                CASE WHEN l.max_participants IS NULL THEN '무제한' 
-                     ELSE CONCAT(COUNT(DISTINCT CASE WHEN lr.status = 'approved' THEN lr.id END), '/', l.max_participants) 
-                END as capacity_info,
+                l.max_participants,
                 CASE WHEN l.registration_deadline IS NULL OR l.registration_deadline > NOW() THEN 1 ELSE 0 END as can_register
             FROM lectures l
             JOIN users u ON l.user_id = u.id
@@ -970,8 +968,14 @@ class LectureController extends BaseController {
         if (empty($data['description'])) {
             $errors[] = '강의 설명을 입력해주세요.';
             error_log("검증 실패: description 누락");
+        } elseif (mb_strlen($data['description']) < 20) {
+            $errors[] = '강의 설명은 20자 이상 입력해주세요.';
+            error_log("검증 실패: description 너무 짧음 (" . mb_strlen($data['description']) . "자)");
+        } elseif (mb_strlen($data['description']) > 2000) {
+            $errors[] = '강의 설명은 2000자 이하로 입력해주세요.';
+            error_log("검증 실패: description 너무 김 (" . mb_strlen($data['description']) . "자)");
         } else {
-            error_log("검증 성공: description 길이 = " . strlen($data['description']));
+            error_log("검증 성공: description 길이 = " . mb_strlen($data['description']));
         }
         if (empty($data['start_date'])) {
             $errors[] = '시작 날짜를 입력해주세요.';

@@ -34,7 +34,7 @@ class CharacterCounter {
         this.options = {
             warningThreshold: options.warningThreshold || 0.8,  // 80%에서 경고
             errorThreshold: options.errorThreshold || 0.9,      // 90%에서 오류
-            useLocaleString: options.useLocaleString || false,  // 천 단위 구분자 사용 여부
+            useLocaleString: options.useLocaleString !== false,  // 천 단위 구분자 사용 여부 (기본값: true)
             showMaxLength: options.showMaxLength !== false,     // 최대 글자 수 표시 여부 (기본 true)
             warningClass: options.warningClass || 'warning',    // 경고 클래스명
             errorClass: options.errorClass || 'error',          // 오류 클래스명

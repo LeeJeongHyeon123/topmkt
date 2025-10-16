@@ -176,7 +176,7 @@ if (file_exists($styleFile)) {
             <div class="info-section">
                 <h2 class="section-title">📋 강의 소개</h2>
                 <div class="description-content">
-                    <?= nl2br(htmlspecialchars($lecture['description'])) ?>
+                    <?= HtmlSanitizerHelper::sanitizeRichText($lecture['description']) ?>
                 </div>
             </div>
             
@@ -739,7 +739,13 @@ if (file_exists($styleFile)) {
                 <div class="registration-info">
                     <div class="registration-status">
                         <div style="font-size: 0.9rem; color: #718096; margin-bottom: 5px; font-weight: 600;">👥 신청 인원</div>
-                        <span class="registration-count"><?= $lecture['capacity_info'] ?></span>
+                        <span class="registration-count">
+                            <?php if ($lecture['max_participants']): ?>
+                                <?= number_format($lecture['registration_count']) ?>/<?= number_format($lecture['max_participants']) ?>
+                            <?php else: ?>
+                                무제한
+                            <?php endif; ?>
+                        </span>
                     </div>
                     
                     <?php if ($lecture['registration_deadline']): ?>
@@ -2448,6 +2454,6 @@ function initCharacterCounters() {
 </script>
 
 <!-- edit-check.js 로드 -->
-<script src="/assets/js/edit-check.js"></script>
+<script src="//www.topmktx.com/assets/js/edit-check.js"></script>
 
-<?php include SRC_PATH . '/views/templates/footer.php'; ?><\!-- Cache Buster: 1756642384 -->
+<?php include SRC_PATH . '/views/templates/footer.php'; ?><!-- Cache Buster: 1756642384 -->
