@@ -156,7 +156,14 @@ class Router {
             'POST:/chat/rooms' => ['ChatController', 'createRoom'],
             'GET:/chat/search-users' => ['ChatController', 'searchUsers'],
             'GET:/chat/firebase-token' => ['ChatController', 'getFirebaseToken'],
-            
+
+            // 알림 설정 라우트
+            'GET:/notifications/settings' => ['NotificationSettingsController', 'index'],
+            'GET:/api/notifications/settings' => ['NotificationSettingsController', 'getSettings'],
+            'PUT:/api/notifications/settings' => ['NotificationSettingsController', 'updateSettings'],
+            'POST:/api/notifications/toggle-all' => ['NotificationSettingsController', 'toggleAll'],
+            'GET:/api/notifications/check/{type}/{id}' => ['NotificationSettingsController', 'checkNotification'],
+
             // 공지사항 라우트
             'GET:/notices' => ['NoticeController', 'index'],
             'GET:/notices/write' => ['NoticeController', 'showWrite'],
