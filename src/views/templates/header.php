@@ -1694,18 +1694,24 @@
                         const elements = document.querySelectorAll(selector);
                         elements.forEach(el => {
                             if (el) {
+                                // 헤더 레이아웃에 영향을 주지 않도록 display: none만 사용
                                 el.style.setProperty('display', 'none', 'important');
                                 el.style.setProperty('visibility', 'hidden', 'important');
                                 el.style.setProperty('opacity', '0', 'important');
-                                el.style.setProperty('position', 'absolute', 'important');
-                                el.style.setProperty('left', '-9999px', 'important');
-                                el.style.setProperty('width', '0', 'important');
-                                el.style.setProperty('height', '0', 'important');
-                                el.style.setProperty('overflow', 'hidden', 'important');
+                                // position과 크기 설정 제거 (헤더 레이아웃 보호)
                                 el.style.setProperty('pointer-events', 'none', 'important');
                             }
                         });
                     });
+
+                    // 헤더 레이아웃 보호를 위한 추가 규칙 적용
+                    const headerContent = document.querySelector('.header-content');
+                    if (headerContent) {
+                        headerContent.style.setProperty('display', 'flex', 'important');
+                        headerContent.style.setProperty('justify-content', 'space-between', 'important');
+                        headerContent.style.setProperty('align-items', 'center', 'important');
+                        headerContent.style.setProperty('width', '100%', 'important');
+                    }
 
                     // 햄버거 메뉴 강제 표시
                     const hamburgerElements = document.querySelectorAll('.mobile-hamburger');
