@@ -32,8 +32,9 @@ class UserOptimized {
             }
 
             // 🚀 v3.66.0: 캐시 TTL 10분 → 1시간 연장 (성능 최적화)
-            // 캐시 파일이 있고 1시간 미만이면 사용
-            $cacheTTL = 3600; // 1시간 (60분 * 60초)
+            // 🚀 v3.76.0: 캐시 TTL 1시간 → 6시간 연장 (캐시 미스 빈도 6배 감소)
+            // 캐시 파일이 있고 6시간 미만이면 사용
+            $cacheTTL = 21600; // 6시간 (360분 * 60초)
             if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTTL) {
                 $cachedData = json_decode(file_get_contents($cacheFile), true);
                 if ($cachedData) {
@@ -145,10 +146,11 @@ class UserOptimized {
     /**
      * 최적화된 통계 정보 조회 (캐시 테이블 사용)
      * v3.66.0: 캐시 TTL 10분 → 1시간 연장
+     * v3.76.0: DB 캐시 TTL 1시간 → 6시간 연장 (일관성 유지)
      */
     private function getOptimizedStats($userId) {
-        // 1. 캐시 테이블에서 먼저 조회 (1시간 TTL)
-        $sql = "SELECT * FROM user_stats_cache WHERE user_id = ? AND last_updated > DATE_SUB(NOW(), INTERVAL 1 HOUR)";
+        // 1. 캐시 테이블에서 먼저 조회 (6시간 TTL)
+        $sql = "SELECT * FROM user_stats_cache WHERE user_id = ? AND last_updated > DATE_SUB(NOW(), INTERVAL 6 HOUR)";
         $cached = $this->db->fetch($sql, [$userId]);
 
         if ($cached) {
