@@ -1476,8 +1476,6 @@ async function confirmDeleteAccount() {
         csrf_token: '<?php echo $_SESSION['csrf_token']; ?>'
     }, { noLoading: true })
     .then(data => {
- // 디버깅용
-
         // ResponseHelper 응답 구조에 맞게 수정
         const result = data.data || data;
         const isSuccess = result.success || data.status === 'success';
