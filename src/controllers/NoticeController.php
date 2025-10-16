@@ -14,6 +14,8 @@ require_once SRC_PATH . '/helpers/PerformanceDebugger.php';
 require_once SRC_PATH . '/helpers/WebLogger.php';
 require_once SRC_PATH . '/helpers/HtmlSanitizerHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/helpers/FcmHelper.php';
+require_once SRC_PATH . '/models/FcmToken.php';
 
 class NoticeController extends BaseController {
     private $noticeModel;
@@ -516,9 +518,39 @@ class NoticeController extends BaseController {
             ];
             
             $noticeId = $this->noticeModel->create($noticeData);
-            
+
             if ($noticeId) {
                 WebLogger::info("✅ 공지사항 생성 성공: ID $noticeId, 제목: '$title'");
+
+                // 🔔 FCM 푸시 알림 전송 (모든 회원에게)
+                try {
+                    $truncatedTitle = mb_strlen($title) > 20 ? mb_substr($title, 0, 20) . '...' : $title;
+
+                    // FcmHelper::sendByNotificationType() 사용하여 알림 설정 확인하고 전송
+                    $result = FcmHelper::sendByNotificationType(
+                        'notices',
+                        '새 공지사항 알림',
+                        '새로운 공지사항 "' . $truncatedTitle . '"가 등록되었습니다.',
+                        [
+                            'type' => 'notice',
+                            'notice_id' => $noticeId
+                        ]
+                    );
+
+                    WebLogger::info('신규 공지사항 알림 전송 완료', [
+                        'notice_id' => $noticeId,
+                        'title' => $title,
+                        'sent_count' => $result['sent_count'] ?? 0,
+                        'total_users' => $result['total_users'] ?? 0
+                    ]);
+                } catch (Exception $e) {
+                    WebLogger::error('신규 공지사항 알림 전송 실패', [
+                        'error' => $e->getMessage(),
+                        'notice_id' => $noticeId
+                    ]);
+                    // 알림 실패해도 공지사항 등록은 성공 처리
+                }
+
                 http_response_code(200);
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode([
@@ -530,7 +562,7 @@ class NoticeController extends BaseController {
                     ]
                 ], JSON_UNESCAPED_UNICODE);
                 exit;
-            } else {
+            } else{
                 throw new Exception('공지사항 생성에 실패했습니다.');
             }
             

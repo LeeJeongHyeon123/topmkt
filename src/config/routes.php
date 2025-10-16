@@ -156,6 +156,7 @@ class Router {
             'POST:/chat/rooms' => ['ChatController', 'createRoom'],
             'GET:/chat/search-users' => ['ChatController', 'searchUsers'],
             'GET:/chat/firebase-token' => ['ChatController', 'getFirebaseToken'],
+            'POST:/api/chat/send-notification' => ['ChatController', 'sendNotification'],
 
             // 알림 설정 라우트
             'GET:/notifications/settings' => ['NotificationSettingsController', 'index'],

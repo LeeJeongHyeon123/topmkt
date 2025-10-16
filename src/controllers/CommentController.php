@@ -7,6 +7,10 @@ require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/models/Comment.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/helpers/FcmHelper.php';
+require_once SRC_PATH . '/models/FcmToken.php';
+require_once SRC_PATH . '/models/NotificationSettings.php';
+require_once SRC_PATH . '/helpers/WebLogger.php';
 
 class CommentController extends BaseController {
     private $commentModel;
@@ -71,6 +75,85 @@ class CommentController extends BaseController {
             ]);
             
             if ($commentId) {
+                // 🔔 FCM 푸시 알림 전송
+                try {
+                    require_once SRC_PATH . '/models/Post.php';
+                    $postModel = new Post();
+                    $fcmTokenModel = new FcmToken();
+                    $notificationSettings = new NotificationSettings();
+                    $currentUserId = AuthMiddleware::getCurrentUserId();
+
+                    // 게시글 정보 조회
+                    $post = $postModel->getPostById($postId);
+
+                    if ($post) {
+                        $recipientIds = [];
+
+                        // 1. 게시글 작성자에게 알림 (자기 자신 제외)
+                        if ($post['user_id'] != $currentUserId) {
+                            $recipientIds[] = $post['user_id'];
+                        }
+
+                        // 2. 대댓글인 경우 댓글 작성자에게도 알림
+                        if ($parentId) {
+                            $parentComment = $this->commentModel->getById($parentId);
+                            if ($parentComment && $parentComment['user_id'] != $currentUserId && $parentComment['user_id'] != $post['user_id']) {
+                                $recipientIds[] = $parentComment['user_id'];
+                            }
+                        }
+
+                        // 3. 알림 설정 확인 및 FCM 토큰 조회
+                        $recipientIds = array_unique($recipientIds);
+
+                        foreach ($recipientIds as $recipientId) {
+                            // 🔔 알림 설정 확인: 사용자가 댓글 알림을 활성화했는지 확인
+                            if (!$notificationSettings->isNotificationEnabled($recipientId, 'comments')) {
+                                WebLogger::info('댓글 알림 스킵 (알림 설정 OFF)', [
+                                    'post_id' => $postId,
+                                    'recipient_id' => $recipientId
+                                ]);
+                                continue;
+                            }
+
+                            $tokens = $fcmTokenModel->getTokensByUserId($recipientId);
+
+                            if (!empty($tokens)) {
+                                $notificationType = $parentId ? '대댓글' : '댓글';
+                                $message = $parentId ? '회원님 댓글에 답글이 달렸어요.' : '회원님 게시글에 새로운 댓글이 달렸어요.';
+
+                                foreach ($tokens as $token) {
+                                    FcmHelper::sendPush(
+                                        $token['fcm_token'],
+                                        '새 ' . $notificationType . ' 알림',
+                                        $message,
+                                        [
+                                            'type' => 'comment',
+                                            'post_id' => $postId,
+                                            'comment_id' => $commentId,
+                                            'is_reply' => $parentId ? 'true' : 'false'
+                                        ]
+                                    );
+                                }
+
+                                WebLogger::info($notificationType . ' 알림 전송 완료', [
+                                    'post_id' => $postId,
+                                    'comment_id' => $commentId,
+                                    'recipient_id' => $recipientId,
+                                    'token_count' => count($tokens),
+                                    'is_reply' => (bool)$parentId
+                                ]);
+                            }
+                        }
+                    }
+                } catch (Exception $e) {
+                    WebLogger::error('댓글 알림 전송 실패', [
+                        'error' => $e->getMessage(),
+                        'post_id' => $postId,
+                        'comment_id' => $commentId
+                    ]);
+                    // 알림 실패해도 댓글 작성은 성공 처리
+                }
+
                 ResponseHelper::json([
                     'success' => true,
                     'message' => '댓글이 작성되었습니다.',

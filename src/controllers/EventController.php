@@ -13,6 +13,8 @@ require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/controllers/LectureController.php';
 require_once SRC_PATH . '/config/upload.php';
 require_once SRC_PATH . '/helpers/FirebaseHelper.php';
+require_once SRC_PATH . '/helpers/FcmHelper.php';
+require_once SRC_PATH . '/models/FcmToken.php';
 
 class EventController extends LectureController {
     public function __construct() {
@@ -523,7 +525,40 @@ class EventController extends LectureController {
                 error_log("강사 이미지 업로드 없음 - \$_FILES['instructor_images'] 비어있음");
                 error_log("사용 가능한 \$_FILES 키들: " . implode(', ', array_keys($_FILES)));
             }
-            
+
+            // 🔔 FCM 푸시 알림 전송 (published 상태일 때만)
+            try {
+                // published 상태일 때만 모든 회원에게 알림 전송
+                if (isset($_POST['status']) && $_POST['status'] === 'published') {
+                    $title = $_POST['title'] ?? '새 행사';
+                    $truncatedTitle = mb_strlen($title) > 20 ? mb_substr($title, 0, 20) . '...' : $title;
+
+                    // FcmHelper::sendByNotificationType() 사용하여 알림 설정 확인하고 전송
+                    $result = FcmHelper::sendByNotificationType(
+                        'lectures_events',
+                        '새 행사 알림',
+                        '새로운 행사 "' . $truncatedTitle . '"가 등록되었습니다.',
+                        [
+                            'type' => 'event',
+                            'event_id' => $eventId
+                        ]
+                    );
+
+                    WebLogger::info('신규 행사 알림 전송 완료', [
+                        'event_id' => $eventId,
+                        'title' => $title,
+                        'sent_count' => $result['sent_count'] ?? 0,
+                        'total_users' => $result['total_users'] ?? 0
+                    ]);
+                }
+            } catch (Exception $e) {
+                WebLogger::error('신규 행사 알림 전송 실패', [
+                    'error' => $e->getMessage(),
+                    'event_id' => $eventId
+                ]);
+                // 알림 실패해도 행사 등록은 성공 처리
+            }
+
             // 성공 메시지 설정
             $_SESSION['success_message'] = '행사가 성공적으로 등록되었습니다.';
 

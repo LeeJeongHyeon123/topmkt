@@ -8,6 +8,10 @@ require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/FirebaseHelper.php';
 require_once SRC_PATH . '/services/EmailService.php';
+require_once SRC_PATH . '/helpers/FcmHelper.php';
+require_once SRC_PATH . '/models/FcmToken.php';
+require_once SRC_PATH . '/models/NotificationSettings.php';
+require_once SRC_PATH . '/helpers/WebLogger.php';
 
 class RegistrationDashboardController extends BaseController
 {
@@ -274,15 +278,15 @@ class RegistrationDashboardController extends BaseController
             // 먼저 event_registrations 테이블에서 확인
             $eventRegistrationQuery = "
                 SELECT r.*, l.user_id as lecture_organizer, l.title as lecture_title,
-                       l.max_participants, l.current_participants, l.start_date, l.start_time, 
-                       l.content_type, r.event_id as lecture_id
+                       l.max_participants, l.current_participants, l.start_date, l.start_time,
+                       l.content_type, r.event_id as lecture_id, r.user_id
                 FROM event_registrations r
                 JOIN lectures l ON r.event_id = l.id
                 WHERE r.id = ?
             ";
-            
+
             $registration = $this->db->fetch($eventRegistrationQuery, [$registrationId]);
-            
+
             if ($registration) {
                 $registrationTable = 'event_registrations';
                 $lectureIdField = 'event_id';
@@ -290,15 +294,15 @@ class RegistrationDashboardController extends BaseController
                 // event_registrations에 없으면 lecture_registrations에서 확인
                 $lectureRegistrationQuery = "
                     SELECT r.*, l.user_id as lecture_organizer, l.title as lecture_title,
-                           l.max_participants, l.current_participants, l.start_date, l.start_time, 
-                           l.content_type, r.lecture_id
+                           l.max_participants, l.current_participants, l.start_date, l.start_time,
+                           l.content_type, r.lecture_id, r.user_id
                     FROM lecture_registrations r
                     JOIN lectures l ON r.lecture_id = l.id
                     WHERE r.id = ?
                 ";
-                
+
                 $registration = $this->db->fetch($lectureRegistrationQuery, [$registrationId]);
-                
+
                 if ($registration) {
                     $registrationTable = 'lecture_registrations';
                     $lectureIdField = 'lecture_id';
@@ -388,9 +392,77 @@ class RegistrationDashboardController extends BaseController
                     error_log("상태 변경 SMS 발송 실패: " . $e->getMessage());
                     // SMS 실패는 전체 프로세스를 중단하지 않음
                 }
-                
+
+                // 🔔 FCM 푸시 알림 전송 (신청자에게)
+                try {
+                    // user_id가 있는 경우에만 FCM 알림 전송
+                    if (!empty($registration['user_id'])) {
+                        $notificationSettings = new NotificationSettings();
+
+                        // 🔔 알림 설정 확인: 사용자가 신청 승인/거절 알림을 활성화했는지 확인
+                        if (!$notificationSettings->isNotificationEnabled($registration['user_id'], 'registration')) {
+                            WebLogger::info('신청 상태 변경 알림 스킵 (알림 설정 OFF)', [
+                                'registration_id' => $registrationId,
+                                'user_id' => $registration['user_id']
+                            ]);
+                        } else {
+                            $fcmTokenModel = new FcmToken();
+                            $tokens = $fcmTokenModel->getTokensByUserId($registration['user_id']);
+
+                            if (!empty($tokens)) {
+                                $contentType = $registration['content_type'] ?? 'lecture';
+                                $contentTypeName = $contentType === 'event' ? '행사' : '강의';
+                                $title = $registration['lecture_title'] ?? $contentTypeName;
+                                $truncatedTitle = mb_strlen($title) > 20 ? mb_substr($title, 0, 20) . '...' : $title;
+
+                                if ($newStatus === 'approved') {
+                                    $notificationTitle = $contentTypeName . ' 신청 승인';
+                                    $notificationBody = '"' . $truncatedTitle . '" 신청이 승인되었습니다.';
+                                } else {
+                                    $notificationTitle = $contentTypeName . ' 신청 거절';
+                                    $notificationBody = '"' . $truncatedTitle . '" 신청이 거절되었습니다.';
+                                }
+
+                                $sentCount = 0;
+                                foreach ($tokens as $token) {
+                                    $result = FcmHelper::sendPush(
+                                        $token['fcm_token'],
+                                        $notificationTitle,
+                                        $notificationBody,
+                                        [
+                                            'type' => 'registration_' . $newStatus,
+                                            'content_type' => $contentType,
+                                            'lecture_id' => $registration['lecture_id'],
+                                            'registration_id' => $registrationId
+                                        ]
+                                    );
+
+                                    if ($result['success']) {
+                                        $sentCount++;
+                                    }
+                                }
+
+                                WebLogger::info($contentTypeName . ' 신청 ' . ($newStatus === 'approved' ? '승인' : '거절') . ' 알림 전송 완료', [
+                                    'registration_id' => $registrationId,
+                                    'user_id' => $registration['user_id'],
+                                    'content_type' => $contentType,
+                                    'status' => $newStatus,
+                                    'token_count' => count($tokens),
+                                    'sent_count' => $sentCount
+                                ]);
+                            }
+                        }
+                    }
+                } catch (Exception $e) {
+                    WebLogger::error('신청 상태 변경 알림 전송 실패', [
+                        'error' => $e->getMessage(),
+                        'registration_id' => $registrationId
+                    ]);
+                    // 알림 실패해도 신청 처리는 성공
+                }
+
                 $message = $newStatus === 'approved' ? '신청이 승인되었습니다.' : '신청이 거절되었습니다.';
-                
+
                 return ResponseHelper::json([
                     'registration_id' => $registrationId,
                     'new_status' => $newStatus

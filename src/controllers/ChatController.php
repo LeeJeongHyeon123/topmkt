@@ -9,6 +9,9 @@ require_once SRC_PATH . '/models/User.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/helpers/FcmHelper.php';
+require_once SRC_PATH . '/models/FcmToken.php';
+require_once SRC_PATH . '/helpers/WebLogger.php';
 
 class ChatController extends BaseController {
     private $userModel;
@@ -177,8 +180,121 @@ class ChatController extends BaseController {
             ResponseHelper::json(null, 500, '서버 오류가 발생했습니다.');
         }
     }
-    
-    
+
+    /**
+     * 채팅 메시지 FCM 푸시 알림 전송 API
+     * POST /api/chat/send-notification
+     */
+    public function sendNotification() {
+        // POST 요청 확인
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            ResponseHelper::json(null, 405, 'POST 메소드만 허용됩니다.');
+            return;
+        }
+
+        // 로그인 확인
+        if (!AuthMiddleware::isLoggedIn()) {
+            ResponseHelper::json(null, 401, '로그인이 필요합니다.');
+            return;
+        }
+
+        try {
+            $senderId = AuthMiddleware::getCurrentUserId();
+
+            // JSON 데이터 파싱
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            if (!$input) {
+                ResponseHelper::json(null, 400, '잘못된 요청 데이터입니다.');
+                return;
+            }
+
+            // CSRF 토큰 검증
+            $csrfToken = $input['csrf_token'] ?? '';
+            if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrfToken)) {
+                ResponseHelper::json(null, 403, 'CSRF 토큰이 유효하지 않습니다.');
+                return;
+            }
+
+            // 필수 파라미터 검증
+            $recipientId = intval($input['recipient_id'] ?? 0);
+            $message = trim($input['message'] ?? '');
+            $roomId = trim($input['room_id'] ?? '');
+
+            if (!$recipientId || empty($message)) {
+                ResponseHelper::json(null, 400, '필수 파라미터가 누락되었습니다.');
+                return;
+            }
+
+            // 자기 자신에게는 알림 X
+            if ($senderId == $recipientId) {
+                ResponseHelper::json(['skipped' => true], 200, '자신에게는 알림을 보내지 않습니다.');
+                return;
+            }
+
+            // 수신자의 FCM 토큰 조회
+            $fcmTokenModel = new FcmToken();
+            $tokens = $fcmTokenModel->getTokensByUserId($recipientId);
+
+            if (empty($tokens)) {
+                ResponseHelper::json(['no_tokens' => true], 200, '수신자의 FCM 토큰이 없습니다.');
+                return;
+            }
+
+            // 발신자 정보 조회
+            $sender = $this->userModel->findById($senderId);
+
+            if (!$sender) {
+                ResponseHelper::json(null, 404, '발신자 정보를 찾을 수 없습니다.');
+                return;
+            }
+
+            $senderName = $sender['nickname'] ?? '알 수 없음';
+
+            // 메시지 내용 요약 (30자 제한)
+            $truncatedMessage = mb_strlen($message) > 30 ? mb_substr($message, 0, 30) . '...' : $message;
+
+            // FCM 푸시 전송
+            $sentCount = 0;
+            foreach ($tokens as $token) {
+                $result = FcmHelper::sendPush(
+                    $token['fcm_token'],
+                    $senderName . '님의 메시지',
+                    $truncatedMessage,
+                    [
+                        'type' => 'chat',
+                        'sender_id' => $senderId,
+                        'room_id' => $roomId
+                    ]
+                );
+
+                if ($result['success']) {
+                    $sentCount++;
+                }
+            }
+
+            WebLogger::info('채팅 메시지 알림 전송 완료', [
+                'sender_id' => $senderId,
+                'recipient_id' => $recipientId,
+                'room_id' => $roomId,
+                'token_count' => count($tokens),
+                'sent_count' => $sentCount
+            ]);
+
+            ResponseHelper::json([
+                'sent_count' => $sentCount,
+                'total_tokens' => count($tokens)
+            ], 200, '알림 전송 완료');
+
+        } catch (Exception $e) {
+            WebLogger::error('채팅 알림 전송 실패', [
+                'error' => $e->getMessage()
+            ]);
+            ResponseHelper::json(null, 500, '알림 전송 중 오류가 발생했습니다.');
+        }
+    }
+
+
     /**
      * Firebase 토큰 반환 (AJAX)
      */

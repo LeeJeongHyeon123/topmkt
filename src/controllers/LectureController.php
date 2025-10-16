@@ -11,6 +11,9 @@ require_once SRC_PATH . '/helpers/ValidationHelper.php';
 require_once SRC_PATH . '/helpers/CacheHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
 require_once SRC_PATH . '/config/upload.php';
+require_once SRC_PATH . '/helpers/FcmHelper.php';
+require_once SRC_PATH . '/models/FcmToken.php';
+require_once SRC_PATH . '/helpers/WebLogger.php';
 
 class LectureController extends BaseController {
     private $userModel;
@@ -573,8 +576,43 @@ class LectureController extends BaseController {
                 error_log("=== 강의 저장 프로세스 시작 ===");
                 
                 $lectureId = $this->createLecture($validationResult['data'], $currentUserId);
-                
+
                 if ($lectureId) {
+                    // 🔔 FCM 푸시 알림 전송 (published 상태일 때만)
+                    try {
+                        $lectureData = $validationResult['data'];
+
+                        // published 상태일 때만 모든 회원에게 알림 전송
+                        if (isset($lectureData['status']) && $lectureData['status'] === 'published') {
+                            $title = $lectureData['title'] ?? '새 강의';
+                            $truncatedTitle = mb_strlen($title) > 20 ? mb_substr($title, 0, 20) . '...' : $title;
+
+                            // FcmHelper::sendByNotificationType() 사용하여 알림 설정 확인하고 전송
+                            $result = FcmHelper::sendByNotificationType(
+                                'lectures_events',
+                                '새 강의 알림',
+                                '새로운 강의 "' . $truncatedTitle . '"가 등록되었습니다.',
+                                [
+                                    'type' => 'lecture',
+                                    'lecture_id' => $lectureId
+                                ]
+                            );
+
+                            WebLogger::info('신규 강의 알림 전송 완료', [
+                                'lecture_id' => $lectureId,
+                                'title' => $title,
+                                'sent_count' => $result['sent_count'] ?? 0,
+                                'total_users' => $result['total_users'] ?? 0
+                            ]);
+                        }
+                    } catch (Exception $e) {
+                        WebLogger::error('신규 강의 알림 전송 실패', [
+                            'error' => $e->getMessage(),
+                            'lecture_id' => $lectureId
+                        ]);
+                        // 알림 실패해도 강의 등록은 성공 처리
+                    }
+
                     // 강의 등록 성공 - 강의 상세 페이지로 이동
                     $message = '강의가 성공적으로 등록되었습니다.';
                     ResponseHelper::json([

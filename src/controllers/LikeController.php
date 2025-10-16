@@ -6,6 +6,10 @@
 require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/helpers/ResponseHelper.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/helpers/FcmHelper.php';
+require_once SRC_PATH . '/models/FcmToken.php';
+require_once SRC_PATH . '/models/NotificationSettings.php';
+require_once SRC_PATH . '/helpers/WebLogger.php';
 
 class LikeController extends BaseController {
     public function __construct() {
@@ -70,7 +74,64 @@ class LikeController extends BaseController {
                 $likeCount = $likeCountResult['like_count'] ?? 0;
                 
                 $this->db->commit();
-                
+
+                // 🔔 FCM 푸시 알림 전송 (좋아요 추가 시에만)
+                if ($action === 'liked') {
+                    try {
+                        require_once SRC_PATH . '/models/Post.php';
+                        $postModel = new Post();
+                        $fcmTokenModel = new FcmToken();
+                        $notificationSettings = new NotificationSettings();
+                        $currentUserId = AuthMiddleware::getCurrentUserId();
+
+                        // 게시글 정보 조회
+                        $post = $postModel->getPostById($postId);
+
+                        if ($post && $post['user_id'] != $currentUserId) {
+                            // 🔔 알림 설정 확인: 사용자가 좋아요 알림을 활성화했는지 확인
+                            if (!$notificationSettings->isNotificationEnabled($post['user_id'], 'likes')) {
+                                WebLogger::info('좋아요 알림 스킵 (알림 설정 OFF)', [
+                                    'post_id' => $postId,
+                                    'recipient_id' => $post['user_id']
+                                ]);
+                            } else {
+                                // 자기 자신의 게시글에는 알림 X
+                                $tokens = $fcmTokenModel->getTokensByUserId($post['user_id']);
+
+                                if (!empty($tokens)) {
+                                    $title = $post['title'] ?? '게시글';
+                                    $truncatedTitle = mb_strlen($title) > 20 ? mb_substr($title, 0, 20) . '...' : $title;
+
+                                    foreach ($tokens as $token) {
+                                        FcmHelper::sendPush(
+                                            $token['fcm_token'],
+                                            '새 좋아요 알림',
+                                            '회원님 게시글 "' . $truncatedTitle . '"에 좋아요를 눌렀어요.',
+                                            [
+                                                'type' => 'like',
+                                                'post_id' => $postId,
+                                                'like_count' => $likeCount
+                                            ]
+                                        );
+                                    }
+
+                                    WebLogger::info('좋아요 알림 전송 완료', [
+                                        'post_id' => $postId,
+                                        'recipient_id' => $post['user_id'],
+                                        'token_count' => count($tokens)
+                                    ]);
+                                }
+                            }
+                        }
+                    } catch (Exception $e) {
+                        WebLogger::error('좋아요 알림 전송 실패', [
+                            'error' => $e->getMessage(),
+                            'post_id' => $postId
+                        ]);
+                        // 알림 실패해도 좋아요 처리는 성공
+                    }
+                }
+
                 ResponseHelper::success([
                     'action' => $action,
                     'like_count' => intval($likeCount),
