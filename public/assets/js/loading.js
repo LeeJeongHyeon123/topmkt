@@ -459,18 +459,7 @@ window.TopMarketingLoading = {
     }
 };
 
-// AJAX 요청 인터셉터 (jQuery가 있는 경우)
-if (typeof $ !== 'undefined') {
-    $(document).ajaxStart(function() {
-        window.TopMarketingLoading.show();
-    });
-    
-    $(document).ajaxStop(function() {
-        setTimeout(() => {
-            window.TopMarketingLoading.hide();
-        }, 500);
-    });
-}
+// jQuery 관련 코드 제거 완료 (프로젝트에서 jQuery 미사용)
 
 // Fetch API 인터셉터
 if (window.fetch) {
