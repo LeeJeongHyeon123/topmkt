@@ -264,6 +264,71 @@ echo renderPagination($paginationData);
 - Python 줄 단위 제거도 여러 줄 console 처리 불가
 - Agent + 수동 확인 방식이 가장 안전하고 확실
 
+### v3.81.1 ~ v3.81.5 - console 로그 제거 후 긴급 문법 오류 수정 (2025-10-16) 🚨
+**상황**: v3.81.0 console 로그 제거 작업 후 프로덕션에서 JavaScript 문법 오류 5건 발생
+**원인**: console.log/error 제거 시 일부 코드가 함께 제거되거나 orphaned 구조가 남음
+
+**긴급 수정 내역**:
+
+#### v3.81.1 - community/detail.php (좋아요 버튼 수정)
+- **오류**: `1000038:3868 Uncaught SyntaxError: missing ) after argument list`
+- **원인**: ApiClient.post() 호출 전체가 제거되어 orphaned 코드만 남음
+- **해결**: 좋아요 기능 ApiClient.post 블록 완전 복원
+
+#### v3.81.2 - user/edit.php (프로필 수정 페이지 - 1차 수정)
+- **오류**: `edit:2458 Uncaught SyntaxError: Unexpected token ':'`
+- **원인**: .then() 블록에 주석만 남고 실제 코드가 제거됨
+- **해결**: confirmDeleteAccount 함수의 .then() 블록 코드 복원
+
+#### v3.81.3 - community/detail.php (공유 기능 수정)
+- **오류**: `1000038:3920 Uncaught SyntaxError: missing ) after argument list`
+- **원인**: navigator.share()의 .catch() 핸들러가 제거됨
+- **해결**: `.catch(() => {})` 추가로 Promise 체인 완성
+
+#### v3.81.4 - user/edit.php (프로필 수정 페이지 - 2차 수정)
+- **오류**: `edit:2458 Uncaught SyntaxError: Unexpected token ':'` (여전히 발생)
+- **원인**: v3.81.2에서 line 1479만 수정했지만, lines 1119-1120에 빈 else 블록이 남아있음
+- **해결**: 빈 else 블록 완전 제거
+```javascript
+// 수정 전 (오류)
+if (imageBlob) {
+    formData.append('profile_image', imageBlob, 'profile_image.jpg');
+} else {
+}  // <- 빈 블록
+
+// 수정 후 (정상)
+if (imageBlob) {
+    formData.append('profile_image', imageBlob, 'profile_image.jpg');
+}
+```
+
+#### v3.81.5 - upload-config.js.php (업로드 설정 수정)
+- **오류**: `allowedExtensions: window.TOPMKT_UPLOAD_CONFIG.allowedImageExtensions` 문법 오류
+- **원인**: console.log 제거 후 객체만 남아 orphaned object literal 발생
+- **해결**: lines 59-62 orphaned object 완전 제거
+```javascript
+// 수정 전 (오류)
+// 디버깅용 정보 출력
+    maxFileSizeMB: window.TOPMKT_UPLOAD_CONFIG.maxFileSizeMB + 'MB',
+    allowedExtensions: window.TOPMKT_UPLOAD_CONFIG.allowedImageExtensions
+});
+
+// 수정 후 (정상)
+// 완전 제거
+```
+
+**교훈**:
+- ✅ console 로그 제거 시 Promise 체인 (.then, .catch) 확인 필수
+- ✅ 빈 else 블록도 문법 오류 유발 가능
+- ✅ 객체/배열 리터럴이 독립적으로 남지 않도록 주의
+- ✅ 프로덕션 배포 전 전체 페이지 문법 검증 필요
+- ✅ 백업 파일로 즉시 비교하여 제거된 코드 복원
+
+**결과**:
+- 5건의 긴급 문법 오류 모두 해결
+- 좋아요, 공유, 프로필 수정, 업로드 기능 정상화
+- 프로덕션 서비스 안정화 완료
+
 ### v3.84.0 - 행사 상세 페이지 모바일 패딩 최적화 (2025-10-16)
 **문제**: 모바일 화면에서 좌우 여백이 과도하여 콘텐츠 영역이 매우 좁게 표시
 **해결**: 모바일 전용 패딩 값 최적화로 콘텐츠 영역 30-40% 확대
@@ -528,4 +593,4 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 **마지막 업데이트**: 2025-10-16
 **작업자**: Claude (Anthropic)
-**최신 버전**: v3.81.0
+**최신 버전**: v3.81.5
