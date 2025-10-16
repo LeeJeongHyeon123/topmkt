@@ -691,6 +691,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // CSRF 토큰 가져오기
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            // v3.42.0: ApiClient 사용
+            ApiClient.post(`/api/posts/${postId}/like`, {}, { noLoading: true })
+            .then(data => {
+
+                if (data.status === 'success' && data.data) {
+
+                    // 좋아요 상태에 따라 버튼 텍스트 및 스타일 변경
+                    if (data.data.action === 'liked') {
+                        this.innerHTML = '❤️ 좋아요 ' + data.data.like_count;
                         this.classList.add('liked');
  // 디버깅용
                     } else if (data.data.action === 'unliked') {
