@@ -1112,11 +1112,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         
         // 크롭된 이미지가 있으면 FormData에 추가
-        
         const imageBlob = croppedImageBlob || window.croppedImageBlob;
         if (imageBlob) {
             formData.append('profile_image', imageBlob, 'profile_image.jpg');
-        } else {
         }
         
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
