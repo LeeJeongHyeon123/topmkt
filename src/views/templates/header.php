@@ -161,6 +161,135 @@
 </head>
 <body class="<?= isset($current_page) && $current_page === 'home' ? 'home-page' : '' ?>">
     <header class="main-header modern-header" style="overflow: visible;">
+        <!-- ============================================================
+             헤더 로고 위치 통합 시스템 v4.0 (SINGLE SOURCE OF TRUTH)
+             - 모든 breakpoint에서 로고 좌측 고정
+             - 페이지 로딩 시 중앙 이동 방지
+             - 반응형 여백 최적화
+             ============================================================ -->
+        
+        <!-- 즉시 실행 스크립트: DOM 파싱 전 스타일 적용 -->
+        <script>
+        (function() {
+            'use strict';
+            var style = document.createElement('style');
+            style.id = 'logo-position-immediate';
+            style.textContent = '.header-content{justify-content:space-between!important}.header-left{margin-left:0!important;flex:0 0 auto!important;order:1!important}';
+            document.head.insertBefore(style, document.head.firstChild);
+        })();
+        </script>
+        
+        <style>
+        /* ============================================================
+           기본 레이아웃 (모든 사이즈 공통)
+           ============================================================ */
+        .header-content,
+        header .header-content,
+        .main-header .header-content {
+            display: flex !important;
+            align-items: center !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: visible !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+        }
+
+        .header-left,
+        header .header-left,
+        .header-content .header-left {
+            flex: 0 0 auto !important;
+            order: 1 !important;
+            position: relative !important;
+            transform: none !important;
+            left: auto !important;
+            right: auto !important;
+            margin-right: auto !important;
+            width: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        /* ============================================================
+           반응형 Breakpoints (SINGLE SOURCE OF TRUTH)
+           ============================================================ */
+        
+        /* PC (1920px 이상) */
+        @media (min-width: 1920px) {
+            .header-content {
+                justify-content: space-between !important;
+                padding: 15px 40px !important;
+            }
+            .header-left {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* 큰 태블릿 (1440px ~ 1919px) */
+        @media (min-width: 1440px) and (max-width: 1919px) {
+            .header-content {
+                justify-content: space-between !important;
+                padding: 15px 30px !important;
+            }
+            .header-left {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* 태블릿 (1024px ~ 1439px) */
+        @media (min-width: 1024px) and (max-width: 1439px) {
+            .header-content {
+                justify-content: space-between !important;
+                padding: 15px 25px !important;
+            }
+            .header-left {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* 작은 태블릿 (768px ~ 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .header-content {
+                justify-content: space-between !important;
+                padding: 12px 20px !important;
+            }
+            .header-left {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* 큰 모바일 (425px ~ 767px) */
+        @media (min-width: 425px) and (max-width: 767px) {
+            .header-content {
+                justify-content: space-between !important;
+                padding: 12px 15px !important;
+            }
+            .header-left {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* 모바일 (375px ~ 424px) */
+        @media (min-width: 375px) and (max-width: 424px) {
+            .header-content {
+                justify-content: space-between !important;
+                padding: 10px 12px !important;
+            }
+            .header-left {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* 작은 모바일 (320px ~ 374px) */
+        @media (max-width: 374px) {
+            .header-content {
+                justify-content: space-between !important;
+                padding: 10px 10px !important;
+            }
+            .header-left {
+                margin-left: 0 !important;
+            }
+        }
+        </style>
         <!-- 🎯 심플하고 깔끔한 모바일 햄버거 메뉴 (로고와 세로 중앙정렬) -->
         <button class="mobile-hamburger" id="mobile-hamburger" style="
             position: fixed !important;
@@ -216,9 +345,9 @@
         </button>
         
         <div class="container" style="overflow: visible !important; position: relative;">
-            <div class="header-content">
+            <div class="header-content" style="display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; padding: 15px 20px 15px 20px !important; overflow: visible !important; flex-direction: row !important; flex-wrap: nowrap !important; box-sizing: border-box !important;">
                 <!-- 로고 -->
-                <div class="header-left">
+                <div class="header-left" style="flex: 0 0 auto !important; order: 1 !important; position: relative !important; transform: none !important; left: auto !important; right: auto !important; margin-left: 0 !important; margin-right: auto !important; width: auto !important; min-width: 0 !important; max-width: none !important; box-sizing: border-box !important;">
                     <h1 class="logo">
                         <a href="/" class="logo-link">
                             <div class="logo-icon">
@@ -548,11 +677,14 @@
                         left: -9999px !important;
                     }
 
-                    /* 헤더 레이아웃 조정 - 높은 특이성 */
+                    /* 🚨 ULTRA FORCE: 헤더 레이아웃 조정 - 높은 특이성 + 로딩 완료 후 중앙 이동 방지 */
                     .header-content,
-                    header .header-content {
+                    header .header-content,
+                    html body .header-content,
+                    html body header .header-content,
+                    html body .main-header .header-content {
                         display: flex !important;
-                        justify-content: space-between !important;
+                        justify-content: space-between !important; /* 로고 좌측 고정 - 중앙 이동 절대 방지 */
                         align-items: center !important;
                         flex-wrap: nowrap !important;
                     }
@@ -1375,44 +1507,11 @@
         }
     }
     
-    /* 헤더 레이아웃 개선 - 로켓 애니메이션 짤림 방지 */
-    .header-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 15px 20px 15px 20px; /* 좌측 패딩을 20px로 조정하여 로고를 좌측으로 */
-        overflow: visible; /* 애니메이션이 컨테이너를 벗어나도 표시되도록 */
-    }
-    
+    /* ============================================================
+       추가 헤더 컴포넌트 스타일 (로고 관련 아님)
+       ============================================================ */
     .header-left {
-        flex: 0 0 auto !important;
-        position: relative !important;
-        z-index: 9997 !important; /* 로고 영역 전체에 높은 z-index 적용 */
-        order: 1 !important; /* 항상 첫 번째 순서로 유지 */
-        min-width: 0 !important; /* flex-shrink 방지 */
-        transform: none !important; /* 변환 방지 */
-        left: auto !important; /* 위치 고정 */
-        right: auto !important; /* 위치 고정 */
-        margin-left: 0 !important; /* 마진 초기화 */
-        margin-right: auto !important; /* 마진 초기화 */
-    }
-
-    /* 최상위 우선순위로 로고 위치 강제 보호 - JavaScript 변경 방지 */
-    html body .header-left,
-    html body header .header-left,
-    html body .header-content .header-left,
-    .header-left,
-    header .header-left,
-    .header-content .header-left {
-        flex: 0 0 auto !important;
-        order: 1 !important;
-        position: relative !important;
-        transform: none !important;
-        left: auto !important;
-        right: auto !important;
-        margin-left: 0 !important;
-        margin-right: auto !important;
+        z-index: 9997 !important; /* 로고 영역 z-index (로켓 애니메이션용) */
     }
     
     .main-nav {
@@ -2144,98 +2243,32 @@
         });
         }, { once: true }); // 🚀 v3.64.0: DOMContentLoaded 중복 실행 방지
 
-        // 🚀 헤더 로고 위치 지속적 보호 시스템 (강화 버전)
+        // ============================================================
+        // 헤더 로고 위치 검증 시스템 v4.0 (SIMPLE & CLEAN)
+        // - CSS가 주요 작업을 수행하므로 JavaScript는 최소화
+        // - 페이지 로드 후 한 번만 검증
+        // ============================================================
         (function() {
             'use strict';
-
-            let logoProtectionInterval;
-            const originalFlex = '0 0 auto';
-            const originalOrder = '1';
-
-            function checkAndFixLogoPosition() {
-                const headerLeft = document.querySelector('.header-left');
-                if (!headerLeft) return;
-
-                const currentFlex = window.getComputedStyle(headerLeft).flex;
-                const currentOrder = window.getComputedStyle(headerLeft).order;
-
-                // 위치가 변경되었는지 확인
-                if (currentFlex !== originalFlex || currentOrder !== originalOrder) {
-                    console.log('🔧 로고 위치 변경 감지 - 복구 실행');
-
-                    // 모든 가능한 스타일 속성 강제 복구
-                    const logoStyles = {
-                        'flex': '0 0 auto',
-                        'order': '1',
-                        'position': 'relative',
-                        'transform': 'none',
-                        'left': 'auto',
-                        'right': 'auto',
-                        'margin-left': '0',
-                        'margin-right': 'auto'
-                    };
-
-                    Object.entries(logoStyles).forEach(([property, value]) => {
-                        headerLeft.style.setProperty(property, value, 'important');
-                    });
-
-                    // 헤더 컨테이너도 보호
-                    const headerContent = document.querySelector('.header-content');
-                    if (headerContent) {
-                        headerContent.style.setProperty('display', 'flex', 'important');
-                        headerContent.style.setProperty('justify-content', 'space-between', 'important');
-                        headerContent.style.setProperty('align-items', 'center', 'important');
-                        headerContent.style.setProperty('width', '100%', 'important');
+            
+            function verifyLogoPosition() {
+                var headerContent = document.querySelector('.header-content');
+                if (headerContent) {
+                    var computed = window.getComputedStyle(headerContent);
+                    if (computed.justifyContent !== 'space-between') {
+                        console.warn('⚠️ 헤더 레이아웃 검증 실패. 외부 CSS 충돌 가능성.');
                     }
                 }
             }
-
-            function startLogoProtection() {
-                console.log('🛡️ 로고 위치 보호 시스템 시작');
-
-                // 100ms마다 위치 확인 및 복구
-                logoProtectionInterval = setInterval(checkAndFixLogoPosition, 100);
-
-                // 30초 후 자동 중단 (성능 최적화)
-                setTimeout(() => {
-                    if (logoProtectionInterval) {
-                        clearInterval(logoProtectionInterval);
-                        console.log('✅ 로고 위치 보호 시스템 종료');
-                    }
-                }, 30000);
+            
+            // 페이지 로드 완료 후 검증
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', verifyLogoPosition, { once: true });
+            } else {
+                verifyLogoPosition();
             }
-
-            // 즉시 시작
-            startLogoProtection();
-
-            // DOM 변경 이벤트 감지 (강화 버전)
-            if (window.MutationObserver) {
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                            // 스타일 변경 감지 시 즉시 확인
-                            setTimeout(checkAndFixLogoPosition, 10);
-                        }
-                    });
-                });
-
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true,
-                    attributes: true,
-                    attributeFilter: ['style', 'class']
-                });
-
-                console.log('🔍 DOM 변경 감지 시스템 활성화');
-            }
-
-            // 페이지 완전 로드 후 최종 확인
-            window.addEventListener('load', () => {
-                setTimeout(checkAndFixLogoPosition, 100);
-                console.log('✅ 페이지 로드 완료 - 로고 위치 최종 확인');
-            });
-
-        })(); // 즉시 실행
+            window.addEventListener('load', verifyLogoPosition, { once: true });
+        })();
 
     } // 🚀 v3.64.0: headerMobileMenuInitialized 플래그 종료
     </script> 
