@@ -164,11 +164,11 @@ class Router {
             'POST:/api/notifications/toggle-all' => ['NotificationSettingsController', 'toggleAll'],
             'GET:/api/notifications/check/{type}/{id}' => ['NotificationSettingsController', 'checkNotification'],
 
-            // FCM (Firebase Cloud Messaging) 라우트
-            'POST:/api/fcm/register' => ['FcmController', 'register'],
-            'DELETE:/api/fcm/unregister' => ['FcmController', 'unregister'],
-            'GET:/api/fcm/tokens' => ['FcmController', 'getMyTokens'],
-            'POST:/api/fcm/test-push' => ['FcmController', 'testPush'],
+            // FCM (Firebase Cloud Messaging) 라우트 - RESTful API
+            'POST:/api/fcm/tokens' => ['FcmController', 'store'],
+            'DELETE:/api/fcm/tokens' => ['FcmController', 'destroy'],
+            'GET:/api/fcm/tokens' => ['FcmController', 'index'],
+            'POST:/api/fcm/push/test' => ['FcmController', 'testPush'],
 
             // 공지사항 라우트
             'GET:/notices' => ['NoticeController', 'index'],

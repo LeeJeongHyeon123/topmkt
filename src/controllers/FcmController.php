@@ -21,12 +21,12 @@ class FcmController extends BaseController
     }
 
     /**
-     * FCM 토큰 등록 API
-     * POST /api/fcm/register
+     * FCM 토큰 등록 API (RESTful)
+     * POST /api/fcm/tokens
      *
      * @return void
      */
-    public function register()
+    public function store()
     {
         try {
             // 로그인 확인
@@ -82,18 +82,18 @@ class FcmController extends BaseController
                 'device_type' => $deviceType
             ]);
         } catch (Exception $e) {
-            error_log('FcmController::register 오류: ' . $e->getMessage());
+            error_log('FcmController::store 오류: ' . $e->getMessage());
             return $this->error('FCM 토큰 등록 중 오류가 발생했습니다.', 500);
         }
     }
 
     /**
-     * FCM 토큰 삭제 API
-     * DELETE /api/fcm/unregister
+     * FCM 토큰 삭제 API (RESTful)
+     * DELETE /api/fcm/tokens
      *
      * @return void
      */
-    public function unregister()
+    public function destroy()
     {
         try {
             // 로그인 확인
@@ -131,18 +131,18 @@ class FcmController extends BaseController
 
             return $this->success('FCM 토큰이 삭제되었습니다.');
         } catch (Exception $e) {
-            error_log('FcmController::unregister 오류: ' . $e->getMessage());
+            error_log('FcmController::destroy 오류: ' . $e->getMessage());
             return $this->error('FCM 토큰 삭제 중 오류가 발생했습니다.', 500);
         }
     }
 
     /**
-     * 내 FCM 토큰 목록 조회 API
+     * 내 FCM 토큰 목록 조회 API (RESTful)
      * GET /api/fcm/tokens
      *
      * @return void
      */
-    public function getMyTokens()
+    public function index()
     {
         try {
             // 로그인 확인
@@ -160,7 +160,7 @@ class FcmController extends BaseController
                 'tokens' => $tokens
             ]);
         } catch (Exception $e) {
-            error_log('FcmController::getMyTokens 오류: ' . $e->getMessage());
+            error_log('FcmController::index 오류: ' . $e->getMessage());
             return $this->error('FCM 토큰 조회 중 오류가 발생했습니다.', 500);
         }
     }
