@@ -27,16 +27,8 @@ if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 행사 상세 페이지 스타일 include
-<style>
-<?php
-// 행사 상세 페이지 스타일 파일 include
+// 행사 상세 페이지 스타일 include - PHP 코드 바깥으로 이동
 $styleFile = SRC_PATH . '/views/events/components/event-detail-styles.css';
-if (file_exists($styleFile)) {
-    echo file_get_contents($styleFile);
-}
-?>
-</style>
 
 // 프로필 이미지 모달 리소스 로드
 include SRC_PATH . '/views/components/profile-modal-resources.php';
@@ -51,7 +43,12 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 <!-- Quill.js 에디터 CSS (리치 텍스트 표시용) -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
 
-</style>
+<!-- 행사 상세 페이지 스타일 include - 강의 페이지와 동일한 방식 -->
+<?php
+if (isset($styleFile) && file_exists($styleFile)) {
+    echo file_get_contents($styleFile);
+}
+?>
 
 <div class="event-detail-container">
     <!-- 행사 히어로 섹션 -->
@@ -1926,3 +1923,6 @@ async function confirmDeleteEvent(eventId) {
 
 <!-- edit-check.js 로드 -->
 <script src="/assets/js/edit-check.js"></script>
+
+<!-- 이벤트 페이지 디버깅 스크립트 -->
+<script src="/debug_events.js"></script>

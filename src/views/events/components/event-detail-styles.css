@@ -1,13 +1,36 @@
 <style>
-/* 행사 상세 페이지 스타일 (파란색 테마) */
+/* 행사 상세 페이지 스타일 (파란색 테마) - 강의 페이지와 동일한 최대 너비 적용 */
 .event-detail-container {
-    max-width: 1200px;
+    max-width: 1650px; /* 강의 페이지와 동일한 최대 너비 적용 */
     margin: 0 auto;
     padding: 30px 15px;
     min-height: calc(100vh - 200px);
     /* 헤더 겹침 방지: 고정 헤더 높이만큼 상단 여백 추가 */
     margin-top: 80px; /* 데스크톱: 헤더 높이(66px) + 여유 공간(14px) */
     padding-top: 20px;
+    overflow-x: hidden !important; /* 가로 스크롤 방지 - 최우선 */
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+
+/* 전역 텍스트 오버플로우 방지 - 강의 페이지와 동일한 규칙 적용 */
+.event-detail-container * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.event-detail-container div,
+.event-detail-container span,
+.event-detail-container p,
+.event-detail-container h1,
+.event-detail-container h2,
+.event-detail-container h3,
+.event-detail-container h4,
+.event-detail-container h5,
+.event-detail-container h6 {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: normal !important;
 }
 
 .event-hero {
@@ -149,7 +172,7 @@
 
 .event-content {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 350px; /* 강의 페이지와 동일한 그리드 레이아웃 적용 */
     gap: 40px;
     margin-bottom: 40px;
 }
