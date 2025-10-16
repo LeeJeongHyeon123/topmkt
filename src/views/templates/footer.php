@@ -496,5 +496,8 @@
 <!-- 🚀 v3.65.0: 클립보드 복사 유틸리티 시스템 -->
 <?php require_once __DIR__ . '/../includes/clipboard-utils.js.php'; ?>
 
+<!-- 🚀 v3.88.0: FCM 앱 브릿지 시스템 -->
+<script src="/assets/js/fcm-app-bridge.js?v=<?= time() ?>"></script>
+
 </body>
 </html> 

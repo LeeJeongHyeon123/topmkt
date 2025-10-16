@@ -19,18 +19,58 @@ class FcmToken
     }
 
     /**
-     * FCM 토큰 등록 (UPSERT 방식)
+     * FCM 토큰 등록 (최적화된 UPSERT 방식)
+     * DB 부하 최소화: 토큰 변경 시에만 쓰기 수행
      *
      * @param int $userId 사용자 ID
      * @param string $fcmToken FCM 토큰
      * @param string $deviceType 디바이스 타입 (android|ios|web)
      * @param string|null $deviceName 디바이스 이름
      * @param string|null $appVersion 앱 버전
-     * @return bool 성공 여부
+     * @return array 결과 ['changed' => bool, 'action' => string, 'message' => string]
      */
     public function registerToken($userId, $fcmToken, $deviceType = 'android', $deviceName = null, $appVersion = null)
     {
         try {
+            // 1. 기존 토큰 조회 (SELECT - 인덱스 사용으로 빠름)
+            $existingToken = $this->db->fetch(
+                "SELECT fcm_token, device_type, device_name, app_version, is_active
+                 FROM fcm_tokens
+                 WHERE user_id = ? AND fcm_token = ?
+                 LIMIT 1",
+                [$userId, $fcmToken]
+            );
+
+            // 2. 토큰이 이미 존재하고 정보가 동일한지 확인
+            if ($existingToken) {
+                $needsUpdate =
+                    $existingToken['device_type'] !== $deviceType ||
+                    $existingToken['device_name'] !== $deviceName ||
+                    $existingToken['app_version'] !== $appVersion ||
+                    $existingToken['is_active'] != 1;
+
+                if (!$needsUpdate) {
+                    // 변경 사항 없음 → DB 쓰기 SKIP
+                    WebLogger::info('FCM 토큰 등록 스킵 (변경 없음)', [
+                        'user_id' => $userId,
+                        'token_length' => strlen($fcmToken)
+                    ]);
+
+                    return [
+                        'changed' => false,
+                        'action' => 'skipped',
+                        'message' => '이미 동일한 토큰이 등록되어 있습니다.'
+                    ];
+                }
+
+                // 정보 변경됨 → UPDATE 필요
+                $action = 'updated';
+            } else {
+                // 토큰 없음 → INSERT 필요
+                $action = 'inserted';
+            }
+
+            // 3. UPSERT 실행 (변경 필요한 경우에만)
             $sql = "INSERT INTO fcm_tokens
                     (user_id, fcm_token, device_type, device_name, app_version, is_active, last_used_at)
                     VALUES (?, ?, ?, ?, ?, 1, NOW())
@@ -45,19 +85,28 @@ class FcmToken
             $params = [$userId, $fcmToken, $deviceType, $deviceName, $appVersion];
             $this->db->execute($sql, $params);
 
-            WebLogger::info('FCM 토큰 등록 성공', [
+            WebLogger::info('FCM 토큰 ' . $action, [
                 'user_id' => $userId,
                 'device_type' => $deviceType,
                 'token_length' => strlen($fcmToken)
             ]);
 
-            return true;
+            return [
+                'changed' => true,
+                'action' => $action,
+                'message' => 'FCM 토큰이 ' . ($action === 'inserted' ? '등록' : '업데이트') . '되었습니다.'
+            ];
         } catch (Exception $e) {
             WebLogger::error('FCM 토큰 등록 실패', [
                 'user_id' => $userId,
                 'error' => $e->getMessage()
             ]);
-            return false;
+
+            return [
+                'changed' => false,
+                'action' => 'error',
+                'message' => $e->getMessage()
+            ];
         }
     }
 

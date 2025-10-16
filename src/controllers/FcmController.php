@@ -64,7 +64,7 @@ class FcmController extends BaseController
                 return $this->error('유효하지 않은 디바이스 타입입니다.', 400);
             }
 
-            // FCM 토큰 등록
+            // FCM 토큰 등록 (최적화된 버전)
             $result = $this->fcmToken->registerToken(
                 $userId,
                 $fcmToken,
@@ -73,13 +73,17 @@ class FcmController extends BaseController
                 $appVersion
             );
 
-            if (!$result) {
-                return $this->error('FCM 토큰 등록에 실패했습니다.', 500);
+            // 에러 처리
+            if ($result['action'] === 'error') {
+                return $this->error($result['message'], 500);
             }
 
-            return $this->success('FCM 토큰이 등록되었습니다.', [
+            // 성공 응답 (action 정보 포함)
+            return $this->success($result['message'], [
                 'user_id' => $userId,
-                'device_type' => $deviceType
+                'device_type' => $deviceType,
+                'action' => $result['action'],      // 'skipped', 'inserted', 'updated'
+                'changed' => $result['changed']     // DB 변경 여부
             ]);
         } catch (Exception $e) {
             error_log('FcmController::store 오류: ' . $e->getMessage());
