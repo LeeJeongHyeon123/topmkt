@@ -1,15 +1,16 @@
 <style data-timestamp="<?php echo time(); ?>">
 /* 채팅 페이지 전용 스타일 - 캐시 무효화: <?php echo date('Y-m-d H:i:s'); ?> */
 .chat-container {
-    max-width: min(1400px, 100vw - 40px); /* 🔥 뷰포트 너비 고려한 제한 */
+    max-width: 1200px; /* 다른 페이지들과 일관성 유지 (커뮤니티, 강의, 행사 등과 동일) */
     margin: 0 auto;
-    padding: 20px; /* 🔥 원래 패딩 복원 - 사이드바 크기 문제 방지 */
+    padding: 20px;
     height: calc(100vh - 120px);
     background: #f8fafc;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box; /* 🔥 패딩 포함 박스 계산 */
+    box-sizing: border-box;
+    min-height: calc(100vh - 200px);
 }
 
 .chat-header {
@@ -37,14 +38,14 @@
 
 .chat-layout {
     display: grid;
-    grid-template-columns: minmax(280px, 320px) 1fr; /* 🔥 유연한 사이드바 너비 */
+    grid-template-columns: minmax(280px, 320px) 1fr;
     gap: 20px;
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    padding: 0 20px; /* 🔥 chat-container와 일관된 좌우 여백 */
-    max-width: 100%; /* 🔥 최대 너비 제한 */
-    box-sizing: border-box; /* 🔥 패딩 포함 박스 계산 */
+    padding: 0; /* 채팅은 사이드바가 있어서 추가 패딩 불필요 */
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* 사이드바 (채팅방 목록) */
