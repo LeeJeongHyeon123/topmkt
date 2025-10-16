@@ -26,13 +26,14 @@ function initializeSession($rememberMe = false) {
     ini_set('session.cookie_lifetime', $cookieLifetime);
     ini_set('session.cookie_httponly', 1);
     ini_set('session.cookie_secure', $isHttps ? 1 : 0);
-    ini_set('session.cookie_samesite', 'Strict');
+    // Tracking Prevention 해결을 위해 SameSite 설정 조정 (HTTPS 환경에서만)
+    ini_set('session.cookie_samesite', $isHttps ? 'Lax' : 'Strict');
     
     // 세션 시작
     session_start([
         'cookie_httponly' => true,
         'cookie_secure' => $isHttps,
-        'cookie_samesite' => 'Strict',
+        'cookie_samesite' => $isHttps ? 'Lax' : 'Strict',
         'gc_maxlifetime' => $sessionLifetime,
         'cookie_lifetime' => $cookieLifetime
     ]);
