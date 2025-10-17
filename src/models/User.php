@@ -510,28 +510,30 @@ class User {
     
     /**
      * 프로필 이미지 업데이트
+     * v3.89.7: profile_image 컬럼도 함께 업데이트하여 캐시 문제 해결
      */
     public function updateProfileImages($userId, $originalPath, $profilePath, $thumbPath) {
-        $sql = "UPDATE users SET 
+        $sql = "UPDATE users SET
+                profile_image = :thumb,
                 profile_image_original = :original,
                 profile_image_profile = :profile,
                 profile_image_thumb = :thumb,
                 updated_at = NOW()
                 WHERE id = :user_id";
-        
+
         $params = [
             ':user_id' => $userId,
             ':original' => $originalPath,
             ':profile' => $profilePath,
             ':thumb' => $thumbPath
         ];
-        
+
         $result = $this->db->execute($sql, $params);
-        
+
         if ($result) {
             $this->logUserActivity($userId, 'PROFILE_IMAGE_UPDATED', '프로필 이미지 변경');
         }
-        
+
         return $result > 0;
     }
     
