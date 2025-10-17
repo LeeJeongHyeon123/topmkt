@@ -410,56 +410,16 @@
                     </h1>
                 </div>
 
-                <!-- 🚨 ULTRA FORCE: 메인 네비게이션 강제 표시 -->
-                <nav class="main-nav" id="main-nav" style="display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important; flex: 1 !important; justify-content: center !important; margin: 0 40px !important;">
-                    <ul class="nav-menu" style="display: flex !important; visibility: visible !important; opacity: 1 !important; list-style: none !important; margin: 0 !important; padding: 0 !important; gap: 30px !important;">
-                        <li style="display: block !important; visibility: visible !important;"><a href="/" class="<?= ($pageSection ?? '') === 'home' ? 'active' : '' ?>" style="display: block !important; visibility: visible !important; color: #374151 !important; text-decoration: none !important; padding: 10px 15px !important; border-radius: 4px !important; font-weight: 500 !important; font-size: 16px !important;">홈</a></li>
-                        <li style="display: block !important; visibility: visible !important;"><a href="/community" class="<?= ($pageSection ?? '') === 'community' ? 'active' : '' ?>" style="display: block !important; visibility: visible !important; color: #374151 !important; text-decoration: none !important; padding: 10px 15px !important; border-radius: 4px !important; font-weight: 500 !important; font-size: 16px !important;">커뮤니티</a></li>
-                        <li style="display: block !important; visibility: visible !important;"><a href="/lectures" class="<?= ($pageSection ?? '') === 'lectures' ? 'active' : '' ?>" style="display: block !important; visibility: visible !important; color: #374151 !important; text-decoration: none !important; padding: 10px 15px !important; border-radius: 4px !important; font-weight: 500 !important; font-size: 16px !important;">강의 일정</a></li>
-                        <li style="display: block !important; visibility: visible !important;"><a href="/events" class="<?= ($pageSection ?? '') === 'events' ? 'active' : '' ?>" style="display: block !important; visibility: visible !important; color: #374151 !important; text-decoration: none !important; padding: 10px 15px !important; border-radius: 4px !important; font-weight: 500 !important; font-size: 16px !important;">행사 일정</a></li>
-                        <li style="display: block !important; visibility: visible !important;"><a href="/notices" class="<?= ($pageSection ?? '') === 'notices' ? 'active' : '' ?>" style="display: block !important; visibility: visible !important; color: #374151 !important; text-decoration: none !important; padding: 10px 15px !important; border-radius: 4px !important; font-weight: 500 !important; font-size: 16px !important;">공지사항</a></li>
+                <!-- 메인 네비게이션 (PC 전용 - 1025px 이상) -->
+                <nav class="main-nav" id="main-nav">
+                    <ul class="nav-menu">
+                        <li><a href="/" class="<?= ($pageSection ?? '') === 'home' ? 'active' : '' ?>">홈</a></li>
+                        <li><a href="/community" class="<?= ($pageSection ?? '') === 'community' ? 'active' : '' ?>">커뮤니티</a></li>
+                        <li><a href="/lectures" class="<?= ($pageSection ?? '') === 'lectures' ? 'active' : '' ?>">강의 일정</a></li>
+                        <li><a href="/events" class="<?= ($pageSection ?? '') === 'events' ? 'active' : '' ?>">행사 일정</a></li>
+                        <li><a href="/notices" class="<?= ($pageSection ?? '') === 'notices' ? 'active' : '' ?>">공지사항</a></li>
                     </ul>
                 </nav>
-
-                <!-- 🚨 ULTRA JAVASCRIPT: 네비게이션 안전한 강제 보장 -->
-                <script>
-                // 안전한 네비게이션 강제 표시 함수
-                function ultraForceNavigation() {
-                    try {
-                        const nav = document.querySelector('.main-nav');
-                        const menu = document.querySelector('.nav-menu');
-
-                        if (nav) {
-                            nav.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important; flex: 1 !important; justify-content: center !important; margin: 0 40px !important;';
-                        }
-
-                        if (menu) {
-                            menu.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; list-style: none !important; margin: 0 !important; padding: 0 !important; gap: 30px !important;';
-                        }
-
-                        // 모든 li와 a 요소도 강제 표시
-                        document.querySelectorAll('.nav-menu li').forEach(li => {
-                            li.style.cssText = 'display: block !important; visibility: visible !important;';
-                        });
-
-                        document.querySelectorAll('.nav-menu a').forEach(a => {
-                            a.style.cssText = 'display: block !important; visibility: visible !important; color: #374151 !important; text-decoration: none !important; padding: 10px 15px !important; border-radius: 4px !important; font-weight: 500 !important; font-size: 16px !important;';
-                        });
-                    } catch (e) {
-                        // 오류 발생시 무시하고 계속 진행
-                    }
-                }
-
-                // DOM 로딩 완료 후 한번만 실행
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', ultraForceNavigation);
-                } else {
-                    ultraForceNavigation();
-                }
-
-                // 페이지 완전 로딩 후 한번 더 실행
-                window.addEventListener('load', ultraForceNavigation);
-                </script>
 
                 <!-- 로그인 상태별 우측 메뉴 -->
                 <div class="nav-auth">
@@ -572,32 +532,51 @@
                     transform: rotate(-45deg) translate(5px, -5px);
                 }
                 
-                /* 🚨 ULTRA CRITICAL FIX: PC에서 네비게이션 절대 강제 표시 */
-                /* 기본 상태에서 네비게이션 항상 표시 */
-                .main-nav,
-                html .main-nav,
-                body .main-nav,
-                header .main-nav,
-                .header-container .main-nav,
-                nav.main-nav,
-                header nav.main-nav {
-                    display: flex !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    position: relative !important;
-                    z-index: 999 !important;
+                /* 🚨 ULTRA CRITICAL FIX: 반응형 네비게이션 시스템 */
+
+                /* 기본 스타일: 메인 네비게이션 */
+                .main-nav {
+                    flex: 1;
+                    justify-content: center;
+                    margin: 0 40px;
                 }
 
-                .nav-menu,
-                html .nav-menu,
-                body .nav-menu {
-                    display: flex !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
+                .nav-menu {
+                    display: flex;
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                    gap: 30px;
                 }
 
-                /* PC 전용 강화 */
-                @media (min-width: 769px) {
+                .nav-menu li {
+                    display: block;
+                }
+
+                .nav-menu a {
+                    display: block;
+                    color: #374151;
+                    text-decoration: none;
+                    padding: 10px 15px;
+                    border-radius: 4px;
+                    font-weight: 500;
+                    font-size: 16px;
+                    transition: all 0.2s ease;
+                }
+
+                .nav-menu a:hover {
+                    background: rgba(99, 102, 241, 0.1);
+                    color: #6366f1;
+                }
+
+                .nav-menu a.active {
+                    background: rgba(99, 102, 241, 0.1);
+                    color: #6366f1;
+                    font-weight: 600;
+                }
+
+                /* PC 전용 (1025px 이상) - 네비게이션 표시 */
+                @media (min-width: 1025px) {
                     .main-nav,
                     header .main-nav,
                     .header-container .main-nav,
@@ -608,36 +587,17 @@
                         opacity: 1 !important;
                         position: relative !important;
                         z-index: 999 !important;
-                        left: auto !important;
-                        right: auto !important;
-                        transform: none !important;
-                        width: auto !important;
-                        height: auto !important;
-                        overflow: visible !important;
-                        pointer-events: auto !important;
-                        max-width: none !important;
-                        max-height: none !important;
-                        margin: 0 40px !important;
-                        padding: 0 !important;
                     }
 
                     .nav-menu {
                         display: flex !important;
                         visibility: visible !important;
                         opacity: 1 !important;
-                        left: auto !important;
-                        right: auto !important;
-                        transform: none !important;
-                        width: auto !important;
-                        height: auto !important;
-                        overflow: visible !important;
-                        pointer-events: auto !important;
-                        max-width: none !important;
-                        max-height: none !important;
-                        margin: 0 !important;
-                        padding: 0 !important;
                     }
+                }
 
+                /* PC에서 햄버거 숨김 */
+                @media (min-width: 1025px) {
                     .mobile-hamburger {
                         display: none !important;
                         visibility: hidden !important;
@@ -645,21 +605,13 @@
                         position: absolute !important;
                         left: -99999px !important;
                         top: -99999px !important;
-                        right: auto !important;
-                        width: 0 !important;
-                        height: 0 !important;
-                        overflow: hidden !important;
                         z-index: -1 !important;
                         pointer-events: none !important;
                     }
                 }
 
-                /* 기본 상태에서 햄버거 숨김 */
-                .mobile-hamburger {
-                    display: none !important;
-                }
-                
-                @media (max-width: 768px) {
+                /* 태블릿/모바일 (1024px 이하) */
+                @media (max-width: 1024px) {
                     /* 태블릿/모바일에서 햄버거 표시 - fixed 위치로 최상위 표시 (로고와 중앙정렬) */
                     .mobile-hamburger,
                     header .mobile-hamburger,
