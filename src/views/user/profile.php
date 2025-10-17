@@ -284,6 +284,16 @@ if (!empty($user['last_login'])) {
     white-space: pre-wrap;
 }
 
+/* 자기소개 내 이미지 크기 제어 (v3.89.5) */
+.bio-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px 0;
+    display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .bio-empty {
     color: #a0aec0;
     font-style: italic;
