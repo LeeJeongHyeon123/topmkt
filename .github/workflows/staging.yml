@@ -14,7 +14,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.1'
           extensions: mbstring, intl, pdo_mysql
           
       - name: Check PHP version
@@ -24,9 +24,9 @@ jobs:
         id: check_composer
         run: |
           if [ -f "composer.json" ]; then
-            echo "::set-output name=exists::true"
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=exists::false"
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
         
       - name: Install dependencies
