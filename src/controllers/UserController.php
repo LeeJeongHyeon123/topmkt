@@ -343,21 +343,16 @@ class UserController extends BaseController {
             if (isset($_POST['bio'])) {
                 $bio = trim($_POST['bio']);
 
-                // base64 이미지 제거 (HTML 에디터에서 붙여넣기한 이미지)
-                // v3.89.5: bio 컬럼 크기 초과 방지
-                $bio = preg_replace('/<img[^>]+src\s*=\s*["\']data:image\/[^;]+;base64,[^"\']+["\']/i', '<img>', $bio);
-                $bio = preg_replace('/<img[^>]*>/i', '', $bio); // 빈 img 태그 제거
-
                 // HTML 태그를 제거하고 순수 텍스트 길이만 계산
                 $bioText = strip_tags($bio);
-                if (mb_strlen($bioText) > 2000) {
-                    ResponseHelper::json(null, 400, '자기소개는 2000자 이하로 입력해주세요. (현재: ' . mb_strlen($bioText) . '자)');
+                if (mb_strlen($bioText) > 5000) {
+                    ResponseHelper::json(null, 400, '자기소개는 5000자 이하로 입력해주세요. (현재: ' . mb_strlen($bioText) . '자)');
                     return;
                 }
 
-                // bio 전체 크기 확인 (TEXT 컬럼 최대 65535 바이트)
-                if (strlen($bio) > 65000) {
-                    ResponseHelper::json(null, 400, '자기소개 내용이 너무 깁니다. 이미지를 제거하고 텍스트만 입력해주세요.');
+                // bio 전체 크기 확인 (MEDIUMTEXT 컬럼 최대 16MB)
+                if (strlen($bio) > 16000000) {
+                    ResponseHelper::json(null, 400, '자기소개 내용이 너무 깁니다. 이미지 개수를 줄여주세요.');
                     return;
                 }
 
