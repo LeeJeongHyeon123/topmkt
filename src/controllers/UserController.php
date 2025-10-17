@@ -248,13 +248,13 @@ class UserController extends BaseController {
     public function updateProfile() {
         // 로그인 확인
         if (!AuthMiddleware::isLoggedIn()) {
-            ResponseHelper::json(['error' => '로그인이 필요합니다.'], 401);
+            ResponseHelper::json(null, 401, '로그인이 필요합니다.');
             return;
         }
         
         // CSRF 토큰 확인
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            ResponseHelper::json(['error' => 'CSRF 토큰이 유효하지 않습니다.'], 403);
+            ResponseHelper::json(null, 403, 'CSRF 토큰이 유효하지 않습니다.');
             return;
         }
         
@@ -268,14 +268,14 @@ class UserController extends BaseController {
             if (isset($_POST['nickname'])) {
                 $nickname = trim($_POST['nickname']);
                 if (empty($nickname)) {
-                    ResponseHelper::json(['error' => '닉네임은 필수 입력 항목입니다.'], 400);
+                    ResponseHelper::json(null, 400, '닉네임은 필수 입력 항목입니다.');
                     return;
                 }
                 
                 // 닉네임 중복 확인 (본인 제외)
                 $existingUser = $this->userModel->findByNickname($nickname);
                 if ($existingUser && $existingUser['id'] != $currentUserId) {
-                    ResponseHelper::json(['error' => '이미 사용 중인 닉네임입니다.'], 400);
+                    ResponseHelper::json(null, 400, '이미 사용 중인 닉네임입니다.');
                     return;
                 }
                 
@@ -286,25 +286,56 @@ class UserController extends BaseController {
             if (isset($_POST['email'])) {
                 $email = trim($_POST['email']);
                 if (empty($email)) {
-                    ResponseHelper::json(['error' => '이메일은 필수 입력 항목입니다.'], 400);
+                    ResponseHelper::json(null, 400, '이메일은 필수 입력 항목입니다.');
                     return;
                 }
                 
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    ResponseHelper::json(['error' => '유효한 이메일 주소를 입력해주세요.'], 400);
+                    ResponseHelper::json(null, 400, '유효한 이메일 주소를 입력해주세요.');
                     return;
                 }
                 
-                // 이메일 중복 확인 (본인 제외)
-                $existingUser = $this->userModel->findByEmail($email);
-                if ($existingUser && $existingUser['id'] != $currentUserId) {
-                    ResponseHelper::json(['error' => '이미 사용 중인 이메일입니다.'], 400);
-                    return;
+                // 현재 사용자 정보 조회
+                $currentUser = $this->userModel->find($currentUserId);
+                $currentEmail = $currentUser['email'] ?? '';
+
+                // 🔍 디버깅: 이메일 중복 체크 상세 로그
+                error_log("=== 프로필 업데이트 이메일 중복 체크 ===");
+                error_log("현재 사용자 ID: " . $currentUserId);
+                error_log("현재 이메일: " . $currentEmail);
+                error_log("입력한 이메일: " . $email);
+
+                // 이메일이 변경되지 않은 경우 중복 체크 건너뛰기
+                if ($email !== $currentEmail) {
+                    error_log("✅ 이메일 변경 감지 - 중복 체크 진행");
+
+                    // 이메일 중복 확인 (본인 제외)
+                    $existingUser = $this->userModel->findByEmail($email);
+
+                    if ($existingUser) {
+                        error_log("⚠️ 기존 사용자 발견:");
+                        error_log("  - 사용자 ID: " . $existingUser['id']);
+                        error_log("  - 닉네임: " . ($existingUser['nickname'] ?? 'N/A'));
+                        error_log("  - 이메일: " . ($existingUser['email'] ?? 'N/A'));
+                        error_log("  - 비교: " . (int)$existingUser['id'] . " !== " . (int)$currentUserId);
+
+                        if ((int)$existingUser['id'] !== (int)$currentUserId) {
+                            error_log("❌ 이메일 중복! 다른 사용자가 이미 사용 중입니다.");
+                            ResponseHelper::json(null, 400, '이미 사용 중인 이메일입니다.');
+                            return;
+                        } else {
+                            error_log("✅ 본인 확인 - 중복 체크 통과");
+                        }
+                    } else {
+                        error_log("✅ 중복 없음 - 사용 가능한 이메일");
+                    }
+                } else {
+                    error_log("✅ 이메일 변경 없음 - 중복 체크 건너뛰기");
                 }
                 
                 $profileData['email'] = $email;
             } else {
-                ResponseHelper::json(['error' => '이메일은 필수 입력 항목입니다.'], 400);
+                ResponseHelper::json(null, 400, '이메일은 필수 입력 항목입니다.');
                 return;
             }
             
@@ -314,7 +345,7 @@ class UserController extends BaseController {
                 // HTML 태그를 제거하고 순수 텍스트 길이만 계산
                 $bioText = strip_tags($bio);
                 if (mb_strlen($bioText) > 2000) {
-                    ResponseHelper::json(['error' => '자기소개는 2000자 이하로 입력해주세요. (현재: ' . mb_strlen($bioText) . '자)'], 400);
+                    ResponseHelper::json(null, 400, '자기소개는 2000자 이하로 입력해주세요. (현재: ' . mb_strlen($bioText) . '자)');
                     return;
                 }
                 $profileData['bio'] = $bio;
@@ -324,7 +355,7 @@ class UserController extends BaseController {
             if (isset($_POST['birth_date']) && !empty($_POST['birth_date'])) {
                 $birthDate = $_POST['birth_date'];
                 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthDate)) {
-                    ResponseHelper::json(['error' => '유효한 생년월일을 입력해주세요.'], 400);
+                    ResponseHelper::json(null, 400, '유효한 생년월일을 입력해주세요.');
                     return;
                 }
                 $profileData['birth_date'] = $birthDate;
@@ -334,7 +365,7 @@ class UserController extends BaseController {
             if (isset($_POST['gender']) && !empty($_POST['gender'])) {
                 $gender = $_POST['gender'];
                 if (!in_array($gender, ['M', 'F', 'OTHER'])) {
-                    ResponseHelper::json(['error' => '유효한 성별을 선택해주세요.'], 400);
+                    ResponseHelper::json(null, 400, '유효한 성별을 선택해주세요.');
                     return;
                 }
                 $profileData['gender'] = $gender;
@@ -350,7 +381,7 @@ class UserController extends BaseController {
                 if (isset($_POST["social_{$platform}"]) && !empty($_POST["social_{$platform}"])) {
                     $url = trim($_POST["social_{$platform}"]);
                     if (!filter_var($url, FILTER_VALIDATE_URL)) {
-                        ResponseHelper::json(['error' => "유효한 {$platform} URL을 입력해주세요."], 400);
+                        ResponseHelper::json(null, 400, "유효한 {$platform} URL을 입력해주세요.");
                         return;
                     }
                     $socialLinks[$platform] = $url;
@@ -393,12 +424,12 @@ class UserController extends BaseController {
                 
                 ResponseHelper::json(['message' => '프로필이 성공적으로 업데이트되었습니다.' . $imageMessage]);
             } else {
-                ResponseHelper::json(['error' => '프로필 업데이트에 실패했습니다.'], 500);
+                ResponseHelper::json(null, 500, '프로필 업데이트에 실패했습니다.');
             }
             
         } catch (Exception $e) {
             error_log('프로필 업데이트 오류: ' . $e->getMessage());
-            ResponseHelper::json(['error' => '프로필 업데이트 중 오류가 발생했습니다.'], 500);
+            ResponseHelper::json(null, 500, '프로필 업데이트 중 오류가 발생했습니다.');
         }
     }
     
@@ -408,13 +439,13 @@ class UserController extends BaseController {
     public function uploadProfileImage() {
         // 로그인 확인
         if (!AuthMiddleware::isLoggedIn()) {
-            ResponseHelper::json(['error' => '로그인이 필요합니다.'], 401);
+            ResponseHelper::json(null, 401, '로그인이 필요합니다.');
             return;
         }
         
         // CSRF 토큰 확인
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            ResponseHelper::json(['error' => 'CSRF 토큰이 유효하지 않습니다.'], 403);
+            ResponseHelper::json(null, 403, 'CSRF 토큰이 유효하지 않습니다.');
             return;
         }
         
@@ -423,7 +454,7 @@ class UserController extends BaseController {
         try {
             // 파일 업로드 확인
             if (!isset($_FILES['profile_image']) || $_FILES['profile_image']['error'] !== UPLOAD_ERR_OK) {
-                ResponseHelper::json(['error' => '파일 업로드에 실패했습니다.'], 400);
+                ResponseHelper::json(null, 400, '파일 업로드에 실패했습니다.');
                 return;
             }
             
@@ -431,7 +462,7 @@ class UserController extends BaseController {
             
             // 파일 크기 확인 (공통 설정 사용: 30MB)
             if (!UploadConfig::validateFileSize($file['size'])) {
-                ResponseHelper::json(['error' => UploadConfig::getErrorMessage('file_too_large')], 400);
+                ResponseHelper::json(null, 400, UploadConfig::getErrorMessage('file_too_large'));
                 return;
             }
             
@@ -442,7 +473,7 @@ class UserController extends BaseController {
             finfo_close($finfo);
             
             if (!in_array($mimeType, $allowedTypes)) {
-                ResponseHelper::json(['error' => '지원하지 않는 파일 형식입니다. (JPG, PNG, GIF, WebP만 허용)'], 400);
+                ResponseHelper::json(null, 400, '지원하지 않는 파일 형식입니다. (JPG, PNG, GIF, WebP만 허용)');
                 return;
             }
             
@@ -456,7 +487,7 @@ class UserController extends BaseController {
             $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             if (!in_array($extension, $allowedExtensions)) {
-                ResponseHelper::json(['error' => '허용되지 않는 파일 확장자입니다.'], 400);
+                ResponseHelper::json(null, 400, '허용되지 않는 파일 확장자입니다.');
                 return;
             }
             
@@ -490,12 +521,12 @@ class UserController extends BaseController {
                     ]
                 ]);
             } else {
-                ResponseHelper::json(['error' => '이미지 정보 저장에 실패했습니다.'], 500);
+                ResponseHelper::json(null, 500, '이미지 정보 저장에 실패했습니다.');
             }
             
         } catch (Exception $e) {
             error_log('프로필 이미지 업로드 오류: ' . $e->getMessage());
-            ResponseHelper::json(['error' => '이미지 업로드 중 오류가 발생했습니다.'], 500);
+            ResponseHelper::json(null, 500, '이미지 업로드 중 오류가 발생했습니다.');
         }
     }
     
@@ -720,14 +751,14 @@ class UserController extends BaseController {
         }
         
         if (!$id) {
-            ResponseHelper::json(['error' => 'User ID is required'], 400);
+            ResponseHelper::json(null, 400, 'User ID is required');
             return;
         }
         
         try {
             $user = $this->userModel->getPublicProfile($id);
             if (!$user) {
-                ResponseHelper::json(['error' => 'User not found'], 404);
+                ResponseHelper::json(null, 404, 'User not found');
                 return;
             }
             
@@ -740,7 +771,7 @@ class UserController extends BaseController {
             
         } catch (Exception $e) {
             error_log('API 사용자 조회 오류: ' . $e->getMessage());
-            ResponseHelper::json(['error' => 'Internal server error'], 500);
+            ResponseHelper::json(null, 500, 'Internal server error');
         }
     }
     
@@ -750,7 +781,7 @@ class UserController extends BaseController {
     
     public function deleteUser() {
         // 계정 삭제는 향후 구현
-        ResponseHelper::json(['error' => 'Not implemented'], 501);
+        ResponseHelper::json(null, 501, 'Not implemented');
     }
     
     /**
@@ -766,7 +797,7 @@ class UserController extends BaseController {
         }
         
         if (!$userId) {
-            ResponseHelper::json(['error' => 'User ID is required'], 400);
+            ResponseHelper::json(null, 400, 'User ID is required');
             return;
         }
         
@@ -775,7 +806,7 @@ class UserController extends BaseController {
             $user = $this->userModel->getProfileImageInfo($userId);
 
             if (!$user) {
-                ResponseHelper::json(['error' => 'User not found'], 404);
+                ResponseHelper::json(null, 404, 'User not found');
                 return;
             }
 
@@ -798,7 +829,7 @@ class UserController extends BaseController {
 
         } catch (Exception $e) {
             error_log('프로필 이미지 API 오류: ' . $e->getMessage());
-            ResponseHelper::json(['error' => 'Internal server error'], 500);
+            ResponseHelper::json(null, 500, 'Internal server error');
         }
     }
 
@@ -813,7 +844,7 @@ class UserController extends BaseController {
         // 로그인 확인
         if (!AuthMiddleware::isLoggedIn()) {
             error_log("❌ 회원탈퇴 실패: 로그인 필요");
-            ResponseHelper::json(['message' => '로그인이 필요합니다.'], 401);
+            ResponseHelper::json(null, 401, '로그인이 필요합니다.');
             return;
         }
 
@@ -824,7 +855,7 @@ class UserController extends BaseController {
         // POST 데이터 확인
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             error_log("❌ 회원탈퇴 실패: 잘못된 요청 방식 - " . $_SERVER['REQUEST_METHOD']);
-            ResponseHelper::json(['message' => '잘못된 요청입니다.'], 405);
+            ResponseHelper::json(null, 405, '잘못된 요청입니다.');
             return;
         }
 
@@ -838,7 +869,7 @@ class UserController extends BaseController {
         // 필수 필드 검증
         if (!isset($data['password']) || empty($data['password'])) {
             error_log("❌ 회원탈퇴 실패: 비밀번호 누락");
-            ResponseHelper::json(['message' => '비밀번호를 입력해주세요.'], 400);
+            ResponseHelper::json(null, 400, '비밀번호를 입력해주세요.');
             return;
         }
 
@@ -846,7 +877,7 @@ class UserController extends BaseController {
         error_log("🔒 CSRF 토큰 검증 - 요청: " . ($data['csrf_token'] ?? 'null') . ", 세션: " . ($_SESSION['csrf_token'] ?? 'null'));
         if (!isset($data['csrf_token']) || $data['csrf_token'] !== $_SESSION['csrf_token']) {
             error_log("❌ 회원탈퇴 실패: CSRF 토큰 불일치");
-            ResponseHelper::json(['message' => '보안 검증에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.'], 403);
+            ResponseHelper::json(null, 403, '보안 검증에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
             return;
         }
 
