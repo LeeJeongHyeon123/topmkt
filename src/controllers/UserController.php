@@ -296,7 +296,7 @@ class UserController extends BaseController {
                 }
                 
                 // 현재 사용자 정보 조회
-                $currentUser = $this->userModel->find($currentUserId);
+                $currentUser = $this->userModel->getFullProfile($currentUserId);
                 $currentEmail = $currentUser['email'] ?? '';
 
                 // 🔍 디버깅: 이메일 중복 체크 상세 로그
