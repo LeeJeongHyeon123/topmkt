@@ -342,58 +342,11 @@
             }
         }
         </style>
-        <!-- 🎯 심플하고 깔끔한 모바일 햄버거 메뉴 (로고와 세로 중앙정렬) -->
-        <button class="mobile-hamburger" id="mobile-hamburger" style="
-            position: fixed !important;
-            top: 14px !important;
-            right: 20px !important;
-            display: flex !important;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 44px !important;
-            height: 44px !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 1px solid rgba(0, 0, 0, 0.1) !important;
-            border-radius: 8px !important;
-            cursor: pointer;
-            padding: 0;
-            gap: 4px;
-            z-index: 999999 !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-            transition: all 0.2s ease !important;
-            backdrop-filter: blur(20px) !important;
-        ">
-            <span style="
-                display: block !important; 
-                width: 18px !important; 
-                height: 2px !important; 
-                background: #374151 !important; 
-                border-radius: 1px; 
-                transition: all 0.2s ease !important;
-                transform-origin: center;
-                pointer-events: none !important;
-            "></span>
-            <span style="
-                display: block !important; 
-                width: 18px !important; 
-                height: 2px !important; 
-                background: #374151 !important; 
-                border-radius: 1px; 
-                transition: all 0.2s ease !important;
-                transform-origin: center;
-                pointer-events: none !important;
-            "></span>
-            <span style="
-                display: block !important; 
-                width: 18px !important; 
-                height: 2px !important; 
-                background: #374151 !important; 
-                border-radius: 1px; 
-                transition: all 0.2s ease !important;
-                transform-origin: center;
-                pointer-events: none !important;
-            "></span>
+        <!-- 모바일 햄버거 메뉴 (태블릿/모바일 전용 - 1024px 이하) -->
+        <button class="mobile-hamburger" id="mobile-hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
         </button>
         
         <div class="container" style="overflow: visible !important; position: relative;">
@@ -471,12 +424,15 @@
                 <!-- 중복 햄버거 버튼 제거됨 - mobile-hamburger만 사용 -->
                 
                 <style>
-                /* 🎯 심플하고 깔끔한 모바일 햄버거 메뉴 스타일 */
+                /* 🎯 모바일 햄버거 메뉴 기본 스타일 */
                 .mobile-hamburger {
-                    background: rgba(255, 255, 255, 0.95);
-                    border: 1px solid rgba(0, 0, 0, 0.1);
-                    cursor: pointer;
-                    padding: 0;
+                    /* 위치 고정 (항상) */
+                    position: fixed;
+                    top: 14px;
+                    right: 20px;
+                    z-index: 999999;
+
+                    /* 레이아웃 */
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -484,10 +440,18 @@
                     width: 44px;
                     height: 44px;
                     gap: 4px;
+                    padding: 0;
+
+                    /* 디자인 */
+                    background: rgba(255, 255, 255, 0.95);
+                    border: 1px solid rgba(0, 0, 0, 0.1);
                     border-radius: 8px;
-                    transition: all 0.2s ease;
-                    backdrop-filter: blur(20px);
                     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    backdrop-filter: blur(20px);
+
+                    /* 인터랙션 */
+                    cursor: pointer;
+                    transition: all 0.2s ease;
                 }
                 
                 .mobile-hamburger span {
@@ -610,17 +574,12 @@
                     }
                 }
 
-                /* 태블릿/모바일 (1024px 이하) */
+                /* 태블릿/모바일 (1024px 이하) - 햄버거 표시 */
                 @media (max-width: 1024px) {
-                    /* 태블릿/모바일에서 햄버거 표시 - fixed 위치로 최상위 표시 (로고와 중앙정렬) */
                     .mobile-hamburger,
                     header .mobile-hamburger,
                     .header-container .mobile-hamburger {
                         display: flex !important;
-                        position: fixed !important;
-                        top: 14px !important;
-                        right: 20px !important;
-                        z-index: 999999 !important;
                         visibility: visible !important;
                     }
 
