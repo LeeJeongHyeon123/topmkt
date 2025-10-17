@@ -97,9 +97,10 @@ class ProfileImageHelper {
     
     /**
      * 프로필 이미지 HTML 속성 생성 (data-* 통일)
-     * 
+     *
      * API 방식과 직접 표시 방식을 모두 지원합니다.
-     * 
+     * v3.89.5: 모달로 이미지 크게 보기 기능 추가
+     *
      * @param array $user 사용자 데이터
      * @param string $mode 'api' (API 호출) 또는 'direct' (직접 표시)
      * @return array HTML 속성 배열
@@ -108,30 +109,44 @@ class ProfileImageHelper {
         if (!is_array($user)) {
             return [];
         }
-        
+
         // 사용자 ID 추출 (다양한 필드명 대응)
         $userId = $user['id'] ?? $user['user_id'] ?? null;
-        
+
         // 사용자 이름 추출 (다양한 필드명 대응)
-        $userName = $user['nickname'] ?? 
-                   $user['author_name'] ?? 
-                   $user['company_name'] ?? 
+        $userName = $user['nickname'] ??
+                   $user['author_name'] ??
+                   $user['company_name'] ??
                    '사용자';
-        
+
+        // 원본 프로필 이미지 URL 추출 (모달용)
+        $originalImageUrl = self::getOriginalImageUrl($user);
+
         $attributes = [
             'data-user-id' => $userId,
             'data-user-name' => htmlspecialchars($userName),
             'class' => 'profile-image-clickable',
-            'title' => htmlspecialchars($userName) . '님의 프로필 이미지'
+            'title' => htmlspecialchars($userName) . '님의 프로필 이미지 (클릭하여 크게 보기)'
         ];
-        
+
+        // 원본 이미지가 있으면 data 속성에 추가
+        if ($originalImageUrl) {
+            $attributes['data-original-image'] = htmlspecialchars($originalImageUrl);
+        }
+
         // 유효한 사용자 ID가 있을 때만 클릭 이벤트 추가
         if ($userId && !empty($user['nickname'])) {
-            // 프로필 페이지로 이동 (로딩 UI 포함)
-            $attributes['onclick'] = "event.stopPropagation(); if(window.TopMarketingLoading) { window.TopMarketingLoading.show(); window.TopMarketingLoading.setMessage('프로필을 불러오는 중...'); } window.location.href='/profile?user_id=" . $userId . "';";
+            // 프로필 이미지 모달로 크게 보기 (v3.89.5)
+            if ($originalImageUrl && $originalImageUrl !== self::DEFAULT_AVATAR) {
+                // 프로필 이미지가 있으면 모달로 크게 보기
+                $attributes['onclick'] = "event.stopPropagation(); window.showProfileImageModal('" . addslashes($originalImageUrl) . "', '" . addslashes($userName) . "');";
+            } else {
+                // 프로필 이미지가 없으면 프로필 페이지로 이동
+                $attributes['onclick'] = "event.stopPropagation(); if(window.TopMarketingLoading) { window.TopMarketingLoading.show(); window.TopMarketingLoading.setMessage('프로필을 불러오는 중...'); } window.location.href='/profile?user_id=" . $userId . "';";
+            }
             $attributes['style'] = 'cursor: pointer;';
         }
-        
+
         return $attributes;
     }
     
