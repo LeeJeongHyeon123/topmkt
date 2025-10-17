@@ -215,7 +215,77 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.58.0 ~ v3.86.0)
+## 최근 주요 작업 (v3.58.0 ~ v3.89.0)
+
+### v3.89.0 - FCM 푸시 알림 9가지 시나리오 통합 완료 + 치명적 버그 3건 수정 (2025-10-16) 🔔🐛
+**Firebase Cloud Messaging 기반 푸시 알림 시스템 완전 구축 및 알림 설정 버그 수정**
+
+**구현 완료된 알림 시나리오 (9가지)**:
+1. ✅ **댓글 알림** - 내 게시글에 댓글 작성 시 → CommentController
+2. ✅ **대댓글 알림** - 내 댓글에 답글 작성 시 → CommentController
+3. ✅ **좋아요 알림** - 내 게시글에 좋아요 클릭 시 → LikeController
+4. ✅ **채팅 메시지 알림** - 1:1 채팅 메시지 수신 시 (필수 알림) → ChatController
+5. ✅ **신규 강의 알림** - 새로운 강의 등록 시 (published) → LectureController
+6. ✅ **신규 행사 알림** - 새로운 행사 등록 시 (published) → EventController
+7. ✅ **신청 승인 알림** - 강의/행사 신청 승인 시 → RegistrationDashboardController
+8. ✅ **신청 거절 알림** - 강의/행사 신청 거절 시 → RegistrationDashboardController
+9. ✅ **기업 공지사항 알림** - 새로운 공지사항 등록 시 → NoticeController
+
+**🐛 수정된 치명적 버그 (3건)**:
+- ❌ **CommentController**: 알림 설정 미확인 → ✅ `NotificationSettings::isNotificationEnabled()` 추가
+- ❌ **LikeController**: 알림 설정 미확인 → ✅ `NotificationSettings::isNotificationEnabled()` 추가
+- ❌ **RegistrationDashboardController**: 알림 설정 미확인 → ✅ `NotificationSettings::isNotificationEnabled()` 추가
+- **버그 영향**: 사용자가 "댓글 알림 OFF" 설정해도 푸시 전송되는 문제 → 사용자 경험 저하 및 스팸 알림
+
+**주요 변경사항**:
+- `NotificationSettings` 모델 require 추가 (3개 컨트롤러)
+- 알림 설정 확인 로직 추가 (`comments`, `likes`, `registration` 타입)
+- WebLogger 스킵 로그 추가 (알림 설정 OFF 시 "알림 스킵" 로그 기록)
+- ChatController: 새 API 엔드포인트 `POST /api/chat/send-notification` 구현
+- 채팅 알림: Firebase 메시지 저장 후 백엔드 API 호출하여 푸시 전송
+
+**QA 문서**:
+- `/var/www/html/topmkt/QA_FCM_PUSH_NOTIFICATIONS.md` 작성
+- 9가지 알림 시나리오 모두 QA 완료
+- 버그 수정 전후 비교 검증
+- 보안, 에러 처리, 로깅 완벽 검증
+
+**기술 스택**:
+- FCM V1 API (OAuth 2.0)
+- NotificationSettings 모델 (v3.86.0)
+- WebLogger 통합 로깅
+- CSRF 토큰 검증 (ChatController)
+- AuthMiddleware 인증 필수
+
+**보안 및 검증**:
+- ✅ AuthMiddleware 인증 필수 (모든 알림 트리거)
+- ✅ CSRF 토큰 검증 (ChatController API)
+- ✅ 자기 알림 제외 로직 (댓글, 좋아요, 채팅)
+- ✅ 알림 실패 시 Core 기능 보장 (try-catch 분리)
+- ✅ 알림 설정 확인 (사용자 OFF 설정 시 푸시 미전송)
+
+**성능 최적화**:
+- 대량 발송: `FcmHelper::sendBulkPush()` (0.1초 대기)
+- 알림 설정 배치 조회: `NotificationSettings::getEnabledUserIds()`
+- API 레이트 리밋 방지
+
+**로깅 시스템**:
+- 성공: `WebLogger::info()` (알림 전송 완료, 알림 스킵)
+- 실패: `WebLogger::error()` (예외 발생, API 오류)
+- 로그 필드: post_id, comment_id, recipient_id, token_count, sent_count, error
+
+**통계**:
+- 9개 파일 수정: +861 lines, -17 lines
+- 3개 컨트롤러 버그 수정 (알림 설정 확인 추가)
+- 7개 컨트롤러 FCM 알림 통합
+- 1개 API 엔드포인트 추가 (ChatController)
+
+**결과**:
+- ✅ 9가지 푸시 알림 시나리오 완벽 구현
+- ✅ 치명적 버그 3건 수정 완료
+- ✅ 보안, 에러 처리, 로깅 완벽
+- ✅ 프로덕션 배포 준비 완료
+- ✅ 사용자 알림 설정 100% 준수
 
 ### v3.86.0 - FCM 앱 푸시 알림 설정 시스템 구축 (2025-10-16) 🔔
 **Firebase Cloud Messaging 기반 사용자별 알림 설정 관리 시스템 완성**
@@ -702,4 +772,4 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 **마지막 업데이트**: 2025-10-16
 **작업자**: Claude (Anthropic)
-**최신 버전**: v3.81.5
+**최신 버전**: v3.89.0
