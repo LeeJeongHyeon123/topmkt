@@ -4,12 +4,65 @@
  */
 
 require_once SRC_PATH . '/config/database.php';
+require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
 class UserOptimized {
     private $db;
-    
+
     public function __construct() {
         $this->db = Database::getInstance();
+    }
+
+    /**
+     * 개인정보 복호화 처리 (v3.89.5)
+     */
+    private function decryptPersonalData($userData) {
+        if (!$userData) {
+            return $userData;
+        }
+
+        // 배열인 경우 (여러 사용자)
+        if (isset($userData[0])) {
+            return array_map([$this, 'decryptSingleUser'], $userData);
+        }
+
+        // 단일 사용자인 경우
+        return $this->decryptSingleUser($userData);
+    }
+
+    /**
+     * 단일 사용자 개인정보 복호화 (v3.89.5)
+     */
+    private function decryptSingleUser($user) {
+        if (!$user) {
+            return $user;
+        }
+
+        // 휴대폰 번호 복호화
+        if (isset($user['phone']) && SecurityHelper::isEncrypted($user['phone'])) {
+            $decrypted = SecurityHelper::decrypt($user['phone']);
+            if ($decrypted !== false) {
+                $user['phone'] = $decrypted;
+            }
+        }
+
+        // 이메일 복호화
+        if (isset($user['email']) && SecurityHelper::isEncrypted($user['email'])) {
+            $decrypted = SecurityHelper::decrypt($user['email']);
+            if ($decrypted !== false) {
+                $user['email'] = $decrypted;
+            }
+        }
+
+        // 생년월일 복호화
+        if (isset($user['birth_date']) && SecurityHelper::isEncrypted($user['birth_date'])) {
+            $decrypted = SecurityHelper::decrypt($user['birth_date']);
+            if ($decrypted !== false) {
+                $user['birth_date'] = $decrypted;
+            }
+        }
+
+        return $user;
     }
     
     /**
@@ -87,6 +140,10 @@ class UserOptimized {
                 return null;
             }
             error_log("User basic data retrieved for user $userId");
+
+            // v3.89.5: 개인정보 복호화 (email, phone, birth_date)
+            $user = $this->decryptPersonalData($user);
+            error_log("Personal data decrypted for user $userId");
 
             // 2. 통계 정보를 개별 쿼리로 최적화
             try {
