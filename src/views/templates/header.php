@@ -659,8 +659,8 @@
                         flex: 0 0 auto !important; /* 로고가 좌측에 고정되도록 설정 */
                     }
 
-                    /* 모든 미디어 쿼리에서 로고 위치 강제 보호 */
-                    @media (max-width: 900px) {
+                    /* 모든 미디어 쿼리에서 로고 위치 강제 보호 - CSS 미디어 쿼리와 동일하게 1024px 기준 */
+                    @media (max-width: 1024px) {
                         .header-left,
                         header .header-left,
                         .header-content .header-left {
@@ -853,8 +853,8 @@
                     font-size: 14px !important;
                 }
 
-                /* PC에서 모바일 요소들 완전 숨김 */
-                @media (min-width: 901px) {
+                /* PC에서 모바일 요소들 완전 숨김 - CSS 미디어 쿼리와 동일하게 1025px 기준 */
+                @media (min-width: 1025px) {
                     .mobile-hamburger {
                         display: none !important;
                         visibility: hidden !important;
@@ -1601,8 +1601,8 @@
         transform: rotate(180deg);
     }
     
-    /* 드롭다운 메뉴 - 데스크톱에서만 적용 */
-    @media (min-width: 901px) {
+    /* 드롭다운 메뉴 - 데스크톱에서만 적용 - CSS 미디어 쿼리와 동일하게 1025px 기준 */
+    @media (min-width: 1025px) {
         .user-dropdown {
             position: absolute !important;
             top: calc(100% + 10px) !important;
@@ -1785,16 +1785,16 @@
             const mobileMenuModal = document.getElementById('mobileMenuModal');
             const mobileDropdownClose = document.getElementById('mobileDropdownClose');
 
-            // 화면 크기 감지 함수 (태블릿 포함)
-            const isMobile = () => window.innerWidth <= 900;
+            // 화면 크기 감지 함수 (태블릿 포함) - CSS 미디어 쿼리와 동일하게 1024px 기준
+            const isMobile = () => window.innerWidth <= 1024;
 
             // 📱 레이아웃 강제 수정 함수 (812×858 사이즈 긴급 대응)
             function forceCorrectLayout() {
                 const screenWidth = window.innerWidth;
                 const screenHeight = window.innerHeight;
 
-                // 812×858 사이즈 또는 900px 이하 모든 경우 처리
-                if (screenWidth <= 900) {
+                // CSS 미디어 쿼리와 동일하게 1024px 이하 모든 경우 처리
+                if (screenWidth <= 1024) {
                     // 강제로 요소들 숨기기
                     const elementsToHide = [
                         '.main-nav',
