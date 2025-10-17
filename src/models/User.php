@@ -338,13 +338,20 @@ class User {
      * 프로필 정보 업데이트
      */
     public function updateProfile($userId, $profileData) {
+        // 개인정보 암호화 처리 (email, phone, birth_date)
+        // v3.89.5: 프로필 업데이트 시 개인정보 암호화 누락 버그 수정
+        if (isset($profileData['email']) || isset($profileData['phone']) || isset($profileData['birth_date'])) {
+            $profileData = $this->encryptPersonalData($profileData);
+        }
+
         $fields = [];
         $params = [':user_id' => $userId];  // 명명된 파라미터로 통일
-        
+
         $allowedFields = [
-            'nickname', 'email', 'phone', 'bio', 'birth_date', 'gender', 
+            'nickname', 'email', 'phone', 'bio', 'birth_date', 'gender',
             'website_url', 'social_links', 'role', 'status',
-            'profile_image_original', 'profile_image_profile', 'profile_image_thumb'
+            'profile_image_original', 'profile_image_profile', 'profile_image_thumb',
+            'email_search_hash', 'phone_search_hash', 'birth_date_age_group'
         ];
         
         foreach ($allowedFields as $field) {
