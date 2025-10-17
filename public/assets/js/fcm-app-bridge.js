@@ -31,11 +31,6 @@
  * );
  */
 async function registerFCMTokenFromApp(fcmToken, deviceType, deviceName, appVersion) {
-    console.log('📱 앱이 registerFCMTokenFromApp 호출');
-    console.log('   토큰:', fcmToken?.substring(0, 20) + '...');
-    console.log('   디바이스:', deviceType, deviceName);
-    console.log('   버전:', appVersion);
-
     try {
         // 1. 파라미터 검증
         if (!fcmToken || typeof fcmToken !== 'string' || fcmToken.trim() === '') {
@@ -90,14 +85,6 @@ async function registerFCMTokenFromApp(fcmToken, deviceType, deviceName, appVers
             const action = result.data?.action || 'unknown';
             const changed = result.data?.changed || false;
 
-            if (action === 'skipped') {
-                console.log('⏭️ FCM 토큰 등록 스킵 (DB에 동일한 토큰 존재)');
-            } else if (action === 'inserted') {
-                console.log('✅ FCM 토큰 신규 등록 완료');
-            } else if (action === 'updated') {
-                console.log('✅ FCM 토큰 정보 업데이트 완료');
-            }
-
             return {
                 status: 'success',
                 message: result.message,
@@ -133,22 +120,11 @@ if (window.location.hostname === 'localhost' ||
      */
     window.testFCMRegistration = function() {
         const testToken = 'test_fcm_token_' + Date.now();
-        console.log('🧪 테스트 FCM 토큰 등록 시작...');
         return registerFCMTokenFromApp(
             testToken,
             'web',
             'Chrome Browser (Test)',
             '1.0.0-test'
-        ).then(result => {
-            console.log('🧪 테스트 결과:', result);
-            return result;
-        });
+        );
     };
-
-    console.log('💡 개발 모드 활성화');
-    console.log('💡 테스트: window.testFCMRegistration() 사용 가능');
 }
-
-// 앱 브릿지 로드 완료 로그
-console.log('✅ FCM 앱 브릿지 로드 완료');
-console.log('📱 앱에서 registerFCMTokenFromApp() 함수 호출 가능');
