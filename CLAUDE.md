@@ -215,7 +215,62 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.58.0 ~ v3.89.0)
+## 최근 주요 작업 (v3.58.0 ~ v3.89.9)
+
+### v3.89.9 - 강의 목록 메타 정보 텍스트 색상 수정 (2025-10-18) 🎨
+**문제**: 강의 목록 페이지에서 4가지 메타 정보 (📅 날짜, 🕒 시간, 👨‍🏫 강사, 📍 장소) 텍스트가 흰색으로 표시되어 안 보이는 문제
+
+**원인 분석**:
+- `.meta-item` 요소에 color 속성이 명시되지 않음
+- 부모 `.lecture-list-item { color: inherit }` 때문에 상위 흰색 색상 상속
+- CSS 우선순위 문제로 기본 회색 색상 무시됨
+
+**해결 방법**:
+- 4곳의 CSS에 명시적 color 추가:
+  1. Desktop CSS: `.lecture-list-item .meta-item { color: #718096 !important }`
+  2. Mobile CSS (tablet): 동일 셀렉터 추가
+  3. Media Query 1 (max-width: 768px): 동일 셀렉터 추가
+  4. Media Query 2 (max-width: 425px): 동일 셀렉터 추가
+
+**검증**:
+- Playwright 헤드리스 모드로 computed color 검증: `rgb(113, 128, 150)` ✅
+- 스크린샷 확인: 모든 메타 정보 회색으로 정상 표시
+- 모든 화면 크기(Desktop, Tablet, Mobile)에서 일관된 색상 적용
+
+**결과**:
+- ✅ 4가지 메타 정보 텍스트 모두 회색(#718096)으로 정상 표시
+- ✅ 반응형 디자인 모든 breakpoint에서 일관성 유지
+- ✅ CSS cascade 문제 완벽 해결
+
+### v3.89.8 - 강의 목록 설명 텍스트 색상 최적화 (2025-10-18) 🎨
+**배경**: v3.89.9 작업 중 강의 설명 텍스트도 함께 최적화
+
+**변경사항**:
+- `.lecture-list-description` 셀렉터 구체화
+- Desktop/Mobile/Media Query 3곳 모두 셀렉터 우선순위 강화
+- `color: #4a5568 !important` 적용 보장
+
+**CSS 셀렉터 개선**:
+```css
+/* Before */
+.lecture-list-description { color: #4a5568 !important; }
+
+/* After */
+.lecture-list-item .lecture-list-description,
+.list-view .lecture-list-item .lecture-list-description {
+    color: #4a5568 !important;
+}
+```
+
+**사이드바 오버플로우 수정**:
+- "다가오는 강의" 섹션 제목 오버플로우 방지
+- `overflow: hidden; text-overflow: ellipsis; white-space: nowrap;` 추가
+- Desktop/Mobile 모두 적용
+
+**결과**:
+- ✅ 강의 설명 텍스트 회색 정상 표시
+- ✅ 사이드바 제목 ellipsis(...) 처리 완벽
+- ✅ CSS 우선순위 문제 근본 해결
 
 ### v3.89.0 - FCM 푸시 알림 9가지 시나리오 통합 완료 + 치명적 버그 3건 수정 (2025-10-16) 🔔🐛
 **Firebase Cloud Messaging 기반 푸시 알림 시스템 완전 구축 및 알림 설정 버그 수정**
