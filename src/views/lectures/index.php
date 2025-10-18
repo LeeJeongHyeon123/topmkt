@@ -497,10 +497,12 @@ $monthNames = [
     margin-bottom: 10px;
 }
 
-.meta-item {
+.lecture-list-item .meta-item,
+.list-view .lecture-list-item .meta-item {
     display: flex;
     align-items: center;
     gap: 6px;
+    color: #718096 !important;
 }
 
 .lecture-list-item .lecture-list-description,
@@ -607,6 +609,11 @@ $monthNames = [
     line-height: 1.4;
 }
 
+.lecture-list-item .meta-item,
+.list-view .lecture-list-item .meta-item {
+    color: #718096 !important;
+}
+
 .lecture-list-item .lecture-list-description,
 .list-view .lecture-list-item .lecture-list-description {
     font-size: 14px;       /* 개선: 설명 텍스트 적절한 크기 */
@@ -703,7 +710,12 @@ $monthNames = [
         gap: 8px !important;
         font-size: 0.8rem !important;
     }
-    
+
+    .lecture-list-item .meta-item,
+    .list-view .lecture-list-item .meta-item {
+        color: #718096 !important;
+    }
+
     .lecture-list-item .lecture-list-description,
     .list-view .lecture-list-item .lecture-list-description {
         max-width: 100% !important;
@@ -920,7 +932,12 @@ $monthNames = [
         font-size: 16px !important; /* 개선: 모바일 가독성 */
         line-height: 1.4 !important; /* 개선: 명시적 line-height */
     }
-    
+
+    .lecture-list-item .meta-item,
+    .list-view .lecture-list-item .meta-item {
+        color: #718096 !important;
+    }
+
     /* 작은 모바일에서 목록형 뷰 추가 최적화 */
     .list-view {
         max-width: calc(100vw - 30px) !important;
