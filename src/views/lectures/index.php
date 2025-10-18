@@ -504,7 +504,7 @@ $monthNames = [
 }
 
 .lecture-list-description {
-    color: #4a5568;
+    color: #4a5568 !important;
     font-size: 0.9rem;
     line-height: 1.5;
     display: -webkit-box;
