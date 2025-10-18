@@ -390,6 +390,10 @@ $monthNames = [
     color: #2d3748;
     font-size: 0.9rem;
     margin-bottom: 4px;
+    /* 긴 제목 오버플로우 방지 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sidebar-lecture-meta {
@@ -577,6 +581,11 @@ $monthNames = [
     font-size: 15px;       /* 개선: 사이드바 제목 적절한 크기 */
     line-height: 1.3;
     font-weight: 600;
+    /* 모바일에서도 긴 제목 오버플로우 방지 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #2d3748; /* 색상 일관성 유지 */
 }
 
 .sidebar-lecture-meta {
@@ -600,6 +609,7 @@ $monthNames = [
 .lecture-list-description {
     font-size: 14px;       /* 개선: 설명 텍스트 적절한 크기 */
     line-height: 1.5;
+    color: #4a5568 !important; /* 다른 페이지와 일관성 유지 */
 }
 
 /* 모달 관련 터치 타겟 개선 */
@@ -698,6 +708,7 @@ $monthNames = [
         box-sizing: border-box;
         overflow: hidden;
         word-wrap: break-word;
+        color: #4a5568 !important; /* 모바일에서도 텍스트 색상 유지 */
     }
     
     /* 카드형 디자인 모바일 최적화 */
