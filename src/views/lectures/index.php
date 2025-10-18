@@ -503,7 +503,8 @@ $monthNames = [
     gap: 6px;
 }
 
-.lecture-list-description {
+.lecture-list-item .lecture-list-description,
+.list-view .lecture-list-item .lecture-list-description {
     color: #4a5568 !important;
     font-size: 0.9rem;
     line-height: 1.5;
@@ -606,7 +607,8 @@ $monthNames = [
     line-height: 1.4;
 }
 
-.lecture-list-description {
+.lecture-list-item .lecture-list-description,
+.list-view .lecture-list-item .lecture-list-description {
     font-size: 14px;       /* 개선: 설명 텍스트 적절한 크기 */
     line-height: 1.5;
     color: #4a5568 !important; /* 다른 페이지와 일관성 유지 */
@@ -702,7 +704,8 @@ $monthNames = [
         font-size: 0.8rem !important;
     }
     
-    .lecture-list-description {
+    .lecture-list-item .lecture-list-description,
+    .list-view .lecture-list-item .lecture-list-description {
         max-width: 100% !important;
         width: 100% !important;
         box-sizing: border-box;
