@@ -14,8 +14,9 @@
  *
  * @package TOPMKT
  * @subpackage Components\ApiClient
- * @version 1.0.0
+ * @version 1.1.0
  * @since 2025-10-05 (v3.42.0)
+ * @updated 2025-10-20 (v3.90.3) - FormData Content-Type 자동 감지
  */
 
 (function(window) {
@@ -317,8 +318,12 @@
                     ...options
                 };
 
-                // body가 있고 객체인 경우 JSON 문자열로 변환
-                if (requestConfig.body && typeof requestConfig.body === 'object' && !(requestConfig.body instanceof FormData)) {
+                // 🔧 [FORMDATA-FIX] 2025-10-20: FormData 전송 시 Content-Type 명시적 삭제
+                if (requestConfig.body instanceof FormData) {
+                    // FormData일 때는 Content-Type을 완전히 삭제 (브라우저가 자동으로 boundary 추가)
+                    delete requestConfig.headers['Content-Type'];
+                } else if (requestConfig.body && typeof requestConfig.body === 'object') {
+                    // 일반 객체는 JSON 문자열로 변환
                     requestConfig.body = JSON.stringify(requestConfig.body);
                 }
 
