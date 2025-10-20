@@ -1,0 +1,21 @@
+# 탑마케팅 리소스 리디렉션 규칙
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # install.php와 db_test.php는 직접 실행 허용
+    RewriteRule ^install\.php$ - [L]
+    RewriteRule ^db_test\.php$ - [L]
+    
+    # 실제 파일이나 디렉토리가 아닌 경우에만 리디렉션
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # /assets/ 경로로 시작하는 요청을 /public/assets/로 내부적으로 리디렉션
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+    
+    # favicon.ico 리디렉션
+    RewriteRule ^favicon\.ico$ public/favicon.ico [L]
+    
+    # 기타 모든 요청을 라우터로 전달
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
+</IfModule> 

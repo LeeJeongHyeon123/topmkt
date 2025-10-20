@@ -28,11 +28,8 @@ define('PROFILE_PATH', UPLOAD_PATH . '/profiles');
 define('CSRF_TOKEN_NAME', 'csrf_token');
 define('SESSION_PREFIX', 'topmkt_');
 
-// JWT 인증 키 (환경변수에서 로드 - 보안 강화 2025-10-19)
-define('JWT_SECRET_KEY', $_ENV['JWT_SECRET_KEY'] ?? '');
-
-// Firebase 설정 (환경변수에서 로드 - 보안 강화 2025-10-19)
-define('FIREBASE_API_KEY', $_ENV['FIREBASE_API_KEY'] ?? '');
+// Firebase 설정
+define('FIREBASE_API_KEY', '');
 define('FIREBASE_AUTH_DOMAIN', '');
 define('FIREBASE_DATABASE_URL', '');
 define('FIREBASE_PROJECT_ID', 'topmkt-832f2');
@@ -42,13 +39,13 @@ define('FCM_SERVICE_ACCOUNT_PATH', ROOT_PATH . '/config/firebase-service-account
 define('FCM_API_URL_V1', 'https://fcm.googleapis.com/v1/projects/topmkt-832f2/messages:send');
 define('FCM_SCOPE', 'https://www.googleapis.com/auth/firebase.messaging');
 
-// 네이버 Maps API 설정 (환경변수에서 로드 - 보안 강화 2025-10-19)
+// 네이버 Maps API 설정
 define('NAVER_MAPS_CLIENT_ID', 'c5yj6m062z'); // 네이버 Maps API 클라이언트 ID
-define('NAVER_MAPS_CLIENT_SECRET', $_ENV['NAVER_MAPS_CLIENT_SECRET'] ?? ''); // 네이버 Maps API 클라이언트 시크릿
+define('NAVER_MAPS_CLIENT_SECRET', 'ifjGgFsON2vMO2DiIFW1QLRBnEQ7l1j4w5CciajG'); // 네이버 Maps API 클라이언트 시크릿
 
 
-// 알리고 SMS API 설정 (환경변수에서 로드 - 보안 강화 2025-10-19)
-define('ALIGO_API_KEY', $_ENV['ALIGO_API_KEY'] ?? ''); // 알리고에서 발급받은 실제 API 키
+// 알리고 SMS API 설정
+define('ALIGO_API_KEY', 'ukqd7brex9cf9o3ggvy3bxr37brxxkm1'); // 알리고에서 발급받은 실제 API 키
 define('ALIGO_USER_ID', 'neungsoft');                          // 알리고 실제 사용자 ID  
 define('ALIGO_SENDER', '070-4136-8899');                       // 실제 등록된 발신번호
 define('ALIGO_API_URL', 'https://apis.aligo.in/send/');        // 알리고 API URL

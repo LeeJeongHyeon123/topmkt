@@ -16,25 +16,13 @@ class SecurityHelper {
     private static $hashSalt = null;
 
     /**
-     * 초기화 - 암호화 키 설정 (환경변수에서 로드 - 보안 강화 2025-10-19)
+     * 초기화 - 암호화 키 설정
      */
     private static function init() {
         if (self::$encryptionKey === null) {
-            // 환경변수에서 암호화 키 로드
-            $key = $_ENV['ENCRYPTION_KEY'] ?? '';
-            if (empty($key)) {
-                error_log('CRITICAL: ENCRYPTION_KEY not set in environment variables');
-                throw new Exception('ENCRYPTION_KEY not configured - check .env file');
-            }
-            self::$encryptionKey = hash('sha256', $key, true);
-
-            // 환경변수에서 해시 솔트 로드
-            $salt = $_ENV['HASH_SALT'] ?? '';
-            if (empty($salt)) {
-                error_log('CRITICAL: HASH_SALT not set in environment variables');
-                throw new Exception('HASH_SALT not configured - check .env file');
-            }
-            self::$hashSalt = $salt;
+            // 실제 운영에서는 환경변수에서 가져와야 함
+            self::$encryptionKey = hash('sha256', 'TOPMKT_ENCRYPTION_KEY_2024_SECURE_DATA_PROTECTION', true);
+            self::$hashSalt = 'TOPMKT_HASH_SALT_2024_SECURE_HASHING';
         }
     }
 

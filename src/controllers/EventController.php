@@ -2031,8 +2031,8 @@ class EventController extends LectureController {
             }
             
             // 수정 권한 확인
-            $userRole = AuthMiddleware::getUserRole();
-            $canEdit = ($userRole === 'ROLE_ADMIN') || ($event['user_id'] == $currentUser['id']);
+            // ✅ [SECURITY-FIX] 2025-10-20: AuthMiddleware::isAdmin() 사용으로 모든 관리자 역할 허용
+            $canEdit = AuthMiddleware::isAdmin() || ($event['user_id'] == $currentUser['id']);
 
             if (!$canEdit) {
                 $this->showErrorPage("수정 권한이 없습니다.", 403);
@@ -2217,12 +2217,18 @@ class EventController extends LectureController {
             $this->showErrorPage("잘못된 요청입니다.", 405);
             return;
         }
-        
+
         try {
             // 로그인 확인
             $currentUser = $this->getCurrentUser();
             if (!$currentUser) {
                 ResponseHelper::json(['success' => false, 'message' => '로그인이 필요합니다.'], 401);
+                return;
+            }
+
+            // ✅ [SECURITY-FIX] 2025-10-20: CSRF 토큰 검증 추가
+            if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+                ResponseHelper::json(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], 403);
                 return;
             }
             
@@ -2234,8 +2240,8 @@ class EventController extends LectureController {
             }
             
             // 수정 권한 확인
-            $userRole = AuthMiddleware::getUserRole();
-            $canEdit = ($userRole === 'ROLE_ADMIN') || ($event['user_id'] == $currentUser['id']);
+            // ✅ [SECURITY-FIX] 2025-10-20: AuthMiddleware::isAdmin() 사용으로 모든 관리자 역할 허용
+            $canEdit = AuthMiddleware::isAdmin() || ($event['user_id'] == $currentUser['id']);
 
             if (!$canEdit) {
                 ResponseHelper::json(['success' => false, 'message' => '수정 권한이 없습니다.'], 403);
@@ -2312,9 +2318,9 @@ class EventController extends LectureController {
             }
             
             // 삭제 권한 확인
-            $userRole = AuthMiddleware::getUserRole();
-            $canDelete = ($userRole === 'ROLE_ADMIN') || ($event['user_id'] == $currentUser['id']);
-            
+            // ✅ [SECURITY-FIX] 2025-10-20: AuthMiddleware::isAdmin() 사용으로 모든 관리자 역할 허용
+            $canDelete = AuthMiddleware::isAdmin() || ($event['user_id'] == $currentUser['id']);
+
             if (!$canDelete) {
                 ResponseHelper::json(['success' => false, 'message' => '삭제 권한이 없습니다.'], 403);
                 return;

@@ -375,6 +375,8 @@ if (!isset($notice) || !$notice) {
     <!-- 편집 폼 -->
     <form id="editNoticeForm" class="edit-form">
         <input type="hidden" name="notice_id" value="<?= $notice['id'] ?>">
+        <!-- 🚀 [SECURITY-FIX] 2025-10-20: CSRF 토큰 추가 (NoticeController::update() CSRF 검증 연동) -->
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         
         <!-- 제목 -->
         <div class="form-group">
@@ -626,6 +628,9 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('content', contentValue);
         formData.append('is_featured', isFeaturedValue);
         formData.append('removed_images', JSON.stringify(removedImages));
+
+        // 🚀 [SECURITY-FIX] 2025-10-20: CSRF 토큰 추가 (NoticeController::update() CSRF 검증 연동)
+        formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
         
         // 새 이미지 파일들 추가
         for (let file of fileInput.files) {

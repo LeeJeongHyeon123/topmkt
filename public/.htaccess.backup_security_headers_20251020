@@ -40,54 +40,8 @@ RewriteRule ^(.*)$ index.php [QSA,L]
     ExpiresByType application/json "access plus 0 seconds"
 </IfModule>
 
-# 캐시 컨트롤 헤더 및 보안 헤더
+# 캐시 컨트롤 헤더
 <IfModule mod_headers.c>
-    # ========================================
-    # 보안 헤더 설정 (2025-10-20 추가)
-    # ========================================
-
-    # X-Frame-Options: 클릭재킹(Clickjacking) 공격 방지
-    # SAMEORIGIN: 같은 도메인에서만 iframe 삽입 허용
-    Header always set X-Frame-Options "SAMEORIGIN"
-
-    # X-Content-Type-Options: MIME 타입 스니핑 방지
-    # nosniff: 브라우저가 선언된 Content-Type을 따르도록 강제
-    Header always set X-Content-Type-Options "nosniff"
-
-    # X-XSS-Protection: XSS(Cross-Site Scripting) 필터 활성화
-    # 1; mode=block: XSS 공격 탐지 시 페이지 렌더링 차단
-    Header always set X-XSS-Protection "1; mode=block"
-
-    # Strict-Transport-Security (HSTS): HTTPS 강제 사용
-    # max-age=31536000: 1년간 HTTPS만 사용
-    # includeSubDomains: 모든 서브도메인에도 적용
-    # preload: HSTS preload 목록 등록 가능
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-
-    # Referrer-Policy: 리퍼러 정보 전송 정책
-    # strict-origin-when-cross-origin: HTTPS→HTTP로 다운그레이드 시 리퍼러 전송 안 함
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-
-    # Permissions-Policy: 민감한 브라우저 기능 접근 제어
-    # 카메라, 마이크, 지오로케이션, 자동재생, 결제 API 등 제한
-    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=()"
-
-    # Content-Security-Policy: 콘텐츠 보안 정책 (XSS, 데이터 인젝션 공격 방지)
-    # default-src 'self': 기본적으로 같은 도메인만 허용
-    # script-src: JavaScript 소스 허용 목록
-    # style-src: CSS 소스 허용 목록
-    # img-src: 이미지 소스 허용 목록
-    # font-src: 폰트 소스 허용 목록
-    # connect-src: AJAX, WebSocket 등 연결 허용 목록
-    # frame-src: iframe 소스 허용 목록
-    # 'unsafe-inline': 인라인 스크립트/스타일 허용 (기존 코드 호환성)
-    # 'unsafe-eval': eval() 허용 (필요시)
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://www.google-analytics.com https://firebasestorage.googleapis.com https://fcm.googleapis.com https://apis.aligo.in; frame-src 'self' https://www.youtube.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';"
-
-    # ========================================
-    # 캐시 컨트롤 헤더
-    # ========================================
-
     # CSS와 JavaScript는 캐시하지 않음 (개발 중)
     <FilesMatch "\.(css|js)$">
         Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"

@@ -19,6 +19,9 @@ if (!defined('CONFIG_PATH')) {
 // paths.php 로드
 require_once CONFIG_PATH . '/paths.php';
 
+// 환경변수 로드 (.env 파일) - 보안 강화 2025-10-19
+require_once CONFIG_PATH . '/env-loader.php';
+
 // forgot-password 요청 디버깅
 if (strpos($_SERVER['REQUEST_URI'], '/auth/forgot-password') !== false) {
     error_log("=== FORGOT-PASSWORD 요청 디버깅 ===");

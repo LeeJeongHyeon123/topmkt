@@ -48,9 +48,8 @@ class AdminController extends BaseController {
         }
         
         // 관리자 권한 체크
-        $user = AuthMiddleware::getCurrentUser();
-        $allowedRoles = ['ROLE_ADMIN', 'SUPER_ADMIN'];
-        if (!in_array($user['role'], $allowedRoles)) {
+        // ✅ [SECURITY-FIX] 2025-10-20: 'ADMIN' 역할 추가 (AuthMiddleware와 일관성)
+        if (!AuthMiddleware::isAdmin()) {
             header('HTTP/1.1 403 Forbidden');
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
                 header('Content-Type: application/json');

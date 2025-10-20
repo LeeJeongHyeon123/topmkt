@@ -603,12 +603,23 @@ class NoticeController extends BaseController {
             // 소유자 권한 확인
             $isOwner = $this->noticeModel->isOwner($noticeId, $currentUserId);
             file_put_contents('/tmp/notice_debug.log', "권한 확인: 공지사항 ID $noticeId, 사용자 ID $currentUserId, 권한: " . ($isOwner ? 'OK' : 'NO') . "\n", FILE_APPEND);
-            
+
             if (!$isOwner) {
                 file_put_contents('/tmp/notice_debug.log', "❌ 권한 없음으로 종료\n", FILE_APPEND);
                 http_response_code(403);
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['success' => false, 'message' => '수정 권한이 없습니다.'], JSON_UNESCAPED_UNICODE);
+                exit;
+                return;
+            }
+
+            // ✅ [SECURITY-FIX] 2025-10-20: CSRF 토큰 검증 추가
+            $csrfToken = $_POST['csrf_token'] ?? '';
+            if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrfToken)) {
+                file_put_contents('/tmp/notice_debug.log', "❌ CSRF 토큰 검증 실패\n", FILE_APPEND);
+                http_response_code(403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => 'CSRF 토큰이 유효하지 않습니다.'], JSON_UNESCAPED_UNICODE);
                 exit;
                 return;
             }

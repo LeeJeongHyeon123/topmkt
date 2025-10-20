@@ -34,13 +34,7 @@ class Database {
             $socket_path = $_ENV['DB_SOCKET'] ?? self::SOCKET_PATH;
             $dbname = $_ENV['DB_NAME'] ?? self::DB_NAME;
             $username = $_ENV['DB_USERNAME'] ?? self::USERNAME;
-            $password = $_ENV['DB_PASSWORD'] ?? '';
-
-            // 비밀번호가 설정되지 않은 경우 예외 발생
-            if (empty($password)) {
-                error_log('CRITICAL: DB_PASSWORD not set in environment variables');
-                throw new Exception('Database password not configured - check .env file');
-            }
+            $password = $_ENV['DB_PASSWORD'] ?? 'Dnlszkem1!'; // 새로운 비밀번호로 업데이트
             
             // MySQLi TCP 연결 (로컬 MySQL 서버)
             $host = $_ENV['DB_HOST'] ?? '127.0.0.1'; // 로컬 데이터베이스 서버

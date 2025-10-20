@@ -127,7 +127,7 @@ class CorporateController extends BaseController {
             
             if (!$isOverseas || !empty($_FILES['business_registration_file']['tmp_name'])) {
                 error_log("[CORP_APPLY] 파일 업로드 처리 시작");
-                $uploadResult = $this->handleFileUpload($_FILES['business_registration_file'], $userId);
+                $uploadResult = $this->handleCorporateFileUpload($_FILES['business_registration_file'], $userId);
                 if (!$uploadResult['success']) {
                     error_log("[CORP_APPLY] 파일 업로드 실패: " . $uploadResult['message']);
                     throw new Exception($uploadResult['message']);
@@ -379,9 +379,10 @@ class CorporateController extends BaseController {
     }
     
     /**
-     * 파일 업로드 처리
+     * 기업 인증 파일 업로드 처리
+     * 🔧 [BUG-FIX] 2025-10-20: handleFileUpload → handleCorporateFileUpload (BaseController 충돌 방지)
      */
-    private function handleFileUpload($file, $userId) {
+    private function handleCorporateFileUpload($file, $userId) {
         try {
             // 파일 업로드 검증
             if ($file['error'] !== UPLOAD_ERR_OK) {
