@@ -437,15 +437,25 @@ function loadChatRoomInfo(roomId) {
     // 새로운 리스너 생성 및 저장
     window.roomListeners[roomId] = function(snapshot) {
         const roomData = snapshot.val();
-        
+
         if (!roomData) {
-            Toast.error('채팅방을 불러올 수 없습니다.\n페이지를 새로고침해주세요.');
+            // 🔧 [BUGFIX] 2025-10-20: 채팅방 데이터가 없으면 조용히 무시 (에러 메시지 제거)
+            // 상대방이 채팅방을 나간 경우 정상적인 동작임
             return;
         }
-        
+
+        // 🔧 [BUGFIX] 2025-10-20: 현재 사용자가 inactive 상태라면 로드하지 않음
+        if (roomData.participants && roomData.participants[currentUserId]) {
+            const myStatus = roomData.participants[currentUserId].status;
+            if (myStatus === 'inactive') {
+                // 내가 이미 나간 채팅방이므로 로드하지 않음
+                return;
+            }
+        }
+
         chatRooms[roomId] = roomData;
 
-        
+
         renderChatRoomItem(roomId, roomData);
     };
     
@@ -629,13 +639,29 @@ function renderChatRoomItem(roomId, roomData) {
         </div>
     `;
 
-    // 비활성 채팅방의 경우 클릭 이벤트 추가
+    // 🔧 [BUGFIX] 2025-10-20: 비활성 채팅방 클릭 이벤트 중복 방지
+    // 기존 이벤트 리스너 제거 후 새로 등록
     if (isOtherParticipantInactive) {
-        roomItem.addEventListener('click', function(e) {
+        // 기존 리스너가 있다면 제거
+        const oldHandler = roomItem._inactiveClickHandler;
+        if (oldHandler) {
+            roomItem.removeEventListener('click', oldHandler);
+            roomItem.removeEventListener('mousedown', oldHandler);
+            roomItem.removeEventListener('touchstart', oldHandler);
+        }
+
+        // 새로운 핸들러 생성 및 저장
+        const newHandler = function(e) {
             e.preventDefault();
             e.stopPropagation();
             showInactiveRoomModal(roomId, roomName);
-        });
+        };
+        roomItem._inactiveClickHandler = newHandler;
+
+        // 이벤트 등록
+        roomItem.addEventListener('click', newHandler);
+        roomItem.addEventListener('mousedown', newHandler);
+        roomItem.addEventListener('touchstart', newHandler, { passive: false });
     }
 
     // 🔥 room-name 디버깅 로그 추가
@@ -735,6 +761,18 @@ function openChatRoom(roomId, retryCount = 0) {
     activeRoomId = roomId;
     const roomData = chatRooms[roomId];
 
+    // 🔧 [BUGFIX] 2025-10-20: inactive 채팅방은 열지 않음
+    if (roomData && roomData.participants) {
+        const otherParticipantId = Object.keys(roomData.participants).find(id => id != currentUserId);
+        const otherParticipant = otherParticipantId ? roomData.participants[otherParticipantId] : null;
+
+        if (otherParticipant && otherParticipant.status === 'inactive') {
+            // 상대방이 나간 채팅방 → 모달 표시
+            const roomName = users[otherParticipantId]?.nickname || '사용자';
+            showInactiveRoomModal(roomId, roomName);
+            return;
+        }
+    }
 
     if (!roomData) {
 
@@ -1821,21 +1859,14 @@ async function leaveChatRoom() {
             }
 
 
-            // 양쪽 모두의 userRooms에서 방 제거 및 참여자 상태 업데이트
+            // 🔧 [BUGFIX] 2025-10-20: 자기 자신의 userRooms만 제거 (상대방 것은 보존)
+            // 상대방의 userRooms를 제거하면 상대방이 채팅 페이지 진입 시 버벅임 발생
             const userRoomRef = database.ref(`userRooms/${currentUserId}/${activeRoomId}`);
-            const otherUserRoomRef = database.ref(`userRooms/${otherParticipantId}/${activeRoomId}`);
             const currentParticipantRef = database.ref(`chatRooms/${activeRoomId}/participants/${currentUserId}`);
-            const otherParticipantRef = database.ref(`chatRooms/${activeRoomId}/participants/${otherParticipantId}`);
 
             Promise.all([
-                userRoomRef.remove(), // 현재 사용자의 채팅방 목록에서 제거
-                otherUserRoomRef.remove(), // 상대방의 채팅방 목록에서도 제거
+                userRoomRef.remove(), // 현재 사용자의 채팅방 목록에서만 제거
                 currentParticipantRef.update({
-                    status: 'inactive',
-                    leftAt: firebase.database.ServerValue.TIMESTAMP,
-                    // 기존 정보는 보존 (joinedAt, role 등)
-                }),
-                otherParticipantRef.update({
                     status: 'inactive',
                     leftAt: firebase.database.ServerValue.TIMESTAMP,
                     // 기존 정보는 보존 (joinedAt, role 등)
