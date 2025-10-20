@@ -6,14 +6,18 @@
 
 require_once SRC_PATH . '/controllers/BaseController.php';
 require_once SRC_PATH . '/middlewares/AuthMiddleware.php';
+require_once SRC_PATH . '/config/upload.php';
 
 class MediaController extends BaseController {
     private $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     private $uploadBasePath;
+    private $maxFileSize;
 
     public function __construct() {
         parent::__construct(); // BaseController의 생성자 호출
         $this->uploadBasePath = ROOT_PATH . '/public/assets/uploads';
+        // 🔧 [FIX] 2025-10-20: UploadConfig에서 최대 파일 크기 가져오기 (30MB)
+        $this->maxFileSize = UploadConfig::MAX_FILE_SIZE;
     }
     
     /**
@@ -247,13 +251,23 @@ class MediaController extends BaseController {
             session_start();
         }
         
-        $token = $_POST['csrf_token'] ?? $_REQUEST['csrf_token'] ?? '';
+        // 🔧 [CSRF-FIX] 2025-10-20: HTTP 헤더에서도 CSRF 토큰 확인 (ApiClient 호환)
+        $token = $_POST['csrf_token']
+            ?? $_REQUEST['csrf_token']
+            ?? $_SERVER['HTTP_X_CSRF_TOKEN']  // ApiClient가 보내는 헤더
+            ?? '';
         $sessionToken = $_SESSION['csrf_token'] ?? '';
-        
+
         // 디버깅 로그
+        $tokenSource = isset($_POST['csrf_token']) ? 'POST'
+            : (isset($_REQUEST['csrf_token']) ? 'REQUEST'
+            : (isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? 'HTTP Header'
+            : 'None'));
+
         error_log("🔒 CSRF 토큰 검증:");
         error_log("- 요청 토큰 존재: " . (!empty($token) ? 'YES' : 'NO'));
         error_log("- 세션 토큰 존재: " . (!empty($sessionToken) ? 'YES' : 'NO'));
+        error_log("- 토큰 소스: " . $tokenSource);
         error_log("- 요청 토큰 (앞 16자): " . substr($token, 0, 16));
         error_log("- 세션 토큰 (앞 16자): " . substr($sessionToken, 0, 16));
         

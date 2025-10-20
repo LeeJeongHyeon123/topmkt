@@ -101,11 +101,16 @@
          */
         buildHeaders(customHeaders = {}, options = {}) {
             const headers = {
-                'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
                 ...this.config.headers,
                 ...customHeaders
             };
+
+            // 🔧 [FORMDATA-FIX] 2025-10-20: FormData 전송 시 Content-Type 자동 설정 (multipart/form-data)
+            // body가 FormData가 아닌 경우에만 Content-Type: application/json 설정
+            if (!(options.body instanceof FormData)) {
+                headers['Content-Type'] = 'application/json';
+            }
 
             // JWT 토큰 자동 주입
             if (this.config.autoTokenInjection && !options.noAuth) {
