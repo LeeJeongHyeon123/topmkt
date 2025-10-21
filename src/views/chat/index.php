@@ -583,8 +583,18 @@ function renderChatRoomItem(roomId, roomData) {
                         // 새로운 정보로 채팅방 아이템 업데이트
                         renderChatRoomItem(roomId, roomData);
                     }).catch((error) => {
-                        Toast.warning('사용자 프로필을 불러올 수 없습니다.');
+                        // 🔥 무한 루프 방지: 실패 시에도 기본값 저장 (이중 안전장치)
+                        if (!users[otherUserId]) {
+                            users[otherUserId] = {
+                                id: otherUserId,
+                                nickname: '사용자',
+                                profile_image: null,
+                                is_deleted: false,
+                                _loadFailed: true
+                            };
+                        }
                         delete roomItem.dataset.loadingUser;
+                        Toast.warning('사용자 프로필을 불러올 수 없습니다.');
                     });
                 }
 
@@ -2060,6 +2070,15 @@ async function loadUserInfo(userId) {
         
         return Promise.resolve();
     } catch (error) {
+        // 🔥 무한 루프 방지: API 실패 시에도 기본 사용자 정보 생성
+        users[userId] = {
+            id: userId,
+            nickname: '사용자',
+            profile_image: null,
+            is_deleted: false,
+            _loadFailed: true  // 로드 실패 플래그
+        };
+
         Toast.warning('사용자 정보를 불러올 수 없습니다.');
         return Promise.reject(error);
     }
