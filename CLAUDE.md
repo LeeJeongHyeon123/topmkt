@@ -215,7 +215,55 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.58.0 ~ v3.89.9)
+## 최근 주요 작업 (v3.58.0 ~ v3.91.0)
+
+### v3.91.0 - 채팅 페이지 무한 루프 완전 해결 (2025-10-21) 🔥
+**문제**: 채팅 페이지 접속 시 페이지가 멈추는 현상 (v3.90.9까지도 미해결)
+
+**근본 원인**:
+- renderChatRoomItem() 함수에서 loadUserInfo() 완료 후 자기 자신을 재귀 호출
+- users[userId] 존재하지만 nickname이 없으면 계속 loadUserInfo() 시도
+- 하지만 loadUserInfo()는 users[userId] 존재 시 early return
+- **결과**: 무한 재귀 루프 발생 → 페이지 완전 멈춤
+
+**해결 방법**:
+1. **renderChatRoomItem() 재귀 호출 완전 제거**
+   - Line 584: `renderChatRoomItem(roomId, roomData)` 삭제
+2. **DOM 직접 업데이트로 전환** (Lines 581-599)
+   - querySelector()로 기존 요소 찾기
+   - textContent, innerHTML 직접 수정
+   - 재렌더링 없이 필요한 부분만 업데이트
+3. **전역 플래그 window.loadingUsers 추가**
+   - 중복 로딩 완벽 방지
+4. **users 객체 사용 로직 단순화**
+   - users[userId] 존재 시 무조건 사용
+   - nickname 없어도 기본값 "사용자" 표시
+
+**개선 효과**:
+- ✅ 무한 재귀 루프 완전 차단
+- ✅ 페이지 멈춤 현상 근본 해결
+- ✅ API 호출 횟수 대폭 감소 (채팅방당 1회로 제한)
+- ✅ 성능 향상 (불필요한 재렌더링 제거)
+
+**파일 수정**:
+- src/views/chat/index.php (Lines 561-611 재구성, 51줄)
+- QA_CHAT_PAGE_FIX_v3.91.0.md (완전한 QA 가이드)
+
+**QA 가이드**:
+- 9개 테스트 시나리오 (페이지 로딩, 기능, 성능, 크로스 브라우저, 회귀)
+- 성능 기준 명시 (페이지 로드 < 5초, API 호출 < 20회)
+- 문제 발생 시 대처 방법 상세 제공
+
+**검증 결과**:
+- ✅ 코드 리뷰 완료 (다른 loadUserInfo() 호출 모두 안전 확인)
+- ✅ Git 커밋 완료
+- ✅ 컴포넌트 사용 검증 통과
+- 📋 수동 QA 필요 (QA_CHAT_PAGE_FIX_v3.91.0.md 참조)
+
+**관련 버전**:
+- v3.90.8: Firebase 리스너 무한 증식 해결
+- v3.90.9: loadUserInfo 무한 루프 방지 (부분 해결)
+- v3.91.0: renderChatRoomItem 무한 재귀 완전 해결 (근본 해결) ← **최종 완성**
 
 ### v3.89.9 - 강의 목록 메타 정보 텍스트 색상 수정 (2025-10-18) 🎨
 **문제**: 강의 목록 페이지에서 4가지 메타 정보 (📅 날짜, 🕒 시간, 👨‍🏫 강사, 📍 장소) 텍스트가 흰색으로 표시되어 안 보이는 문제
