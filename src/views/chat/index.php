@@ -180,6 +180,9 @@ let chatRooms = {};
 let users = {};
 let currentPartnerUserId = null;
 
+// Firebase 리스너 참조 저장용 전역 객체
+window.lastMessageListeners = {}; // 마지막 메시지 리스너 저장용
+
 
 /**
  * 전역 fetch 인터셉터 비활성화
@@ -202,14 +205,14 @@ function chatFetch(url, options = {}) {
  * 채팅 리스너 정리 함수
  */
 function cleanupChatListeners() {
-    
+
     // 채팅방 목록 리스너 제거
     if (window.chatRoomsListener) {
         const userRoomsRef = database.ref(`userRooms/${currentUserId}`);
         userRoomsRef.off('value', window.chatRoomsListener);
         window.chatRoomsListener = null;
     }
-    
+
     // 개별 채팅방 리스너 제거
     if (window.roomListeners) {
         Object.keys(window.roomListeners).forEach(roomId => {
@@ -218,7 +221,16 @@ function cleanupChatListeners() {
         });
         window.roomListeners = {};
     }
-    
+
+    // 마지막 메시지 리스너 제거 (🔥 무한 증식 방지)
+    if (window.lastMessageListeners) {
+        Object.keys(window.lastMessageListeners).forEach(roomId => {
+            const lastMessageRef = database.ref(`messages/${roomId}`).limitToLast(1);
+            lastMessageRef.off('value', window.lastMessageListeners[roomId]);
+        });
+        window.lastMessageListeners = {};
+    }
+
     // 메시지 리스너 제거
     if (window.currentMessageListener && activeRoomId) {
         const messagesRef = database.ref(`messages/${activeRoomId}`);
@@ -1478,29 +1490,43 @@ function createPrivateChatRoom(user) {
  */
 function updateLastMessage(roomId) {
     const lastMessageRef = database.ref(`messages/${roomId}`).limitToLast(1);
-    
-    lastMessageRef.on('value', function(snapshot) {
+
+    // 기존 리스너가 있다면 제거 (중복 방지)
+    if (window.lastMessageListeners && window.lastMessageListeners[roomId]) {
+        lastMessageRef.off('value', window.lastMessageListeners[roomId]);
+    }
+
+    // 리스너 저장용 객체 초기화
+    if (!window.lastMessageListeners) {
+        window.lastMessageListeners = {};
+    }
+
+    // 새로운 리스너 생성 및 저장
+    window.lastMessageListeners[roomId] = function(snapshot) {
         const messages = snapshot.val();
         if (messages) {
             const lastMessage = Object.values(messages)[0];
             const lastMessageElement = document.getElementById(`lastMessage-${roomId}`);
             const lastTimeElement = document.getElementById(`lastTime-${roomId}`);
-            
+
             if (lastMessageElement) {
                 const messageText = lastMessage.text || lastMessage.message || '';
                 lastMessageElement.textContent = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '');
             }
-            
+
             if (lastTimeElement) {
                 lastTimeElement.textContent = formatTime(lastMessage.timestamp);
             }
-            
+
             // 새 메시지가 있으면 읽지 않은 메시지 수 업데이트
             if (lastMessage.senderId != currentUserId) {
                 updateRoomUnreadCount(roomId);
             }
         }
-    });
+    };
+
+    // 리스너 등록
+    lastMessageRef.on('value', window.lastMessageListeners[roomId]);
 }
 
 /**
