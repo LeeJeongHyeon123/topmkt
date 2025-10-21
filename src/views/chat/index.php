@@ -558,54 +558,56 @@ function renderChatRoomItem(roomId, roomData) {
         if (otherUserId) {
             const otherParticipant = roomData.participants[otherUserId];
 
-            // 🔥 근본 원인 해결: 사용자 정보가 실제로 없는 경우에만 로드 (탈퇴한 회원 예외 처리)
-            const shouldRefreshProfile = !users[otherUserId] ||
-                                       (!users[otherUserId].nickname || !users[otherUserId].profile_image) &&
-                                       !(users[otherUserId] && (users[otherUserId].is_deleted || users[otherUserId].status === 'deleted'));
-
-            if (users[otherUserId] && !shouldRefreshProfile) {
-                // 기존 사용자 정보 사용
+            // 🔥 [FIX v3.91.0] 무한 루프 완전 제거: users 객체가 존재하면 무조건 사용
+            if (users[otherUserId]) {
+                // 기존 사용자 정보 사용 (nickname이 없어도 기본값 "사용자" 사용)
                 roomName = users[otherUserId].nickname || '사용자';
                 avatarText = roomName.substring(0, 1).toUpperCase();
                 partnerImage = users[otherUserId].profile_image || users[otherUserId].profile_image_thumb;
             } else {
-                // 🔥 실제로 필요한 정보가 없는 경우에만 로드 (근본 원인 해결)
-                // 탈퇴한 회원인 경우 추가 로드 방지
-                const isDeletedUser = users[otherUserId] && (users[otherUserId].is_deleted || users[otherUserId].status === 'deleted');
-                if (isDeletedUser) {
+                // 🔥 users 객체가 아예 없는 경우에만 로드 시도
+                // 전역 플래그로 중복 로딩 방지
+                if (!window.loadingUsers) {
+                    window.loadingUsers = {};
                 }
-                if (!roomItem.dataset.loadingUser && shouldRefreshProfile && !isDeletedUser) {
-                    roomItem.dataset.loadingUser = 'true';
+
+                if (!window.loadingUsers[otherUserId]) {
+                    window.loadingUsers[otherUserId] = true;
 
                     loadUserInfo(otherUserId).then(() => {
-                        // 로딩 플래그 제거
-                        delete roomItem.dataset.loadingUser;
-                        // 새로운 정보로 채팅방 아이템 업데이트
-                        renderChatRoomItem(roomId, roomData);
-                    }).catch((error) => {
-                        // 🔥 무한 루프 방지: 실패 시에도 기본값 저장 (이중 안전장치)
-                        if (!users[otherUserId]) {
-                            users[otherUserId] = {
-                                id: otherUserId,
-                                nickname: '사용자',
-                                profile_image: null,
-                                is_deleted: false,
-                                _loadFailed: true
-                            };
+                        // 로딩 완료
+                        delete window.loadingUsers[otherUserId];
+
+                        // 🔥 재귀 호출 대신 DOM 직접 업데이트
+                        if (users[otherUserId]) {
+                            const nameEl = roomItem.querySelector('.room-name');
+                            const avatarEl = roomItem.querySelector('.room-avatar');
+
+                            if (nameEl) {
+                                const newName = users[otherUserId].nickname || '사용자';
+                                nameEl.textContent = newName + (isOtherParticipantInactive ? ' (종료된 대화)' : '');
+                            }
+
+                            if (avatarEl && users[otherUserId].profile_image) {
+                                avatarEl.innerHTML = `
+                                    <img src="${users[otherUserId].profile_image}"
+                                         alt="${users[otherUserId].nickname || '사용자'}"
+                                         style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
+                                         onerror="this.style.display='none';">
+                                `;
+                            }
                         }
-                        delete roomItem.dataset.loadingUser;
-                        Toast.warning('사용자 프로필을 불러올 수 없습니다.');
+                    }).catch((error) => {
+                        // 로딩 실패 플래그 제거
+                        delete window.loadingUsers[otherUserId];
+                        // users 객체는 loadUserInfo() 내부에서 기본값으로 생성됨
                     });
                 }
 
-                // 임시로 기존 정보나 기본값 사용
-                if (users[otherUserId]) {
-                    roomName = users[otherUserId].nickname || '사용자';
-                    partnerImage = users[otherUserId].profile_image || users[otherUserId].profile_image_thumb;
-                } else {
-                    roomName = '사용자';
-                }
+                // 임시로 기본값 사용
+                roomName = '사용자';
                 avatarText = roomName.substring(0, 1).toUpperCase();
+                partnerImage = null;
             }
         }
     }
