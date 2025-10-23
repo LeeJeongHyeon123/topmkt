@@ -8,8 +8,8 @@
     'use strict';
     
     // 원본 console.error 저장
+    const originalConsoleError = console.error;
 
-    
     // 억제할 에러 패턴들
     const suppressedErrors = [
         /A listener indicated an asynchronous response by returning true/,

@@ -9,9 +9,6 @@ require_once SRC_PATH . '/helpers/ProfileImageHelper.php';
 include SRC_PATH . '/views/components/profile-modal-resources.php';
 ?>
 
-<!-- 브라우저 확장 프로그램 에러 억제 -->
-<script src="/assets/js/error-suppressor.js"></script>
-
 <!-- 채팅 페이지 스타일 include -->
 <style>
 <?php

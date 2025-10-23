@@ -109,6 +109,8 @@
     ?>
     
     <!-- JavaScript -->
+    <!-- 🔥 v3.91.1: Chrome Extension 에러 억제 (전역) -->
+    <script src="//www.topmktx.com/assets/js/error-suppressor.js"></script>
     <script src="//www.topmktx.com/assets/js/loading.js?v=<?= time() ?>"></script>
     <script src="//www.topmktx.com/assets/js/jwt-auth.js" defer></script>
     <script src="//www.topmktx.com/assets/js/main.js" defer></script>
