@@ -326,13 +326,10 @@ if (file_exists($styleFile)) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // 세션에서 디버깅 정보 확인
     <?php if (isset($_SESSION['debug_info'])): ?>
-
+    // 세션에서 디버깅 정보 확인
     Toast.error('🚨 디버깅 정보\n\n<?= addslashes($_SESSION["debug_info"]) ?>\n\n콘솔 로그도 확인하세요.');
-    <?php unset($_SESSION['debug_info']); ?>
-    <?php endif; ?>
+    <?php unset($_SESSION['debug_info']); endif; ?>
     
     // 전역 변수
     let verificationTimer = null;
