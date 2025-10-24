@@ -321,8 +321,10 @@ $styleFile = SRC_PATH . '/views/auth/components/signup-styles.css';
 if (file_exists($styleFile)) {
     echo file_get_contents($styleFile);
 }
+// PHP 모드 종료 태그 제거 - 이후 PHP 코드 정상 실행 보장
 ?>
 </style>
+<?php // PHP 모드 재개 (Line 324의 ?> 이후 PHP 모드가 종료되므로 재개 필요)
 
 <?php if (isset($_SESSION['debug_info'])): ?>
 <script>
