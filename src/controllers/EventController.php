@@ -631,12 +631,17 @@ class EventController extends LectureController {
             $validated[$field] = $data[$field] ?? null;
         }
         
-        // 데이터 타입 변환
-        if ($validated['max_participants']) {
+        // 데이터 타입 변환 (빈 문자열은 NULL로 변환)
+        if (!empty($validated['max_participants']) && $validated['max_participants'] !== '') {
             $validated['max_participants'] = intval($validated['max_participants']);
+        } else {
+            $validated['max_participants'] = null;
         }
-        if ($validated['registration_fee']) {
+
+        if (!empty($validated['registration_fee']) && $validated['registration_fee'] !== '') {
             $validated['registration_fee'] = intval($validated['registration_fee']);
+        } else {
+            $validated['registration_fee'] = null;
         }
         
         // 참가 신청 허용 여부 처리
