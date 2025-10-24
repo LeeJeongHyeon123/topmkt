@@ -324,12 +324,17 @@ if (file_exists($styleFile)) {
 ?>
 </style>
 
+<?php if (isset($_SESSION['debug_info'])): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    <?php if (isset($_SESSION['debug_info'])): ?>
     // 세션에서 디버깅 정보 확인
     Toast.error('🚨 디버깅 정보\n\n<?= addslashes($_SESSION["debug_info"]) ?>\n\n콘솔 로그도 확인하세요.');
-    <?php unset($_SESSION['debug_info']); endif; ?>
+    <?php unset($_SESSION['debug_info']); ?>
+</script>
+<?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
     
     // 전역 변수
     let verificationTimer = null;
