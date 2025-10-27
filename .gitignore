@@ -39,3 +39,4 @@ Thumbs.db
 *.bak
 backup_*.sql
 *.sql
+backups/ echo *.tar.gz echo complete_backup_*/ cat .gitignore
