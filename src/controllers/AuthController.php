@@ -1090,12 +1090,12 @@ class AuthController extends BaseController {
             
             // 중복 검사
             $exists = $this->userModel->isPhoneExists($phone);
-            
+
             if ($exists) {
                 echo json_encode([
                     'success' => true,
                     'available' => false,
-                    'message' => '이미 가입된 휴대폰 번호입니다.',
+                    'message' => '이미 가입된 휴대폰 번호입니다. 로그인하시거나 다른 번호를 사용해주세요.',
                     'field' => 'phone'
                 ]);
             } else {

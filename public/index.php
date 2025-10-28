@@ -223,4 +223,3 @@ if (strpos($_SERVER['REQUEST_URI'], '/auth/forgot-password') !== false) {
         echo "<h1>시스템 오류</h1><p>시스템에 심각한 문제가 발생했습니다.</p>";
     }
 }
-// PHP 모드 유지 - ?> 제거하여 included 파일의 PHP 코드 정상 실행 보장
