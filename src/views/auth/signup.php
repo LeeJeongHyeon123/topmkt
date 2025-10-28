@@ -7,8 +7,8 @@ $page_description = '탑마케팅에 가입하여 글로벌 네트워크 마케�
 $current_page = 'signup';
 
 require_once SRC_PATH . '/views/templates/header.php';
+// PHP 모드 계속 유지
 ?>
-
 <!-- reCAPTCHA v3 스크립트 -->
 <script src="https://www.google.com/recaptcha/api.js?render=6LfViDErAAAAAMcOf3D-JxEhisMDhzLhEDYEahZb"></script>
 
@@ -321,19 +321,10 @@ $styleFile = SRC_PATH . '/views/auth/components/signup-styles.css';
 if (file_exists($styleFile)) {
     echo file_get_contents($styleFile);
 }
-// PHP 모드 종료 태그 제거 - 이후 PHP 코드 정상 실행 보장
+// PHP 모드 계속 유지
+echo "\n";
 ?>
 </style>
-<?php // PHP 모드 재개 (Line 324의 ?> 이후 PHP 모드가 종료되므로 재개 필요)
-
-<?php if (isset($_SESSION['debug_info'])): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 세션에서 디버깅 정보 확인
-    Toast.error('🚨 디버깅 정보\n\n<?= addslashes($_SESSION["debug_info"]) ?>\n\n콘솔 로그도 확인하세요.');
-    <?php unset($_SESSION['debug_info']); ?>
-</script>
-<?php endif; ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
