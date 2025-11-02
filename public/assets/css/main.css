@@ -5986,7 +5986,7 @@ body {
 }
 
 .toast-top-center {
-    top: 30vh;
+    top: 20vh;
     left: calc(50% - 150px);
     right: auto;
 }
