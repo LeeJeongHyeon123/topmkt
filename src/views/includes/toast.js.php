@@ -32,7 +32,7 @@ class Toast {
         // 기본 옵션 설정
         const settings = {
             duration: options.duration || 3000,
-            position: options.position || 'top-right',
+            position: options.position || 'top-center',
             dismissible: options.dismissible !== false
         };
 

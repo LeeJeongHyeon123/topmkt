@@ -6021,7 +6021,7 @@ body {
     min-width: 300px;
     max-width: 400px;
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-50px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -6032,7 +6032,7 @@ body {
 
 .toast-message.toast-hide {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-50px);
 }
 
 /* Toast 내용 */
