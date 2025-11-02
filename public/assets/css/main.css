@@ -5975,7 +5975,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-width: 400px;
+    width: 300px;
+    max-width: 300px;
 }
 
 /* 위치별 스타일 */
@@ -5986,8 +5987,8 @@ body {
 
 .toast-top-center {
     top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: calc(50% - 150px);
+    right: auto;
 }
 
 .toast-top-left {
@@ -6002,8 +6003,8 @@ body {
 
 .toast-bottom-center {
     bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: calc(50% - 150px);
+    right: auto;
 }
 
 .toast-bottom-left {

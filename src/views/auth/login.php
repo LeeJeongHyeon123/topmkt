@@ -46,20 +46,22 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <p class="auth-subtitle">계정에 로그인하여 커뮤니티 활동을 계속하세요</p>
                 </div>
 
-                <!-- 에러/성공 메시지 표시 -->
+                <!-- 에러/성공 메시지 표시 (Toast로 전환) -->
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span><?= htmlspecialchars($_SESSION['error']) ?></span>
-                    </div>
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toast.error('<?= addslashes(htmlspecialchars($_SESSION['error'])) ?>');
+                    });
+                    </script>
                     <?php unset($_SESSION['error']); ?>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['success'])): ?>
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i>
-                        <span><?= htmlspecialchars($_SESSION['success']) ?></span>
-                    </div>
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toast.success('<?= addslashes(htmlspecialchars($_SESSION['success'])) ?>');
+                    });
+                    </script>
                     <?php unset($_SESSION['success']); ?>
                 <?php endif; ?>
 

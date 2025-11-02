@@ -1027,35 +1027,23 @@
     </div>
     
     <main class="main-content">
-        <!-- 알림 메시지 -->
+        <!-- 알림 메시지 (Toast로 전환) -->
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-error">
-                <div class="alert-icon">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <div class="alert-content">
-                    <span><?= $_SESSION['error'] ?></span>
-                    <button class="alert-close" onclick="this.parentElement.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <?php unset($_SESSION['error']); ?>
-            </div>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toast.error('<?= addslashes(htmlspecialchars($_SESSION['error'])) ?>');
+            });
+            </script>
+            <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
-        
+
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success">
-                <div class="alert-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="alert-content">
-                    <span><?= $_SESSION['success'] ?></span>
-                    <button class="alert-close" onclick="this.parentElement.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <?php unset($_SESSION['success']); ?>
-            </div>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toast.success('<?= addslashes(htmlspecialchars($_SESSION['success'])) ?>');
+            });
+            </script>
+            <?php unset($_SESSION['success']); ?>
         <?php endif; ?>
         
         <!-- 페이지 컨텐츠 시작 -->

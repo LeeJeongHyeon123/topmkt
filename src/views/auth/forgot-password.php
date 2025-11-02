@@ -41,24 +41,24 @@ require_once SRC_PATH . '/views/templates/header.php';
                 </p>
             </header>
 
-            <!-- 알림 메시지 영역 -->
-            <div class="alert-zone" role="alert" aria-live="polite">
-                <?php if (isset($_SESSION['error'])): ?>
-                    <div class="alert alert-error" tabindex="0">
-                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span class="alert-message"><?= htmlspecialchars($_SESSION['error']) ?></span>
-                    </div>
-                    <?php unset($_SESSION['error']); ?>
-                <?php endif; ?>
+            <!-- 알림 메시지 영역 (Toast로 전환) -->
+            <?php if (isset($_SESSION['error'])): ?>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Toast.error('<?= addslashes(htmlspecialchars($_SESSION['error'])) ?>');
+                });
+                </script>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
 
-                <?php if (isset($_SESSION['success'])): ?>
-                    <div class="alert alert-success" tabindex="0">
-                        <i class="fas fa-check-circle" aria-hidden="true"></i>
-                        <span class="alert-message"><?= htmlspecialchars($_SESSION['success']) ?></span>
-                    </div>
-                    <?php unset($_SESSION['success']); ?>
-                <?php endif; ?>
-            </div>
+            <?php if (isset($_SESSION['success'])): ?>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Toast.success('<?= addslashes(htmlspecialchars($_SESSION['success'])) ?>');
+                });
+                </script>
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
 
             <!-- 🚀 3단계 통합 비밀번호 찾기 폼 -->
             <div class="multi-step-form">
