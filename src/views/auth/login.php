@@ -354,9 +354,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('login-form');
 
     // 휴대폰 번호 포맷팅
-    phoneInput.addEventListener('input', function() {
+    let previousValue = '';
+    phoneInput.addEventListener('input', function(e) {
+        // 커서 위치 저장
+        const cursorPosition = this.selectionStart;
         let value = this.value.replace(/[^0-9]/g, '');
-        
+
+        // 빈 값이면 그대로 허용 (완전히 지울 수 있도록)
+        if (value.length === 0) {
+            this.value = '';
+            previousValue = '';
+            this.setCustomValidity('');
+            this.classList.remove('error');
+            return;
+        }
+
         // 010으로 시작하지 않으면 에러 표시
         if (value.length > 0 && !value.startsWith('010')) {
             this.setCustomValidity('010으로 시작하는 휴대폰 번호만 입력할 수 있습니다.');
@@ -365,15 +377,18 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setCustomValidity('');
             this.classList.remove('error');
         }
-        
+
+        // 자동 하이픈 추가
+        let formatted = value;
         if (value.length >= 3) {
-            value = value.substring(0, 3) + '-' + value.substring(3);
+            formatted = value.substring(0, 3) + '-' + value.substring(3);
         }
-        if (value.length >= 8) {
-            value = value.substring(0, 8) + '-' + value.substring(8, 12);
+        if (value.length >= 7) {
+            formatted = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
         }
-        
-        this.value = value;
+
+        this.value = formatted;
+        previousValue = formatted;
     });
 
     // 비밀번호 표시/숨김 토글
