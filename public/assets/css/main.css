@@ -6015,9 +6015,14 @@ body {
 /* Toast 메시지 기본 스타일 */
 .toast-message {
     pointer-events: auto;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 4px 16px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(0, 0, 0, 0.08);
     padding: 16px;
     min-width: 300px;
     max-width: 400px;
@@ -6076,6 +6081,7 @@ body {
 /* 타입별 스타일 */
 .toast-success {
     border-left: 4px solid #10b981;
+    background: linear-gradient(135deg, rgba(236, 253, 245, 0.95) 0%, rgba(209, 250, 229, 0.92) 100%);
 }
 
 .toast-success .toast-icon {
@@ -6084,6 +6090,7 @@ body {
 
 .toast-error {
     border-left: 4px solid #ef4444;
+    background: linear-gradient(135deg, rgba(254, 242, 242, 0.95) 0%, rgba(254, 226, 226, 0.92) 100%);
 }
 
 .toast-error .toast-icon {
@@ -6092,6 +6099,7 @@ body {
 
 .toast-warning {
     border-left: 4px solid #f59e0b;
+    background: linear-gradient(135deg, rgba(255, 251, 235, 0.95) 0%, rgba(254, 243, 199, 0.92) 100%);
 }
 
 .toast-warning .toast-icon {
@@ -6100,6 +6108,7 @@ body {
 
 .toast-info {
     border-left: 4px solid #3b82f6;
+    background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.92) 100%);
 }
 
 .toast-info .toast-icon {
