@@ -88,6 +88,7 @@ class LikeController extends BaseController {
 
                         if ($post && $post['user_id'] != $currentUserId) {
                             // 🔔 알림 설정 확인: 사용자가 좋아요 알림을 활성화했는지 확인
+                            $shouldSendNotification = true;
                             try {
                                 $notificationSettings = new NotificationSettings();
                                 $isEnabled = $notificationSettings->isNotificationEnabled($post['user_id'], 'likes');
@@ -97,8 +98,7 @@ class LikeController extends BaseController {
                                         'post_id' => $postId,
                                         'recipient_id' => $post['user_id']
                                     ]);
-                                    // 알림 설정이 OFF면 여기서 종료
-                                    return;
+                                    $shouldSendNotification = false;
                                 }
                             } catch (Exception $e) {
                                 // NotificationSettings 실패 시 기본적으로 알림 전송 (opt-in 방식)
@@ -108,31 +108,34 @@ class LikeController extends BaseController {
                                 ]);
                             }
 
-                            // 자기 자신의 게시글에는 알림 X
-                            $tokens = $fcmTokenModel->getTokensByUserId($post['user_id']);
+                            // 알림 설정이 ON이거나 확인 실패 시 알림 전송
+                            if ($shouldSendNotification) {
+                                // 자기 자신의 게시글에는 알림 X
+                                $tokens = $fcmTokenModel->getTokensByUserId($post['user_id']);
 
-                            if (!empty($tokens)) {
-                                $title = $post['title'] ?? '게시글';
-                                $truncatedTitle = mb_strlen($title) > 20 ? mb_substr($title, 0, 20) . '...' : $title;
+                                if (!empty($tokens)) {
+                                    $title = $post['title'] ?? '게시글';
+                                    $truncatedTitle = mb_strlen($title) > 20 ? mb_substr($title, 0, 20) . '...' : $title;
 
-                                foreach ($tokens as $token) {
-                                    FcmHelper::sendPush(
-                                        $token['fcm_token'],
-                                        '새 좋아요 알림',
-                                        '회원님 게시글 "' . $truncatedTitle . '"에 좋아요를 눌렀어요.',
-                                        [
-                                            'type' => 'like',
-                                            'post_id' => $postId,
-                                            'like_count' => $likeCount
-                                        ]
-                                    );
+                                    foreach ($tokens as $token) {
+                                        FcmHelper::sendPush(
+                                            $token['fcm_token'],
+                                            '새 좋아요 알림',
+                                            '회원님 게시글 "' . $truncatedTitle . '"에 좋아요를 눌렀어요.',
+                                            [
+                                                'type' => 'like',
+                                                'post_id' => $postId,
+                                                'like_count' => $likeCount
+                                            ]
+                                        );
+                                    }
+
+                                    WebLogger::info('좋아요 알림 전송 완료', [
+                                        'post_id' => $postId,
+                                        'recipient_id' => $post['user_id'],
+                                        'token_count' => count($tokens)
+                                    ]);
                                 }
-
-                                WebLogger::info('좋아요 알림 전송 완료', [
-                                    'post_id' => $postId,
-                                    'recipient_id' => $post['user_id'],
-                                    'token_count' => count($tokens)
-                                ]);
                             }
                         }
                     } catch (Exception $e) {
