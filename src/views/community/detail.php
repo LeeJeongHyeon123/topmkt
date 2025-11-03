@@ -681,55 +681,62 @@ document.addEventListener('DOMContentLoaded', function() {
     const likeBtn = document.getElementById('likeBtn');
     if (likeBtn && isLoggedIn) {
         likeBtn.addEventListener('click', function() {
- // 디버깅용
-            
+            const buttonElement = this; // this 컨텍스트 저장
+
             // 로딩 상태 표시
-            const originalText = this.innerHTML;
- // 디버깅용
-            this.disabled = true;
-            this.innerHTML = '🔄 처리 중...';
-            
-            // CSRF 토큰 가져오기
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const originalText = buttonElement.innerHTML;
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = '🔄 처리 중...';
+
+            console.log('🔍 [LIKE] 좋아요 버튼 클릭, postId:', postId);
 
             // v3.42.0: ApiClient 사용
             ApiClient.post(`/api/posts/${postId}/like`, {}, { noLoading: true })
             .then(data => {
+                console.log('🔍 [LIKE] 응답 데이터:', data);
 
                 if (data.status === 'success' && data.data) {
+                    console.log('🔍 [LIKE] action:', data.data.action, 'like_count:', data.data.like_count);
+
+                    // 좋아요 수 포맷팅
+                    const likeCount = Number(data.data.like_count) || 0;
+                    const formattedCount = likeCount.toLocaleString('ko-KR');
 
                     // 좋아요 상태에 따라 버튼 텍스트 및 스타일 변경
                     if (data.data.action === 'liked') {
-                        this.innerHTML = '❤️ 좋아요 ' + data.data.like_count;
-                        this.classList.add('liked');
- // 디버깅용
+                        buttonElement.innerHTML = '❤️ 좋아요 ' + formattedCount;
+                        buttonElement.classList.add('liked');
+                        console.log('✅ [LIKE] 좋아요 추가 완료');
                     } else if (data.data.action === 'unliked') {
-                        this.innerHTML = '🤍 좋아요 ' + data.data.like_count;
-                        this.classList.remove('liked');
- // 디버깅용
+                        buttonElement.innerHTML = '🤍 좋아요 ' + formattedCount;
+                        buttonElement.classList.remove('liked');
+                        console.log('✅ [LIKE] 좋아요 취소 완료');
                     }
-                    
+
                     // 통계 업데이트 - 좋아요 수 표시하는 모든 요소 찾기
                     const likeStats = document.querySelectorAll('.stat-item');
+                    console.log('🔍 [LIKE] 통계 요소 개수:', likeStats.length);
                     likeStats.forEach(stat => {
                         if (stat.textContent.includes('좋아요')) {
-                            stat.innerHTML = '❤️ 좋아요 ' + data.data.like_count;
+                            stat.innerHTML = '❤️ 좋아요 ' + formattedCount;
+                            console.log('✅ [LIKE] 통계 업데이트 완료:', stat.innerHTML);
                         }
                     });
-                    
- // 디버깅용
+
+                    Toast.success(data.message || '처리되었습니다.');
                 } else {
- // 디버깅용
+                    console.error('❌ [LIKE] 응답 형식 오류:', data);
                     Toast.error(data.message || '좋아요 처리 중 오류가 발생했습니다.');
-                    this.innerHTML = originalText;
+                    buttonElement.innerHTML = originalText;
                 }
             })
             .catch(error => {
+                console.error('❌ [LIKE] 네트워크 오류:', error);
                 Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
-                this.innerHTML = originalText;
+                buttonElement.innerHTML = originalText;
             })
             .finally(() => {
-                this.disabled = false;
+                buttonElement.disabled = false;
             });
         });
     }
