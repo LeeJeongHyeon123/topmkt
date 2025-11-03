@@ -861,11 +861,14 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     function renderUserDetail(user) {
         const profileImage = user.profile_image_thumb || user.profile_image || '/assets/uploads/default-avatar.png';
         
-        const html = 
+        const html =
             '<div class="profile-image-container">' +
                 '<img src="' + profileImage + '" alt="프로필 이미지" class="profile-image-large profile-image-clickable" ' +
-                'title="클릭하면 큰 이미지로 볼 수 있습니다" ' +
-                'onclick="openProfileImageModal(\'' + (user.profile_image_original || user.profile_image || profileImage) + '\', \'' + escapeHtml(user.nickname) + '\')" ' +
+                'title="' + escapeHtml(user.nickname) + '님의 프로필 보기" ' +
+                'onclick="if(window.TopMarketingLoading) { window.TopMarketingLoading.show(); window.TopMarketingLoading.setMessage(\'프로필을 불러오는 중...\'); } window.location.href=\'/profile?user_id=' + user.id + '\';" ' +
+                'style="cursor: pointer;" ' +
+                'data-user-id="' + user.id + '" ' +
+                'data-user-name="' + escapeHtml(user.nickname) + '" ' +
                 'onerror="this.src=\'/assets/uploads/default-avatar.png\'">' +
                 '<h3>' + escapeHtml(user.nickname) + '</h3>' +
                 '<div class="user-status-badges">' +
@@ -1208,90 +1211,92 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         return statusMap[status] || '알 수 없음';
     }
 
+    // v3.98.0: 더 이상 사용 안 함 (프로필 페이지로 이동으로 변경)
     // 프로필 이미지 모달 안전한 열기 함수
-    function openProfileImageModal(imageSrc, userName) {
-        
-        if (typeof window.profileModal !== 'undefined' && window.profileModal.show) {
-            // ProfileImageModal이 정상 로드된 경우
-            window.profileModal.show(imageSrc, userName, true);
-        } else {
-            // ProfileImageModal이 로드되지 않은 경우 fallback
-            createFallbackProfileModal(imageSrc, userName);
-        }
-    }
+    // function openProfileImageModal(imageSrc, userName) {
+    //
+    //     if (typeof window.profileModal !== 'undefined' && window.profileModal.show) {
+    //         // ProfileImageModal이 정상 로드된 경우
+    //         window.profileModal.show(imageSrc, userName, true);
+    //     } else {
+    //         // ProfileImageModal이 로드되지 않은 경우 fallback
+    //         createFallbackProfileModal(imageSrc, userName);
+    //     }
+    // }
 
+    // v3.98.0: 더 이상 사용 안 함 (프로필 페이지로 이동으로 변경)
     // 완전 CSS 클래스 기반 Fallback 프로필 모달 생성 (인라인 스타일 완전 제거)
-    function createFallbackProfileModal(imageSrc, userName) {
-        // 기존 모달이 있으면 제거
-        const existingModal = document.getElementById('fallbackProfileModal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-
-        // profile-modal.css의 정확한 클래스 구조 사용 (모든 인라인 스타일 제거)
-        const modalHTML = `
-        <div id="fallbackProfileModal" class="profile-image-modal show" onclick="closeFallbackProfileModal()">
-            <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header">
-                    <h3>${userName}의 프로필</h3>
-                    <button class="modal-close" onclick="closeFallbackProfileModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <img src="${imageSrc}" alt="${userName}님의 프로필 이미지" 
-                         onerror="this.src='/assets/uploads/default-avatar.png'"
-                         onload="">
-                </div>
-            </div>
-        </div>
-        
-        <style>
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(-30px) scale(0.9); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
-        }
-        </style>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
-        // ESC 키 이벤트 추가
-        document.addEventListener('keydown', fallbackModalEscHandler);
-        
-        // 스크롤 방지
-        document.body.style.overflow = 'hidden';
-        
-    }
-
-    // Fallback 모달 닫기
-    function closeFallbackProfileModal() {
-        const modal = document.getElementById('fallbackProfileModal');
-        if (modal) {
-            modal.style.animation = 'fadeOut 0.3s ease';
-            setTimeout(() => {
-                modal.remove();
-                document.body.style.overflow = '';
-                document.removeEventListener('keydown', fallbackModalEscHandler);
-            }, 300);
-        }
-    }
-
-    // Fallback 모달 ESC 키 핸들러
-    function fallbackModalEscHandler(event) {
-        if (event.key === 'Escape') {
-            closeFallbackProfileModal();
-        }
-    }
+    // function createFallbackProfileModal(imageSrc, userName) {
+    //     // 기존 모달이 있으면 제거
+    //     const existingModal = document.getElementById('fallbackProfileModal');
+    //     if (existingModal) {
+    //         existingModal.remove();
+    //     }
+    //
+    //     // profile-modal.css의 정확한 클래스 구조 사용 (모든 인라인 스타일 제거)
+    //     const modalHTML = `
+    //     <div id="fallbackProfileModal" class="profile-image-modal show" onclick="closeFallbackProfileModal()">
+    //         <div class="modal-content" onclick="event.stopPropagation()">
+    //             <div class="modal-header">
+    //                 <h3>${userName}의 프로필</h3>
+    //                 <button class="modal-close" onclick="closeFallbackProfileModal()">&times;</button>
+    //             </div>
+    //             <div class="modal-body">
+    //                 <img src="${imageSrc}" alt="${userName}님의 프로필 이미지"
+    //                      onerror="this.src='/assets/uploads/default-avatar.png'"
+    //                      onload="">
+    //             </div>
+    //         </div>
+    //     </div>
+    //
+    //     <style>
+    //     @keyframes fadeIn {
+    //         from { opacity: 0; }
+    //         to { opacity: 1; }
+    //     }
+    //
+    //     @keyframes slideIn {
+    //         from {
+    //             opacity: 0;
+    //             transform: translateY(-30px) scale(0.9);
+    //         }
+    //         to {
+    //             opacity: 1;
+    //             transform: translateY(0) scale(1);
+    //         }
+    //     }
+    //     </style>
+    //     `;
+    //
+    //     document.body.insertAdjacentHTML('beforeend', modalHTML);
+    //
+    //     // ESC 키 이벤트 추가
+    //     document.addEventListener('keydown', fallbackModalEscHandler);
+    //
+    //     // 스크롤 방지
+    //     document.body.style.overflow = 'hidden';
+    //
+    // }
+    //
+    // // Fallback 모달 닫기
+    // function closeFallbackProfileModal() {
+    //     const modal = document.getElementById('fallbackProfileModal');
+    //     if (modal) {
+    //         modal.style.animation = 'fadeOut 0.3s ease';
+    //         setTimeout(() => {
+    //             modal.remove();
+    //             document.body.style.overflow = '';
+    //             document.removeEventListener('keydown', fallbackModalEscHandler);
+    //         }, 300);
+    //     }
+    // }
+    //
+    // // Fallback 모달 ESC 키 핸들러
+    // function fallbackModalEscHandler(event) {
+    //     if (event.key === 'Escape') {
+    //         closeFallbackProfileModal();
+    //     }
+    // }
 
     // 사용자 프로필 페이지로 이동
     function viewUserProfile(userId) {

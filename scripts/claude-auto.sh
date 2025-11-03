@@ -11,11 +11,9 @@ if ! command -v claude &> /dev/null; then
     exit 1
 fi
 
-# 백그라운드에서 업데이트 체크 (성능 최적화)
-echo "📦 Claude Code CLI 백그라운드 업데이트 체크..."
-timeout 3s claude update --auto-confirm &> /dev/null || {
-    echo "⚡ 업데이트 체크 건너뜀 (빠른 시작 모드)"
-}
+# 업데이트 체크 비활성화 (이미 최신 버전 설치됨)
+export CLAUDE_DISABLE_UPDATE_CHECK=true
+export CLAUDE_SKIP_VERSION_CHECK=true
 
 # 모든 확인 관련 환경 변수 설정
 export CLAUDE_AUTO_EXECUTE=true
