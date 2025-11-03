@@ -679,67 +679,48 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 좋아요 버튼 처리
     const likeBtn = document.getElementById('likeBtn');
-    console.log('🔍 [DEBUG] likeBtn:', likeBtn);
-    console.log('🔍 [DEBUG] isLoggedIn:', isLoggedIn);
-
     if (likeBtn && isLoggedIn) {
-        console.log('✅ [DEBUG] 이벤트 리스너 등록 중...');
         likeBtn.addEventListener('click', function() {
-            console.log('🔍 [DEBUG] 버튼 클릭됨!');
             const buttonElement = this; // this 컨텍스트 저장
 
             // 로딩 상태 표시
             const originalText = buttonElement.textContent;
             buttonElement.disabled = true;
             buttonElement.textContent = '🔄 처리 중...';
-            console.log('🔍 [DEBUG] 버튼 텍스트 변경:', buttonElement.textContent);
 
             // v3.42.0: ApiClient 사용
-            console.log('🔍 [DEBUG] API 호출 시작, postId:', postId);
             ApiClient.post(`/api/posts/${postId}/like`, {}, { noLoading: true })
             .then(data => {
-                console.log('🔍 [DEBUG] API 응답 받음:', data);
                 // success: true 또는 status: 'success' 둘 다 지원
                 if ((data.success === true || data.status === 'success') && data.data) {
-                    console.log('🔍 [DEBUG] 성공 응답 처리 중...');
                     // 좋아요 수 포맷팅
                     const likeCount = Number(data.data.like_count) || 0;
                     const formattedCount = likeCount.toLocaleString('ko-KR');
-                    console.log('🔍 [DEBUG] likeCount:', likeCount, 'formattedCount:', formattedCount);
 
                     // 좋아요 상태에 따라 버튼 텍스트 및 스타일 변경
                     if (data.data.action === 'liked') {
-                        console.log('🔍 [DEBUG] 좋아요 추가 - 버튼 업데이트 중...');
                         buttonElement.textContent = '❤️ 좋아요 ' + formattedCount;
                         buttonElement.classList.add('liked');
-                        console.log('🔍 [DEBUG] 버튼 업데이트 완료:', buttonElement.textContent, buttonElement.className);
                     } else if (data.data.action === 'unliked') {
-                        console.log('🔍 [DEBUG] 좋아요 취소 - 버튼 업데이트 중...');
                         buttonElement.textContent = '🤍 좋아요 ' + formattedCount;
                         buttonElement.classList.remove('liked');
-                        console.log('🔍 [DEBUG] 버튼 업데이트 완료:', buttonElement.textContent, buttonElement.className);
                     }
 
                     // 통계 업데이트 - 좋아요 수 표시하는 모든 요소 찾기
                     const likeStats = document.querySelectorAll('.stat-item');
-                    console.log('🔍 [DEBUG] 통계 요소 개수:', likeStats.length);
                     likeStats.forEach(stat => {
                         if (stat.textContent.includes('좋아요')) {
                             stat.textContent = '❤️ 좋아요 ' + formattedCount;
-                            console.log('🔍 [DEBUG] 통계 업데이트:', stat.textContent);
                         }
                     });
 
-                    console.log('🔍 [DEBUG] Toast 표시 중...');
                     Toast.success(data.message || '처리되었습니다.');
                 } else {
-                    console.error('❌ [DEBUG] 응답 형식 오류:', data);
                     Toast.error(data.message || '좋아요 처리 중 오류가 발생했습니다.');
                     buttonElement.textContent = originalText;
                 }
             })
             .catch(error => {
-                console.error('❌ [DEBUG] API 에러:', error);
                 Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 buttonElement.textContent = originalText;
             })
