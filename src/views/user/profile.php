@@ -942,6 +942,7 @@ if (!empty($user['last_login'])) {
                 $size = ProfileImageHelper::SIZE_PROFILE;
                 $mode = 'direct';
                 $extraClasses = ['profile-image'];
+                $keepModalOnOwnProfile = true; // v3.98.0: 프로필 페이지에서만 모달로 크게 보기 유지
                 include SRC_PATH . '/views/components/profile-image.php';
                 ?>
             </div>

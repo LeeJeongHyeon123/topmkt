@@ -246,19 +246,25 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeChat();
     setupEventListeners();
     
-    // 프로필 이미지 클릭 이벤트 위임 (동적으로 생성된 요소용)
+    // v3.98.0: 프로필 이미지 클릭 이벤트 위임 (동적으로 생성된 요소용)
+    // 프로필 이미지 클릭 → 프로필 페이지로 이동
     document.addEventListener('click', function(e) {
         const profileImage = e.target.closest('.profile-image-clickable');
         if (profileImage) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             const userId = profileImage.getAttribute('data-user-id');
-            const userName = profileImage.getAttribute('data-user-name');
-            
-            if (userId && userName && typeof window.profileModal !== 'undefined') {
-                window.profileModal.show(userId, userName, false);
-            } else {
+
+            if (userId) {
+                // Loading 표시
+                if (window.TopMarketingLoading) {
+                    window.TopMarketingLoading.show();
+                    window.TopMarketingLoading.setMessage('프로필을 불러오는 중...');
+                }
+
+                // 프로필 페이지로 이동
+                window.location.href = '/profile?user_id=' + userId;
             }
         }
     });
