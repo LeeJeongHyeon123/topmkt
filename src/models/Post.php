@@ -222,9 +222,9 @@ class Post {
         } else {
             // 일반 목록 조회 - 서브쿼리 최적화 버전
             WebLogger::info("🚀 [OPTIMIZED] 서브쿼리 기반 최적화 쿼리 실행");
-            
+
             $sql = "
-                SELECT 
+                SELECT
                     p.id,
                     p.user_id,
                     p.title,
@@ -241,16 +241,17 @@ class Post {
                     u.profile_image_thumb,
                     COALESCE(u.profile_image, u.profile_image_thumb, u.profile_image_profile, '/assets/images/default-avatar.png') as profile_image_url
                 FROM (
-                    SELECT id, user_id, title, content, view_count, like_count, 
+                    SELECT id, user_id, title, content, view_count, like_count,
                            comment_count, status, created_at
-                    FROM posts 
+                    FROM posts
                     WHERE status = 'published'
-                    ORDER BY created_at DESC 
+                    ORDER BY created_at DESC, id DESC
                     LIMIT ? OFFSET ?
                 ) p
                 JOIN users u ON p.user_id = u.id
+                ORDER BY p.created_at DESC, p.id DESC
             ";
-            
+
             $result = PerformanceDebugger::executeQuery($this->db, $sql, [$pageSize, $offset]);
         }
         

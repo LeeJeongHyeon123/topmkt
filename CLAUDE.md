@@ -215,7 +215,59 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.92.0 ~ v3.95.1) - 2025-11-02/03
+## 최근 주요 작업 (v3.92.0 ~ v3.96.0) - 2025-11-02/03
+
+### v3.96.0 - 커뮤니티 게시글 정렬 순서 완전 수정 (2025-11-03) 🔥
+**문제**: 커뮤니티 페이지에서 게시글 날짜가 섞여서 표시됨 (최신글이 중간에 위치)
+
+**Ultra Think 7단계 분석**:
+1. **문제 정의**: https://www.topmktx.com/community에서 게시글 정렬 순서가 무작위
+2. **근본 원인 파악**:
+   - Post 모델 `getListWithOffset()` 메서드의 서브쿼리 최적화 방식 사용
+   - 서브쿼리에서만 ORDER BY 사용, 외부 쿼리에는 ORDER BY 없음
+   - **MySQL 동작**: 서브쿼리의 ORDER BY는 외부 쿼리에 보장되지 않음
+   - JOIN 연산 후 순서가 무작위로 섞임
+
+**MySQL 문제점**:
+```php
+// ❌ 문제 코드
+SELECT ...
+FROM (
+    SELECT ... FROM posts
+    WHERE status = 'published'
+    ORDER BY created_at DESC    -- 서브쿼리에만 ORDER BY
+    LIMIT ? OFFSET ?
+) p
+JOIN users u ON p.user_id = u.id
+-- 외부 쿼리에 ORDER BY 없음!
+```
+
+**해결 방법**:
+```php
+// ✅ 수정 코드
+SELECT ...
+FROM (
+    SELECT ... FROM posts
+    WHERE status = 'published'
+    ORDER BY created_at DESC, id DESC    -- 1차 정렬
+    LIMIT ? OFFSET ?
+) p
+JOIN users u ON p.user_id = u.id
+ORDER BY p.created_at DESC, p.id DESC   -- 2차 정렬 (외부 쿼리)
+```
+
+**개선 효과**:
+- ✅ 최신 게시글 → 오래된 게시글 순서 완벽 보장
+- ✅ 동일 created_at 시 id DESC로 명확한 정렬
+- ✅ MySQL 옵티마이저 인덱스 활용 가능
+- ✅ 서브쿼리 최적화 유지하면서 정렬 문제 해결
+
+**파일**:
+- src/models/Post.php (Lines 248, 252)
+
+**QA**:
+- 웹사이트에서 즉시 확인 필요 (캐시 없음)
+- 기대: 최신 게시글이 최상단에 표시
 
 ### v3.95.1 - 로그인 페이지 휴대폰 번호 백스페이스 완전 수정 (2025-11-03) 🐛
 **문제**: 휴대폰 번호 입력 후 백스페이스로 지울 때 "010-2659-" 또는 "010-"에서 멈춤
