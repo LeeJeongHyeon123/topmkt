@@ -88,25 +88,27 @@ class LikeController extends BaseController {
 
                         if ($post && $post['user_id'] != $currentUserId) {
                             // 🔔 알림 설정 확인: 사용자가 좋아요 알림을 활성화했는지 확인
+                            // 🔥 임시 비활성화: NotificationSettings 문제 디버깅용
                             $shouldSendNotification = true;
-                            try {
-                                $notificationSettings = new NotificationSettings();
-                                $isEnabled = $notificationSettings->isNotificationEnabled($post['user_id'], 'likes');
 
-                                if (!$isEnabled) {
-                                    WebLogger::info('좋아요 알림 스킵 (알림 설정 OFF)', [
-                                        'post_id' => $postId,
-                                        'recipient_id' => $post['user_id']
-                                    ]);
-                                    $shouldSendNotification = false;
-                                }
-                            } catch (Exception $e) {
-                                // NotificationSettings 실패 시 기본적으로 알림 전송 (opt-in 방식)
-                                WebLogger::warning('알림 설정 확인 실패, 기본 알림 전송', [
-                                    'error' => $e->getMessage(),
-                                    'post_id' => $postId
-                                ]);
-                            }
+                            // try {
+                            //     $notificationSettings = new NotificationSettings();
+                            //     $isEnabled = $notificationSettings->isNotificationEnabled($post['user_id'], 'likes');
+
+                            //     if (!$isEnabled) {
+                            //         WebLogger::info('좋아요 알림 스킵 (알림 설정 OFF)', [
+                            //             'post_id' => $postId,
+                            //             'recipient_id' => $post['user_id']
+                            //         ]);
+                            //         $shouldSendNotification = false;
+                            //     }
+                            // } catch (Exception $e) {
+                            //     // NotificationSettings 실패 시 기본적으로 알림 전송 (opt-in 방식)
+                            //     WebLogger::warning('알림 설정 확인 실패, 기본 알림 전송', [
+                            //         'error' => $e->getMessage(),
+                            //         'post_id' => $postId
+                            //     ]);
+                            // }
 
                             // 알림 설정이 ON이거나 확인 실패 시 알림 전송
                             if ($shouldSendNotification) {
