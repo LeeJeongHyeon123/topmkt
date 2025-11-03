@@ -776,7 +776,11 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data.status === 'success') {
-                    window.location.href = data.data?.redirectUrl || '/community';
+                    Toast.success('게시글이 삭제되었습니다.');
+                    // Toast 표시 후 리다이렉트 (300ms 딜레이)
+                    setTimeout(() => {
+                        window.location.href = data.data?.redirectUrl || '/community';
+                    }, 300);
                 } else {
                     Toast.error(data.message || '삭제 중 오류가 발생했습니다.');
                     deleteBtn.disabled = false;
