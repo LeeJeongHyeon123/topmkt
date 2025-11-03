@@ -684,56 +684,44 @@ document.addEventListener('DOMContentLoaded', function() {
             const buttonElement = this; // this 컨텍스트 저장
 
             // 로딩 상태 표시
-            const originalText = buttonElement.innerHTML;
+            const originalText = buttonElement.textContent;
             buttonElement.disabled = true;
-            buttonElement.innerHTML = '🔄 처리 중...';
-
-            console.log('🔍 [LIKE] 좋아요 버튼 클릭, postId:', postId);
+            buttonElement.textContent = '🔄 처리 중...';
 
             // v3.42.0: ApiClient 사용
             ApiClient.post(`/api/posts/${postId}/like`, {}, { noLoading: true })
             .then(data => {
-                console.log('🔍 [LIKE] 응답 데이터:', data);
-
                 if (data.status === 'success' && data.data) {
-                    console.log('🔍 [LIKE] action:', data.data.action, 'like_count:', data.data.like_count);
-
                     // 좋아요 수 포맷팅
                     const likeCount = Number(data.data.like_count) || 0;
                     const formattedCount = likeCount.toLocaleString('ko-KR');
 
                     // 좋아요 상태에 따라 버튼 텍스트 및 스타일 변경
                     if (data.data.action === 'liked') {
-                        buttonElement.innerHTML = '❤️ 좋아요 ' + formattedCount;
+                        buttonElement.textContent = '❤️ 좋아요 ' + formattedCount;
                         buttonElement.classList.add('liked');
-                        console.log('✅ [LIKE] 좋아요 추가 완료');
                     } else if (data.data.action === 'unliked') {
-                        buttonElement.innerHTML = '🤍 좋아요 ' + formattedCount;
+                        buttonElement.textContent = '🤍 좋아요 ' + formattedCount;
                         buttonElement.classList.remove('liked');
-                        console.log('✅ [LIKE] 좋아요 취소 완료');
                     }
 
                     // 통계 업데이트 - 좋아요 수 표시하는 모든 요소 찾기
                     const likeStats = document.querySelectorAll('.stat-item');
-                    console.log('🔍 [LIKE] 통계 요소 개수:', likeStats.length);
                     likeStats.forEach(stat => {
                         if (stat.textContent.includes('좋아요')) {
-                            stat.innerHTML = '❤️ 좋아요 ' + formattedCount;
-                            console.log('✅ [LIKE] 통계 업데이트 완료:', stat.innerHTML);
+                            stat.textContent = '❤️ 좋아요 ' + formattedCount;
                         }
                     });
 
                     Toast.success(data.message || '처리되었습니다.');
                 } else {
-                    console.error('❌ [LIKE] 응답 형식 오류:', data);
                     Toast.error(data.message || '좋아요 처리 중 오류가 발생했습니다.');
-                    buttonElement.innerHTML = originalText;
+                    buttonElement.textContent = originalText;
                 }
             })
             .catch(error => {
-                console.error('❌ [LIKE] 네트워크 오류:', error);
                 Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
-                buttonElement.innerHTML = originalText;
+                buttonElement.textContent = originalText;
             })
             .finally(() => {
                 buttonElement.disabled = false;
