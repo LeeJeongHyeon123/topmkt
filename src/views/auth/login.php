@@ -354,19 +354,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('login-form');
 
     // 휴대폰 번호 포맷팅
-    let previousValue = '';
+    let isDeleting = false;
+
+    // beforeinput으로 삭제 감지
+    phoneInput.addEventListener('beforeinput', function(e) {
+        if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+            isDeleting = true;
+        } else {
+            isDeleting = false;
+        }
+    });
+
     phoneInput.addEventListener('input', function(e) {
-        // 커서 위치 저장
-        const cursorPosition = this.selectionStart;
         let value = this.value.replace(/[^0-9]/g, '');
 
-        // 빈 값이면 그대로 허용 (완전히 지울 수 있도록)
+        // 빈 값이면 그대로 허용
         if (value.length === 0) {
             this.value = '';
-            previousValue = '';
             this.setCustomValidity('');
             this.classList.remove('error');
             return;
+        }
+
+        // 삭제 중이고 끝 하이픈 문제 방지
+        if (isDeleting) {
+            // "010-2659-" → "010-2659" (7자리) → 하이픈 추가 방지
+            if (value.length === 7) {
+                this.value = value.substring(0, 3) + '-' + value.substring(3);
+                isDeleting = false;
+                return;
+            }
+            // "010-" → "010" (3자리) → 하이픈 추가 방지
+            if (value.length === 3) {
+                this.value = value;
+                isDeleting = false;
+                return;
+            }
         }
 
         // 010으로 시작하지 않으면 에러 표시
@@ -380,15 +403,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 자동 하이픈 추가
         let formatted = value;
-        if (value.length >= 3) {
+        if (value.length >= 3 && value.length < 7) {
             formatted = value.substring(0, 3) + '-' + value.substring(3);
-        }
-        if (value.length >= 7) {
+        } else if (value.length >= 7) {
             formatted = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
         }
 
         this.value = formatted;
-        previousValue = formatted;
+        isDeleting = false;
     });
 
     // 비밀번호 표시/숨김 토글
