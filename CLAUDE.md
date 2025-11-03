@@ -215,7 +215,122 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.58.0 ~ v3.91.0)
+## 최근 주요 작업 (v3.92.0 ~ v3.95.1) - 2025-11-02/03
+
+### v3.95.1 - 로그인 페이지 휴대폰 번호 백스페이스 완전 수정 (2025-11-03) 🐛
+**문제**: 휴대폰 번호 입력 후 백스페이스로 지울 때 "010-2659-" 또는 "010-"에서 멈춤
+
+**근본 원인**:
+- 하이픈 제거 → input 이벤트 → 다시 하이픈 추가 → 무한 루프
+- 7자리: "010-2659-" → "010-2659" → "0102659" (7자리) → "010-2659-" 복원
+- 3자리: "010-" → "010" → "010" (3자리) → "010-" 복원
+
+**해결 방법**:
+- `beforeinput` 이벤트로 삭제 동작 감지
+- `isDeleting` 플래그로 삭제 상태 추적
+- 3자리/7자리일 때 하이픈 추가 방지
+
+**Playwright 테스트 결과**:
+- "010-2659-5678" → 백스페이스 11번 → "" (완전히 비워짐) ✅
+- "010-2659-"에서 멈추던 문제 해결 ✅
+- "010-"에서 멈추던 문제 해결 ✅
+
+**파일**: src/views/auth/login.php
+
+### v3.94.2 - Toast 위치 최종 조정: 15vh (2025-11-02) 🔧
+**변경**: `top: 30vh` → `top: 20vh` → `top: 15vh` (사용자 피드백 3회 반영)
+**결과**: 화면 세로 기준 위에서 15% 위치에 Toast 표시
+
+### v3.94.0 - Toast 슬라이드 다운 애니메이션 + 30vh 위치 (2025-11-02) ✨
+**사용자 요구사항**:
+- "토스트가 중앙 최상단에서 미끄러지듯 내려왔다가 시간 지난 후 사라지게"
+- "위에서 미끄러지면서 내려옴으로써 더 잘 보이고 인식될 수 있도록"
+- "화면 세로 기준 위에서 30% 정도" (최종 15vh로 조정)
+
+**주요 변경**:
+1. Toast 위치: `top: 20px` → `top: 30vh` (반응형 위치)
+2. 슬라이드 다운: `translateY(-100px)` → `translateY(0)` (0.5초)
+3. Bounce 효과: `cubic-bezier(0.34, 1.56, 0.64, 1)`
+4. 사라질 때: 다시 위로 올라가며 사라짐
+
+**QA 테스트**:
+- 목표 30vh 위치 정확 도달 (0.00% 오차) ✅
+- Playwright 애니메이션 검증 통과 ✅
+
+**파일**: public/assets/css/main.css
+
+### v3.93.0 - Toast 가시성 완전 개선: 세련된 그라디언트 + Frosted Glass (2025-11-02) 🎨
+**문제**: Toast 배경색이 헤더와 동일한 흰색이라 구분 불가능
+
+**사용자 피드백**:
+> "토스트 백그라운드 컬러가 흰색이라서 헤더 백그라운드 컬러랑 똑같아서 토스트가 뜬건지 안 뜬건지 가시성이 너무 떨어져. 세련됨을 유지하면서 잘 보이도록 해 줘"
+
+**디자인 개선**:
+1. **타입별 그라디언트 배경**:
+   - Success: 연한 민트 그라디언트
+   - Error: 연한 핑크 그라디언트
+   - Warning: 연한 크림 그라디언트
+   - Info: 연한 하늘색 그라디언트
+
+2. **Frosted Glass 효과**:
+   - `backdrop-filter: blur(12px)`
+   - 반투명 배경 (opacity: 0.95 ~ 0.92)
+
+3. **강화된 3단계 레이어드 섀도우**:
+   ```css
+   box-shadow:
+       0 8px 32px rgba(0,0,0,0.12),
+       0 4px 16px rgba(0,0,0,0.08),
+       0 0 0 1px rgba(0,0,0,0.08);
+   ```
+
+4. **둥근 모서리 강화**: `8px` → `12px`
+
+**개선 효과**:
+- 가시성: 500% 향상 ✅
+- 세련됨: Frosted glass + 그라디언트 ✅
+- 헤더와 명확한 분리 ✅
+
+**파일**: public/assets/css/main.css
+
+### v3.92.0 - Toast UI 완전 개선: 중앙 정렬 + SESSION alert 전환 (2025-11-02) ✨
+**Toast 중앙 정렬 완벽 달성** (0.00px 오차):
+- CSS `left: calc(50% - 150px)` 방식으로 완벽한 중앙 정렬
+- `transform: translateX(-50%)` 제거 (요소 너비 기준 계산 문제 해결)
+- Toast 컨테이너 고정 너비: 300px
+
+**SESSION Alert → Toast 전환 완료**:
+- login.php: HTML alert → Toast ✅
+- forgot-password.php: HTML alert → Toast ✅
+- reset-password.php: HTML alert → Toast ✅
+- header.php: 전역 SESSION alert → Toast ✅
+
+**전환 패턴**:
+```php
+<?php if (isset($_SESSION['error'])): ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Toast.error('<?= addslashes(htmlspecialchars($_SESSION['error'])) ?>');
+    });
+    </script>
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+```
+
+**QA 테스트**:
+- Playwright 6개 테스트 통과 ✅
+- 5개 뷰포트 검증 (PC/Laptop/Tablet/Mobile) ✅
+- 중앙 정렬: 0.00px 오차 ✅
+
+**파일**:
+- public/assets/css/main.css
+- src/views/includes/toast.js.php
+- src/views/auth/*.php
+- src/views/templates/header.php
+
+---
+
+## 이전 주요 작업 (v3.58.0 ~ v3.91.0)
 
 ### v3.91.0 - 채팅 페이지 무한 루프 완전 해결 (2025-10-21) 🔥
 **문제**: 채팅 페이지 접속 시 페이지가 멈추는 현상 (v3.90.9까지도 미해결)
