@@ -1361,8 +1361,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // v3.42.0: ApiClient 사용
             ApiClient.delete(`/community/posts/${postId}`, {
-                csrf_token: document.querySelector('input[name="csrf_token"]').value
-            }, { noLoading: true })
+                body: { csrf_token: document.querySelector('input[name="csrf_token"]').value },
+                noLoading: true
+            })
             .then(data => {
                 hideLoading();
 

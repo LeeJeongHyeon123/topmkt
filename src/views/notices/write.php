@@ -984,7 +984,7 @@ async function deleteNotice(noticeId) {
 
     // v3.42.0: ApiClient 사용
     ApiClient.delete(`/api/notices/${noticeId}`, {
-        csrf_token: document.querySelector('input[name="csrf_token"]').value
+        body: { csrf_token: document.querySelector('input[name="csrf_token"]').value }
     })
     .then(data => {
         if (data.success) {

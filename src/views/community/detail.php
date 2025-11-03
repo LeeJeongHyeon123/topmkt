@@ -771,8 +771,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // v3.42.0: ApiClient 사용
             ApiClient.delete(`/community/posts/${postId}`, {
-                csrf_token: csrfToken
-            }, { noLoading: true })
+                body: { csrf_token: csrfToken },
+                noLoading: true
+            })
             .then(data => {
                 if (data.status === 'success') {
                     window.location.href = data.data?.redirectUrl || '/community';

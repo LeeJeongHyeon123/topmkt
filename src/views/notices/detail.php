@@ -1382,7 +1382,7 @@ async function deleteComment(commentId) {
     
     // v3.42.0: ApiClient 사용
     ApiClient.delete(`/api/notice-comments/${commentId}`, {
-        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
+        body: { csrf_token: '<?= $_SESSION['csrf_token'] ?>' }
     })
     .then(data => {
         if (data.data && data.data.success) {
@@ -1404,7 +1404,7 @@ async function deleteNotice(noticeId) {
     
     // v3.42.0: ApiClient 사용
     ApiClient.delete(`/api/notices/${noticeId}`, {
-        csrf_token: '<?= $_SESSION['csrf_token'] ?>'
+        body: { csrf_token: '<?= $_SESSION['csrf_token'] ?>' }
     })
     .then(data => {
         if (data.data && data.data.success) {
