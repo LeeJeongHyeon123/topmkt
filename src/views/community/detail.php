@@ -774,15 +774,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: { csrf_token: csrfToken },
                 noLoading: true
             })
-            .then(data => {
-                if (data.status === 'success') {
-                    Toast.success('게시글이 삭제되었습니다.');
+            .then(response => {
+                // ApiClient는 응답을 { success, data, message } 형태로 정규화
+                if (response.success) {
+                    Toast.success(response.message || '게시글이 삭제되었습니다.');
                     // Toast 표시 후 리다이렉트 (300ms 딜레이)
                     setTimeout(() => {
-                        window.location.href = data.data?.redirectUrl || '/community';
+                        window.location.href = response.data?.redirectUrl || '/community';
                     }, 300);
                 } else {
-                    Toast.error(data.message || '삭제 중 오류가 발생했습니다.');
+                    Toast.error(response.message || '삭제 중 오류가 발생했습니다.');
                     deleteBtn.disabled = false;
                     deleteBtn.innerHTML = '🗑️ 삭제';
                 }
