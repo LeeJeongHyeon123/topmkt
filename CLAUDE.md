@@ -215,7 +215,68 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.92.0 ~ v3.96.0) - 2025-11-02/03
+## 최근 주요 작업 (v3.92.0 ~ v3.97.2) - 2025-11-02/03
+
+### v3.97.2 - 커뮤니티 게시글 삭제 후 리다이렉트 완전 수정 (2025-11-03) 🐛
+**문제**: 게시글 삭제는 성공하지만 페이지 이동이 안 됨
+
+**근본 원인 - ApiClient 응답 정규화 불일치**:
+```javascript
+// 서버 응답
+{ status: 'success', data: { redirectUrl: '/community' }, message: '...' }
+
+// ApiClient 정규화 (api-client.js.php:190-196)
+if (data.status === 'success') {
+    return { success: true, data: data.data, message: data.message };
+}
+
+// ❌ 클라이언트 체크 (잘못됨)
+if (data.status === 'success') { ... }  // data.status는 undefined!
+
+// ✅ 올바른 체크
+if (response.success) { ... }  // 정규화된 success 필드 사용
+```
+
+**해결**:
+- `data.status === 'success'` → `response.success` 변경
+- ApiClient 정규화된 `{ success, data, message }` 형태 사용
+- 파라미터명 `data` → `response`로 명확화
+
+**파일**: src/views/community/detail.php (Lines 777-789)
+
+### v3.97.0 - ApiClient.delete() 파라미터 오류 완전 수정 (2025-11-03) 🐛
+**문제**: 커뮤니티/공지사항 삭제 시 400 Bad Request - "잘못된 JSON 형식입니다."
+
+**근본 원인**:
+```javascript
+// ❌ 잘못된 사용 (3개 파라미터)
+ApiClient.delete('/api/endpoint', {
+    csrf_token: token  // options로 인식됨
+}, { noLoading: true })  // 무시됨!
+
+// ✅ 올바른 사용 (2개 파라미터)
+ApiClient.delete('/api/endpoint', {
+    body: { csrf_token: token },
+    noLoading: true
+})
+```
+
+**ApiClient.delete() 시그니처**:
+```javascript
+async delete(url, options = {}) {
+    return this.request(url, { ...options, method: 'DELETE' });
+}
+```
+
+**수정 파일** (4개, 5곳):
+- src/views/community/detail.php
+- src/views/community/write.php
+- src/views/notices/detail.php (2곳)
+- src/views/notices/write.php
+
+**검증 완료**:
+- lectures/detail.php: 이미 올바름 ✅
+- events/detail.php: 이미 올바름 ✅
 
 ### v3.96.0 - 커뮤니티 게시글 정렬 순서 완전 수정 (2025-11-03) 🔥
 **문제**: 커뮤니티 페이지에서 게시글 날짜가 섞여서 표시됨 (최신글이 중간에 위치)
