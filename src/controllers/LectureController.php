@@ -2759,7 +2759,15 @@ class LectureController extends BaseController {
             // 입력 데이터 검증
             $validationResult = $this->validateLectureData($postData, $fileData, false);
             if (!$validationResult['isValid']) {
-                ResponseHelper::error($validationResult['message'], 400);
+                WebLogger::warning('Lecture update validation failed', [
+                    'lecture_id' => $lectureId,
+                    'validation_message' => $validationResult['message'],
+                    'validation_errors' => $validationResult['errors'] ?? [],
+                    'post_data_keys' => array_keys($postData),
+                    'file_data_keys' => array_keys($fileData),
+                    'request_method' => $requestMethod
+                ]);
+                ResponseHelper::error($validationResult['message'], 400, $validationResult['errors'] ?? []);
                 return;
             }
             

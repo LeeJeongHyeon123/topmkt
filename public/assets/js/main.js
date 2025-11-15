@@ -65,6 +65,11 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function setupFormMethodOverride() {
     document.querySelectorAll('form').forEach(form => {
+        // lectureForm은 자체 submit 핸들러가 있으므로 제외
+        if (form.id === 'lectureForm') {
+            return;
+        }
+
         form.addEventListener('submit', function(e) {
             const methodInput = form.querySelector('input[name="_method"]');
             if (methodInput) {
