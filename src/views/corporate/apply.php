@@ -710,9 +710,16 @@ document.addEventListener('DOMContentLoaded', function() {
             noErrorToast: true
         })
         .then(data => {
-
             if (data.success || data.data?.success) {
-                window.location.href = '/corp/status';
+                // 성공 메시지 표시
+                const message = data.message || data.data?.message || '신청이 완료되었습니다.';
+                Toast.success(message);
+
+                // 리다이렉트 (백엔드 응답 사용)
+                const redirectUrl = data.redirect || data.data?.redirect || '/corp/status';
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1000);
             } else {
                 throw new Error(data.message || '서버 오류가 발생했습니다');
             }

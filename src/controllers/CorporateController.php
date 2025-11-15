@@ -166,11 +166,17 @@ class CorporateController extends BaseController {
                 error_log("[CORP_APPLY] 신규 신청 완료");
             }
             
-            // 성공 메시지와 함께 상태 페이지로 리다이렉트
+            // 성공 응답 (JSON)
             $_SESSION['success_message'] = $message;
-            error_log("[CORP_APPLY] 리다이렉트 실행: /corp/status");
+            error_log("[CORP_APPLY] 신청 성공 - JSON 응답 전송");
             error_log("[CORP_APPLY] 세션 메시지 설정: " . $message);
-            header('Location: /corp/status'); 
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => $message,
+                'redirect' => '/corp/status'
+            ]);
             exit;
             
         } catch (Exception $e) {
@@ -178,12 +184,17 @@ class CorporateController extends BaseController {
             $logMessage = date('Y-m-d H:i:s') . " [CORP_APPLY] 오류: " . $e->getMessage() . "\n";
             $logMessage .= "스택 트레이스: " . $e->getTraceAsString() . "\n\n";
             file_put_contents('/tmp/corp-apply-debug.log', $logMessage, FILE_APPEND | LOCK_EX);
-            
+
             error_log("[CORP_APPLY] 오류 발생: " . $e->getMessage());
             error_log("[CORP_APPLY] 스택 트레이스: " . $e->getTraceAsString());
-            $_SESSION['error_message'] = $e->getMessage();
-            error_log("[CORP_APPLY] 오류로 인한 리다이렉트: /corp/apply");
-            header('Location: /corp/apply'); 
+
+            // 오류 응답 (JSON)
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
             exit;
         }
     }
