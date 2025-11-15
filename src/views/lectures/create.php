@@ -1951,15 +1951,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // 강의 등록 성공 - 리다이렉트
                 setTimeout(() => {
-                    if (isEditMode && responseData.lectureId) {
-                        // 수정 모드인 경우 강의 상세 페이지의 수정 모드로 리다이렉트
-                        window.location.href = `/lectures/${responseData.lectureId}/edit`;
-                    } else if (responseData.lectureId) {
-                        // 새 강의 등록인 경우 강의 상세 페이지의 수정 모드로 리다이렉트
-                        window.location.href = `/lectures/${responseData.lectureId}/edit`;
+                    // redirect_url이 있으면 우선 사용 (백엔드에서 지정한 URL)
+                    if (responseData.redirect_url || data.redirect_url) {
+                        window.location.href = responseData.redirect_url || data.redirect_url;
+                    } else if (responseData.redirectUrl || data.redirectUrl) {
+                        window.location.href = responseData.redirectUrl || data.redirectUrl;
+                    } else if (responseData.lectureId || responseData.lecture_id) {
+                        // lectureId가 있으면 상세 페이지로 이동
+                        const lectureId = responseData.lectureId || responseData.lecture_id;
+                        window.location.href = `/lectures/${lectureId}`;
                     } else {
-                        // 기본 리다이렉트
-                        window.location.href = responseData.redirectUrl || data.redirectUrl || '/lectures';
+                        // 기본 리다이렉트: 강의 목록
+                        window.location.href = '/lectures';
                     }
                 }, 1500);
             } else {
