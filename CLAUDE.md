@@ -215,7 +215,89 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.98.0 ~ v3.98.10) - 2025-11-03/15
+## 최근 주요 작업 (v3.98.0 ~ v3.98.13) - 2025-11-03/15
+
+### v3.98.13 - 강의 등록 디버깅 로그 제거 (2025-11-15) 🧹
+**프로덕션 준비 완료 - 디버깅 로그 정리**
+
+**제거 내용**:
+- v3.98.11에서 추가한 임시 console.log 18개 모두 제거
+- 코드 가독성 향상 (112줄 → 76줄, 32% 감소)
+
+**수정 파일**:
+- `src/views/lectures/create.php` (validateForm 함수, 폼 제출 이벤트)
+
+**결과**:
+- ✅ 클라이언트 콘솔 깔끔
+- ✅ 코드 간결화
+- ✅ 프로덕션 배포 준비 완료
+
+### v3.98.12 - 강의 등록 강사명 필수 표시 추가 (2025-11-15) 🎨
+**문제**: 강사명이 필수 필드인데 빨간색 * 표시 없음
+
+**해결**:
+```html
+<!-- BEFORE -->
+<label for="instructor_name_0" class="form-label">강사명</label>
+
+<!-- AFTER -->
+<label for="instructor_name_0" class="form-label required">강사명</label>
+```
+
+**CSS**: `.form-label.required::after { content: ' *'; color: #e53e3e; }`
+
+**결과**:
+- ✅ 사용자가 필수 입력임을 명확히 인지
+- ✅ 다른 필수 필드들과 UI 일관성 확보
+
+### v3.98.11 - 강의 등록 폼 검증 실패 시 사용자 피드백 개선 (2025-11-15) 🐛
+**문제**: https://www.topmktx.com/lectures/create 등록 버튼 클릭 시 아무 반응 없음
+
+**근본 원인**:
+- `validateForm()` 함수가 검증 실패 시 `false` 반환
+- 하지만 사용자에게 어떤 필드가 문제인지 알림 없음
+- `showError()`로 빨간 테두리만 표시되지만 눈에 안 띔
+
+**Ultra Think 7단계 분석**:
+1. **문제 정의**: 등록 버튼 클릭 시 무반응 (강사명 비어있음)
+2. **데이터 수집**: 브라우저 콘솔 로그로 `validateForm()` 실패 확인
+3. **근본 원인**: Toast 알림 및 필드 포커스 부재
+4. **해결 전략**: Toast 알림 + 자동 스크롤 + 포커스 추가
+5. **구현**: 3가지 사용자 피드백 메커니즘 통합
+6. **검증**: 사용자 테스트 완료 ("잘 해결됨")
+7. **문서화**: v3.98.11~13 버전 기록
+
+**해결 방법**:
+```javascript
+// 1. 검증 실패 시 Toast 알림
+if (!isValid) {
+    Toast.error('필수 입력 항목을 확인해주세요.');
+}
+
+// 2. 첫 번째 에러 필드로 자동 스크롤
+if (firstErrorField) {
+    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => firstErrorField.focus(), 500);
+}
+
+// 3. 위치별 필수 필드 개별 Toast
+Toast.info('오프라인 진행 시 장소명은 필수입니다.');
+```
+
+**사용자 경험 개선**:
+1. **Toast 알림**: 빨간색 에러 메시지로 즉시 알림
+2. **자동 스크롤**: 에러 필드로 부드럽게 이동 (smooth)
+3. **자동 포커스**: 500ms 후 해당 필드에 포커스
+4. **빨간 테두리**: 기존 showError() 유지 (이중 피드백)
+
+**수정 파일**:
+- `src/views/lectures/create.php` (Lines 1941-2017: validateForm 함수)
+
+**개선 효과**:
+- ✅ 사용자가 어떤 필드를 수정해야 하는지 명확히 인지
+- ✅ 에러 필드로 자동 이동하여 UX 대폭 향상
+- ✅ Toast + 빨간 테두리 + 포커스 3중 피드백
+- ✅ 강사명 필수 검증 완벽 작동
 
 ### v3.98.10 - Modal 확인 버튼 hover 텍스트 색상 수정 (2025-11-15) 🎨
 **문제**: 삭제 확인 등 모든 Modal.confirm() 대화상자에서 "확인" 버튼에 마우스 hover 시 텍스트가 보이지 않는 문제
