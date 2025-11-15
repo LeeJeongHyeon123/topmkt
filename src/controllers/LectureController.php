@@ -1930,14 +1930,18 @@ class LectureController extends BaseController {
         if (!isset($_SESSION['csrf_token'])) {
             return false;
         }
-        
+
         $requestCsrfToken = null;
-        
-        // POST 요청이나 method override를 사용하는 경우
-        if (isset($_POST['csrf_token'])) {
+
+        // 1. 헤더에서 확인 (ApiClient가 X-CSRF-Token 헤더로 전송)
+        if (isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+            $requestCsrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
+        }
+        // 2. POST 요청이나 method override를 사용하는 경우
+        else if (isset($_POST['csrf_token'])) {
             $requestCsrfToken = $_POST['csrf_token'];
         }
-        // 실제 PUT/PATCH 요청인 경우 raw input에서 파싱
+        // 3. 실제 PUT/PATCH 요청인 경우 raw input에서 파싱
         else if (in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PATCH']) && empty($_POST)) {
             $rawInput = file_get_contents('php://input');
             if ($rawInput) {
@@ -1957,11 +1961,11 @@ class LectureController extends BaseController {
                 }
             }
         }
-        
+
         if (!$requestCsrfToken) {
             return false;
         }
-        
+
         return hash_equals($_SESSION['csrf_token'], $requestCsrfToken);
     }
     

@@ -1908,11 +1908,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
-        ApiClient.post('/lectures/store', formData, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            noLoading: true
-        })
-        .then(data => {
+        // 수정 모드와 등록 모드에 따라 다른 엔드포인트와 HTTP 메서드 사용
+        const apiPromise = isEditMode
+            ? ApiClient.put(`/lectures/${formData.get('lecture_id')}/update`, formData, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                noLoading: true
+            })
+            : ApiClient.post('/lectures/store', formData, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                noLoading: true
+            });
+
+        apiPromise.then(data => {
             showLoading(false);
 
             if (data.success || (data.data && data.data.success)) {
