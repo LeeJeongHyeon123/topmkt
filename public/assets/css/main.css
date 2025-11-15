@@ -6369,6 +6369,7 @@ body {
 
 .modal-confirm-primary .modal-confirm-ok:hover {
     background: #5a67d8;
+    color: white;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
@@ -6379,6 +6380,7 @@ body {
 
 .modal-confirm-danger .modal-confirm-ok:hover {
     background: #dc2626;
+    color: white;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
@@ -6389,6 +6391,7 @@ body {
 
 .modal-confirm-warning .modal-confirm-ok:hover {
     background: #d97706;
+    color: white;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
 }
@@ -6399,6 +6402,7 @@ body {
 
 .modal-confirm-success .modal-confirm-ok:hover {
     background: #059669;
+    color: white;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
