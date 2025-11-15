@@ -505,7 +505,7 @@ class AdminController extends BaseController {
             exit('유효하지 않은 파일명입니다.');
         }
         
-        $filePath = ROOT_PATH . '/public/PUBLIC_PATH/assets/uploads/corp_docs/' . $filename;
+        $filePath = ROOT_PATH . '/public/assets/uploads/corp_docs/' . $filename;
         
         if (!file_exists($filePath)) {
             header('HTTP/1.1 404 Not Found');
