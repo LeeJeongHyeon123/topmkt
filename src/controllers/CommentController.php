@@ -84,7 +84,7 @@ class CommentController extends BaseController {
                     $currentUserId = AuthMiddleware::getCurrentUserId();
 
                     // 게시글 정보 조회
-                    $post = $postModel->getPostById($postId);
+                    $post = $postModel->getById($postId);
 
                     if ($post) {
                         $recipientIds = [];
