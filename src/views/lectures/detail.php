@@ -657,17 +657,6 @@ if (file_exists($styleFile)) {
                                 });
                                 </script>
                             </div>
-                            
-                            <!-- 지도 하단 정보 -->
-                            <div style="margin-top: 15px; padding: 12px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #2d3748;">
-                                    <span style="color: #667eea;">🏢</span>
-                                    <strong><?= htmlspecialchars($lecture['venue_name'] ?? '강의 장소') ?></strong>
-                                </div>
-                                <div style="font-size: 13px; color: #4a5568; margin-top: 4px;">
-                                    지도를 클릭하거나 확대하여 상세 위치를 확인하세요
-                                </div>
-                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
