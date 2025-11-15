@@ -134,7 +134,7 @@ if (file_exists($styleFile)) {
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="instructor_name_0" class="form-label">강사명</label>
+                            <label for="instructor_name_0" class="form-label required">강사명</label>
                             <div class="input-with-counter">
                                 <input type="text" id="instructor_name_0" name="instructors[0][name]" class="form-input"
                                        value="<?= $isEditMode ? htmlspecialchars($lecture['instructors'][0]['name'] ?? '') : '' ?>"
