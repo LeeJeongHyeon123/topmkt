@@ -2130,7 +2130,7 @@ async function confirmDeleteLecture(lectureId) {
                         <textarea id="motivation" name="motivation" maxlength="2000"
                                   placeholder="이 강의에 참가하시는 이유나 기대하시는 점을 간단히 적어주세요 (선택사항)"></textarea>
                         <div class="char-counter">
-                            <span id="motivation-counter">0</span>/2,000자
+                            <span id="motivation-counter">0</span>자
                         </div>
                     </div>
                     
@@ -2154,7 +2154,7 @@ async function confirmDeleteLecture(lectureId) {
                         <textarea id="special_requests" name="special_requests" maxlength="2000"
                                   placeholder="식단 제한, 접근성 지원 등 특별한 요청사항이 있으시면 적어주세요 (선택사항)"></textarea>
                         <div class="char-counter">
-                            <span id="special-requests-counter">0</span>/2,000자
+                            <span id="special-requests-counter">0</span>자
                         </div>
                     </div>
                 </div>
