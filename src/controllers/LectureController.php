@@ -2758,7 +2758,7 @@ class LectureController extends BaseController {
             
             // 입력 데이터 검증
             $validationResult = $this->validateLectureData($postData, $fileData, false);
-            if (!$validationResult['isValid']) {
+            if (!$validationResult['valid']) {
                 $errorMessage = !empty($validationResult['message'])
                     ? $validationResult['message']
                     : '입력 데이터 검증에 실패했습니다.';
@@ -2836,7 +2836,6 @@ class LectureController extends BaseController {
                     'max_participants' => isset($postData['max_participants']) && $postData['max_participants'] !== '' ? intval($postData['max_participants']) : null,
                     'registration_fee' => isset($postData['registration_fee']) && $postData['registration_fee'] !== '' ? intval($postData['registration_fee']) : 0,
                     'registration_deadline' => !empty($postData['registration_deadline']) ? $postData['registration_deadline'] . ':00' : null,
-                    'contact_info' => $postData['contact_info'] ?? null,
                     'prerequisites' => $postData['prerequisites'] ?? null,
                     'what_to_bring' => $postData['what_to_bring'] ?? null,
                     'additional_info' => $postData['additional_info'] ?? null,
@@ -2849,12 +2848,12 @@ class LectureController extends BaseController {
                 ];
                 
                 // 강의 업데이트 실행
-                $sql = "UPDATE lectures SET 
+                $sql = "UPDATE lectures SET
                     title = ?, description = ?, category = ?, difficulty_level = ?,
                     start_date = ?, end_date = ?, start_time = ?, end_time = ?, timezone = ?,
                     location_type = ?, venue_name = ?, venue_address = ?, venue_latitude = ?, venue_longitude = ?,
                     online_link = ?, max_participants = ?, registration_fee = ?, registration_deadline = ?,
-                    contact_info = ?, prerequisites = ?, what_to_bring = ?, additional_info = ?, benefits = ?,
+                    prerequisites = ?, what_to_bring = ?, additional_info = ?, benefits = ?,
                     youtube_video = ?, instructors_json = ?, lecture_images = ?, status = ?, updated_at = ?
                     WHERE id = ? AND user_id = ?";
                 
@@ -2863,7 +2862,7 @@ class LectureController extends BaseController {
                     $updateData['start_date'], $updateData['end_date'], $updateData['start_time'], $updateData['end_time'], $updateData['timezone'],
                     $updateData['location_type'], $updateData['venue_name'], $updateData['venue_address'], $updateData['venue_latitude'], $updateData['venue_longitude'],
                     $updateData['online_link'], $updateData['max_participants'], $updateData['registration_fee'], $updateData['registration_deadline'],
-                    $updateData['contact_info'], $updateData['prerequisites'], $updateData['what_to_bring'], $updateData['additional_info'], $updateData['benefits'],
+                    $updateData['prerequisites'], $updateData['what_to_bring'], $updateData['additional_info'], $updateData['benefits'],
                     $updateData['youtube_video'], $updateData['instructors_json'], $updateData['lecture_images'], $updateData['status'], $updateData['updated_at'],
                     $lectureId, $currentUserId
                 ];
