@@ -1750,11 +1750,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // 폼 제출 처리
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
+        console.log('=== 폼 제출 시작 ===');
+
         // 유효성 검사
-        if (!validateForm()) {
+        const isValid = validateForm();
+        console.log('validateForm() 결과:', isValid);
+
+        if (!isValid) {
+            console.log('❌ 폼 검증 실패 - 제출 중단');
             return;
         }
+
+        console.log('✅ 폼 검증 통과 - 제출 진행');
         
         // 로딩 상태 표시
         showLoading(true);
@@ -1939,60 +1947,117 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 유효성 검사 함수
     function validateForm() {
+        console.log('=== validateForm 시작 ===');
         let isValid = true;
-        
+
         // 필수 필드 검사
         const requiredFields = [
             'title', 'description',
             'start_date', 'end_date', 'start_time', 'end_time'
         ];
-        
+
+        const fieldLabels = {
+            'title': '강의 제목',
+            'description': '강의 설명',
+            'start_date': '시작 날짜',
+            'end_date': '종료 날짜',
+            'start_time': '시작 시간',
+            'end_time': '종료 시간'
+        };
+
+        let firstErrorField = null;
+
         requiredFields.forEach(fieldName => {
             const field = document.getElementById(fieldName);
+            const value = field ? field.value.trim() : '';
+            console.log(`필드 ${fieldName}:`, value ? `"${value}"` : '(비어있음)');
+
             if (field && !field.value.trim()) {
                 showError(fieldName, '이 필드는 필수입니다.');
+                console.log(`❌ ${fieldName} 필드가 비어있습니다`);
+
+                // 첫 번째 에러 필드 저장
+                if (!firstErrorField) {
+                    firstErrorField = field;
+                }
+
                 isValid = false;
             } else if (field) {
                 clearError(fieldName);
             }
         });
-        
+
         // 첫 번째 강사명 필수 검사
         const firstInstructor = document.getElementById('instructor_name_0');
+        console.log('첫 번째 강사명:', firstInstructor ? firstInstructor.value : '(요소 없음)');
         if (firstInstructor && !firstInstructor.value.trim()) {
             showError('instructor_name_0', '강사명을 입력해주세요.');
+            console.log('❌ 강사명이 비어있습니다');
+
+            // 첫 번째 에러 필드로 설정 (다른 필드보다 우선순위 높음)
+            if (!firstErrorField) {
+                firstErrorField = firstInstructor;
+            }
+
             isValid = false;
         } else if (firstInstructor) {
             clearError('instructor_name_0');
         }
-        
+
+        // 첫 번째 에러 필드로 스크롤 및 포커스
+        if (firstErrorField) {
+            firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => firstErrorField.focus(), 500);
+        }
+
         // 날짜/시간 검사
-        if (!validateDates() || !validateTimes()) {
+        const datesValid = validateDates();
+        const timesValid = validateTimes();
+        console.log('validateDates():', datesValid);
+        console.log('validateTimes():', timesValid);
+
+        if (!datesValid || !timesValid) {
+            console.log('❌ 날짜/시간 검증 실패');
             isValid = false;
         }
-        
+
         // 위치 타입별 필수 필드 검사
         const locationType = document.querySelector('input[name="location_type"]:checked');
+        console.log('위치 타입:', locationType ? locationType.value : '(선택 안 됨)');
+
         if (locationType) {
             if (locationType.value === 'offline') {
                 const venueField = document.getElementById('venue_name');
+                console.log('오프라인 장소명:', venueField ? venueField.value : '(요소 없음)');
                 if (venueField && !venueField.value.trim()) {
                     Toast.info('오프라인 진행 시 장소명은 필수입니다.');
-                    venueField.focus();
+                    venueField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => venueField.focus(), 500);
+                    console.log('❌ 오프라인 장소명 필수');
                     isValid = false;
                 }
             }
-            
+
             if (locationType.value === 'online') {
                 const linkField = document.getElementById('online_link');
+                console.log('온라인 링크:', linkField ? linkField.value : '(요소 없음)');
                 if (linkField && !linkField.value.trim()) {
                     Toast.info('온라인 진행 시 온라인 링크는 필수입니다.');
-                    linkField.focus();
+                    linkField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => linkField.focus(), 500);
+                    console.log('❌ 온라인 링크 필수');
                     isValid = false;
                 }
             }
         }
-        
+
+        console.log('=== validateForm 최종 결과:', isValid, '===');
+
+        // 검증 실패 시 최종 Toast 알림
+        if (!isValid) {
+            Toast.error('필수 입력 항목을 확인해주세요.');
+        }
+
         return isValid;
     }
     

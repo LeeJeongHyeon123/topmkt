@@ -215,7 +215,264 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.92.0 ~ v3.97.2) - 2025-11-02/03
+## 최근 주요 작업 (v3.98.0 ~ v3.98.10) - 2025-11-03/15
+
+### v3.98.10 - Modal 확인 버튼 hover 텍스트 색상 수정 (2025-11-15) 🎨
+**문제**: 삭제 확인 등 모든 Modal.confirm() 대화상자에서 "확인" 버튼에 마우스 hover 시 텍스트가 보이지 않는 문제
+
+**근본 원인**:
+- 모달 버튼의 base 스타일에는 `color: white` 설정됨
+- 하지만 hover 상태에서 `background` 색상만 변경하고 `color` 속성 누락
+- CSS 우선순위 문제로 hover 시 텍스트 색상이 상실됨
+
+**해결 방법**:
+```css
+/* 4가지 모달 타입 모두 hover 시 color: white 추가 */
+.modal-confirm-primary .modal-confirm-ok:hover { color: white; }
+.modal-confirm-danger .modal-confirm-ok:hover { color: white; }
+.modal-confirm-warning .modal-confirm-ok:hover { color: white; }
+.modal-confirm-success .modal-confirm-ok:hover { color: white; }
+```
+
+**영향 범위**:
+- 게시글 삭제 확인 모달
+- 댓글 삭제 확인 모달
+- 계정 삭제 확인 모달
+- 기타 모든 Modal.confirm() 사용 케이스
+
+**수정 파일**:
+- `public/assets/css/main.css` (Lines 6370-6407)
+
+**결과**:
+- ✅ 모든 모달 타입에서 hover 시 텍스트 가시성 보장
+- ✅ 일관된 UX 제공
+- ✅ 접근성 개선
+
+### v3.98.9 - 댓글 작성 500 오류 및 불필요한 API 호출 제거 (2025-11-15) 🐛
+**두 가지 중요한 버그 수정**
+
+#### 버그 1: 댓글 작성 시 500 Internal Server Error
+**문제**: 댓글은 정상적으로 데이터베이스에 저장되지만 API 응답이 500 오류 반환
+
+**근본 원인**:
+- `CommentController.php` Line 87: `$post = $postModel->getPostById($postId);`
+- Post 모델에는 `getById()` 메서드만 존재, `getPostById()` 메서드 없음
+- FCM 푸시 알림 전송 코드에서 Fatal Error 발생
+- 댓글 저장은 성공했지만 FCM 알림 전송 중 오류로 인해 성공 응답 전송 실패
+
+**해결 방법**:
+```php
+// BEFORE (Line 87)
+$post = $postModel->getPostById($postId);
+
+// AFTER (Line 87)
+$post = $postModel->getById($postId);
+```
+
+**영향**:
+- ✅ 댓글 작성 성공 응답 정상 반환
+- ✅ FCM 푸시 알림 정상 전송
+- ✅ 프론트엔드 UI 정상 업데이트
+- ✅ 로그 오류 제거
+
+#### 버그 2: 불필요한 /api/comments GET 요청
+**문제**: 커뮤니티 게시글 페이지 접속 시 `/api/comments` 엔드포인트로 불필요한 GET 요청 발생
+
+**근본 원인**:
+- 구버전 `public/assets/js/comments.js` 파일이 페이지 로드 시 자동으로 API 호출
+- 현재 시스템은 `comment/list.php`에서 PHP 렌더링으로 댓글 표시
+- JavaScript는 댓글 작성/수정/삭제 기능만 담당
+- 422줄의 레거시 코드가 새 시스템과 충돌
+
+**해결 방법**:
+- `public/assets/js/comments.js` 파일 완전 삭제 (422 lines)
+- PHP 렌더링 시스템으로 통일
+
+**영향**:
+- ✅ 페이지 로드 성능 개선 (불필요한 API 호출 제거)
+- ✅ 서버 부하 감소
+- ✅ 콘솔 오류 제거
+- ✅ 코드 중복 제거 및 유지보수성 향상
+
+**수정 파일**:
+- `src/controllers/CommentController.php` (Line 87 메서드명 수정)
+- `public/assets/js/comments.js` (전체 삭제)
+
+**기술적 교훈**:
+- v3.98.4의 LikeController와 동일한 `getPostById()` 버그 패턴
+- 레거시 코드 정리의 중요성
+- 단일 진실의 원천(Single Source of Truth) 원칙 준수
+
+**커밋 히스토리**:
+- Commit 1: CommentController 메서드명 수정
+- Commit 2: comments.js 레거시 파일 제거
+
+### v3.98.8 - 좋아요 버튼 UI 업데이트 완전 해결 (2025-11-03) 🎉🐛
+**가장 까다로웠던 디버깅 사례 - ApiClient 응답 정규화 문제**
+
+**문제**: 좋아요 API는 성공하지만 UI가 전혀 업데이트되지 않음
+- 백엔드 응답: ✅ 정상
+- 프론트엔드 코드: ✅ 정상
+- Toast 메시지: ✅ 표시됨
+- **하지만 버튼 텍스트/클래스 변경: ❌ 안 됨**
+
+**디버깅 과정 (v3.98.1 ~ v3.98.8)**:
+1. **v3.98.1-3**: NotificationSettings 문제로 착각 → 실패
+2. **v3.98.4**: `Post::getPostById()` 존재하지 않는 메서드 호출 → `getById()` 수정
+3. **v3.98.5**: 백엔드 디버깅 로그 30개 제거
+4. **v3.98.6**: `innerHTML` → `textContent` 변경 시도 → 실패
+5. **v3.98.7**: ✅ **근본 원인 발견!**
+6. **v3.98.8**: 디버깅 로그 20개 제거, 프로덕션 준비 완료
+
+**근본 원인 - ApiClient 응답 정규화 불일치**:
+```javascript
+// 백엔드 ResponseHelper::success()
+{ status: 'success', data: {...}, message: '...' }
+
+// ApiClient 정규화 후 (api-client.js.php)
+{ success: true, data: {...}, message: '...' }  // status → success 변환!
+
+// 프론트엔드 조건문 (실패)
+if (data.status === 'success' && data.data) { ... }  // ❌ status가 없음!
+```
+
+**해결 방법**:
+```javascript
+// 두 가지 응답 형식 모두 지원
+if ((data.success === true || data.status === 'success') && data.data) {
+    // UI 업데이트 코드
+}
+```
+
+**기술적 교훈**:
+- ApiClient가 백엔드 응답을 정규화한다는 사실을 간과
+- 백엔드 응답 형식을 직접 체크하는 프론트엔드 코드의 위험성
+- 중간 레이어(ApiClient)의 동작을 명확히 이해해야 함
+- 디버깅 시 응답 데이터 구조를 먼저 확인해야 함
+
+**최종 구현**:
+- ✅ 좋아요 추가: `❤️ 좋아요 N` + `liked` 클래스
+- ✅ 좋아요 취소: `🤍 좋아요 N` + `liked` 클래스 제거
+- ✅ 통계 영역 실시간 동기화 (3개 요소)
+- ✅ Toast 성공 메시지 표시
+- ✅ 로딩 상태 표시 (`🔄 처리 중...`)
+- ✅ 한국어 숫자 포맷팅 (`toLocaleString('ko-KR')`)
+- ✅ 응답 형식 호환성 보장
+
+**수정 파일**:
+- `src/controllers/LikeController.php` (메서드명 수정, 디버깅 로그)
+- `src/views/community/detail.php` (응답 형식 호환성 추가)
+
+**커밋 히스토리**:
+- v3.98.4: Post 모델 메서드명 수정
+- v3.98.5: 백엔드 디버깅 로그 제거
+- v3.98.6: textContent 사용으로 변경
+- v3.98.7: 응답 형식 호환성 추가 (핵심 해결)
+- v3.98.8: 프론트엔드 디버깅 로그 제거
+
+### v3.98.0 - 프로필 이미지 클릭 동작 변경 (Phase 1 + Phase 2) (2025-11-03) 🎯
+**전체 서비스 UX 개선 - 프로필 이미지 클릭 시 프로필 페이지로 이동**
+
+**주요 변경사항**:
+- **기존**: 프로필 이미지 클릭 → 모달로 크게 보기
+- **변경**: 프로필 이미지 클릭 → 프로필 페이지로 이동
+- **예외**: 프로필 페이지 자체에서는 모달로 크게 보기 유지
+
+**영향 범위 (8개 페이지)**:
+1. **Phase 1 (즉시 배포)**:
+   - `community` (커뮤니티 목록/상세/댓글)
+   - `notices` (공지사항 목록/상세/댓글)
+   - `chat` (채팅방 목록/헤더/메시지)
+   - `profile` (프로필 페이지 - 예외 처리)
+
+2. **Phase 2 (리팩토링)**:
+   - `lectures/detail.php` (강의 상세)
+   - `events/detail.php` (행사 상세)
+   - `admin/users/list_direct.php` (관리자 사용자 관리)
+
+**기술적 구현**:
+1. **ProfileImageHelper.php** (Lines 137-144):
+   ```php
+   // BEFORE: 이미지 있으면 모달, 없으면 프로필 페이지
+   if ($originalImageUrl && $originalImageUrl !== self::DEFAULT_AVATAR) {
+       $attributes['onclick'] = "window.showProfileImageModal(...)";
+   }
+
+   // AFTER: 모두 프로필 페이지로 이동
+   if ($userId && !empty($user['nickname'])) {
+       $attributes['onclick'] = "window.location.href='/profile?user_id=" . $userId . "';";
+   }
+   ```
+
+2. **profile-image.php** (Lines 42, 63-85):
+   ```php
+   // 예외 플래그 추가
+   $keepModalOnOwnProfile = $keepModalOnOwnProfile ?? false;
+
+   // 프로필 페이지에서만 모달 유지
+   if ($keepModalOnOwnProfile && $hasProfileImage) {
+       $attributes['onclick'] = "window.showProfileImageModal(...)";
+   } else {
+       echo ProfileImageHelper::generateProfileImageHtml(...);
+   }
+   ```
+
+3. **chat/index.php** (Lines 249-270):
+   ```javascript
+   // BEFORE: 모달 호출
+   if (userId && userName && typeof window.profileModal !== 'undefined') {
+       window.profileModal.show(userId, userName, false);
+   }
+
+   // AFTER: 프로필 페이지로 이동
+   if (userId) {
+       if (window.TopMarketingLoading) {
+           window.TopMarketingLoading.show();
+           window.TopMarketingLoading.setMessage('프로필을 불러오는 중...');
+       }
+       window.location.href = '/profile?user_id=' + userId;
+   }
+   ```
+
+4. **admin/users/list_direct.php** (Lines 866-872):
+   ```javascript
+   // BEFORE
+   onclick="openProfileImageModal(...)"
+
+   // AFTER
+   onclick="if(window.TopMarketingLoading) {
+       window.TopMarketingLoading.show();
+       window.TopMarketingLoading.setMessage('프로필을 불러오는 중...');
+   }
+   window.location.href='/profile?user_id=' + user.id + '\\';"
+   ```
+
+**Single Source of Truth 원칙**:
+- ProfileImageHelper.php 한 곳에서 로직 변경
+- 5개 페이지 (community, notices, profile, lectures, events) 자동 적용
+- 중복 코드 최소화로 유지보수성 향상
+
+**사용자 경험 개선**:
+1. **직관적인 UX**: SNS와 동일한 동작 (프로필 이미지 = 프로필 페이지)
+2. **일관성**: 전체 서비스에서 동일한 동작
+3. **Loading 피드백**: "프로필을 불러오는 중..." 메시지로 사용자 피드백 강화
+4. **예외 처리**: 프로필 페이지에서만 이미지 크게 보기 유지 (논리적)
+
+**검증 완료**:
+- ✅ PHP 문법 검증 통과
+- ✅ 컴포넌트 사용 검증 통과
+- ✅ Git 커밋 완료 (2개: phase1, phase2 태그)
+- ✅ QA 문서 2개 작성 (Phase 1, Phase 2)
+- ✅ 릴리스 노트 작성
+
+**관련 문서**:
+- `/var/www/html/topmkt/RELEASE_NOTES_v3.98.0.md`
+- `/var/www/html/topmkt/QA_PROFILE_IMAGE_CLICK_v3.98.0_PHASE1.md`
+- `/var/www/html/topmkt/QA_PROFILE_IMAGE_CLICK_v3.98.0_PHASE2.md`
+
+---
+
+## 이전 주요 작업 아카이브 (v3.92.0 ~ v3.97.2) - 2025-11-02/03
 
 ### v3.97.2 - 커뮤니티 게시글 삭제 후 리다이렉트 완전 수정 (2025-11-03) 🐛
 **문제**: 게시글 삭제는 성공하지만 페이지 이동이 안 됨
