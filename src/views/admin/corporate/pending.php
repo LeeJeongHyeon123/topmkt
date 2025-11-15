@@ -956,12 +956,20 @@ document.getElementById("processForm").addEventListener("submit", async function
 
 // Modal.js 통합 - 래퍼 함수 정의
 function closeProcessModal() {
-    closeModal("processModal");
+    const modal = document.getElementById("processModal");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+    }
     document.getElementById("processForm").reset();
 }
 
 function closeApplicationDetailModal() {
-    closeModal("detailModal");
+    const modal = document.getElementById("detailModal");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+    }
 }
 </script>
 
