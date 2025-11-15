@@ -1764,7 +1764,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 클릭된 버튼 추적
     let clickedButton = null;
-    
+
+    // 중복 제출 방지 플래그
+    let isSubmitting = false;
+
     // 모든 submit 버튼에 클릭 이벤트 추가
     const submitButtons = form.querySelectorAll('button[type="submit"]');
     submitButtons.forEach(button => {
@@ -1772,16 +1775,30 @@ document.addEventListener('DOMContentLoaded', function() {
             clickedButton = this;
         });
     });
-    
+
     // 폼 제출 처리
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+
+        // 중복 제출 방지
+        if (isSubmitting) {
+            Toast.warning('처리 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
 
         // 유효성 검사
         if (!validateForm()) {
             return;
         }
-        
+
+        // 제출 플래그 설정 및 버튼 비활성화
+        isSubmitting = true;
+        submitButtons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            btn.style.cursor = 'not-allowed';
+        });
+
         // 로딩 상태 표시
         showLoading(true);
         
@@ -1953,11 +1970,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     const errorMessage = isEditMode ? '강의 수정 중 오류가 발생했습니다.' : '강의 등록 중 오류가 발생했습니다.';
                     Toast.error(data.message || errorMessage);
                 }
+
+                // 제출 플래그 해제 및 버튼 재활성화
+                isSubmitting = false;
+                submitButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                });
+                showLoading(false);
             }
         })
         .catch(error => {
             const baseErrorMessage = isEditMode ? '강의 수정 중 오류가 발생했습니다.' : '강의 등록 중 오류가 발생했습니다.';
             Toast.error(baseErrorMessage + '\n잠시 후 다시 시도해주세요.');
+
+            // 제출 플래그 해제 및 버튼 재활성화
+            isSubmitting = false;
+            submitButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            });
             showLoading(false);
 
             // 네트워크 오류 타입별 처리
