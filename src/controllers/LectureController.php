@@ -2717,8 +2717,14 @@ class LectureController extends BaseController {
                     'request_method' => $requestMethod,
                     'content_type' => $_SERVER['CONTENT_TYPE'] ?? '',
                     'has_session_token' => isset($_SESSION['csrf_token']),
+                    'session_token_length' => isset($_SESSION['csrf_token']) ? strlen($_SESSION['csrf_token']) : 0,
+                    'header_csrf_token' => isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? substr($_SERVER['HTTP_X_CSRF_TOKEN'], 0, 10) . '...' : 'NONE',
                     'post_token_exists' => isset($_POST['csrf_token']),
-                    'raw_input_size' => strlen(file_get_contents('php://input'))
+                    'post_token_preview' => isset($_POST['csrf_token']) ? substr($_POST['csrf_token'], 0, 10) . '...' : 'NONE',
+                    'raw_input_size' => strlen(file_get_contents('php://input')),
+                    'all_headers' => array_filter($_SERVER, function($key) {
+                        return strpos($key, 'HTTP_') === 0;
+                    }, ARRAY_FILTER_USE_KEY)
                 ]);
                 ResponseHelper::error('보안 토큰이 유효하지 않습니다.', 403);
                 return;
