@@ -2759,15 +2759,20 @@ class LectureController extends BaseController {
             // 입력 데이터 검증
             $validationResult = $this->validateLectureData($postData, $fileData, false);
             if (!$validationResult['isValid']) {
+                $errorMessage = !empty($validationResult['message'])
+                    ? $validationResult['message']
+                    : '입력 데이터 검증에 실패했습니다.';
+
                 WebLogger::warning('Lecture update validation failed', [
                     'lecture_id' => $lectureId,
                     'validation_message' => $validationResult['message'],
                     'validation_errors' => $validationResult['errors'] ?? [],
                     'post_data_keys' => array_keys($postData),
                     'file_data_keys' => array_keys($fileData),
-                    'request_method' => $requestMethod
+                    'request_method' => $requestMethod,
+                    'post_data_sample' => array_slice($postData, 0, 10, true) // 처음 10개 필드만
                 ]);
-                ResponseHelper::error($validationResult['message'], 400, $validationResult['errors'] ?? []);
+                ResponseHelper::error($errorMessage, 400, $validationResult['errors'] ?? []);
                 return;
             }
             
