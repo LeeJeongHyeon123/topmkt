@@ -700,6 +700,32 @@ function removeInstructorImage(index) {
     }
 }
 
+// 오류 표시/제거 함수 (전역으로 정의 - 수정 모드 스크립트에서도 접근 가능)
+function showError(fieldName, message) {
+    const errorElement = document.getElementById(fieldName + '-error');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+    const field = document.getElementById(fieldName);
+    if (field) {
+        field.style.borderColor = '#e53e3e';
+    }
+}
+
+function clearError(fieldName) {
+    const errorElement = document.getElementById(fieldName + '-error');
+    if (errorElement) {
+        errorElement.style.display = 'none';
+    }
+
+    const field = document.getElementById(fieldName);
+    if (field) {
+        field.style.borderColor = '#e2e8f0';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
     const form = document.getElementById('lectureForm');
@@ -2014,32 +2040,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         return isValid;
-    }
-    
-    // 오류 표시 함수
-    function showError(fieldName, message) {
-        const errorElement = document.getElementById(fieldName + '-error');
-        if (errorElement) {
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
-        
-        const field = document.getElementById(fieldName);
-        if (field) {
-            field.style.borderColor = '#e53e3e';
-        }
-    }
-    
-    function clearError(fieldName) {
-        const errorElement = document.getElementById(fieldName + '-error');
-        if (errorElement) {
-            errorElement.style.display = 'none';
-        }
-        
-        const field = document.getElementById(fieldName);
-        if (field) {
-            field.style.borderColor = '#e2e8f0';
-        }
     }
 
     // 🚀 v3.64.0: Loading 컴포넌트 사용 (overlay 메서드)
