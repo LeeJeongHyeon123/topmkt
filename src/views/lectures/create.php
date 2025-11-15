@@ -1908,18 +1908,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
-        // 수정 모드와 등록 모드에 따라 다른 엔드포인트와 HTTP 메서드 사용
-        const apiPromise = isEditMode
-            ? ApiClient.put(`/lectures/${formData.get('lecture_id')}/update`, formData, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                noLoading: true
-            })
-            : ApiClient.post('/lectures/store', formData, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                noLoading: true
-            });
+        // 수정 모드와 등록 모드에 따라 다른 엔드포인트 사용
+        // 주의: PUT 요청 시 PHP는 $_POST를 파싱하지 않으므로, POST + _method=PUT 사용
+        if (isEditMode) {
+            formData.append('_method', 'PUT');
+        }
 
-        apiPromise.then(data => {
+        const apiUrl = isEditMode
+            ? `/lectures/${formData.get('lecture_id')}/update`
+            : '/lectures/store';
+
+        ApiClient.post(apiUrl, formData, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            noLoading: true
+        }).then(data => {
             showLoading(false);
 
             if (data.success || (data.data && data.data.success)) {
