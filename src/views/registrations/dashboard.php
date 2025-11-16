@@ -126,6 +126,7 @@ require_once SRC_PATH . '/components/ui/Card.php';
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
     transition: all 0.2s ease;
+    max-width: 500px; /* 1개 카드가 전체 너비 차지하는 것 방지 */
 }
 
 .lecture-card:hover {
