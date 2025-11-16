@@ -37,15 +37,18 @@ class RegistrationDashboardController extends BaseController
         $userId = AuthMiddleware::getCurrentUserId();
         
         try {
-            // 날짜 필터 파라미터 처리
-            $startDate = $_GET['start_date'] ?? null;
-            $endDate = $_GET['end_date'] ?? null;
-            $contentType = $_GET['type'] ?? 'lecture'; // 새로운 파라미터: lecture | event
-            
-            // 기본값: 최근 1년
-            if (!$startDate || !$endDate) {
-                $startDate = date('Y-m-d', strtotime('-1 year'));
-                $endDate = date('Y-m-d');
+            // v3.98.15 - 전체 보기 체크박스 파라미터 처리
+            $showAll = isset($_GET['show_all']) && $_GET['show_all'] === '1';
+            $contentType = $_GET['type'] ?? 'lecture'; // lecture | event
+
+            // 날짜 필터 적용 여부 결정
+            if ($showAll) {
+                // 전체 보기: 날짜 제한 없음
+                $dateFilter = false;
+            } else {
+                // 기본값: 오늘부터 미래만 (예정된 강의/행사)
+                $dateFilter = true;
+                $currentDate = date('Y-m-d');
             }
             
             // 내 강의/행사 목록 조회 (날짜 필터 및 컨텐츠 타입 적용)
@@ -53,7 +56,7 @@ class RegistrationDashboardController extends BaseController
             if ($contentType === 'event') {
                 // 행사의 경우 event_registrations 테이블 사용
                 $lecturesQuery = "
-                    SELECT 
+                    SELECT
                         l.id, l.title, l.start_date, l.start_time, l.end_date, l.end_time,
                         l.max_participants, l.auto_approval,
                         l.registration_end_date, l.content_type, l.location_type,
@@ -65,9 +68,9 @@ class RegistrationDashboardController extends BaseController
                         COUNT(DISTINCT CASE WHEN er.status = 'waiting' THEN er.id END) as waiting_count
                     FROM lectures l
                     LEFT JOIN event_registrations er ON l.id = er.event_id
-                    WHERE l.user_id = ? AND l.status = 'published' 
-                    AND l.content_type = ?
-                    AND l.start_date >= ? AND l.start_date <= ?
+                    WHERE l.user_id = ? AND l.status = 'published'
+                    AND l.content_type = ?" .
+                    ($dateFilter ? " AND l.end_date >= ?" : "") . "
                     GROUP BY l.id, l.title, l.start_date, l.start_time, l.end_date, l.end_time,
                              l.max_participants, l.auto_approval, l.registration_end_date,
                              l.content_type, l.location_type
@@ -76,7 +79,7 @@ class RegistrationDashboardController extends BaseController
             } else {
                 // 강의의 경우 lecture_registrations 테이블 사용
                 $lecturesQuery = "
-                    SELECT 
+                    SELECT
                         l.id, l.title, l.start_date, l.start_time, l.end_date, l.end_time,
                         l.max_participants, l.auto_approval,
                         l.registration_end_date, l.content_type, l.location_type,
@@ -88,27 +91,33 @@ class RegistrationDashboardController extends BaseController
                         COUNT(DISTINCT CASE WHEN lr.status = 'waiting' THEN lr.id END) as waiting_count
                     FROM lectures l
                     LEFT JOIN lecture_registrations lr ON l.id = lr.lecture_id
-                    WHERE l.user_id = ? AND l.status = 'published' 
-                    AND l.content_type = ?
-                    AND l.start_date >= ? AND l.start_date <= ?
+                    WHERE l.user_id = ? AND l.status = 'published'
+                    AND l.content_type = ?" .
+                    ($dateFilter ? " AND l.end_date >= ?" : "") . "
                     GROUP BY l.id, l.title, l.start_date, l.start_time, l.end_date, l.end_time,
                              l.max_participants, l.auto_approval, l.registration_end_date,
                              l.content_type, l.location_type
                     ORDER BY l.start_date DESC, l.created_at DESC
                 ";
             }
-            
-            $lectures = $this->db->fetchAll($lecturesQuery, [$userId, $contentType, $startDate, $endDate]);
+
+            // 파라미터 준비: 날짜 필터 적용 시에만 $currentDate 추가
+            $params = [$userId, $contentType];
+            if ($dateFilter) {
+                $params[] = $currentDate;
+            }
+
+            $lectures = $this->db->fetchAll($lecturesQuery, $params);
             
             // 각 강의/행사의 신청 상태 계산
             foreach ($lectures as &$lecture) {
                 $lecture['registration_status'] = $this->calculateRegistrationStatus($lecture);
             }
-            
+
             // 대시보드 통계 계산 (컨텐츠 타입별)
-            $stats = $this->getDashboardStats($userId, $contentType, $startDate, $endDate);
+            $stats = $this->getDashboardStats($userId, $contentType, $dateFilter, $currentDate ?? null);
             
-            // 최근 신청 목록 (최근 20개, 컨텐츠 타입별) - v3.74.0: 날짜 필터 적용
+            // 최근 신청 목록 (최근 20개, 컨텐츠 타입별) - v3.98.15: 날짜 필터 적용
             if ($contentType === 'event') {
                 // 행사의 경우 event_registrations 테이블 사용
                 $recentRegistrationsQuery = "
@@ -118,8 +127,8 @@ class RegistrationDashboardController extends BaseController
                         l.title as lecture_title, l.id as lecture_id, l.content_type
                     FROM event_registrations r
                     JOIN lectures l ON r.event_id = l.id
-                    WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?
-                    AND l.start_date >= ? AND l.start_date <= ?
+                    WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?" .
+                    ($dateFilter ? " AND l.end_date >= ?" : "") . "
                     ORDER BY r.created_at DESC
                     LIMIT 20
                 ";
@@ -132,14 +141,20 @@ class RegistrationDashboardController extends BaseController
                         l.title as lecture_title, l.id as lecture_id, l.content_type
                     FROM lecture_registrations r
                     JOIN lectures l ON r.lecture_id = l.id
-                    WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?
-                    AND l.start_date >= ? AND l.start_date <= ?
+                    WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?" .
+                    ($dateFilter ? " AND l.end_date >= ?" : "") . "
                     ORDER BY r.created_at DESC
                     LIMIT 20
                 ";
             }
 
-            $recentRegistrations = $this->db->fetchAll($recentRegistrationsQuery, [$userId, $contentType, $startDate, $endDate]);
+            // 최근 신청 목록 파라미터 준비
+            $recentParams = [$userId, $contentType];
+            if ($dateFilter) {
+                $recentParams[] = $currentDate;
+            }
+
+            $recentRegistrations = $this->db->fetchAll($recentRegistrationsQuery, $recentParams);
             
             // 뷰 렌더링
             $pageTitle = '신청 관리 대시보드';
@@ -480,13 +495,13 @@ class RegistrationDashboardController extends BaseController
     /**
      * 대시보드 통계 정보 (컨텐츠 타입별)
      */
-    private function getDashboardStats($userId, $contentType = 'lecture', $startDate = null, $endDate = null)
+    private function getDashboardStats($userId, $contentType = 'lecture', $dateFilter = false, $currentDate = null)
     {
         // content_type에 따라 적절한 테이블 사용하여 직접 집계
         if ($contentType === 'event') {
             // 행사의 경우 event_registrations 테이블 사용
             $statsQuery = "
-                SELECT 
+                SELECT
                     COUNT(DISTINCT l.id) as total_lectures,
                     COUNT(DISTINCT er.id) as total_applications,
                     COUNT(DISTINCT CASE WHEN er.status = 'pending' THEN er.id END) as pending_applications,
@@ -494,12 +509,12 @@ class RegistrationDashboardController extends BaseController
                     COUNT(DISTINCT CASE WHEN er.status = 'rejected' THEN er.id END) as rejected_applications
                 FROM lectures l
                 LEFT JOIN event_registrations er ON l.id = er.event_id
-                WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?
-            ";
+                WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?" .
+                ($dateFilter ? " AND l.end_date >= ?" : "");
         } else {
             // 강의의 경우 lecture_registrations 테이블 사용
             $statsQuery = "
-                SELECT 
+                SELECT
                     COUNT(DISTINCT l.id) as total_lectures,
                     COUNT(DISTINCT lr.id) as total_applications,
                     COUNT(DISTINCT CASE WHEN lr.status = 'pending' THEN lr.id END) as pending_applications,
@@ -507,19 +522,17 @@ class RegistrationDashboardController extends BaseController
                     COUNT(DISTINCT CASE WHEN lr.status = 'rejected' THEN lr.id END) as rejected_applications
                 FROM lectures l
                 LEFT JOIN lecture_registrations lr ON l.id = lr.lecture_id
-                WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?
-            ";
+                WHERE l.user_id = ? AND l.status = 'published' AND l.content_type = ?" .
+                ($dateFilter ? " AND l.end_date >= ?" : "");
         }
-        
+
         $params = [$userId, $contentType];
-        
-        // 날짜 필터 추가
-        if ($startDate && $endDate) {
-            $statsQuery .= " AND l.start_date >= ? AND l.start_date <= ?";
-            $params[] = $startDate;
-            $params[] = $endDate;
+
+        // 날짜 필터 적용 시 현재 날짜 추가
+        if ($dateFilter && $currentDate) {
+            $params[] = $currentDate;
         }
-        
+
         return $this->db->fetch($statsQuery, $params);
     }
     

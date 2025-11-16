@@ -357,55 +357,39 @@ require_once SRC_PATH . '/components/ui/Card.php';
     gap: 8px;
 }
 
-.dashboard-filter-controls label {
-    color: #4a5568;
-    font-weight: 500;
-    font-size: 0.85rem;
-    margin: 0;
-    white-space: nowrap;
-}
-
-.dashboard-filter-controls .filter-date-input {
-    width: 140px;
-    padding: 6px 10px;
-    border: 1px solid #cbd5e0;
-    border-radius: 4px;
-    background: white;
+/* v3.98.15 - 전체 보기 체크박스 스타일 */
+.filter-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
     color: #2d3748;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
-}
-
-.dashboard-filter-controls .filter-date-input:hover {
-    border-color: #667eea;
-}
-
-.dashboard-filter-controls .filter-date-input:focus {
-    border-color: #667eea;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-}
-
-.dashboard-filter-controls .btn-filter {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
     cursor: pointer;
+    padding: 12px 20px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
     transition: all 0.2s ease;
-    white-space: nowrap;
+    margin: 0;
 }
 
-.dashboard-filter-controls .btn-filter-apply {
-    background: #667eea;
-    color: white;
+.filter-checkbox-label:hover {
+    border-color: #667eea;
+    background: #f7fafc;
 }
 
-.dashboard-filter-controls .btn-filter-apply:hover {
-    background: #5a67d8;
+.filter-checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #667eea;
 }
 
+.filter-checkbox-label span {
+    font-weight: 600;
+}
+
+/* 레거시 날짜 필터 스타일 (v3.98.15 제거 예정) */
 .dashboard-filter-controls .btn-filter-reset {
     background: #f7fafc;
     color: #4a5568;
@@ -614,19 +598,17 @@ require_once SRC_PATH . '/components/ui/Card.php';
         </div>
     </div>
 
-    <!-- 글로벌 대시보드 필터 (v3.75.0 - 좌우 배치 버전) -->
+    <!-- 글로벌 대시보드 필터 (v3.98.15 - 전체 보기 체크박스) -->
     <div class="dashboard-filter-wrapper">
-        <h3 class="dashboard-filter-title">📊 기간별 현황</h3>
+        <h3 class="dashboard-filter-title">📊 신청 현황</h3>
 
         <div class="dashboard-filter-controls">
-            <label for="startDate">시작일</label>
-            <input type="date" id="startDate" class="filter-date-input" value="<?= htmlspecialchars($_GET['start_date'] ?? date('Y-m-d', strtotime('-1 month'))) ?>">
-
-            <label for="endDate">종료일</label>
-            <input type="date" id="endDate" class="filter-date-input" value="<?= htmlspecialchars($_GET['end_date'] ?? date('Y-m-d')) ?>">
-
-            <button type="button" class="btn-filter btn-filter-apply" onclick="applyDateFilter()">필터 적용</button>
-            <button type="button" class="btn-filter btn-filter-reset" onclick="resetDateFilter()">초기화</button>
+            <label class="filter-checkbox-label">
+                <input type="checkbox" id="showAll"
+                       onchange="toggleShowAll()"
+                       <?= isset($_GET['show_all']) && $_GET['show_all'] === '1' ? 'checked' : '' ?>>
+                <span>전체 보기 (종료된 강의/행사 포함)</span>
+            </label>
         </div>
     </div>
 
@@ -821,36 +803,19 @@ require_once SRC_PATH . '/components/ui/Card.php';
 </div>
 
 <script>
-// 날짜 필터 기능 (v3.75.0 - 네이티브 date input 사용)
-function applyDateFilter() {
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
+// v3.98.15 - 전체 보기 체크박스 토글 기능
+function toggleShowAll() {
+    const checkbox = document.getElementById('showAll');
+    const url = new URL(window.location.href);
 
-    const startDate = startDateInput.value;
-    const endDate = endDateInput.value;
-
-    if (!startDate || !endDate) {
-        Toast.info('시작일과 종료일을 모두 선택해주세요.');
-        return;
+    if (checkbox.checked) {
+        // 체크 시: 전체 보기 (과거 포함)
+        url.searchParams.set('show_all', '1');
+    } else {
+        // 체크 해제 시: 미래만 보기 (기본값)
+        url.searchParams.delete('show_all');
     }
 
-    if (startDate > endDate) {
-        Toast.error('시작일이 종료일보다 늦을 수 없습니다.');
-        return;
-    }
-
-    // 현재 URL에 날짜 파라미터 추가
-    const url = new URL(window.location.href);
-    url.searchParams.set('start_date', startDate);
-    url.searchParams.set('end_date', endDate);
-    window.location.href = url.toString();
-}
-
-function resetDateFilter() {
-    // URL에서 날짜 파라미터 제거
-    const url = new URL(window.location.href);
-    url.searchParams.delete('start_date');
-    url.searchParams.delete('end_date');
     window.location.href = url.toString();
 }
 
@@ -858,50 +823,6 @@ function resetDateFilter() {
 function switchContentType(type) {
     const url = new URL(window.location.href);
     url.searchParams.set('type', type);
-    // 날짜 필터는 유지
     window.location.href = url.toString();
 }
-
-// 페이지 로드 시 날짜 input에 min/max 설정
-document.addEventListener('DOMContentLoaded', function() {
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
-
-    // 시작일 변경 시 종료일의 최소값 설정
-    if (startDateInput && endDateInput) {
-        startDateInput.addEventListener('change', function() {
-            endDateInput.min = this.value;
-        });
-
-        // 종료일 변경 시 시작일의 최대값 설정
-        endDateInput.addEventListener('change', function() {
-            startDateInput.max = this.value;
-        });
-
-        // 초기 min/max 설정
-        if (startDateInput.value) {
-            endDateInput.min = startDateInput.value;
-        }
-        if (endDateInput.value) {
-            startDateInput.max = endDateInput.value;
-        }
-
-        // input 클릭 시 달력 picker 자동 표시 (v3.75.1)
-        startDateInput.addEventListener('click', function() {
-            try {
-                this.showPicker();
-            } catch (error) {
-                // showPicker()를 지원하지 않는 브라우저는 기본 동작 사용
-            }
-        });
-
-        endDateInput.addEventListener('click', function() {
-            try {
-                this.showPicker();
-            } catch (error) {
-                // showPicker()를 지원하지 않는 브라우저는 기본 동작 사용
-            }
-        });
-    }
-});
 </script>
