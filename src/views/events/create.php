@@ -2170,6 +2170,28 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('❌ Quill 에디터 초기화 실패');
         }
     }, 1000);
+
+    // 날짜/시간 input 클릭 시 picker 자동 열기
+    const dateTimeInputs = [
+        'start_date', 'end_date', 'start_time', 'end_time', 'registration_deadline'
+    ];
+
+    dateTimeInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('click', function() {
+                // showPicker() 메서드 지원 여부 확인 (최신 브라우저)
+                if (typeof this.showPicker === 'function') {
+                    try {
+                        this.showPicker();
+                    } catch (error) {
+                        // 일부 브라우저에서는 사용자 제스처 없이 호출 시 오류 발생 가능
+                        console.log('Picker 자동 열기 실패 (브라우저 제한):', error);
+                    }
+                }
+            });
+        }
+    });
 });
 
 // 전역 오류 핸들러

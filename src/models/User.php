@@ -1126,15 +1126,39 @@ class User {
                 }
             }
 
-            // 4. 기업회원 체크 - 진행 중인 강의가 있는지 확인
+            // 4. 기업회원 체크 - 진행 중인 강의/행사가 있는지 확인
             if ($user['role'] === 'ROLE_CORP' || $user['role'] === 'ROLE_CORPORATE') {
-                $activeLectureSql = "SELECT COUNT(*) as count FROM lectures
-                                     WHERE user_id = ? AND status = 'published'
-                                     AND end_date >= CURDATE()";
-                $activeLectures = $this->db->fetch($activeLectureSql, [$userId]);
+                // 강의 개수 확인
+                $lectureSql = "SELECT COUNT(*) as count FROM lectures
+                               WHERE user_id = ? AND status = 'published'
+                               AND content_type = 'lecture'
+                               AND end_date >= CURDATE()";
+                $lectureCount = $this->db->fetch($lectureSql, [$userId]);
 
-                if ($activeLectures['count'] > 0) {
-                    return ['success' => false, 'message' => '진행 중인 강의가 있어 탈퇴할 수 없습니다.'];
+                // 행사 개수 확인
+                $eventSql = "SELECT COUNT(*) as count FROM lectures
+                             WHERE user_id = ? AND status = 'published'
+                             AND content_type = 'event'
+                             AND end_date >= CURDATE()";
+                $eventCount = $this->db->fetch($eventSql, [$userId]);
+
+                $totalCount = $lectureCount['count'] + $eventCount['count'];
+
+                if ($totalCount > 0) {
+                    // 구체적인 메시지 생성
+                    $items = [];
+                    if ($lectureCount['count'] > 0) {
+                        $items[] = "강의 {$lectureCount['count']}개";
+                    }
+                    if ($eventCount['count'] > 0) {
+                        $items[] = "행사 {$eventCount['count']}개";
+                    }
+                    $itemsText = implode(', ', $items);
+
+                    return [
+                        'success' => false,
+                        'message' => "등록된 {$itemsText}가 있어 탈퇴할 수 없습니다.\n먼저 해당 강의/행사를 삭제하거나 종료 처리해주세요."
+                    ];
                 }
             }
 

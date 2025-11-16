@@ -1350,7 +1350,7 @@ document.getElementById('delete-account-btn').addEventListener('click', async fu
     <ul style="margin: 0; padding-left: 20px;">
         <li>탈퇴 시 모든 개인정보가 <strong>삭제되며 복구할 수 없습니다</strong>.</li>
         <li>작성한 게시글과 댓글은 유지되나 <strong>"탈퇴한 회원"</strong>으로 표시됩니다.</li>
-        <li>진행 중인 강의나 행사가 있으면 탈퇴할 수 없습니다.</li>
+        <li><strong>기업회원</strong>의 경우, 등록된 강의나 행사가 있으면 탈퇴할 수 없습니다. 먼저 해당 강의/행사를 삭제하거나 종료 처리해주세요.</li>
         <li>30일 이내 고객센터를 통해 복구 신청이 가능하나, <strong>개인정보는 복구되지 않습니다</strong>.</li>
     </ul>
     <br>
@@ -1468,16 +1468,28 @@ async function confirmDeleteAccount() {
     Loading.button(deleteBtn, true, { text: '처리 중...' });
 
     // v3.42.0: ApiClient 사용
-    ApiClient.post('/api/user/delete-account', {
-        password: password,
-        reason: reason,
-        csrf_token: '<?php echo $_SESSION['csrf_token']; ?>'
-    }, { noLoading: true })
+    // fetch 직접 사용으로 변경 (ApiClient가 400 오류에서 throw하므로)
+    fetch('/api/user/delete-account', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            password: password,
+            reason: reason,
+            csrf_token: '<?php echo $_SESSION['csrf_token']; ?>'
+        })
+    })
+    .then(response => response.json())
     .then(data => {
-        // ResponseHelper 응답 구조에 맞게 수정
-        const result = data.data || data;
-        const isSuccess = result.success || data.status === 'success';
-        const message = result.message || data.message || '회원탈퇴 처리에 실패했습니다.';
+        // ResponseHelper 응답 구조 처리
+        // { status: 'success'/'error', data: { success: true/false, message: '...' } }
+        const isSuccess = data.status === 'success' || (data.data && data.data.success);
+
+        // 메시지 추출: data.data.message 우선, 빈 문자열 필터링
+        const message = (data.data && data.data.message)
+            || (data.message && data.message.trim())
+            || '회원탈퇴 처리에 실패했습니다.';
 
         if (isSuccess) {
             Toast.warning('회원탈퇴가 완료되었습니다.\n\n그동안 이용해주셔서 감사합니다.');

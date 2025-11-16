@@ -2874,10 +2874,10 @@ class LectureController extends BaseController {
                     
                     // 성공 응답
                     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-                        ResponseHelper::success('강의가 성공적으로 수정되었습니다.', [
+                        ResponseHelper::success([
                             'lecture_id' => $lectureId,
                             'redirect_url' => "/lectures/{$lectureId}"
-                        ]);
+                        ], '강의가 성공적으로 수정되었습니다.');
                     } else {
                         $_SESSION['success_message'] = '강의가 성공적으로 수정되었습니다.';
                         header("Location: /lectures/{$lectureId}");

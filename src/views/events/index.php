@@ -80,28 +80,18 @@ if (file_exists($styleFile)) {
                                          data-date="<?= $day['date'] ?>"
                                          data-event-count="<?= count($day['events'] ?? []) ?>">
                                         <div class="day-number"><?= $day['day'] ?></div>
-                                        <?php 
+                                        <?php
                                         $dayEvents = $day['events'] ?? [];
-                                        $maxVisible = 3; // 최대 표시할 일정 수
-                                        $visibleEvents = array_slice($dayEvents, 0, $maxVisible);
-                                        $remainingCount = count($dayEvents) - $maxVisible;
                                         ?>
-                                        
-                                        <?php foreach ($visibleEvents as $event): ?>
-                                            <a href="/events/detail?id=<?= $event['id'] ?>" 
+
+                                        <?php foreach ($dayEvents as $event): ?>
+                                            <a href="/events/detail?id=<?= $event['id'] ?>"
                                                class="event-item"
                                                title="<?= htmlspecialchars($event['title']) ?>">
                                                 <span class="event-time"><?= date('H:i', strtotime($event['start_time'])) ?></span>
                                                 <span class="event-title"><?= htmlspecialchars($event['title']) ?></span>
                                             </a>
                                         <?php endforeach; ?>
-                                        
-                                        <?php if ($remainingCount > 0): ?>
-                                            <div class="more-events-btn" 
-                                                 onclick="showDayEvents('<?= $day['date'] ?>', <?= $day['day'] ?>, <?= htmlspecialchars(json_encode($dayEvents), ENT_QUOTES) ?>)">
-                                                <span class="more-text">+<?= $remainingCount ?>개 더보기</span>
-                                            </div>
-                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -172,20 +162,6 @@ if (file_exists($styleFile)) {
     </div>
 </div>
 
-<!-- 일정 상세 모달 -->
-<div id="dayEventsModal" class="day-events-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title" id="modalTitle">일정 상세</h3>
-            <p class="modal-subtitle" id="modalSubtitle">날짜별 일정 목록</p>
-            <button class="modal-close" onclick="closeDayEventsModal()">&times;</button>
-        </div>
-        <div class="modal-body" id="modalBody">
-            <!-- 일정 목록이 여기에 동적으로 삽입됩니다 -->
-        </div>
-    </div>
-</div>
-
 <script>
 // 🌟 ULTRA THINK 모드 - 간단한 JavaScript v4.0
 document.addEventListener('DOMContentLoaded', function() {
@@ -231,118 +207,5 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = '?year=<?= $year ?>&month=<?= $month ?>&view=list';
         }
     });
-});
-
-/**
- * 날짜별 일정 상세 모달 표시
- */
-function showDayEvents(date, day, events) {
-    try {
-        const modal = document.getElementById('dayEventsModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalSubtitle = document.getElementById('modalSubtitle');
-        const modalBody = document.getElementById('modalBody');
-        
-        if (!modal || !modalTitle || !modalSubtitle || !modalBody) {
-            return;
-        }
-        
-        // 날짜 포맷팅
-        const dateObj = new Date(date + 'T00:00:00');
-        const options = { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            weekday: 'long'
-        };
-        const formattedDate = dateObj.toLocaleDateString('ko-KR', options);
-        
-        // 모달 헤더 설정
-        modalTitle.textContent = `${day}일 일정`;
-        modalSubtitle.textContent = `${formattedDate} · 총 ${events.length}개 일정`;
-        
-        // 모달 바디 내용 생성
-        let modalContent = '';
-        
-        if (events.length === 0) {
-            modalContent = '<div class="modal-empty">📅 이 날에는 예정된 일정이 없습니다.</div>';
-        } else {
-            // 시간 순으로 정렬
-            events.sort((a, b) => {
-                return new Date(`2000-01-01T${a.start_time}`) - new Date(`2000-01-01T${b.start_time}`);
-            });
-            
-            events.forEach(event => {
-                const startTime = event.start_time.substring(0, 5); // HH:MM 형식
-                const endTime = event.end_time.substring(0, 5);
-                
-                const categoryMap = {
-                    'conference': '컨퍼런스',
-                    'seminar': '세미나', 
-                    'workshop': '워크샵',
-                    'networking': '네트워킹',
-                    'exhibition': '전시회'
-                };
-                
-                const categoryName = categoryMap[event.category] || event.category;
-                
-                modalContent += `
-                    <a href="/events/detail?id=${event.id}" class="modal-event-item">
-                        <div class="modal-event-time">${startTime} - ${endTime}</div>
-                        <div class="modal-event-title">${escapeHtml(event.title)}</div>
-                        <div class="modal-event-meta">
-                            <span>👨‍🏫 ${escapeHtml(event.organizer_name || '미정')}</span>
-                            <span>📍 ${escapeHtml(event.venue_name || '오프라인')}</span>
-                            <span>🏷️ ${categoryName}</span>
-                        </div>
-                    </a>
-                `;
-            });
-        }
-        
-        modalBody.innerHTML = modalContent;
-        
-        // 모달 표시
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
-        
-        // 모달 외부 클릭 시 닫기
-        modal.onclick = function(event) {
-            if (event.target === modal) {
-                closeDayEventsModal();
-            }
-        };
-        
-        
-    } catch (error) {
-        Toast.error('일정을 불러오는 중 오류가 발생했습니다.');
-    }
-}
-
-/**
- * 날짜별 일정 모달 닫기
- */
-function closeDayEventsModal() {
-    const modal = document.getElementById('dayEventsModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto'; // 배경 스크롤 복원
-    }
-}
-
-/**
- * HTML 이스케이프 함수
- */
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// ESC 키로 모달 닫기
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeDayEventsModal();
-    }
 });
 </script>

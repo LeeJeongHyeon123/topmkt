@@ -215,7 +215,134 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.98.0 ~ v3.98.13) - 2025-11-03/15
+## 최근 주요 작업 (v3.98.0 ~ v3.98.14) - 2025-11-03/15
+
+### v3.98.14 - 기업 회원 탈퇴 에러 메시지 완전 개선 (2025-11-15) 🔥
+**Ultra Think 모드 - 3단계 근본 원인 분석 및 해결**
+
+#### 문제 1: 기업 회원 신청 관리 메뉴 권한 버그
+**증상**: `corp_status = 'pending'` 사용자에게도 "신청 관리" 메뉴 표시
+
+**근본 원인**:
+```php
+// CorporateMiddleware.php Line 50
+$result = $db->fetch($sql, [$_SESSION['user_id']]);
+return $result !== false;  // ❌ Bug: null !== false = true
+```
+- `Database::fetch()`는 결과 없을 때 `null` 반환 (not `false`)
+- PHP에서 `null !== false`는 `true`로 평가됨
+- 승인되지 않은 사용자도 권한 획득
+
+**해결**:
+```php
+return !empty($result);  // ✅ Fix: !empty(null) = false
+```
+
+**수정 파일**: `src/middlewares/CorporateMiddleware.php` (Line 50)
+
+#### 문제 2: 기업 회원 탈퇴 불가 에러 메시지 개선
+**증상**: 강의/행사가 있을 때 일반적인 "탈퇴 중 오류가 발생하였다" 메시지만 표시
+
+**개선 내용**:
+```php
+// User.php Lines 1129-1163
+// Before: 단순 개수만 체크
+if ($activeLectures['count'] > 0) {
+    return ['success' => false, 'message' => '진행 중인 강의가 있어 탈퇴할 수 없습니다.'];
+}
+
+// After: 강의/행사 구분 + 구체적 메시지
+$lectureCount = // 강의 개수
+$eventCount = // 행사 개수
+
+return [
+    'success' => false,
+    'message' => "등록된 강의 3개, 행사 1개가 있어 탈퇴할 수 없습니다.\n먼저 해당 강의/행사를 삭제하거나 종료 처리해주세요."
+];
+```
+
+**수정 파일**: `src/models/User.php` (Lines 1129-1163)
+
+#### 문제 3: 프론트엔드 메시지 표시 완전 수정
+**증상**: 백엔드는 정확한 메시지 반환하지만 Toast에는 일반적인 에러만 표시
+
+**근본 원인 분석 (3단계)**:
+
+1. **1차 원인**: 빈 문자열 필터링 실패
+   ```json
+   {
+       "status": "error",
+       "data": { "message": "등록된 강의 3개..." },
+       "message": ""  // ← 빈 문자열!
+   }
+   ```
+   ```javascript
+   // ❌ 빈 문자열도 truthy 취급
+   const message = data.data.message || data.message || '기본 메시지';
+   ```
+
+2. **2차 원인**: ApiClient가 400 오류에서 throw
+   ```javascript
+   // api-client.js.php Line 345-347
+   if (!response.ok) {
+       await this.handleHttpError(response, options);  // throw 발생!
+   }
+   // ❌ Line 350의 응답 파싱에 도달하지 못함
+   ```
+
+3. **최종 원인**: `.catch()` 블록으로 이동하여 일반 메시지 표시
+   ```javascript
+   .catch(error => {
+       Toast.error('회원탈퇴 처리 중 오류가 발생했습니다.');  // ← 여기서 출력
+   });
+   ```
+
+**해결 방법**:
+```javascript
+// edit.php Lines 1472-1519
+// ApiClient 대신 fetch 직접 사용
+fetch('/api/user/delete-account', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password, reason, csrf_token })
+})
+.then(response => response.json())  // ✅ HTTP 상태 무관하게 파싱
+.then(data => {
+    const isSuccess = data.status === 'success' || (data.data && data.data.success);
+
+    // ✅ 빈 문자열 필터링 + data.data.message 우선
+    const message = (data.data && data.data.message)
+        || (data.message && data.message.trim())
+        || '회원탈퇴 처리에 실패했습니다.';
+
+    Toast.error(message);  // ✅ 정확한 메시지 표시
+});
+```
+
+**수정 파일**: `src/views/user/edit.php` (Lines 1472-1519, 1353 경고문)
+
+#### 문제 4: CSP 에러 수정
+**증상**: cropperjs가 cdnjs.cloudflare.com에서 차단됨
+
+**해결**:
+```apache
+# .htaccess Line 87
+Header always set Content-Security-Policy "... script-src ... https://cdnjs.cloudflare.com ..."
+```
+
+**수정 파일**: `public/.htaccess` (Line 87)
+
+**최종 결과**:
+- ✅ 기업 회원 메뉴 권한 정확히 제어
+- ✅ 강의 3개, 행사 1개 등 구체적 메시지 표시
+- ✅ Toast에 정확한 백엔드 메시지 출력
+- ✅ CSP 정책 업데이트 완료
+
+**기술적 교훈**:
+1. `Database::fetch()` 반환값: `null` vs `false` 명확히 구분
+2. ApiClient 400 오류 시 throw → 응답 본문 읽을 수 없음
+3. 빈 문자열도 falsy지만 `||` 연산자로 필터링 불가
+4. Ultra Think 모드로 3단계 근본 원인 분석 → 완벽한 해결
 
 ### v3.98.13 - 강의 등록 디버깅 로그 제거 (2025-11-15) 🧹
 **프로덕션 준비 완료 - 디버깅 로그 정리**

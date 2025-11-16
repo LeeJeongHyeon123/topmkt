@@ -46,8 +46,8 @@ class CorporateMiddleware {
             
             $sql = "SELECT corp_status FROM users WHERE id = ? AND corp_status = 'approved'";
             $result = $db->fetch($sql, [$_SESSION['user_id']]);
-            
-            return $result !== false;
+
+            return !empty($result);
             
         } catch (Exception $e) {
             error_log('CorporateMiddleware::hasCorpPermission() error: ' . $e->getMessage());
