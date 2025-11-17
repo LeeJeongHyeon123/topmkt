@@ -710,8 +710,9 @@ if (window.innerWidth <= 768) {
         box-sizing: border-box !important;
     }
 
-    /* 모바일 타이틀 크기 조정 (v4.2.3) - 중복 방지 주석 */
-    .events-header h1 {
+    /* 모바일 타이틀 크기 조정 (v4.2.3) - 인라인 스타일 오버라이드 */
+    .events-header h1,
+    .gradient-header h1 {
         font-size: 1.6rem !important;
     }
 

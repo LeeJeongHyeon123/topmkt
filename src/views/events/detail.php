@@ -44,11 +44,13 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
 
 <!-- 행사 상세 페이지 스타일 include - 강의 페이지와 동일한 방식 -->
+<style>
 <?php
 if (isset($styleFile) && file_exists($styleFile)) {
     echo file_get_contents($styleFile);
 }
 ?>
+</style>
 
 <div class="event-detail-container">
     <!-- 행사 히어로 섹션 -->
@@ -783,13 +785,13 @@ if (isset($styleFile) && file_exists($styleFile)) {
 
 <!-- 행사 신청 모달 -->
 <?php if ($isLoggedIn): ?>
-<div id="eventRegistrationModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title">📋 행사 신청</h3>
-            <button class="modal-close" onclick="closeEventRegistrationModal()">&times;</button>
+<div id="eventRegistrationModal" class="event-registration-modal" style="display: none;">
+    <div class="event-modal-content">
+        <div class="event-modal-header">
+            <h3 class="event-modal-title">📋 행사 신청</h3>
+            <button class="event-modal-close" onclick="closeEventRegistrationModal()">&times;</button>
         </div>
-        <div class="modal-body">
+        <div class="event-modal-body">
             <form id="eventRegistrationForm">
                 <!-- 개인 정보 섹션 -->
                 <div class="form-section">
@@ -862,7 +864,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                 </div>
             </form>
         </div>
-        <div class="modal-footer">
+        <div class="event-modal-footer">
             <button type="button" class="btn btn-secondary" onclick="closeEventRegistrationModal()">
                 취소
             </button>
@@ -1171,9 +1173,10 @@ function updateEventRegistrationUI(status, registration) {
             cancelBtn.style.setProperty('display', 'block', 'important');
             cancelBtn.textContent = '신청 취소 (승인 대기중)';
             cancelBtn.style.background = '#dc3545';
-            
+            cancelBtn.style.color = 'white';
+
             // 대기 상태 메시지 표시
-            showStatusMessage('pending', '🕒', '신청 검토 중입니다', 
+            showStatusMessage('pending', '🕒', '신청 검토 중입니다',
                 '신청이 접수되었습니다. 승인 결과를 기다려주세요.');
             break;
             
@@ -1182,7 +1185,8 @@ function updateEventRegistrationUI(status, registration) {
             cancelBtn.style.setProperty('display', 'block', 'important');
             cancelBtn.textContent = '신청 취소 (승인됨)';
             cancelBtn.style.background = '#dc3545';
-            
+            cancelBtn.style.color = 'white';
+
             // 승인 상태 메시지 표시
             const approvedMessage = registration?.admin_notes || '신청이 승인되었습니다. 행사에 참석해주세요.';
             showStatusMessage('approved', '✅', '신청이 승인되었습니다', approvedMessage);
@@ -1193,9 +1197,10 @@ function updateEventRegistrationUI(status, registration) {
             cancelBtn.style.setProperty('display', 'block', 'important');
             cancelBtn.textContent = `신청 취소 (대기: ${registration.waiting_order}번)`;
             cancelBtn.style.background = '#dc3545';
-            
+            cancelBtn.style.color = 'white';
+
             // 대기열 상태 메시지 표시
-            showStatusMessage('waiting', '⏳', `대기열 ${registration.waiting_order}번입니다`, 
+            showStatusMessage('waiting', '⏳', `대기열 ${registration.waiting_order}번입니다`,
                 '정원이 초과되어 대기열에 등록되었습니다. 승인 시 알림을 드리겠습니다.');
             break;
             

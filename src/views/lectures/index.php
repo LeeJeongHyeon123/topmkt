@@ -31,7 +31,8 @@ $monthNames = [
     overflow-x: auto;
 }
 
-.lectures-header {
+.lectures-header,
+.gradient-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 40px 20px;
@@ -44,13 +45,15 @@ $monthNames = [
     margin-right: auto;
 }
 
-.lectures-header h1 {
+.lectures-header h1,
+.gradient-header h1 {
     font-size: 2.5rem;
     margin-bottom: 10px;
     font-weight: 700;
 }
 
-.lectures-header p {
+.lectures-header p,
+.gradient-header p {
     font-size: 1.1rem;
     opacity: 0.9;
     margin: 0;
@@ -773,8 +776,15 @@ $monthNames = [
         margin-right: 0;
     }
     
-    .lectures-header h1 {
-        font-size: 1.6rem;
+    /* 강력한 셀렉터로 인라인 스타일 오버라이드 */
+    html body .lectures-header h1,
+    html body .gradient-header h1,
+    body .lectures-header h1,
+    body .gradient-header h1,
+    .lectures-header h1,
+    .gradient-header h1,
+    h1.gradient-header-title {
+        font-size: 1.6rem !important;
     }
     
     .lectures-header p {
@@ -1919,4 +1929,12 @@ document.addEventListener('keydown', function(event) {
         closeDayLecturesModal();
     }
 });
+
+// 모바일 h1 폰트 크기 강제 적용 (v4.2.3) - CSS cascade 우회
+if (window.innerWidth <= 768) {
+    const h1Elements = document.querySelectorAll('.gradient-header h1, .lectures-header h1, h1.gradient-header-title');
+    h1Elements.forEach(h1 => {
+        h1.style.setProperty('font-size', '1.6rem', 'important');
+    });
+}
 </script>

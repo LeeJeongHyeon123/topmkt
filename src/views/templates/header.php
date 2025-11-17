@@ -986,18 +986,24 @@
                         <span>알림 설정</span>
                     </a>
                     <?php
-                    // 기업 회원만 신청 관리 메뉴 표시 (자신의 강의/행사 신청 관리용)
+                    // 기업 회원(승인된)만 신청 관리 메뉴 표시 (자신의 강의/행사 신청 관리용)
+                    $showRegistrationMenu = false;
                     try {
-                        $currentUserRole = AuthMiddleware::getUserRole();
-                        if ($currentUserRole === 'ROLE_CORPORATE'): ?>
+                        if (file_exists(SRC_PATH . '/middlewares/CorporateMiddleware.php')) {
+                            require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
+                            $showRegistrationMenu = CorporateMiddleware::hasCorpPermission();
+                        }
+                    } catch (Exception $e) {
+                        error_log('Header registration menu check failed: ' . $e->getMessage());
+                        $showRegistrationMenu = false;
+                    }
+
+                    if ($showRegistrationMenu): ?>
                     <a href="/registrations" class="dropdown-item">
                         <i class="fas fa-clipboard-list"></i>
                         <span>신청 관리</span>
                     </a>
-                    <?php endif;
-                    } catch (Exception $e) {
-                        // 권한 확인 실패 시 메뉴 표시 안함
-                    } ?>
+                    <?php endif; ?>
                     
                     <?php 
                     // 관리자를 위한 관리자 대시보드 메뉴
@@ -2016,24 +2022,46 @@
         }
         
         // 데스크톱 드롭다운 생성 함수
+        <?php
+        // 데스크톱 드롭다운용 신청 관리 메뉴 HTML 생성
+        $desktopRegistrationMenuHtml = '';
+        $showRegistrationMenuDesktop = false;
+        try {
+            if (file_exists(SRC_PATH . '/middlewares/CorporateMiddleware.php')) {
+                require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
+                $showRegistrationMenuDesktop = CorporateMiddleware::hasCorpPermission();
+            }
+        } catch (Exception $e) {
+            error_log('Desktop dropdown registration menu check failed: ' . $e->getMessage());
+            $showRegistrationMenuDesktop = false;
+        }
+
+        if ($showRegistrationMenuDesktop) {
+            $desktopRegistrationMenuHtml = '<a href="/registrations" class="dropdown-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>신청 관리</span>
+            </a>';
+        }
+        ?>
+
         function createDesktopDropdown() {
             // 기존 드롭다운 확인
             let existingDropdown = document.getElementById('floating-user-dropdown');
-            
+
             if (existingDropdown) {
                 existingDropdown.remove();
                 userMenu.classList.remove('active');
                 return;
             }
-            
+
             userMenu.classList.add('active');
             const rect = userMenu.getBoundingClientRect();
-            
+
             // 현재 읽지 않은 메시지 수 가져오기
             const currentBadge = document.getElementById('chatNotificationBadge');
             const unreadCount = currentBadge ? parseInt(currentBadge.textContent) || 0 : 0;
             const badgeHtml = unreadCount > 0 ? `<span class="notification-badge dropdown-chat-badge">${unreadCount}</span>` : '';
-            
+
             // 관리자 메뉴 HTML 생성
             const adminMenuHtml = isAdmin ? `
                 <a href="/admin" class="dropdown-item admin-item">
@@ -2041,10 +2069,12 @@
                     <span>관리자 페이지</span>
                 </a>
                 <div class="dropdown-divider"></div>` : '';
-            
+
             const floatingDropdown = document.createElement('div');
             floatingDropdown.id = 'floating-user-dropdown';
             const userNickname = '<?= htmlspecialchars($currentUser['nickname'] ?? '사용자') ?>';
+            const registrationMenuHtml = `<?= $desktopRegistrationMenuHtml ?>`;
+
             floatingDropdown.innerHTML = `
                 <div class="dropdown-header">
                     <div class="user-info">
@@ -2065,19 +2095,7 @@
                     <i class="fas fa-bell"></i>
                     <span>알림 설정</span>
                 </a>
-                <?php
-                // 기업 회원만 신청 관리 메뉴 표시 (모바일 메뉴용, 자신의 강의/행사 신청 관리용)
-                try {
-                    $currentUserRoleMobile = AuthMiddleware::getUserRole();
-                    if ($currentUserRoleMobile === 'ROLE_CORPORATE'): ?>
-                <a href="/registrations" class="dropdown-item">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>신청 관리</span>
-                </a>
-                <?php endif;
-                } catch (Exception $e) {
-                    // 권한 확인 실패 시 메뉴 표시 안함
-                } ?>
+                ${registrationMenuHtml}
                 ${adminMenuHtml}
                 <div class="dropdown-divider"></div>
                 <a href="/auth/logout" class="dropdown-item logout-item">
