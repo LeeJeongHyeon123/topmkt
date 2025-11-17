@@ -215,7 +215,65 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v4.2.1 ~ v3.98.0) - 2025-11-03/17
+## 최근 주요 작업 (v4.2.2 ~ v3.98.0) - 2025-11-03/17
+
+### v4.2.2 - CorporateMiddleware Fatal Error 긴급 수정 (2025-11-17) 🔥
+**Ultra Think 7단계 근본 원인 분석 - 디렉토리 중복 문제 해결**
+
+**문제**: https://www.topmktx.com/lectures?view=list 페이지 Fatal Error (서비스 중단)
+- `Fatal error: Cannot declare class CorporateMiddleware, because the name is already in use`
+- 심각도: Critical
+
+**근본 원인 (Ultra Think 3단계)**:
+1. **디렉토리 중복**: `middleware/` (단수형, 구버전) + `middlewares/` (복수형, 최신)
+2. **참조 경로 불일치**:
+   - `header.php` → `middlewares/CorporateMiddleware.php` (최신)
+   - `LectureController.php` 등 6개 파일 → `middleware/CorporateMiddleware.php` (구버전)
+3. **클래스 중복 로드**: 두 파일이 모두 로드되어 Fatal Error
+
+**충돌 메커니즘**:
+```
+1. /lectures?view=list 접속
+2. header.php → middlewares/CorporateMiddleware.php 로드
+3. LectureController.php → middleware/CorporateMiddleware.php 로드
+4. Fatal Error: 클래스 중복 선언!
+```
+
+**왜 갑자기 발생했는가?**:
+- v3.98.14 작업 시 `middlewares/`로 리팩토링 시도
+- `header.php`만 새 경로로 변경, 나머지 파일들은 구 경로 유지
+- 불완전한 마이그레이션으로 인한 충돌
+
+**해결 방법 (Option A 채택)**:
+```bash
+# 1. 6개 파일 경로 일괄 변경
+sed -i "s|/middleware/CorporateMiddleware|/middlewares/CorporateMiddleware|g" \
+  src/controllers/LectureController.php \
+  src/controllers/EventController.php \
+  src/components/EventsControls.php \
+  src/views/lectures/index.php \
+  src/views/lectures/create.php \
+  src/views/events/create.php
+
+# 2. 구 디렉토리 완전 삭제
+rm -rf src/middleware
+```
+
+**개선 효과**:
+- ✅ Fatal Error 완전 해결
+- ✅ 최신 코드 유지 (v3.98.14 수정 포함)
+- ✅ 관리자 권한 체크 유지
+- ✅ `!empty($result)` 버그 수정 유지
+- ✅ 디렉토리 통일 (middlewares/ 단일 사용)
+
+**수정 파일**: 7개 (경로 변경 6개 + 디렉토리 삭제 1개)
+
+**재발 방지 대책**:
+1. 단일 디렉토리 원칙: `middlewares/` 복수형만 사용
+2. 리팩토링 시 모든 참조 일괄 변경 + `grep` 확인
+3. 구 디렉토리 즉시 삭제, 공존 금지
+
+---
 
 ### v4.2.1 - 공지사항 목록 HTML 엔티티 표시 오류 수정 (2025-11-17) 🐛
 **Ultra Think 7단계 체계적 분석 - Quill.js 인코딩 문제 해결**
