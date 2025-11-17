@@ -1224,49 +1224,44 @@ $monthNames = [
     position: relative;
 }
 
-/* v4.2.4: title과 close 버튼을 한 줄에 배치 */
-.modal-title-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.modal-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin: 0;
-    flex: 1;
-}
-
-.modal-subtitle {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin: 0;
-}
-
-/* v4.2.4: close 버튼을 relative positioning으로 변경 */
+/* v4.2.5: close 버튼을 우측 상단에 고정 */
 .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 25px;
     background: none;
     border: none;
     color: white;
     font-size: 1.8rem;
     cursor: pointer;
-    padding: 0 5px;
-    margin-left: 15px;
+    padding: 0;
     border-radius: 50%;
     width: 32px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
     transition: background-color 0.2s ease;
     line-height: 1;
 }
 
 .modal-close:hover {
     background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* v4.2.5: title만 표시 (wrapper 제거) */
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    padding-right: 40px; /* close 버튼 공간 확보 */
+}
+
+/* v4.2.5: subtitle을 title 바로 아래 배치 */
+.modal-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin: 0;
 }
 
 .modal-body {
@@ -1347,25 +1342,23 @@ $monthNames = [
         padding: 15px 20px;
     }
 
-    /* v4.2.4: 모바일에서도 title-wrapper 유지 */
-    .modal-title-wrapper {
-        margin-bottom: 6px;
-    }
-
+    /* v4.2.5: 모바일에서 텍스트 크기 조정 */
     .modal-title {
         font-size: 1.1rem;
+        margin: 0 0 6px 0;
     }
 
     .modal-subtitle {
         font-size: 0.85rem;
     }
 
-    /* v4.2.4: 모바일에서 close 버튼 크기 조정 */
+    /* v4.2.5: 모바일에서 close 버튼 위치/크기 조정 */
     .modal-close {
+        top: 15px;
+        right: 20px;
         font-size: 1.6rem;
         width: 28px;
         height: 28px;
-        margin-left: 10px;
     }
 
     .modal-body {
@@ -1773,11 +1766,9 @@ body {
 <div id="dayLecturesModal" class="day-lectures-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <div class="modal-title-wrapper">
-                <h3 class="modal-title" id="modalTitle">일정 상세</h3>
-                <button class="modal-close" onclick="closeDayLecturesModal()">&times;</button>
-            </div>
+            <h3 class="modal-title" id="modalTitle">일정 상세</h3>
             <p class="modal-subtitle" id="modalSubtitle">날짜별 일정 목록</p>
+            <button class="modal-close" onclick="closeDayLecturesModal()">&times;</button>
         </div>
         <div class="modal-body" id="modalBody">
             <!-- 일정 목록이 여기에 동적으로 삽입됩니다 -->
