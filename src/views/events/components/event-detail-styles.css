@@ -1,4 +1,3 @@
-<style>
 /* 행사 상세 페이지 스타일 (파란색 테마) - 강의 페이지와 동일한 최대 너비 적용 */
 .event-detail-container {
     max-width: 1650px; /* 강의 페이지와 동일한 최대 너비 적용 */
@@ -1634,4 +1633,3 @@
         padding: 15px !important;
     }
 }
-</style>
