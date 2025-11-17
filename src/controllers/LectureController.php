@@ -187,7 +187,7 @@ class LectureController extends BaseController {
         $currentUserId = AuthMiddleware::getCurrentUserId();
         
         // 기업회원 권한 확인
-        require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+        require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
         $permission = CorporateMiddleware::checkLectureEventPermission();
         
         if (!$permission['hasPermission']) {
@@ -255,7 +255,7 @@ class LectureController extends BaseController {
             
             // 기업회원 권한 확인
             file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "권한 확인 시작\n", FILE_APPEND);
-            require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+            require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
             $permission = CorporateMiddleware::checkLectureEventPermission();
             file_put_contents('/var/www/html/topmkt/logs/topmkt_errors.log', "권한 확인 결과: " . json_encode($permission) . "\n", FILE_APPEND);
             
@@ -984,7 +984,7 @@ class LectureController extends BaseController {
      * 강의 생성 권한 확인
      */
     private function canCreateLecture() {
-        require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+        require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
         $permission = CorporateMiddleware::checkLectureEventPermission();
         return $permission['hasPermission'];
     }
@@ -2436,7 +2436,7 @@ class LectureController extends BaseController {
             }
             
             // 기업회원 권한 확인
-            require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+            require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
             $permission = CorporateMiddleware::checkLectureEventPermission();
             
             if (!$permission['hasPermission']) {
@@ -2596,7 +2596,7 @@ class LectureController extends BaseController {
             }
 
             // 기업회원 권한 확인
-            require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+            require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
             $permission = CorporateMiddleware::checkLectureEventPermission();
 
             if (!$permission['hasPermission']) {
@@ -2683,7 +2683,7 @@ class LectureController extends BaseController {
             }
             
             // 기업회원 권한 확인
-            require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+            require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
             $permission = CorporateMiddleware::checkLectureEventPermission();
             
             if (!$permission['hasPermission']) {

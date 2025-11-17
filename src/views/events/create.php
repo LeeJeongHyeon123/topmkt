@@ -16,7 +16,7 @@ if (!$isLoggedIn) {
 }
 
 // 기업회원 권한 확인
-require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
 $permission = CorporateMiddleware::checkLectureEventPermission();
 
 if (!$permission['hasPermission']) {
@@ -821,12 +821,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="form-group">
                     <label for="start_date" class="form-label required">시작일</label>
                     <input type="date" id="start_date" name="start_date" class="form-input" required
+                           min="<?= date('Y-m-d') ?>"
                            value="<?= $isEditMode ? htmlspecialchars($event['start_date'] ?? '', ENT_QUOTES, 'UTF-8') : '' ?>">
                 </div>
                 <div class="form-group">
                     <label for="start_time" class="form-label required">시작시간</label>
                     <input type="time" id="start_time" name="start_time" class="form-input" required
-                           value="<?= $isEditMode && !empty($event['start_time']) ? htmlspecialchars(substr($event['start_time'], 0, 5), ENT_QUOTES, 'UTF-8') : '' ?>">
+                           value="<?= $isEditMode && !empty($event['start_time']) ? htmlspecialchars(substr($event['start_time'], 0, 5), ENT_QUOTES, 'UTF-8') : '00:00' ?>">
                 </div>
             </div>
 
@@ -834,13 +835,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="form-group">
                     <label for="end_date" class="form-label">종료일</label>
                     <input type="date" id="end_date" name="end_date" class="form-input"
+                           min="<?= date('Y-m-d') ?>"
                            value="<?= $isEditMode ? htmlspecialchars($event['end_date'] ?? '', ENT_QUOTES, 'UTF-8') : '' ?>">
                     <div class="help-text">당일 행사인 경우 비워두세요.</div>
                 </div>
                 <div class="form-group">
                     <label for="end_time" class="form-label">종료시간</label>
                     <input type="time" id="end_time" name="end_time" class="form-input"
-                           value="<?= $isEditMode && !empty($event['end_time']) ? htmlspecialchars(substr($event['end_time'], 0, 5), ENT_QUOTES, 'UTF-8') : '' ?>">
+                           value="<?= $isEditMode && !empty($event['end_time']) ? htmlspecialchars(substr($event['end_time'], 0, 5), ENT_QUOTES, 'UTF-8') : '00:00' ?>">
                 </div>
             </div>
             
@@ -1643,21 +1645,50 @@ function validateForm() {
     const category = document.getElementById('category').value;
     const startDate = document.getElementById('start_date').value;
     const startTime = document.getElementById('start_time').value;
+    const endDate = document.getElementById('end_date').value;
     const description = quill.getText().trim();
-    
+
     if (!title) {
         Toast.error('행사 제목을 입력해주세요.');
         return false;
     }
-    
+
     if (!category) {
         Toast.info('카테고리를 선택해주세요.');
         return false;
     }
-    
+
     if (!startDate || !startTime) {
         Toast.error('시작 날짜와 시간을 입력해주세요.');
         return false;
+    }
+
+    // 시작일 오늘 이전 날짜 검증
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedStartDate = new Date(startDate);
+
+    if (selectedStartDate < today) {
+        Toast.error('시작일은 오늘 이후의 날짜만 선택 가능합니다.');
+        document.getElementById('start_date').focus();
+        return false;
+    }
+
+    // 종료일이 있는 경우 시작일보다 이전인지 검증
+    if (endDate) {
+        const selectedEndDate = new Date(endDate);
+
+        if (selectedEndDate < today) {
+            Toast.error('종료일은 오늘 이후의 날짜만 선택 가능합니다.');
+            document.getElementById('end_date').focus();
+            return false;
+        }
+
+        if (selectedEndDate < selectedStartDate) {
+            Toast.error('종료일은 시작일보다 이전일 수 없습니다.');
+            document.getElementById('end_date').focus();
+            return false;
+        }
     }
     
     if (!description || description.length < 10) {

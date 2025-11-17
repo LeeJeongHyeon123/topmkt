@@ -1541,7 +1541,7 @@ body {
             <?php if ($isLoggedIn): ?>
                 <?php 
                 // 기업회원 권한 확인
-                require_once SRC_PATH . '/middleware/CorporateMiddleware.php';
+                require_once SRC_PATH . '/middlewares/CorporateMiddleware.php';
                 $permission = CorporateMiddleware::checkLectureEventPermission();
                 
                 if ($permission['hasPermission']): ?>
