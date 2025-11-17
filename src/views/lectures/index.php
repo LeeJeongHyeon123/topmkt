@@ -1222,6 +1222,7 @@ $monthNames = [
     padding: 20px 25px;
     border-radius: 12px 12px 0 0;
     position: relative;
+    display: block; /* v4.2.6: flexbox 방지 */
 }
 
 /* v4.2.5: close 버튼을 우측 상단에 고정 */
@@ -1249,19 +1250,24 @@ $monthNames = [
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* v4.2.5: title만 표시 (wrapper 제거) */
+/* v4.2.5: title - 한 줄로 표시 */
 .modal-title {
     font-size: 1.3rem;
     font-weight: 700;
     margin: 0 0 8px 0;
     padding-right: 40px; /* close 버튼 공간 확보 */
+    display: block;
+    width: 100%;
 }
 
-/* v4.2.5: subtitle을 title 바로 아래 배치 */
+/* v4.2.5: subtitle - title 아래 새로운 줄에 배치 */
 .modal-subtitle {
     font-size: 0.9rem;
     opacity: 0.9;
     margin: 0;
+    display: block;
+    width: 100%;
+    padding-right: 40px; /* close 버튼 공간 확보 */
 }
 
 .modal-body {
