@@ -97,7 +97,6 @@ html body .events-header,
     html body .events-header,
     .events-container .events-header,
     .events-header {
-        margin-top: 15px !important; /* 모바일에서는 매우 좁게 */
         padding: 30px 20px !important; /* 패딩도 줄임 */
     }
 
@@ -711,6 +710,11 @@ if (window.innerWidth <= 768) {
         box-sizing: border-box !important;
     }
 
+    /* 모바일 타이틀 크기 조정 (v4.2.3) - 중복 방지 주석 */
+    .events-header h1 {
+        font-size: 1.6rem !important;
+    }
+
     /* 사이드바 모바일 최적화 */
     .events-sidebar {
         max-width: calc(100vw - 40px) !important;
@@ -1061,6 +1065,51 @@ if (window.innerWidth <= 768) {
         font-size: 16px !important;
         line-height: 1.3 !important;
     }
+}
+
+/* 🎯 세련된 모던 호버 효과 */
+html body .events-list .event-card,
+html body .event-card,
+.events-list .event-card,
+.event-card,
+div.event-card {
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: visible !important;
+    border: 1px solid transparent !important;
+}
+
+/* 모든 자식 요소에도 pointer 커서 강제 적용 */
+.event-card *,
+.event-card > *,
+.event-card-header,
+.event-card-header *,
+.event-title,
+.event-meta,
+.event-description {
+    cursor: pointer !important;
+}
+
+/* 미묘한 호버 효과 - 그림자만 강화 */
+.event-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12),
+                0 4px 8px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(102, 126, 234, 0.2) !important;
+}
+
+/* 클릭 시 살짝 눌리는 효과 */
+.event-card:active {
+    transform: translateY(0px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 제목에만 색상 변화 */
+.event-card:hover .event-title {
+    color: #667eea !important;
+    transition: color 0.3s ease !important;
 }
 </style>
 

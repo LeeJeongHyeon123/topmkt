@@ -303,6 +303,12 @@ body .events-container .events-layout .events-sidebar,
         gap: 15px;
         margin-bottom: 15px;
     }
+
+    /* 모바일 타이틀 크기 조정 (v4.2.3) */
+    .gradient-header h1,
+    .events-header h1 {
+        font-size: 1.6rem !important;
+    }
 }
 
 /* 📱 소형 모바일 반응형 */
@@ -775,12 +781,12 @@ html body .events-header p,
     padding: 20px;
     margin-bottom: 16px;
     border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    cursor: pointer !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     color: inherit;
     display: block;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
     position: relative;
     overflow: hidden;
@@ -791,22 +797,28 @@ html body .events-header p,
     position: absolute;
     top: 0;
     left: 0;
-    width: 4px;
+    width: 5px;
     height: 100%;
-    background: linear-gradient(135deg, #4A90E2 0%, #2E86AB 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .event-list-item:hover {
-    background-color: #fbfcfe;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: #b3d1f7;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
 }
 
 .event-list-item:hover::before {
     opacity: 1;
+    width: 6px;
+}
+
+.event-list-item:active {
+    transform: translateY(-2px) scale(1.005);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
 }
 
 .event-list-item:last-child {
