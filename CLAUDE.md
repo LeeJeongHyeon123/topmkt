@@ -215,7 +215,81 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v4.2.7 ~ v3.98.0) - 2025-11-03/17
+## 최근 주요 작업 (v4.2.8 ~ v3.98.0) - 2025-11-03/17
+
+### v4.2.8 - GNB 반응형 표시 버그 수정 (2025-11-17) 🔥
+**치명적 UX 버그 수정 - 모바일→PC 전환 시 메뉴 표시 문제 해결**
+
+**문제**: 모든 페이지에서 모바일 사이즈 → PC 사이즈로 브라우저 창 늘릴 때 GNB 메뉴가 보이지 않음
+- ❌ 사용자가 PC에서도 메뉴를 볼 수 없어 네비게이션 불가능
+- ❌ CSS media query `display: flex !important`가 적용되지 않음
+- ❌ 인라인 스타일 `display: none`이 남아있어 CSS 무시됨
+
+**근본 원인 (Playwright로 진단)**:
+- `forceCorrectLayout()` 함수 (header.php:1788-1865)가 모바일 사이즈일 때 `.main-nav`에 인라인 스타일 설정:
+  ```javascript
+  el.style.setProperty('display', 'none', 'important');
+  el.style.setProperty('visibility', 'hidden', 'important');
+  el.style.setProperty('opacity', '0', 'important');
+  el.style.setProperty('pointer-events', 'none', 'important');
+  ```
+- **문제**: PC 사이즈(`> 1024px`)로 전환되어도 인라인 스타일을 **제거하지 않음**
+- 결과: 인라인 스타일이 CSS `!important`보다 우선순위가 높아 메뉴 숨김 유지
+
+**Playwright 테스트 결과**:
+- Before Fix (모바일→PC 전환 후):
+  - `display: "none"` ❌
+  - `inlineDisplay: "none"` ❌ (인라인 스타일 남아있음)
+  - `isVisible: false` ❌
+
+- After Fix:
+  - `display: "flex"` ✅
+  - `inlineDisplay: "(없음)"` ✅ (인라인 스타일 완전 제거)
+  - `isVisible: true` ✅
+  - `rect.width: 578` ✅ (메뉴 정상 렌더링)
+
+**해결**:
+- `forceCorrectLayout()` 함수에 `else` 블록 추가 (header.php:1864-1901)
+- PC 사이즈일 때 모바일에서 설정한 인라인 스타일 제거:
+  ```javascript
+  } else {
+      // PC 사이즈 (1025px 이상): 인라인 스타일 제거하여 CSS media query가 적용되도록
+      const elementsToShow = ['.main-nav', '.user-menu', '.nav-auth', ...];
+
+      elementsToShow.forEach(selector => {
+          elements.forEach(el => {
+              el.style.removeProperty('display');
+              el.style.removeProperty('visibility');
+              el.style.removeProperty('opacity');
+              el.style.removeProperty('pointer-events');
+          });
+      });
+
+      // 햄버거 메뉴도 CSS에 맡김
+      hamburgerElements.forEach(el => {
+          el.style.removeProperty('display');
+          el.style.removeProperty('visibility');
+          // ...
+      });
+  }
+  ```
+
+**개선 효과**:
+- ✅ 모바일→PC 전환 시 GNB 메뉴 정상 표시
+- ✅ PC→모바일 전환 시 햄버거 메뉴 정상 표시
+- ✅ CSS media query 정상 작동 (인라인 스타일 간섭 제거)
+- ✅ 모든 뷰포트 사이즈에서 올바른 네비게이션 제공
+
+**수정 파일**: `src/views/templates/header.php` (Lines 1864-1901, 38줄 추가)
+
+**검증**: Playwright 헤드리스 모드 (375px→1920px 전환 테스트)
+
+**기술적 교훈**:
+1. 인라인 스타일은 CSS `!important`보다도 우선순위가 높음
+2. JavaScript로 스타일 설정 시 반드시 역방향(제거) 로직도 구현해야 함
+3. 반응형 동작 변경 시 Playwright로 실제 DOM 상태 검증 필수
+
+---
 
 ### v4.2.7 - 행사 상세 페이지 CSS 완전 복구 (2025-11-17) 🔥
 **긴급 버그 수정 - CSS 렌더링 무효화 문제 해결**

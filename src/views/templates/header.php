@@ -1861,6 +1861,43 @@
                             el.style.setProperty('z-index', '999999', 'important');
                         }
                     });
+                } else {
+                    // PC 사이즈 (1025px 이상): 인라인 스타일 제거하여 CSS media query가 적용되도록
+                    const elementsToShow = [
+                        '.main-nav',
+                        '.user-menu',
+                        '.nav-auth',
+                        'nav.main-nav',
+                        'header .main-nav',
+                        'header .user-menu',
+                        'header .nav-auth'
+                    ];
+
+                    elementsToShow.forEach(selector => {
+                        const elements = document.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            if (el) {
+                                // 모바일에서 설정한 인라인 스타일 제거
+                                el.style.removeProperty('display');
+                                el.style.removeProperty('visibility');
+                                el.style.removeProperty('opacity');
+                                el.style.removeProperty('pointer-events');
+                            }
+                        });
+                    });
+
+                    // 햄버거 메뉴 숨기기 (PC에서는 CSS media query에 맡김)
+                    const hamburgerElements = document.querySelectorAll('.mobile-hamburger');
+                    hamburgerElements.forEach(el => {
+                        if (el) {
+                            el.style.removeProperty('display');
+                            el.style.removeProperty('visibility');
+                            el.style.removeProperty('position');
+                            el.style.removeProperty('top');
+                            el.style.removeProperty('right');
+                            el.style.removeProperty('z-index');
+                        }
+                    });
                 }
             }
 
