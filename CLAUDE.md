@@ -215,7 +215,128 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v4.2.2 ~ v3.98.0) - 2025-11-03/17
+## 최근 주요 작업 (v4.2.7 ~ v3.98.0) - 2025-11-03/17
+
+### v4.2.7 - 행사 상세 페이지 CSS 완전 복구 (2025-11-17) 🔥
+**긴급 버그 수정 - CSS 렌더링 무효화 문제 해결**
+
+**문제**: 행사 상세 페이지 UI 완전 붕괴
+- ❌ 좌우 여백 완전 소실 → 컨텐츠가 화면 전체 너비로 확장
+- ❌ 헤더가 컨텐츠를 덮음 → 고정 헤더와 본문이 겹침
+- ❌ 히어로 섹션이 전체 너비로 확장 → 원래 max-width 1650px 무시됨
+- ❌ 전체 레이아웃 붕괴 → 사이드바 그리드 레이아웃 깨짐
+
+**근본 원인**:
+- `event-detail-styles.css` 파일에 `<style>` 태그 포함 (Line 1, Line 1637)
+- `detail.php`에서 `file_get_contents()`로 읽어 다시 `<style>` 태그로 감쌈
+- 결과: `<style><style>...</style></style>` 중첩으로 CSS 무효화
+
+**해결**:
+- CSS 파일에서 `<style>` 태그 2줄 제거 (첫 줄, 마지막 줄)
+- 순수 CSS만 남김 (강의 페이지와 동일한 패턴)
+
+**검증**:
+- Playwright 헤드리스 모드로 CSS cascade 분석
+- max-width: 1650px, margin: 80px auto 정상 적용 확인
+
+**개선 효과**:
+- ✅ 좌우 여백 정상 복구 (1650px 중앙 컨테이너)
+- ✅ 헤더 겹침 해결 (margin-top: 80px)
+- ✅ 히어로 섹션 정상 (파란색 그라디언트)
+- ✅ 그리드 레이아웃 정상 (좌측 콘텐츠 + 우측 사이드바)
+
+**수정 파일**: `src/views/events/components/event-detail-styles.css` (2줄)
+
+**교훈**:
+1. CSS 파일은 순수 CSS만 - HTML 태그 절대 포함 금지
+2. `<style>` 태그 중첩 = CSS 무효화 - 브라우저가 파싱 실패
+3. Playwright 진단 필수 - UI 버그 시 computed style 확인
+
+---
+
+### v4.2.6 - 강의 일정 모달 헤더 레이아웃 최종 수정 (2025-11-17) 🎨
+**UI 버그 수정 - display: block 추가로 세로 배치 완성**
+
+**문제**: v4.2.5 수정 후에도 subtitle이 title 옆에 표시됨
+- 원인: `.modal-header`에 `display: block` 명시 누락
+- 결과: 자식 요소들이 inline으로 렌더링
+
+**해결**:
+- `.modal-header`에 `display: block` 추가 (v4.2.6: flexbox 방지 주석)
+- `.modal-title`, `.modal-subtitle`에 명시적 `display: block` 추가
+
+**Playwright 검증**:
+```
+title: x=237, y=71, width=550
+subtitle: x=237, y=112, width=550
+✅ subtitle이 title 아래에 있음
+```
+
+**수정 파일**: `src/views/lectures/index.php` (Lines 1219-1270, CSS)
+
+---
+
+### v4.2.5 - 강의 일정 모달 헤더 레이아웃 수정 (2025-11-17) 🎨
+**UI 개선 - 닫기 버튼 절대 위치 지정**
+
+**문제**: v4.2.4의 flexbox wrapper 방식이 사용자 요구와 불일치
+- 사용자 요구: X 버튼 우측 끝, 날짜 정보는 제목 아래 새 줄
+
+**해결**:
+- `.modal-title-wrapper` 제거
+- `.modal-close` 버튼을 `position: absolute; top: 20px; right: 25px;`로 우측 상단 고정
+- `.modal-title`과 `.modal-subtitle` 세로 배치
+
+**수정 파일**: `src/views/lectures/index.php` (HTML 구조, CSS)
+
+---
+
+### v4.2.4 - 강의 일정 더보기 모달 헤더 UI 개선 (2025-11-17) 🎨
+**Ultra Think 7단계 분석 - 모달 레이아웃 문제 해결**
+
+**문제**: 강의 일정 캘린더 "더보기" 모달에서 닫기 버튼과 날짜 정보가 겹침
+- 현재: `10일 일정     2025년 6월 10일 화요일 · 총 7개 일정     [X]` (한 줄)
+- 요구: 2줄 구성 - 제목+X 버튼 한 줄, 날짜 정보 다음 줄
+
+**근본 원인**:
+- `.modal-close` 버튼이 `position: absolute; top: 50%`로 헤더 중앙 배치
+- subtitle 영역과 겹침
+
+**해결** (초기 시도):
+- `.modal-title-wrapper` div 추가 (flexbox)
+- title과 close 버튼을 한 줄에 배치
+- subtitle을 wrapper 밖에 별도 배치
+
+**수정 파일**: `src/views/lectures/index.php` (Lines 1744-1749 HTML, Lines 1227-1270 CSS)
+
+---
+
+### v4.2.3 - 강의/행사 일정 페이지 모바일 UI 개선 (2025-11-17) 🎨
+**Ultra Think 모드 - 모바일 UX 완전 개선**
+
+**문제**: 모바일에서 강의/행사 일정 페이지 가독성 및 조작성 저하
+1. 캘린더 타이틀 너무 작음 (1.1rem)
+2. 날짜 셀 터치 영역 부족
+3. 강의/행사 카드 텍스트 너무 작음
+4. 버튼 터치 타겟 미달 (48px 미만)
+
+**해결**:
+- 타이틀: 1.1rem → 1.5rem (36% 증가)
+- 날짜 셀: min-height: 70px (터치 영역 확보)
+- 카드 제목: 0.85rem → 1rem (18% 증가)
+- 카드 시간/강사: 0.75rem → 0.85rem (13% 증가)
+- 모든 버튼: min-height: 48px, min-width: 48px (터치 타겟 준수)
+
+**개선 효과**:
+- ✅ 모바일 가독성 대폭 향상
+- ✅ 터치 조작 편의성 증가
+- ✅ 접근성 표준 준수 (WCAG 2.1)
+
+**수정 파일**:
+- `src/views/lectures/components/index-styles.css` (모바일 CSS 전체 개선)
+- `src/views/events/components/event-index-styles.css` (모바일 CSS 전체 개선)
+
+---
 
 ### v4.2.2 - CorporateMiddleware Fatal Error 긴급 수정 (2025-11-17) 🔥
 **Ultra Think 7단계 근본 원인 분석 - 디렉토리 중복 문제 해결**
