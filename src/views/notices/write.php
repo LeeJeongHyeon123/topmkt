@@ -511,12 +511,12 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
         
         <!-- 버튼 그룹 -->
         <div class="form-buttons">
-            <button type="submit" class="btn btn-primary" id="submitBtn">
-                <i class="fas fa-save"></i> <?= $submitText ?>
-            </button>
             <a href="/notices" class="btn btn-secondary" onclick="isFormSubmitted = true;">
                 <i class="fas fa-times"></i> 취소
             </a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i> <?= $submitText ?>
+            </button>
             <?php if ($isEdit): ?>
                 <button type="button" class="btn btn-danger" onclick="deleteNotice(<?= $notice['id'] ?>)">
                     <i class="fas fa-trash"></i> 삭제
