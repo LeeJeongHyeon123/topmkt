@@ -803,14 +803,18 @@ body {
                         <div class="notice-content-preview">
                             <?php
                             $content = $notice['content_preview'] ?? $notice['content'] ?? '';
-                            
+
                             if (!empty($search)) {
+                                // HTML 엔티티 디코딩 추가 (Quill.js 인코딩 문제 해결)
+                                $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
                                 $snippet = SearchHelper::generateSearchSnippet($content, $search, 150);
                                 $preview = htmlspecialchars($snippet);
                                 $preview = SearchHelper::highlightSearchTerm($preview, $search);
                             } else {
-                                $preview = htmlspecialchars(mb_substr(strip_tags($content), 0, 150));
-                                if (mb_strlen($content) > 150) {
+                                // HTML 엔티티 디코딩 추가 (Quill.js 인코딩 문제 해결)
+                                $decodedContent = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+                                $preview = htmlspecialchars(mb_substr(strip_tags($decodedContent), 0, 150));
+                                if (mb_strlen(strip_tags($decodedContent)) > 150) {
                                     $preview .= '...';
                                 }
                             }

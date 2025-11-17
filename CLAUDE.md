@@ -215,7 +215,64 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v3.98.0 ~ v3.98.16) - 2025-11-03/16
+## 최근 주요 작업 (v4.2.1 ~ v3.98.0) - 2025-11-03/17
+
+### v4.2.1 - 공지사항 목록 HTML 엔티티 표시 오류 수정 (2025-11-17) 🐛
+**Ultra Think 7단계 체계적 분석 - Quill.js 인코딩 문제 해결**
+
+**문제**: 공지사항 목록에서 한글 내용이 HTML 엔티티 코드로 표시
+- Victoria 공지사항 "ㅇㅇㅇㅇㅇ" 내용: `&#51060;&#54616;&#44396;&#54632;...`
+- 사용자가 공지사항 미리보기를 읽을 수 없는 상태
+
+**근본 원인 (Ultra Think 3단계)**:
+1. **Quill.js 에디터**: 한글을 HTML 엔티티로 인코딩 (`"이" → &#51060;`)
+2. **뷰 레이어 처리**: `strip_tags()` → `htmlspecialchars()` 순서
+3. **문제점**: HTML 엔티티 디코딩 누락
+
+**데이터베이스 조회**:
+```sql
+SELECT id, title, content FROM notices WHERE content LIKE '%&#%';
+-- ID 24: <p>&#51060;&#49345;&#54632;</p> → "이상함"
+-- ID 23: <p>&#44396;&#50864;&#50883;</p> → "구웨웃"
+```
+
+**해결 방법 (Option A 채택)**:
+```php
+// Before
+$preview = htmlspecialchars(mb_substr(strip_tags($content), 0, 150));
+
+// After
+$decodedContent = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+$preview = htmlspecialchars(mb_substr(strip_tags($decodedContent), 0, 150));
+```
+
+**데이터 흐름**:
+1. DB: `<p>&#51060;&#49345;&#54632;</p>`
+2. `html_entity_decode()`: `<p>이상함</p>`
+3. `strip_tags()`: `이상함`
+4. `mb_substr()`: `이상함` (150자)
+5. `htmlspecialchars()`: `이상함` (XSS 방어)
+6. 출력: "이상함" ✅
+
+**개선 효과**:
+- ✅ HTML 엔티티 → 한글 정상 변환
+- ✅ 검색 기능 정상 작동
+- ✅ XSS 방어 유지
+- ✅ 데이터베이스 변경 없음 (안전)
+
+**수정 파일**:
+- `src/views/notices/index.php` (Lines 803-823, 21줄)
+
+**Ultra Think 단계**:
+- 1단계: 문제 정의 ✅
+- 2단계: 데이터 수집 (DB 쿼리) ✅
+- 3단계: 근본 원인 (Quill.js 인코딩) ✅
+- 4단계: 해결 전략 (Option A vs B) ✅
+- 5단계: 구현 (`html_entity_decode()` 추가) ✅
+- 6단계: 검증 (PHP 문법, 두 경로) ✅
+- 7단계: 문서화 (개발노트, CLAUDE.md) ✅
+
+---
 
 ### v3.98.16 - 최근 행사 목록 카드 너비 수정 (2025-11-16) 🐛
 **버그 수정 - CSS Grid 레이아웃 개선**
