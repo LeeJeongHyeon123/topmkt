@@ -135,7 +135,9 @@ class ProfileImageHelper {
         }
 
         // 유효한 사용자 ID가 있을 때만 클릭 이벤트 추가
-        if ($userId && !empty($user['nickname'])) {
+        // v4.2.9: nickname 체크 제거 - userId만으로 프로필 페이지 이동 허용
+        // (이유: $userName은 이미 기본값 '사용자' 처리됨, nickname 유무와 프로필 접근 권한은 별개)
+        if ($userId && is_numeric($userId) && $userId > 0) {
             // v3.98.0: 프로필 이미지 클릭 → 프로필 페이지로 이동 (통일)
             // (프로필 페이지 자체는 예외 처리: profile-image.php에서 플래그 확인)
             $attributes['onclick'] = "event.stopPropagation(); if(window.TopMarketingLoading) { window.TopMarketingLoading.show(); window.TopMarketingLoading.setMessage('프로필을 불러오는 중...'); } window.location.href='/profile?user_id=" . $userId . "';";
