@@ -131,6 +131,14 @@ if (file_exists($styleFile)) {
                     <span class="meta-icon">👥</span>
                     <span><?= $lecture['capacity_info'] ?></span>
                 </div>
+                <?php if ($lecture['registration_deadline']): ?>
+                    <div class="meta-item">
+                        <span class="meta-icon">⏰</span>
+                        <span>
+                            신청 마감: <?= date('Y년 m월 d일 H:i', strtotime($lecture['registration_deadline'])) ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
