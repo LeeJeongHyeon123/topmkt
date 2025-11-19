@@ -215,7 +215,70 @@ echo renderPagination($paginationData);
 11. Pagination
 ```
 
-## 최근 주요 작업 (v4.2.8 ~ v3.98.0) - 2025-11-03/17
+## 최근 주요 작업 (v4.2.10 ~ v3.98.0) - 2025-11-03/19
+
+### v4.2.10 - 강의 신청 인원 0명 표시 오류 완전 수정 (2025-11-19) 🐛
+**Ultra Think 7단계 분석 - 사용자 경험 개선**
+
+**문제**: 무제한 강의(max_participants: NULL)에서 신청 인원 0명일 때 현재 인원 정보 손실
+- 히어로 섹션: 빈 값 표시 (`capacity_info` 미생성)
+- 사이드바: "무제한"만 표시 (`registration_count` 무시)
+- URL: https://www.topmktx.com/lectures/226
+
+**근본 원인**:
+1. **히어로 섹션**: `LectureController::show()` 메서드에 `capacity_info` 생성 로직 없음
+   - `getLectureById()` SQL 쿼리는 `registration_count`와 `max_participants`만 조회
+   - `$lecture['capacity_info']` 키 자체가 없어 detail.php Line 132에서 빈 값 출력
+
+2. **사이드바**: PHP 조건문이 `max_participants` 존재 여부만 체크
+   ```php
+   <?php else: ?>
+       무제한  // ❌ registration_count 완전히 무시
+   <?php endif; ?>
+   ```
+
+**해결 방법**:
+1. **LectureController.php** (Lines 142-149, 8줄 추가):
+   ```php
+   // 신청 인원 정보 생성 (v4.2.10: 무제한 강의도 현재 인원 표시)
+   if ($lecture['max_participants']) {
+       // 정원 제한 있는 경우: "15/30명"
+       $lecture['capacity_info'] = number_format($lecture['registration_count']) . '/' . number_format($lecture['max_participants']) . '명';
+   } else {
+       // 무제한 강의: "0명/무제한"
+       $lecture['capacity_info'] = number_format($lecture['registration_count']) . '명/무제한';
+   }
+   ```
+
+2. **detail.php** (Lines 724-730, 사이드바):
+   - else 블록에 `registration_count` 표시 추가
+   - "명" 단위 일관성 확보
+
+**개선 효과**:
+- ✅ 히어로 섹션: "" (빈 값) → "0명/무제한"
+- ✅ 사이드바: "무제한" → "0명/무제한"
+- ✅ 정원 제한: "15/30" → "15/30명" (일관성)
+- ✅ 행사 페이지와 UI/UX 일관성 확보
+- ✅ 비즈니스 로직 정확성 향상 ("정원 무제한" ≠ "현재 인원 정보 불필요")
+
+**수정 파일**:
+- `src/controllers/LectureController.php` (8줄 추가)
+- `src/views/lectures/detail.php` (2줄 수정)
+
+**Ultra Think 7단계**:
+1. 문제 정의: 무제한 강의에서 현재 신청 인원 정보 손실
+2. 데이터 수집: Agent 조사로 두 곳 문제 발견 (히어로 + 사이드바)
+3. 근본 원인: capacity_info 미생성, PHP 조건문 로직 오류
+4. 해결 전략: "0명/무제한" 형식 채택 (행사 페이지와 일관성)
+5. 구현: Controller + View 동시 수정
+6. 검증: PHP 문법 + 사용자 QA 완료
+7. 문서화: PLAN.md → TASK.md → 개발노트 → 초기화
+
+**검증 완료**:
+- PHP 문법: detail.php, LectureController.php ✅
+- 사용자 QA: 히어로 섹션 + 사이드바 정상 표시 ✅
+
+---
 
 ### v4.2.8 - GNB 반응형 표시 버그 수정 (2025-11-17) 🔥
 **치명적 UX 버그 수정 - 모바일→PC 전환 시 메뉴 표시 문제 해결**
