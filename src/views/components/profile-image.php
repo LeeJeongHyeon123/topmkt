@@ -90,13 +90,14 @@ if (isset($user) && is_array($user)) {
             echo ProfileImageHelper::generateProfileImageHtml($user, $size, $mode, $extraClasses);
         } else {
             // 대체 이미지 표시 (이니셜)
-            echo ProfileImageHelper::generateFallbackHtml($userName, $extraClasses);
+            // v4.2.9: $user 파라미터 전달하여 onclick 이벤트 추가
+            echo ProfileImageHelper::generateFallbackHtml($userName, $extraClasses, $user);
         }
     }
 } else {
     // 유효하지 않은 사용자 데이터인 경우 기본 대체 이미지 표시
     if ($showFallback) {
-        echo ProfileImageHelper::generateFallbackHtml('?', $extraClasses);
+        echo ProfileImageHelper::generateFallbackHtml('?', $extraClasses, null);
     }
 }
 ?>
