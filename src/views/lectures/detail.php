@@ -723,9 +723,9 @@ if (file_exists($styleFile)) {
                         <div style="font-size: 0.9rem; color: #718096; margin-bottom: 5px; font-weight: 600;">👥 신청 인원</div>
                         <span class="registration-count">
                             <?php if ($lecture['max_participants']): ?>
-                                <?= number_format($lecture['registration_count']) ?>/<?= number_format($lecture['max_participants']) ?>
+                                <?= number_format($lecture['registration_count']) ?>/<?= number_format($lecture['max_participants']) ?>명
                             <?php else: ?>
-                                무제한
+                                <?= number_format($lecture['registration_count']) ?>명/무제한
                             <?php endif; ?>
                         </span>
                     </div>

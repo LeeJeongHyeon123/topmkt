@@ -138,7 +138,15 @@ class LectureController extends BaseController {
             // 강의 이미지 조회
             $lectureImages = $this->getLectureImages($lectureId);
             $lecture['images'] = $lectureImages;
-            
+
+            // 신청 인원 정보 생성 (v4.2.10: 무제한 강의도 현재 인원 표시)
+            if ($lecture['max_participants']) {
+                // 정원 제한 있는 경우: "15/30명"
+                $lecture['capacity_info'] = number_format($lecture['registration_count']) . '/' . number_format($lecture['max_participants']) . '명';
+            } else {
+                // 무제한 강의: "0명/무제한"
+                $lecture['capacity_info'] = number_format($lecture['registration_count']) . '명/무제한';
+            }
 
             $viewData = [
                 'lecture' => $lecture,
