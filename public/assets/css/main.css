@@ -4896,6 +4896,70 @@ body {
     border-color: rgba(255, 255, 255, 0.4);
 }
 
+/* v4.2.9: 프로필 이미지 Fallback (이니셜 표시) - 전역 스타일 */
+.profile-image-fallback {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.profile-image-fallback:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* v4.2.9: 사이즈별 Fallback 스타일 */
+/* 작은 사이즈 (채팅, 댓글 등) */
+.profile-image-fallback.profile-image-thumb,
+.profile-image-fallback.author-avatar-small {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+    border-width: 1.5px;
+}
+
+/* 중간 사이즈 (커뮤니티 목록, 공지사항 등) */
+.profile-image-fallback.profile-image-profile,
+.profile-image-fallback.author-avatar,
+.profile-image-fallback.post-author-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.1rem;
+    border-width: 2px;
+}
+
+/* 큰 사이즈 (게시글 상세, 프로필 헤더) */
+.profile-image-fallback.author-avatar-large {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    border-width: 2.5px;
+}
+
+/* 프로필 페이지 전용 대형 사이즈 */
+.profile-header .profile-image-fallback {
+    width: 120px;
+    height: 120px;
+    font-size: 3rem;
+    border-width: 4px;
+}
+
+.profile-header .profile-image-fallback:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
 /* 프로필 이미지 컨테이너 */
 .alert.chat-notification .chat-profile-image {
     width: 56px;
