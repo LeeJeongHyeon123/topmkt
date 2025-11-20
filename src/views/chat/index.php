@@ -27,7 +27,7 @@ if (file_exists($styleFile)) {
     <div class="chat-header">
         <div class="chat-header-content">
             <div class="chat-header-text">
-                <h1>💬 실시간 채팅</h1>
+                <h1><i data-lucide="message-circle" width="20" height="20"></i> 실시간 채팅</h1>
                 <p>다른 회원들과 실시간으로 소통하세요</p>
             </div>
             <!-- 모바일 채팅방 목록 토글 버튼 -->
@@ -219,7 +219,7 @@ function cleanupChatListeners() {
         window.roomListeners = {};
     }
 
-    // 마지막 메시지 리스너 제거 (🔥 무한 증식 방지)
+    // 마지막 메시지 리스너 제거 (flame 무한 증식 방지)
     if (window.lastMessageListeners) {
         Object.keys(window.lastMessageListeners).forEach(roomId => {
             const lastMessageRef = database.ref(`messages/${roomId}`).limitToLast(1);
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('beforeunload', cleanupChatListeners);
     window.addEventListener('pagehide', cleanupChatListeners);
     
-    // 🔍 전역 클릭 디버깅 - 모든 클릭 이벤트 감지
+    // search 전역 클릭 디버깅 - 모든 클릭 이벤트 감지
     document.addEventListener('click', function(e) {
         const target = e.target;
         const roomItem = target.closest('.chat-room-item');
@@ -454,12 +454,12 @@ function loadChatRoomInfo(roomId) {
         const roomData = snapshot.val();
 
         if (!roomData) {
-            // 🔧 [BUGFIX] 2025-10-20: 채팅방 데이터가 없으면 조용히 무시 (에러 메시지 제거)
+            // wrench [BUGFIX] 2025-10-20: 채팅방 데이터가 없으면 조용히 무시 (에러 메시지 제거)
             // 상대방이 채팅방을 나간 경우 정상적인 동작임
             return;
         }
 
-        // 🔧 [BUGFIX] 2025-10-20: 현재 사용자가 inactive 상태라면 로드하지 않음
+        // wrench [BUGFIX] 2025-10-20: 현재 사용자가 inactive 상태라면 로드하지 않음
         if (roomData.participants && roomData.participants[currentUserId]) {
             const myStatus = roomData.participants[currentUserId].status;
             if (myStatus === 'inactive') {
@@ -527,7 +527,7 @@ function renderChatRoomItem(roomId, roomData) {
         roomItem.addEventListener('mousedown', clickHandler);
         roomItem.addEventListener('touchstart', clickHandler, { passive: false });
         
-        // 🔥 최신 메시지 순서로 삽입 위치 결정
+        // flame 최신 메시지 순서로 삽입 위치 결정
         insertChatRoomAtCorrectPosition(roomsListContainer, roomItem, roomData);
         
         // 디버깅: 요소 클릭 가능 여부 확인
@@ -561,14 +561,14 @@ function renderChatRoomItem(roomId, roomData) {
         if (otherUserId) {
             const otherParticipant = roomData.participants[otherUserId];
 
-            // 🔥 [FIX v3.91.0] 무한 루프 완전 제거: users 객체가 존재하면 무조건 사용
+            // flame [FIX v3.91.0] 무한 루프 완전 제거: users 객체가 존재하면 무조건 사용
             if (users[otherUserId]) {
                 // 기존 사용자 정보 사용 (nickname이 없어도 기본값 "사용자" 사용)
                 roomName = users[otherUserId].nickname || '사용자';
                 avatarText = roomName.substring(0, 1).toUpperCase();
                 partnerImage = users[otherUserId].profile_image || users[otherUserId].profile_image_thumb;
             } else {
-                // 🔥 users 객체가 아예 없는 경우에만 로드 시도
+                // flame users 객체가 아예 없는 경우에만 로드 시도
                 // 전역 플래그로 중복 로딩 방지
                 if (!window.loadingUsers) {
                     window.loadingUsers = {};
@@ -581,7 +581,7 @@ function renderChatRoomItem(roomId, roomData) {
                         // 로딩 완료
                         delete window.loadingUsers[otherUserId];
 
-                        // 🔥 재귀 호출 대신 DOM 직접 업데이트
+                        // flame 재귀 호출 대신 DOM 직접 업데이트
                         if (users[otherUserId]) {
                             const nameEl = roomItem.querySelector('.room-name');
                             const avatarEl = roomItem.querySelector('.room-avatar');
@@ -666,7 +666,7 @@ function renderChatRoomItem(roomId, roomData) {
         </div>
     `;
 
-    // 🔧 [BUGFIX] 2025-10-20: 비활성 채팅방 클릭 이벤트 중복 방지
+    // wrench [BUGFIX] 2025-10-20: 비활성 채팅방 클릭 이벤트 중복 방지
     // 기존 이벤트 리스너 제거 후 새로 등록
     if (isOtherParticipantInactive) {
         // 기존 리스너가 있다면 제거
@@ -691,7 +691,7 @@ function renderChatRoomItem(roomId, roomData) {
         roomItem.addEventListener('touchstart', newHandler, { passive: false });
     }
 
-    // 🔥 room-name 디버깅 로그 추가
+    // flame room-name 디버깅 로그 추가
     setTimeout(() => {
 
         const roomNameElement = roomItem.querySelector('.room-name');
@@ -707,7 +707,7 @@ function renderChatRoomItem(roomId, roomData) {
                              style.visibility !== 'hidden' &&
                              parseFloat(style.opacity) > 0;
 
-            // 🔥 디버깅 완료 - 강제 스타일 제거됨
+            // flame 디버깅 완료 - 강제 스타일 제거됨
         } else {
         }
     }, 100);
@@ -718,12 +718,12 @@ function renderChatRoomItem(roomId, roomData) {
     // 읽지 않은 메시지 수 업데이트
     updateRoomUnreadCount(roomId);
 
-    // 🔥 기존 채팅방 업데이트 시에도 위치 재조정
+    // flame 기존 채팅방 업데이트 시에도 위치 재조정
     repositionExistingChatRoom(roomId, roomData);
 }
 
 /**
- * 🔥 채팅방을 최신 메시지 순서로 적절한 위치에 삽입
+ * flame 채팅방을 최신 메시지 순서로 적절한 위치에 삽입
  */
 function insertChatRoomAtCorrectPosition(container, roomItem, roomData) {
     const currentTime = roomData.lastMessageTime || 0;
@@ -759,7 +759,7 @@ function insertChatRoomAtCorrectPosition(container, roomItem, roomData) {
 }
 
 /**
- * 🔥 기존 채팅방 위치 재조정 (메시지 업데이트 시)
+ * flame 기존 채팅방 위치 재조정 (메시지 업데이트 시)
  */
 function repositionExistingChatRoom(roomId, roomData) {
     const roomItem = document.querySelector(`[data-room-id="${roomId}"]`);
@@ -788,7 +788,7 @@ function openChatRoom(roomId, retryCount = 0) {
     activeRoomId = roomId;
     const roomData = chatRooms[roomId];
 
-    // 🔧 [BUGFIX] 2025-10-20: inactive 채팅방은 열지 않음
+    // wrench [BUGFIX] 2025-10-20: inactive 채팅방은 열지 않음
     if (roomData && roomData.participants) {
         const otherParticipantId = Object.keys(roomData.participants).find(id => id != currentUserId);
         const otherParticipant = otherParticipantId ? roomData.participants[otherParticipantId] : null;
@@ -857,7 +857,7 @@ function openChatRoom(roomId, retryCount = 0) {
     // 읽음 상태 업데이트
     markRoomAsRead(roomId);
 
-    // 🔥 모바일에서 채팅방 선택 시 채팅창으로 전환
+    // flame 모바일에서 채팅방 선택 시 채팅창으로 전환
     if (window.innerWidth <= 768) {
         const chatLayout = document.querySelector('.chat-layout');
         if (chatLayout) {
@@ -923,7 +923,7 @@ function updateChatHeader(roomData) {
         document.getElementById('visitProfileBtn').style.display = 'none';
     }
     
-    // 🔍 닉네임 설정 디버깅 시작
+    // search 닉네임 설정 디버깅 시작
 
     // 1. 기본 정보 확인
 
@@ -1150,7 +1150,7 @@ function sendMessage() {
     
     newMessageRef.set(messageData)
         .then(() => {
-            // 🔥 메시지 전송 시 비활성 참여자의 userRooms 복구
+            // flame 메시지 전송 시 비활성 참여자의 userRooms 복구
             const currentRoom = chatRooms[activeRoomId];
             if (currentRoom && currentRoom.participants) {
                 Object.keys(currentRoom.participants).forEach(participantId => {
@@ -1376,7 +1376,7 @@ function findExistingPrivateRoom(userId) {
                 participantIds.includes(userId.toString())) {
 
 
-                // 🔥 비활성 참여자가 있어도 기존 채팅방으로 인식
+                // flame 비활성 참여자가 있어도 기존 채팅방으로 인식
                 // 나간 사용자의 상태를 다시 활성화
                 const myParticipant = room.participants[currentUserId];
                 const otherParticipant = room.participants[userId];
@@ -1415,12 +1415,12 @@ function createPrivateChatRoom(user) {
             [currentUserId]: {
                 joinedAt: firebase.database.ServerValue.TIMESTAMP,
                 role: 'member',
-                status: 'active' // 🔥 기본 상태를 활성으로 설정
+                status: 'active' // flame 기본 상태를 활성으로 설정
             },
             [user.id]: {
                 joinedAt: firebase.database.ServerValue.TIMESTAMP,
                 role: 'member',
-                status: 'active' // 🔥 기본 상태를 활성으로 설정
+                status: 'active' // flame 기본 상태를 활성으로 설정
             }
         },
         lastMessage: '',
@@ -1900,7 +1900,7 @@ async function leaveChatRoom() {
             }
 
 
-            // 🔧 [BUGFIX] 2025-10-20: 자기 자신의 userRooms만 제거 (상대방 것은 보존)
+            // wrench [BUGFIX] 2025-10-20: 자기 자신의 userRooms만 제거 (상대방 것은 보존)
             // 상대방의 userRooms를 제거하면 상대방이 채팅 페이지 진입 시 버벅임 발생
             const userRoomRef = database.ref(`userRooms/${currentUserId}/${activeRoomId}`);
             const currentParticipantRef = database.ref(`chatRooms/${activeRoomId}/participants/${currentUserId}`);
@@ -2075,7 +2075,7 @@ async function loadUserInfo(userId) {
         
         return Promise.resolve();
     } catch (error) {
-        // 🔥 무한 루프 방지: API 실패 시에도 기본 사용자 정보 생성
+        // flame 무한 루프 방지: API 실패 시에도 기본 사용자 정보 생성
         users[userId] = {
             id: userId,
             nickname: '사용자',
