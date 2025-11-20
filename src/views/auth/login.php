@@ -38,7 +38,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <div class="auth-header">
                     <div class="auth-logo">
                         <div class="logo-icon">
-                            <i class="fas fa-rocket"></i>
+                            <i data-lucide="rocket" width="32" height="32"></i>
                         </div>
                         <span class="logo-text"><?= APP_NAME ?? '탑마케팅' ?></span>
                     </div>
@@ -69,7 +69,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <form class="auth-form" method="POST" action="/auth/login" id="login-form">
                     <div class="form-group">
                         <label for="phone" class="form-label">
-                            <i class="fas fa-mobile-alt"></i>
+                            <i data-lucide="smartphone" width="20" height="20"></i>
                             휴대폰 번호
                         </label>
                         <input 
@@ -89,21 +89,21 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="password" class="form-label">
-                            <i class="fas fa-lock"></i>
+                            <i data-lucide="lock" width="20" height="20"></i>
                             비밀번호
                         </label>
                         <div class="password-input-wrapper">
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password" 
-                                class="form-input" 
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-input"
                                 placeholder="비밀번호를 입력하세요"
-                                required 
+                                required
                                 autocomplete="current-password"
                             >
                             <button type="button" class="password-toggle" id="password-toggle">
-                                <i class="fas fa-eye"></i>
+                                <i data-lucide="eye" width="20" height="20"></i>
                             </button>
                         </div>
                     </div>
@@ -125,7 +125,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <?= renderButton('로그인', 'primary', 'lg', [
                         'buttonType' => 'submit',
-                        'icon' => 'fas fa-sign-in-alt',
+                        'icon' => 'log-in',
                         'fullWidth' => true,
                         'class' => 'btn-primary-gradient'
                     ]) ?>
@@ -134,10 +134,10 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <!-- 회원가입 링크 -->
                 <div class="auth-footer">
                     <p class="auth-switch">
-                        아직 계정이 없으신가요? 
+                        아직 계정이 없으신가요?
                         <a href="/auth/signup" class="auth-link">
                             회원가입하기
-                            <i class="fas fa-arrow-right"></i>
+                            <i data-lucide="arrow-right" width="18" height="18"></i>
                         </a>
                     </p>
                 </div>
@@ -159,22 +159,22 @@ require_once SRC_PATH . '/views/templates/header.php';
             <div class="auth-side-info">
                 <div class="side-info-content">
                     <div class="side-info-icon">
-                        <i class="fas fa-lock"></i>
+                        <i data-lucide="lock" width="64" height="64"></i>
                     </div>
                     <h2>안전한 로그인</h2>
                     <p>최신 보안 기술로 여러분의 계정을 안전하게 보호합니다</p>
-                    
+
                     <div class="security-features">
                         <div class="security-feature">
-                            <i class="fas fa-shield-alt"></i>
+                            <i data-lucide="shield" width="24" height="24"></i>
                             <span>SSL 암호화</span>
                         </div>
                         <div class="security-feature">
-                            <i class="fas fa-user-shield"></i>
+                            <i data-lucide="shield-check" width="24" height="24"></i>
                             <span>2단계 인증</span>
                         </div>
                         <div class="security-feature">
-                            <i class="fas fa-history"></i>
+                            <i data-lucide="history" width="24" height="24"></i>
                             <span>로그인 기록</span>
                         </div>
                     </div>
@@ -182,10 +182,10 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <div class="login-benefits">
                         <h3>로그인 후 이용 가능한 서비스</h3>
                         <ul>
-                            <li><i class="fas fa-comments"></i> 커뮤니티 참여</li>
-                            <li><i class="fas fa-bell"></i> 실시간 알림</li>
-                            <li><i class="fas fa-chart-line"></i> 성과 분석 도구</li>
-                            <li><i class="fas fa-graduation-cap"></i> 전문가 강의</li>
+                            <li><i data-lucide="message-square" width="20" height="20"></i> 커뮤니티 참여</li>
+                            <li><i data-lucide="bell" width="20" height="20"></i> 실시간 알림</li>
+                            <li><i data-lucide="trending-up" width="20" height="20"></i> 성과 분석 도구</li>
+                            <li><i data-lucide="graduation-cap" width="20" height="20"></i> 전문가 강의</li>
                         </ul>
                     </div>
                 </div>
@@ -417,10 +417,16 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordToggle.addEventListener('click', function() {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
-        
+
+        // Lucide 아이콘 토글
         const icon = this.querySelector('i');
-        icon.classList.toggle('fa-eye');
-        icon.classList.toggle('fa-eye-slash');
+        const newIcon = type === 'password' ? 'eye' : 'eye-off';
+        icon.setAttribute('data-lucide', newIcon);
+
+        // Lucide 아이콘 재초기화
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     });
 
     // 폼 제출 시 추가 검증
@@ -455,6 +461,11 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordInput.value = 'admin123!';
         phoneInput.focus();
     };
+
+    // Lucide 아이콘 초기화 (v5.0.0)
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 </script>
 
