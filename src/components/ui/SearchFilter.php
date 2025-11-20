@@ -46,9 +46,9 @@ class SearchFilter
             'searchInputId' => '',  // 검색 input ID (선택사항)
             'searchValue' => '',
             'submitButton' => true,  // 검색 버튼 표시 여부
-            'submitText' => '<i class="fas fa-search"></i> 검색',
+            'submitText' => '<i data-lucide="search" width="18" height="18"></i> 검색',
             'resetButton' => true,  // 초기화 버튼 표시 여부
-            'resetText' => '<i class="fas fa-undo"></i> 초기화',
+            'resetText' => '<i data-lucide="undo" width="18" height="18"></i> 초기화',
             'collapsible' => false,  // 접기/펼치기 기능
             'collapsed' => false,  // 초기 접힘 상태
             'title' => '🔍 필터 및 검색',
@@ -109,14 +109,14 @@ class SearchFilter
      */
     private static function renderHeader(array $config, string $id): string
     {
-        $toggleIcon = $config['collapsed'] ? 'fa-chevron-down' : 'fa-chevron-up';
+        $toggleIcon = $config['collapsed'] ? 'chevron-down' : 'chevron-up';
         $toggleText = $config['collapsed'] ? '펼치기' : '간단히 보기';
 
         return '<div class="search-filter-header">
             <h3 class="search-filter-title">' . $config['title'] . '</h3>
             <button type="button" class="search-filter-toggle" onclick="SearchFilter.toggle(\'' . $id . '\')">
                 <span class="toggle-text">' . $toggleText . '</span>
-                <i class="fas ' . $toggleIcon . ' toggle-icon"></i>
+                <i data-lucide="' . $toggleIcon . '" width="18" height="18" class="toggle-icon"></i>
             </button>
         </div>';
     }
@@ -376,14 +376,14 @@ if (typeof SearchFilter === "undefined") {
 
             if (content.style.display === "none") {
                 content.style.display = "block";
-                icon.classList.remove("fa-chevron-down");
-                icon.classList.add("fa-chevron-up");
+                icon.setAttribute("data-lucide", "chevron-up");
                 text.textContent = "간단히 보기";
+                if (typeof lucide !== "undefined") lucide.createIcons();
             } else {
                 content.style.display = "none";
-                icon.classList.remove("fa-chevron-up");
-                icon.classList.add("fa-chevron-down");
+                icon.setAttribute("data-lucide", "chevron-down");
                 text.textContent = "펼치기";
+                if (typeof lucide !== "undefined") lucide.createIcons();
             }
         },
 

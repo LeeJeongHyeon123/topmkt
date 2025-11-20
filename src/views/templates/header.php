@@ -373,7 +373,7 @@
                     <h1 class="logo">
                         <a href="/" class="logo-link">
                             <div class="logo-icon">
-                                <i class="fas fa-rocket header-rocket"></i>
+                                <i data-lucide="rocket" width="28" height="28" class="header-rocket"></i>
                             </div>
                             <span class="logo-text">탑마케팅</span>
                         </a>
@@ -422,17 +422,17 @@
                                 $currentUser = null;
                             } ?>
                             <span class="user-name"><?= htmlspecialchars($currentUser['nickname'] ?? '사용자') ?></span>
-                            <i class="fas fa-chevron-down"></i>
-                            
+                            <i data-lucide="chevron-down" width="18" height="18"></i>
+
                         </div>
                     <?php else: ?>
                         <!-- 비로그인 사용자 메뉴 -->
                         <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI'] ?? '/') ?>" class="nav-link login-btn">
-                            <i class="fas fa-sign-in-alt"></i>
+                            <i data-lucide="log-in" width="20" height="20"></i>
                             로그인
                         </a>
                         <a href="/auth/signup" class="btn btn-primary">
-                            <i class="fas fa-user-plus"></i>
+                            <i data-lucide="user-plus" width="20" height="20"></i>
                             회원가입
                         </a>
                     <?php endif; ?>
@@ -908,7 +908,7 @@
         <div class="mobile-modal-overlay">
             <!-- 모바일 닫기 버튼 -->
             <button class="mobile-dropdown-close" id="mobileDropdownClose">
-                <i class="fas fa-times"></i>
+                <i data-lucide="x" width="24" height="24"></i>
             </button>
             
             <!-- 모달 콘텐츠 -->
@@ -961,23 +961,23 @@
                 <div class="menu-section">
                     <div class="section-title">메인 메뉴</div>
                     <a href="/" class="dropdown-item <?= ($pageSection ?? '') === 'home' ? 'active' : '' ?>">
-                        <i class="fas fa-home"></i>
+                        <i data-lucide="home" width="20" height="20"></i>
                         <span>홈</span>
                     </a>
                     <a href="/community" class="dropdown-item <?= ($pageSection ?? '') === 'community' ? 'active' : '' ?>">
-                        <i class="fas fa-comments"></i>
+                        <i data-lucide="message-square" width="20" height="20"></i>
                         <span>커뮤니티</span>
                     </a>
                     <a href="/lectures" class="dropdown-item <?= ($pageSection ?? '') === 'lectures' ? 'active' : '' ?>">
-                        <i class="fas fa-chalkboard-teacher"></i>
+                        <i data-lucide="presentation" width="20" height="20"></i>
                         <span>강의 일정</span>
                     </a>
                     <a href="/events" class="dropdown-item <?= ($pageSection ?? '') === 'events' ? 'active' : '' ?>">
-                        <i class="fas fa-calendar-alt"></i>
+                        <i data-lucide="calendar" width="20" height="20"></i>
                         <span>행사 일정</span>
                     </a>
                     <a href="/notices" class="dropdown-item <?= ($pageSection ?? '') === 'notices' ? 'active' : '' ?>">
-                        <i class="fas fa-bullhorn"></i>
+                        <i data-lucide="megaphone" width="20" height="20"></i>
                         <span>공지사항</span>
                     </a>
                 </div>
@@ -989,15 +989,15 @@
                 <div class="menu-section">
                     <div class="section-title">개인 메뉴</div>
                     <a href="/profile" class="dropdown-item">
-                        <i class="fas fa-user"></i>
+                        <i data-lucide="user" width="20" height="20"></i>
                         <span>프로필</span>
                     </a>
                     <a href="/chat" class="dropdown-item">
-                        <i class="fas fa-envelope"></i>
+                        <i data-lucide="mail" width="20" height="20"></i>
                         <span>채팅</span>
                     </a>
                     <a href="/notifications/settings" class="dropdown-item">
-                        <i class="fas fa-bell"></i>
+                        <i data-lucide="bell" width="20" height="20"></i>
                         <span>알림 설정</span>
                     </a>
                     <?php
@@ -1015,18 +1015,18 @@
 
                     if ($showRegistrationMenu): ?>
                     <a href="/registrations" class="dropdown-item">
-                        <i class="fas fa-clipboard-list"></i>
+                        <i data-lucide="clipboard-list" width="20" height="20"></i>
                         <span>신청 관리</span>
                     </a>
                     <?php endif; ?>
-                    
-                    <?php 
+
+                    <?php
                     // 관리자를 위한 관리자 대시보드 메뉴
                     try {
                         $userRole = AuthMiddleware::getUserRole();
                         if ($userRole === 'ROLE_ADMIN'): ?>
                     <a href="/admin" class="dropdown-item admin-item">
-                        <i class="fas fa-cog"></i>
+                        <i data-lucide="settings" width="20" height="20"></i>
                         <span>관리자 대시보드</span>
                     </a>
                     <?php endif;
@@ -1036,10 +1036,10 @@
                 </div>
                 
                 <div class="dropdown-divider"></div>
-                
+
                 <!-- 시스템 메뉴 -->
                 <a href="/auth/logout" class="dropdown-item logout-item">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i data-lucide="log-out" width="20" height="20"></i>
                     <span>로그아웃</span>
                 </a>
                 <?php endif; ?>
@@ -2090,7 +2090,7 @@
 
         if ($showRegistrationMenuDesktop) {
             $desktopRegistrationMenuHtml = '<a href="/registrations" class="dropdown-item">
-                <i class="fas fa-clipboard-list"></i>
+                <i data-lucide="clipboard-list" width="20" height="20"></i>
                 <span>신청 관리</span>
             </a>';
         }
@@ -2135,23 +2135,23 @@
                 </div>
                 <div class="dropdown-divider"></div>
                 <a href="/profile" class="dropdown-item">
-                    <i class="fas fa-user"></i>
+                    <i data-lucide="user" width="20" height="20"></i>
                     <span>프로필</span>
                 </a>
                 <a href="/chat" class="dropdown-item">
-                    <i class="fas fa-envelope"></i>
+                    <i data-lucide="mail" width="20" height="20"></i>
                     <span>채팅</span>
                     ${badgeHtml}
                 </a>
                 <a href="/notifications/settings" class="dropdown-item">
-                    <i class="fas fa-bell"></i>
+                    <i data-lucide="bell" width="20" height="20"></i>
                     <span>알림 설정</span>
                 </a>
                 ${registrationMenuHtml}
                 ${adminMenuHtml}
                 <div class="dropdown-divider"></div>
                 <a href="/auth/logout" class="dropdown-item logout-item">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i data-lucide="log-out" width="20" height="20"></i>
                     <span>로그아웃</span>
                 </a>
             `;
@@ -2179,6 +2179,11 @@
             // 데스크톱 드롭다운 스타일 적용
             applyDesktopDropdownStyles(floatingDropdown);
             document.body.appendChild(floatingDropdown);
+
+            // Lucide 아이콘 초기화
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
         
         // 데스크톱 드롭다운 닫기 함수

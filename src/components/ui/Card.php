@@ -94,7 +94,8 @@ class Card
      * Feature Card 생성 (기능 소개 카드)
      *
      * @param array $options 카드 옵션
-     *   - icon: Font Awesome 아이콘 클래스
+     *   - icon: Lucide 아이콘명 (예: 'star', 'users') 또는 Font Awesome 클래스 (자동 변환)
+     *   - iconSize: 아이콘 크기 (기본: 32)
      *   - iconBg: 아이콘 배경 색상 (blue, green, purple, orange)
      *   - title: 제목
      *   - description: 설명
@@ -104,7 +105,26 @@ class Card
      */
     public static function feature(array $options): string
     {
-        $icon = $options['icon'] ?? 'fas fa-star';
+        // 아이콘 처리 (Font Awesome → Lucide 자동 변환)
+        $iconInput = $options['icon'] ?? 'star';
+        $iconSize = $options['iconSize'] ?? 32;
+
+        // Font Awesome 감지 및 변환
+        $lucideIcon = $iconInput;
+        if (strpos($iconInput, 'fa-') !== false || strpos($iconInput, 'fas ') !== false) {
+            $faToLucideMap = [
+                'fas fa-star' => 'star',
+                'fas fa-users' => 'users',
+                'fas fa-graduation-cap' => 'graduation-cap',
+                'fas fa-calendar' => 'calendar',
+                'fas fa-comments' => 'message-square',
+                'fas fa-heart' => 'heart',
+                'fas fa-rocket' => 'rocket'
+            ];
+
+            $lucideIcon = $faToLucideMap[$iconInput] ?? str_replace(['fas fa-', 'far fa-', 'fa-'], '', $iconInput);
+        }
+
         $iconBg = $options['iconBg'] ?? 'blue';
         $title = $options['title'] ?? '';
         $description = $options['description'] ?? '';
@@ -115,14 +135,14 @@ class Card
         <div class="feature-card">
             <div class="feature-icon">
                 <div class="icon-bg {$iconBg}">
-                    <i class="{$icon}"></i>
+                    <i data-lucide="{$lucideIcon}" width="{$iconSize}" height="{$iconSize}"></i>
                 </div>
             </div>
             <h3>{$title}</h3>
             <p>{$description}</p>
             <a href="{$link}" class="feature-link">
                 <span>{$linkText}</span>
-                <i class="fas fa-arrow-right"></i>
+                <i data-lucide="arrow-right" width="18" height="18"></i>
             </a>
         </div>
         HTML;

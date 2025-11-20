@@ -29,8 +29,9 @@
  *   - class: 추가 CSS 클래스
  *   - onclick: JavaScript 클릭 이벤트
  *   - href: 링크 URL (a 태그로 렌더링)
- *   - icon: 아이콘 클래스 (예: 'fas fa-save')
+ *   - icon: Lucide 아이콘명 (예: 'save', 'trash-2', 'check') 또는 Font Awesome 클래스 (자동 변환)
  *   - iconPosition: 아이콘 위치 ('left'|'right')
+ *   - iconSize: 아이콘 크기 (기본: 20)
  *   - fullWidth: 전체 너비 (true|false)
  *   - disabled: 비활성화 (true|false)
  *   - ariaLabel: 접근성 레이블
@@ -42,16 +43,20 @@
  * @example
  * // 기본 사용
  * <?= renderButton('저장', 'primary') ?>
- * 
+ *
  * // 크기 지정
  * <?= renderButton('취소', 'secondary', 'lg') ?>
- * 
- * // 아이콘 포함
- * <?= renderButton('삭제', 'danger', 'md', ['icon' => 'fas fa-trash']) ?>
- * 
+ *
+ * // Lucide 아이콘 포함 (v5.0.0)
+ * <?= renderButton('저장', 'primary', 'md', ['icon' => 'save']) ?>
+ * <?= renderButton('삭제', 'danger', 'md', ['icon' => 'trash-2']) ?>
+ *
+ * // Font Awesome도 자동 변환 지원 (하위 호환성)
+ * <?= renderButton('저장', 'primary', 'md', ['icon' => 'fas fa-save']) ?>
+ *
  * // 링크 버튼
  * <?= renderButton('목록', 'secondary', 'md', ['href' => '/lectures']) ?>
- * 
+ *
  * // 전체 너비
  * <?= renderButton('로그인', 'primary', 'lg', ['fullWidth' => true]) ?>
  */
@@ -64,13 +69,14 @@ function renderButton($text, $type = 'primary', $size = 'md', $options = []) {
         'href' => '',
         'icon' => '',
         'iconPosition' => 'left',
+        'iconSize' => 20,
         'fullWidth' => false,
         'disabled' => false,
         'ariaLabel' => '',
         'buttonType' => 'button',
         'attributes' => []
     ];
-    
+
     $opts = array_merge($defaults, $options);
     
     // 버튼 타입 검증
@@ -131,11 +137,46 @@ function renderButton($text, $type = 'primary', $size = 'md', $options = []) {
     }
     
     $attrString = implode(' ', $attributes);
-    
-    // 아이콘 HTML 생성
+
+    // 아이콘 HTML 생성 (v5.0.0: Lucide Icons 지원)
     $iconHtml = '';
     if ($opts['icon']) {
-        $iconHtml = '<i class="' . htmlspecialchars($opts['icon']) . '"></i>';
+        $iconName = $opts['icon'];
+
+        // Font Awesome 클래스 감지 및 Lucide로 변환
+        if (strpos($iconName, 'fa-') !== false || strpos($iconName, 'fas ') !== false || strpos($iconName, 'far ') !== false || strpos($iconName, 'fab ') !== false) {
+            // Font Awesome → Lucide 매핑
+            $faToLucideMap = [
+                'fas fa-save' => 'save',
+                'fas fa-trash' => 'trash-2',
+                'fas fa-undo' => 'undo',
+                'fas fa-edit' => 'edit',
+                'fas fa-plus' => 'plus',
+                'fas fa-check' => 'check',
+                'fas fa-times' => 'x',
+                'fas fa-search' => 'search',
+                'fas fa-arrow-left' => 'arrow-left',
+                'fas fa-arrow-right' => 'arrow-right',
+                'fas fa-upload' => 'upload',
+                'fas fa-download' => 'download',
+                'fas fa-user' => 'user',
+                'fas fa-users' => 'users',
+                'fas fa-cog' => 'settings',
+                'fas fa-home' => 'home'
+            ];
+
+            // 매핑 테이블에서 찾기
+            if (isset($faToLucideMap[$iconName])) {
+                $iconName = $faToLucideMap[$iconName];
+            } else {
+                // 매핑 테이블에 없으면 'fas fa-' 제거하고 그대로 사용
+                $iconName = str_replace(['fas fa-', 'far fa-', 'fab fa-', 'fa-'], '', $iconName);
+            }
+        }
+
+        // Lucide 아이콘 HTML 생성
+        $iconSize = isset($opts['iconSize']) ? intval($opts['iconSize']) : 20;
+        $iconHtml = '<i data-lucide="' . htmlspecialchars($iconName) . '" width="' . $iconSize . '" height="' . $iconSize . '"></i>';
     }
     
     // 버튼 내용 생성

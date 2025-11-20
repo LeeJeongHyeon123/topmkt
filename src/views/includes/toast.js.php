@@ -59,18 +59,18 @@ class Toast {
         toastEl.setAttribute('role', 'alert');
         toastEl.setAttribute('aria-live', 'polite');
 
-        // 아이콘 결정
+        // 아이콘 결정 (v5.0.0: Lucide Icons)
         const icons = {
-            success: 'fa-check-circle',
-            error: 'fa-exclamation-circle',
-            warning: 'fa-exclamation-triangle',
-            info: 'fa-info-circle'
+            success: 'check-circle',
+            error: 'alert-circle',
+            warning: 'alert-triangle',
+            info: 'info'
         };
 
         // Toast 내용 구성
         toastEl.innerHTML = `
             <div class="toast-content">
-                <i class="fas ${icons[type] || icons.info} toast-icon"></i>
+                <i data-lucide="${icons[type] || icons.info}" width="20" height="20" class="toast-icon"></i>
                 <span class="toast-text">${message}</span>
                 ${settings.dismissible ? '<button class="toast-close" aria-label="닫기">&times;</button>' : ''}
             </div>
@@ -78,6 +78,11 @@ class Toast {
 
         // 컨테이너에 추가
         container.appendChild(toastEl);
+
+        // Lucide 아이콘 초기화 (v5.0.0)
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
 
         // 애니메이션 트리거 (reflow 강제)
         void toastEl.offsetWidth;

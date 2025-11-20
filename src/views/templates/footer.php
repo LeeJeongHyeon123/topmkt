@@ -8,7 +8,7 @@
                 <!-- 로고만 (간소화) -->
                 <div class="footer-brand">
                     <div class="footer-logo">
-                        <i class="fas fa-rocket footer-logo-icon"></i>
+                        <i data-lucide="rocket" width="24" height="24" class="footer-logo-icon"></i>
                         <span class="footer-logo-text">탑마케팅</span>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                     <!-- 로고 및 설명 -->
                     <div class="footer-desktop-brand">
                         <div class="footer-logo">
-                            <i class="fas fa-rocket footer-logo-icon"></i>
+                            <i data-lucide="rocket" width="24" height="24" class="footer-logo-icon"></i>
                             <span class="footer-logo-text">탑마케팅</span>
                         </div>
                         <p class="footer-description">

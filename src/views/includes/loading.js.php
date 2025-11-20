@@ -25,7 +25,7 @@ class Loading {
      * @param {boolean} loading - true: 로딩 시작, false: 로딩 종료
      * @param {Object} options - 옵션 객체
      * @param {string} options.text - 로딩 중 표시할 텍스트 (기본: '처리 중...')
-     * @param {string} options.icon - 스피너 아이콘 클래스 (기본: 'fa-spinner fa-spin')
+     * @param {string} options.icon - Lucide 아이콘명 (기본: 'loader-2')
      * @returns {HTMLElement} 버튼 요소
      */
     static button(buttonElement, loading = true, options = {}) {
@@ -35,7 +35,7 @@ class Loading {
 
         const settings = {
             text: options.text || '처리 중...',
-            icon: options.icon || 'fa-spinner fa-spin'
+            icon: options.icon || 'loader-2'
         };
 
         if (loading) {
@@ -48,10 +48,15 @@ class Loading {
             // 2. 버튼 비활성화
             buttonElement.disabled = true;
 
-            // 3. 로딩 텍스트 및 스피너 아이콘 설정
-            buttonElement.innerHTML = `<i class="fas ${settings.icon}"></i> ${settings.text}`;
+            // 3. 로딩 텍스트 및 스피너 아이콘 설정 (v5.0.0: Lucide Icons)
+            buttonElement.innerHTML = `<i data-lucide="${settings.icon}" width="18" height="18"></i> ${settings.text}`;
 
-            // 4. 로딩 상태 클래스 추가
+            // 4. Lucide 아이콘 초기화
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
+            // 5. 로딩 상태 클래스 추가
             buttonElement.classList.add('btn-loading');
         } else {
             // 로딩 종료
@@ -126,12 +131,17 @@ class Loading {
                 overlay.innerHTML = `
                     <div class="loading-overlay-content">
                         <div class="loading-spinner">
-                            <i class="fas fa-circle-notch fa-spin"></i>
+                            <i data-lucide="loader-2" width="48" height="48"></i>
                         </div>
                         <div class="loading-overlay-message">${settings.message}</div>
                     </div>
                 `;
                 document.body.appendChild(overlay);
+
+                // Lucide 아이콘 초기화 (v5.0.0)
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
             } else {
                 // 메시지 업데이트
                 const messageEl = overlay.querySelector('.loading-overlay-message');
