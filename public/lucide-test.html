@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucide Icons 테스트 - v5.0.0</title>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Lucide Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/lucide-custom.css">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f7fafc;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .test-section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .icon-item:hover {
+            background: #f7fafc;
+            border-color: #667eea;
+        }
+
+        .icon-item i {
+            margin-bottom: 10px;
+        }
+
+        .icon-name {
+            font-size: 12px;
+            color: #718096;
+            text-align: center;
+        }
+
+        .test-result {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .test-result.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #48bb78;
+        }
+
+        .test-result.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #f56565;
+        }
+
+        .animation-demo {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .button-demo {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Lucide Icons Phase 1 검증 테스트</h1>
+
+    <!-- 1. Lucide 로드 확인 -->
+    <div class="test-section">
+        <h2>1. Lucide CDN 로드 확인</h2>
+        <div id="lucide-load-test"></div>
+    </div>
+
+    <!-- 2. Top 30 아이콘 표시 테스트 -->
+    <div class="test-section">
+        <h2>2. Top 30 자주 사용되는 아이콘</h2>
+        <div class="icon-grid">
+            <div class="icon-item">
+                <i data-lucide="x" width="24" height="24"></i>
+                <span class="icon-name">X (닫기)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="check" width="24" height="24"></i>
+                <span class="icon-name">Check (확인)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="user" width="24" height="24"></i>
+                <span class="icon-name">User (사용자)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="info" width="24" height="24"></i>
+                <span class="icon-name">Info (정보)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="eye" width="24" height="24"></i>
+                <span class="icon-name">Eye (보기)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="message-square" width="24" height="24"></i>
+                <span class="icon-name">MessageSquare (댓글)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="check-circle" width="24" height="24"></i>
+                <span class="icon-name">CheckCircle (완료)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="lock" width="24" height="24"></i>
+                <span class="icon-name">Lock (잠금)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="users" width="24" height="24"></i>
+                <span class="icon-name">Users (사용자들)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="search" width="24" height="24"></i>
+                <span class="icon-name">Search (검색)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="rocket" width="24" height="24"></i>
+                <span class="icon-name">Rocket (로켓)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="plus" width="24" height="24"></i>
+                <span class="icon-name">Plus (추가)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="loader-2" width="24" height="24" class="lucide-loader2"></i>
+                <span class="icon-name">Loader2 (로딩)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="log-in" width="24" height="24"></i>
+                <span class="icon-name">LogIn (로그인)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="calendar" width="24" height="24"></i>
+                <span class="icon-name">Calendar (일정)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="arrow-left" width="24" height="24"></i>
+                <span class="icon-name">ArrowLeft (뒤로)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="graduation-cap" width="24" height="24"></i>
+                <span class="icon-name">GraduationCap (강의)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="edit" width="24" height="24"></i>
+                <span class="icon-name">Edit (수정)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="clock" width="24" height="24"></i>
+                <span class="icon-name">Clock (시간)</span>
+            </div>
+            <div class="icon-item">
+                <i data-lucide="trash-2" width="24" height="24"></i>
+                <span class="icon-name">Trash2 (삭제)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 애니메이션 테스트 -->
+    <div class="test-section">
+        <h2>3. 애니메이션 테스트</h2>
+        <div class="animation-demo">
+            <div>
+                <i data-lucide="loader-2" width="32" height="32" class="lucide-loader2"></i>
+                <p>Loader2 (회전)</p>
+            </div>
+            <div>
+                <i data-lucide="loader" width="32" height="32" style="animation: spin 1s linear infinite;"></i>
+                <p>Loader (회전)</p>
+            </div>
+            <div>
+                <i data-lucide="bell" width="32" height="32" class="lucide-pulse"></i>
+                <p>Bell (펄스)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 크기 변형 테스트 -->
+    <div class="test-section">
+        <h2>4. 아이콘 크기 변형</h2>
+        <div class="animation-demo">
+            <i data-lucide="heart" width="16" height="16" class="lucide-sm"></i>
+            <i data-lucide="heart" width="24" height="24"></i>
+            <i data-lucide="heart" width="32" height="32" class="lucide-lg"></i>
+            <i data-lucide="heart" width="40" height="40" class="lucide-xl"></i>
+            <i data-lucide="heart" width="48" height="48" class="lucide-2x"></i>
+            <i data-lucide="heart" width="64" height="64" class="lucide-3x"></i>
+        </div>
+    </div>
+
+    <!-- 5. 색상 유틸리티 테스트 -->
+    <div class="test-section">
+        <h2>5. 색상 유틸리티</h2>
+        <div class="animation-demo">
+            <i data-lucide="star" width="32" height="32" class="lucide-primary"></i>
+            <i data-lucide="star" width="32" height="32" class="lucide-success"></i>
+            <i data-lucide="star" width="32" height="32" class="lucide-danger"></i>
+            <i data-lucide="star" width="32" height="32" class="lucide-warning"></i>
+            <i data-lucide="star" width="32" height="32" class="lucide-info"></i>
+        </div>
+    </div>
+
+    <!-- 6. Helper 함수 테스트 -->
+    <div class="test-section">
+        <h2>6. Helper 함수 테스트</h2>
+        <div id="helper-test"></div>
+        <div class="button-demo">
+            <button class="btn btn-primary" onclick="testReplaceLucideIcon()">
+                replaceLucideIcon 테스트
+            </button>
+            <button class="btn btn-success" onclick="testCreateLucideIcon()">
+                createLucideIcon 테스트
+            </button>
+            <button class="btn btn-danger" onclick="testGetLucideIconName()">
+                getLucideIconName 테스트
+            </button>
+        </div>
+        <div id="helper-result" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Lucide Helper 함수 로드 (실제 환경에서는 footer.php에서 자동 로드)
+        const FA_TO_LUCIDE_MAP = {
+            'fas fa-times': 'x',
+            'fas fa-check': 'check',
+            'fas fa-user': 'user',
+            'fas fa-save': 'save',
+            'fas fa-trash': 'trash-2'
+        };
+
+        function replaceLucideIcon(element, iconName, className = '') {
+            if (!element) return;
+            element.innerHTML = '';
+            const icon = document.createElement('i');
+            icon.setAttribute('data-lucide', iconName);
+            if (className) icon.className = className;
+            element.appendChild(icon);
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        function createLucideIcon(iconName, className = '', size = 24) {
+            const icon = document.createElement('i');
+            icon.setAttribute('data-lucide', iconName);
+            icon.setAttribute('width', size);
+            icon.setAttribute('height', size);
+            if (className) icon.className = className;
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            return icon;
+        }
+
+        function getLucideIconName(fontAwesomeClass) {
+            return FA_TO_LUCIDE_MAP[fontAwesomeClass] || null;
+        }
+
+        // DOM 로드 후 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Lucide 로드 확인
+            const loadTestDiv = document.getElementById('lucide-load-test');
+            if (typeof lucide !== 'undefined') {
+                loadTestDiv.innerHTML = '<div class="test-result success">✅ Lucide CDN 정상 로드 완료!</div>';
+                lucide.createIcons();
+            } else {
+                loadTestDiv.innerHTML = '<div class="test-result error">❌ Lucide CDN 로드 실패</div>';
+            }
+        });
+
+        // Helper 함수 테스트
+        function testReplaceLucideIcon() {
+            const resultDiv = document.getElementById('helper-result');
+            const testDiv = document.createElement('div');
+            testDiv.id = 'replace-test';
+            testDiv.innerHTML = '<i class="fas fa-spinner"></i>';
+            resultDiv.appendChild(testDiv);
+
+            // 3초 후 아이콘 교체
+            setTimeout(() => {
+                replaceLucideIcon(testDiv, 'check-circle', 'lucide-success');
+                resultDiv.innerHTML += '<p style="color: #48bb78;">✅ replaceLucideIcon 성공! (3초 후 Spinner → CheckCircle)</p>';
+            }, 3000);
+
+            resultDiv.innerHTML = '<p style="color: #4299e1;">⏳ 3초 후 아이콘이 변경됩니다...</p>' + resultDiv.innerHTML;
+        }
+
+        function testCreateLucideIcon() {
+            const resultDiv = document.getElementById('helper-result');
+            const newIcon = createLucideIcon('rocket', 'lucide-primary', 32);
+            resultDiv.innerHTML = '<p style="color: #48bb78;">✅ createLucideIcon 성공!</p>';
+            resultDiv.appendChild(newIcon);
+        }
+
+        function testGetLucideIconName() {
+            const resultDiv = document.getElementById('helper-result');
+            const lucideName = getLucideIconName('fas fa-user');
+            resultDiv.innerHTML = `<p style="color: #48bb78;">✅ getLucideIconName('fas fa-user') = '${lucideName}'</p>`;
+        }
+    </script>
+</body>
+</html>

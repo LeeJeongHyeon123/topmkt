@@ -75,6 +75,21 @@
     <!-- Font Awesome 6.4.0 with fallback for connection issues -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <!-- Lucide Icons 0.460.0 (v5.0.0: Font Awesome과 병행 사용) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      // Lucide 아이콘 초기화 (DOM 로드 후)
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+      });
+    </script>
+
+    <!-- Lucide Custom CSS (v5.0.0) -->
+    <link rel="stylesheet" href="/assets/css/lucide-custom.css">
+
     <style>
     /* Font Awesome fallback - 연결 오류시 대체 스타일 */
     .fa-solid::before, .fas::before { 

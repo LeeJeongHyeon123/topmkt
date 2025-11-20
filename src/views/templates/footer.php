@@ -496,6 +496,9 @@
 <!-- 🚀 v3.65.0: 클립보드 복사 유틸리티 시스템 -->
 <?php require_once __DIR__ . '/../includes/clipboard-utils.js.php'; ?>
 
+<!-- 🚀 v5.0.0: Lucide Icons Helper 함수 시스템 -->
+<?php require_once __DIR__ . '/../includes/lucide-helper.js.php'; ?>
+
 <!-- 🚀 v3.88.0: FCM 앱 브릿지 시스템 -->
 <script src="/assets/js/fcm-app-bridge.js?v=<?= time() ?>"></script>
 

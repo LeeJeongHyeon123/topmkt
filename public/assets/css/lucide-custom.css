@@ -1,0 +1,161 @@
+/* ========================================
+   Lucide Icons 커스텀 스타일
+   v5.0.0 - Font Awesome → Lucide 전환
+   ======================================== */
+
+/* 1. 기본 아이콘 스타일 */
+i[data-lucide] {
+    display: inline-block;
+    vertical-align: middle;
+    width: 1em;
+    height: 1em;
+    stroke-width: 2;
+}
+
+/* 2. 로딩 스피너 애니메이션 (Loader2) */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.lucide-loader2,
+i[data-lucide="loader-2"] {
+    animation: spin 1s linear infinite;
+}
+
+/* 3. 아이콘 크기 변형 */
+.lucide-sm {
+    width: 0.875em;
+    height: 0.875em;
+}
+
+.lucide-lg {
+    width: 1.25em;
+    height: 1.25em;
+}
+
+.lucide-xl {
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.lucide-2x {
+    width: 2em;
+    height: 2em;
+}
+
+.lucide-3x {
+    width: 3em;
+    height: 3em;
+}
+
+/* 4. 아이콘 색상 유틸리티 */
+.lucide-primary {
+    color: #667eea;
+}
+
+.lucide-secondary {
+    color: #718096;
+}
+
+.lucide-success {
+    color: #48bb78;
+}
+
+.lucide-danger {
+    color: #f56565;
+}
+
+.lucide-warning {
+    color: #ed8936;
+}
+
+.lucide-info {
+    color: #4299e1;
+}
+
+.lucide-light {
+    color: #f7fafc;
+}
+
+.lucide-dark {
+    color: #2d3748;
+}
+
+/* 5. 아이콘 회전 */
+.lucide-rotate-90 {
+    transform: rotate(90deg);
+}
+
+.lucide-rotate-180 {
+    transform: rotate(180deg);
+}
+
+.lucide-rotate-270 {
+    transform: rotate(270deg);
+}
+
+/* 6. 아이콘 뒤집기 */
+.lucide-flip-horizontal {
+    transform: scaleX(-1);
+}
+
+.lucide-flip-vertical {
+    transform: scaleY(-1);
+}
+
+/* 7. 버튼 내 아이콘 정렬 */
+button i[data-lucide],
+a.btn i[data-lucide] {
+    margin-right: 0.5rem;
+}
+
+button i[data-lucide]:last-child,
+a.btn i[data-lucide]:last-child {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+/* 8. 호버 효과 */
+.lucide-hover:hover {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+/* 9. 펄스 애니메이션 (알림 등) */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.lucide-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 10. Font Awesome 호환 클래스 (마이그레이션 중 임시) */
+.fa-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* 11. 반응형 아이콘 크기 */
+@media (max-width: 768px) {
+    i[data-lucide] {
+        width: 1.1em;
+        height: 1.1em;
+    }
+}
+
+@media (max-width: 425px) {
+    i[data-lucide] {
+        width: 1.2em;
+        height: 1.2em;
+    }
+}
