@@ -765,7 +765,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 기본 정보 섹션 -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-info-circle"></i>
+                <i data-lucide="info" width="20" height="20"></i>
                 기본 정보
             </h3>
             
@@ -813,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 일정 정보 섹션 -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-calendar-alt"></i>
+                <i data-lucide="calendar" width="20" height="20"></i>
                 일정 정보
             </h3>
             
@@ -866,7 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 장소 정보 섹션 -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-map-marker-alt"></i>
+                <i data-lucide="map-pin" width="20" height="20"></i>
                 장소 정보
             </h3>
             
@@ -924,7 +924,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 행사 세부사항 섹션 -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-cogs"></i>
+                <i data-lucide="settings" width="20" height="20"></i>
                 행사 세부사항
             </h3>
             
@@ -951,13 +951,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="registration-toggle">
                     <input type="radio" id="allow_registration_yes" name="allow_online_registration" value="1" <?= (!$isEditMode || ($isEditMode && $event['allow_online_registration'] == 1)) ? 'checked' : '' ?>>
                     <label for="allow_registration_yes">
-                        <i class="fas fa-check-circle"></i>
+                        <i data-lucide="check-circle" width="20" height="20"></i>
                         온라인 참가 신청 접수
                     </label>
                     
                     <input type="radio" id="allow_registration_no" name="allow_online_registration" value="0" <?= ($isEditMode && $event['allow_online_registration'] == 0) ? 'checked' : '' ?>>
                     <label for="allow_registration_no">
-                        <i class="fas fa-times-circle"></i>
+                        <i data-lucide="x-circle" width="20" height="20"></i>
                         참가 신청을 받지 않음
                     </label>
                 </div>
@@ -971,7 +971,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 행사 이미지 섹션 -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-images"></i>
+                <i data-lucide="images" width="20" height="20"></i>
                 행사 이미지
             </h3>
             
@@ -992,13 +992,13 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 강사 정보 섹션 -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-user-tie"></i>
+                <i data-lucide="user" width="20" height="20"></i>
                 강사/연사 정보
             </h3>
             
             <div class="form-group">
                 <button type="button" id="add-instructor" class="btn btn-secondary">
-                    <i class="fas fa-plus"></i>
+                    <i data-lucide="plus" width="20" height="20"></i>
                     강사 추가 (최대 5명)
                 </button>
                 <div class="help-text">행사의 강사나 연사 정보를 추가할 수 있습니다.</div>
@@ -1012,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 추가 정보 섹션 -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-plus-circle"></i>
+                <i data-lucide="plus-circle" width="20" height="20"></i>
                 추가 정보
             </h3>
             
@@ -1028,11 +1028,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 등록 버튼 -->
         <div class="form-buttons">
             <a href="/events" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
+                <i data-lucide="arrow-left" width="20" height="20"></i>
                 취소
             </a>
             <button type="submit" class="btn btn-primary" id="submit-btn">
-                <i class="fas fa-<?= $isEditMode ? 'save' : 'calendar-plus' ?>"></i>
+                <i data-lucide="<?= $isEditMode ? 'save' : 'calendar-plus' ?>" width="20" height="20"></i>
                 <?= $isEditMode ? '행사 수정' : '행사 등록' ?>
             </button>
         </div>
@@ -1532,7 +1532,7 @@ function addInstructor() {
         <div class="instructor-header">
             <h4 class="instructor-title">강사 ${instructorIndex + 1}</h4>
             <button type="button" class="remove-instructor" onclick="removeInstructor(${instructorIndex})">
-                <i class="fas fa-trash"></i> 제거
+                <i data-lucide="trash-2" width="20" height="20"></i> 제거
             </button>
         </div>
         
@@ -1593,7 +1593,7 @@ function updateAddInstructorButton() {
         btn.style.display = 'none';
     } else {
         btn.style.display = 'inline-flex';
-        btn.innerHTML = `<i class="fas fa-plus"></i> 강사 추가 (${remainingSlots}명 추가 가능)`;
+        btn.innerHTML = `<i data-lucide="plus" width="20" height="20"></i> 강사 추가 (${remainingSlots}명 추가 가능)`;
     }
 }
 
@@ -1945,7 +1945,7 @@ function loadEditData() {
             previewItem.innerHTML = `
                 <img src="${image.image_path || image.url}" alt="${image.alt_text || ''}">
                 <button type="button" class="remove-image" onclick="removeExistingImage(this, ${image.id})">
-                    <i class="fas fa-times"></i>
+                    <i data-lucide="x" width="20" height="20"></i>
                 </button>
                 <input type="hidden" name="existing_images[]" value="${image.id}">
             `;

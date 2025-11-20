@@ -98,11 +98,11 @@ if (isset($styleFile) && file_exists($styleFile)) {
             
             <div class="event-meta-row">
                 <div class="event-meta-item">
-                    <i class="fas fa-calendar"></i>
+                    <i data-lucide="calendar" width="20" height="20"></i>
                     <span><?= date('Y년 n월 j일', strtotime($event['start_date'])) ?></span>
                 </div>
                 <div class="event-meta-item">
-                    <i class="fas fa-clock"></i>
+                    <i data-lucide="clock" width="20" height="20"></i>
                     <span>
                         <?php
                         // 시작 시간만 표시
@@ -115,7 +115,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                     </span>
                 </div>
                 <div class="event-meta-item">
-                    <i class="fas fa-map-marker-alt"></i>
+                    <i data-lucide="map-pin" width="20" height="20"></i>
                     <span>
                         <?php if ($event['location_type'] === 'online'): ?>
                             온라인
@@ -128,7 +128,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                 </div>
                 <?php if (!empty($event['registration_deadline'])): ?>
                 <div class="event-meta-item">
-                    <i class="fas fa-hourglass-half"></i>
+                    <i data-lucide="hourglass" width="20" height="20"></i>
                     <span>
                         <?php
                         $deadline = new DateTime($event['registration_deadline']);
@@ -217,7 +217,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
         <div class="event-sidebar">
             <!-- 등록 정보 -->
             <div class="info-card register-card">
-                <h3><i class="fas fa-ticket-alt"></i>
+                <h3><i data-lucide="ticket" width="20" height="20"></i>
                     <?php if ($event['registration_fee'] && $event['registration_fee'] > 0): ?>
                         참가 신청 비용
                     <?php else: ?>
@@ -275,7 +275,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(255, 193, 7, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i class="fas fa-user-edit" style="
+                                <i data-lucide="user-cog" width="20" height="20" style="
                                     font-size: 2rem;
                                     color: #ffc107;
                                     margin-bottom: 8px;
@@ -306,7 +306,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i class="fas fa-users" style="
+                                <i data-lucide="users" width="20" height="20" style="
                                     font-size: 2rem;
                                     color: #dc3545;
                                     margin-bottom: 8px;
@@ -334,7 +334,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                                 border-left: 4px solid #17a2b8;
                                 margin-top: 15px;
                             ">
-                                <i class="fas fa-clock" style="color: #17a2b8; margin-right: 8px;"></i>
+                                <i data-lucide="clock" width="20" height="20" style="color: #17a2b8; margin-right: 8px;"></i>
                                 <span style="color: #495057; font-size: 0.95rem;">
                                     취소 발생 시 선착순으로 신청 가능합니다
                                 </span>
@@ -352,7 +352,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(23, 162, 184, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i class="fas fa-play-circle" style="
+                                <i data-lucide="play-circle" width="20" height="20" style="
                                     font-size: 2rem;
                                     color: #17a2b8;
                                     margin-bottom: 8px;
@@ -401,7 +401,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i class="fas fa-clock" style="
+                                <i data-lucide="clock" width="20" height="20" style="
                                     font-size: 2rem;
                                     color: #dc3545;
                                     margin-bottom: 8px;
@@ -425,7 +425,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                         </div>
                     <?php elseif (!$event['allow_online_registration'] || $event['allow_online_registration'] == 0): ?>
                         <div class="no-registration-notice" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; color: #64748b;">
-                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                            <i data-lucide="info" width="20" height="20" style="margin-right: 8px;"></i>
                             온라인 참가 신청을 받지 않는 행사입니다<br>
                             <small style="color: #94a3b8;">참가 문의는 주최자에게 별도 연락하세요</small>
                         </div>
@@ -434,7 +434,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                         <div id="event-status-message" class="event-status-message" style="display: none; margin-bottom: 15px;">
                             <div class="status-content">
                                 <div class="status-icon">
-                                    <i class="fas fa-info-circle"></i>
+                                    <i data-lucide="info" width="20" height="20"></i>
                                 </div>
                                 <div class="status-text">
                                     <div class="status-title" id="event-status-title"></div>
@@ -487,7 +487,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i class="fas fa-clock" style="
+                                <i data-lucide="clock" width="20" height="20" style="
                                     font-size: 2rem;
                                     color: #dc3545;
                                     margin-bottom: 8px;
@@ -511,7 +511,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                         </div>
                     <?php elseif (!$event['allow_online_registration'] || $event['allow_online_registration'] == 0): ?>
                         <div class="no-registration-notice" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; color: #64748b;">
-                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                            <i data-lucide="info" width="20" height="20" style="margin-right: 8px;"></i>
                             온라인 참가 신청을 받지 않는 행사입니다<br>
                             <small style="color: #94a3b8;">참가 문의는 주최자에게 별도 연락하세요</small>
                         </div>
@@ -527,7 +527,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
 
             <!-- 행사 정보 -->
             <div class="info-card">
-                <h3><i class="fas fa-info-circle"></i> 행사 정보</h3>
+                <h3><i data-lucide="info" width="20" height="20"></i> 행사 정보</h3>
                 <ul class="info-list">
                     <li>
                         <span class="info-label">시작</span>
@@ -623,7 +623,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
             ?>
             <?php if ($hasValidInstructors): ?>
             <div class="info-card instructors-card">
-                <h3><i class="fas fa-users"></i> 강사/연사 정보</h3>
+                <h3><i data-lucide="users" width="20" height="20"></i> 강사/연사 정보</h3>
                 <div class="instructors-list">
                     <?php foreach ($event['instructors'] as $instructor): ?>
                     <?php if ((!empty($instructor['name']) && $instructor['name'] !== '미정') || (!empty($instructor['info']) && trim($instructor['info']) !== '')): ?>
@@ -659,7 +659,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
             <?php elseif ((!empty($event['instructor_name']) && $event['instructor_name'] !== '미정') || (!empty($event['instructor_info']) && trim($event['instructor_info']) !== '')): ?>
             <!-- 기본 강사 정보 표시 (instructor_name, instructor_info 필드 사용) -->
             <div class="info-card instructors-card">
-                <h3><i class="fas fa-user"></i> 강사 정보</h3>
+                <h3><i data-lucide="user" width="20" height="20"></i> 강사 정보</h3>
                 <div class="instructors-list">
                     <div class="instructor-item">
                         <div class="instructor-header">
@@ -691,7 +691,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
             <?php if ($event['venue_address'] || $event['online_link']): ?>
             <!-- 장소 정보 -->
             <div class="info-card">
-                <h3><i class="fas fa-map-marker-alt"></i> 장소 안내</h3>
+                <h3><i data-lucide="map-pin" width="20" height="20"></i> 장소 안내</h3>
                 <ul class="info-list">
                     <?php if ($event['venue_name']): ?>
                     <li>
@@ -721,7 +721,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
             <!-- 행사장 지도 (오프라인/하이브리드 행사만 표시) -->
             <?php if (in_array($event['location_type'], ['offline', 'hybrid']) && $event['venue_address']): ?>
             <div class="info-card">
-                <h3><i class="fas fa-map"></i> 오시는 길</h3>
+                <h3><i data-lucide="map" width="20" height="20"></i> 오시는 길</h3>
                 <div id="eventVenueMap" style="width: 100%; height: 300px; border-radius: 8px; margin-top: 15px;"></div>
                 <div style="text-align: center; margin-top: 10px; color: #64748b; font-size: 0.9rem;">
                     지도를 드래그하여 위치를 확인하세요
@@ -733,7 +733,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
             <!-- 작성자 정보 -->
             <?php if (isset($event['user_id'])): ?>
                 <div class="info-card author-info-card">
-                    <h3><i class="fas fa-user-edit"></i> 작성자</h3>
+                    <h3><i data-lucide="user-cog" width="20" height="20"></i> 작성자</h3>
                     <div class="author-info-compact">
                         <?php
                         // 작성자 정보만 추출 (행사 데이터가 아닌 사용자 데이터로 변환)
@@ -765,13 +765,13 @@ if (isset($styleFile) && file_exists($styleFile)) {
                     <div style="display: flex; gap: 10px; margin-top: 12px; align-items: center;">
                         <?php if (isset($event['user_id'])): ?>
                             <a href="/profile/<?= $event['user_id'] ?>" class="btn-visit-profile" style="flex: 1;">
-                                <i class="fas fa-user"></i> 프로필 방문
+                                <i data-lucide="user" width="20" height="20"></i> 프로필 방문
                             </a>
                             <?php if ($isLoggedIn && $event['user_id'] != $currentUserId): ?>
                                 <?= renderButton('', 'primary', 'md', [
                                     'class' => 'btn-chat-author',
                                     'onclick' => 'startChatWithAuthor(' . $event['user_id'] . ', \'' . addslashes(htmlspecialchars($authorName)) . '\')',
-                                    'icon' => 'fas fa-comment',
+                                    'icon' => 'message-square',
                                     'ariaLabel' => '채팅하기'
                                 ]) ?>
                             <?php endif; ?>
@@ -796,7 +796,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                 <!-- 개인 정보 섹션 -->
                 <div class="form-section">
                     <h4 class="form-section-title">
-                        <i class="fas fa-user"></i> 개인 정보 (필수)
+                        <i data-lucide="user" width="20" height="20"></i> 개인 정보 (필수)
                     </h4>
                     <div class="form-row">
                         <div class="form-group">
@@ -818,7 +818,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                 <!-- 소속 정보 섹션 -->
                 <div class="form-section">
                     <h4 class="form-section-title">
-                        <i class="fas fa-building"></i> 소속 정보 (선택)
+                        <i data-lucide="building" width="20" height="20"></i> 소속 정보 (선택)
                     </h4>
                     <div class="form-row">
                         <div class="form-group">
@@ -835,7 +835,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                 <!-- 추가 정보 섹션 -->
                 <div class="form-section">
                     <h4 class="form-section-title">
-                        <i class="fas fa-clipboard-check"></i> 추가 정보 (선택)
+                        <i data-lucide="clipboard-check" width="20" height="20"></i> 추가 정보 (선택)
                     </h4>
                     <div class="form-group">
                         <label for="event_motivation">참가 동기/목적</label>

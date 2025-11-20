@@ -150,7 +150,7 @@ if (file_exists($styleFile)) {
             <div id="lecture-status-message" class="lecture-status-message" style="display: none;">
                 <div class="status-content">
                     <div class="status-icon">
-                        <i class="fas fa-info-circle"></i>
+                        <i data-lucide="info" width="20" height="20"></i>
                     </div>
                     <div class="status-text">
                         <div class="status-title" id="lecture-status-title"></div>
@@ -852,13 +852,13 @@ if (file_exists($styleFile)) {
                     <div style="display: flex; gap: 10px; margin-top: 12px; align-items: center;">
                         <?php if (isset($lecture['user_id'])): ?>
                             <a href="/profile/<?= $lecture['user_id'] ?>" class="btn-visit-profile" style="flex: 1;">
-                                <i class="fas fa-user"></i> 프로필 방문
+                                <i data-lucide="user" width="20" height="20"></i> 프로필 방문
                             </a>
                             <?php if ($isLoggedIn && $lecture['user_id'] != $currentUserId): ?>
                                 <?= renderButton('', 'primary', 'md', [
                                     'class' => 'btn-chat-author',
                                     'onclick' => 'startChatWithAuthor(' . $lecture['user_id'] . ', \'' . addslashes(htmlspecialchars($authorName)) . '\')',
-                                    'icon' => 'fas fa-comment',
+                                    'icon' => 'message-square',
                                     'ariaLabel' => '채팅하기'
                                 ]) ?>
                             <?php endif; ?>

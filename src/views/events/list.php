@@ -1129,7 +1129,7 @@ div.event-card {
             <div class="events-list">
                 <?php if (empty($events)): ?>
                     <div class="no-events">
-                        <i class="fas fa-calendar-times"></i>
+                        <i data-lucide="calendar-x" width="20" height="20"></i>
                         <h3><?= $year ?>년 <?= $monthNames[$month] ?>에 등록된 행사가 없습니다</h3>
                         <p>새로운 행사를 등록하거나 다른 달을 확인해보세요.</p>
                         <?php if ($isLoggedIn && isset($permission) && $permission['hasPermission']): ?>
@@ -1152,15 +1152,15 @@ div.event-card {
 
                                 <div class="event-meta">
                                     <div class="event-meta-item">
-                                        <i class="fas fa-calendar"></i>
+                                        <i data-lucide="calendar" width="20" height="20"></i>
                                         <span><?= date('n월 j일', strtotime($event['start_date'])) ?></span>
                                     </div>
                                     <div class="event-meta-item">
-                                        <i class="fas fa-clock"></i>
+                                        <i data-lucide="clock" width="20" height="20"></i>
                                         <span><?= date('H:i', strtotime($event['start_time'])) ?></span>
                                     </div>
                                     <div class="event-meta-item">
-                                        <i class="fas fa-map-marker-alt"></i>
+                                        <i data-lucide="map-pin" width="20" height="20"></i>
                                         <span>
                                             <?php if ($event['location_type'] === 'online'): ?>
                                                 온라인
@@ -1173,7 +1173,7 @@ div.event-card {
                                     </div>
                                     <?php if ($event['max_participants']): ?>
                                     <div class="event-meta-item">
-                                        <i class="fas fa-users"></i>
+                                        <i data-lucide="users" width="20" height="20"></i>
                                         <span>최대 <?= number_format($event['max_participants']) ?>명</span>
                                     </div>
                                     <?php endif; ?>
@@ -1186,7 +1186,7 @@ div.event-card {
 
                             <div class="event-footer">
                                 <div class="event-instructor">
-                                    <i class="fas fa-user"></i>
+                                    <i data-lucide="user" width="20" height="20"></i>
                                     <?= htmlspecialchars($event['instructor_name']) ?>
                                 </div>
                                 <div class="event-fee">

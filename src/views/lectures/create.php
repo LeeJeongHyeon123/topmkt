@@ -112,7 +112,7 @@ if (file_exists($styleFile)) {
                     <div class="instructor-header">
                         <h3>강사 1</h3>
                         <button type="button" class="remove-instructor-btn" style="display: none;">
-                            <i class="fas fa-times"></i> 제거
+                            <i data-lucide="x" width="20" height="20"></i> 제거
                         </button>
                     </div>
                     <!-- 강사 이미지 업로드 -->
@@ -120,11 +120,11 @@ if (file_exists($styleFile)) {
                         <label class="form-label">강사 프로필 이미지</label>
                         <div class="instructor-image-container" onclick="document.getElementById('instructor_image_0').click()">
                             <div class="instructor-image-placeholder">
-                                <i class="fas fa-user-circle"></i>
+                                <i data-lucide="user-circle" width="20" height="20"></i>
                                 <span>클릭하여 이미지 선택</span>
                             </div>
                             <button type="button" class="remove-instructor-image" onclick="removeInstructorImage(0)">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="20" height="20"></i>
                             </button>
                         </div>
                         <input type="file" id="instructor_image_0" name="instructors[0][image]"
@@ -165,10 +165,10 @@ if (file_exists($styleFile)) {
             
             <div class="instructor-actions">
                 <button type="button" id="add-instructor-btn" class="btn btn-outline">
-                    <i class="fas fa-plus"></i> 강사 추가
+                    <i data-lucide="plus" width="20" height="20"></i> 강사 추가
                 </button>
                 <div class="instructor-limit-info">
-                    <i class="fas fa-info-circle"></i>
+                    <i data-lucide="info" width="20" height="20"></i>
                     <span>최대 5명까지 강사를 추가할 수 있습니다</span>
                 </div>
             </div>
@@ -345,14 +345,14 @@ if (file_exists($styleFile)) {
                             <input type="file" id="lecture_images" name="lecture_images[]" 
                                    accept="image/*" multiple style="display: none;">
                             <div class="upload-placeholder" id="lectureImagePlaceholder">
-                                <i class="fas fa-images upload-icon"></i>
+                                <i data-lucide="images" width="24" height="24" class="upload-icon"></i>
                                 <p>클릭하여 강의 이미지 업로드</p>
                                 <span class="upload-help">JPG, PNG, GIF, WebP 파일 (최대 30MB, 최대 8장)</span>
                             </div>
                         </div>
                         <div class="image-preview-container sortable-container" id="lectureImagePreview">
                             <div class="drag-instructions" style="display: none;">
-                                <i class="fas fa-arrows-alt"></i>
+                                <i data-lucide="move" width="20" height="20"></i>
                                 <span>드래그하여 순서를 변경하세요</span>
                             </div>
                         </div>
@@ -568,7 +568,7 @@ async function updateLectureImagesDisplay(updatedImages) {
         imageItem.setAttribute('data-image-index', index);
         imageItem.innerHTML = '<div class="image-container">' +
             '<img src="' + image.file_path + '" alt="' + (image.original_name || '강의 이미지') + '" class="lecture-image-preview">' +
-            '<button type="button" class="remove-existing-image"><i class="fas fa-times"></i></button>' +
+            '<button type="button" class="remove-existing-image"><i data-lucide="x" width="20" height="20"></i></button>' +
             '</div>' +
             '<div class="image-info">' +
             '<div style="font-size: 12px; color: #666; margin-bottom: 2px;">' + (image.original_name || '알 수 없는 파일') + '</div>' +
@@ -656,7 +656,7 @@ function handleInstructorImage(index, input) {
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
         removeBtn.className = 'remove-instructor-image';
-        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.innerHTML = '<i data-lucide="x" width="20" height="20"></i>';
         removeBtn.onclick = function() { removeInstructorImage(index); };
         
         // 컨테이너에 추가
@@ -683,11 +683,11 @@ function removeInstructorImage(index) {
         // 플레이스홀더로 복원
         container.innerHTML = `
             <div class="instructor-image-placeholder">
-                <i class="fas fa-user-circle"></i>
+                <i data-lucide="user-circle" width="20" height="20"></i>
                 <span>클릭하여 이미지 선택</span>
             </div>
             <button type="button" class="remove-instructor-image" onclick="removeInstructorImage(${index})">
-                <i class="fas fa-times"></i>
+                <i data-lucide="x" width="20" height="20"></i>
             </button>
         `;
         
@@ -769,7 +769,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="instructor-header">
                 <h3>강사 ${instructorCount + 1}</h3>
                 <button type="button" class="remove-instructor-btn">
-                    <i class="fas fa-times"></i> 제거
+                    <i data-lucide="x" width="20" height="20"></i> 제거
                 </button>
             </div>
             <!-- 강사 이미지 업로드 -->
@@ -777,11 +777,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <label class="form-label">강사 프로필 이미지</label>
                 <div class="instructor-image-container" onclick="document.getElementById('instructor_image_${instructorCount}').click()">
                     <div class="instructor-image-placeholder">
-                        <i class="fas fa-user-circle"></i>
+                        <i data-lucide="user-circle" width="20" height="20"></i>
                         <span>클릭하여 이미지 선택</span>
                     </div>
                     <button type="button" class="remove-instructor-image" onclick="removeInstructorImage(${instructorCount})">
-                        <i class="fas fa-times"></i>
+                        <i data-lucide="x" width="20" height="20"></i>
                     </button>
                 </div>
                 <input type="file" id="instructor_image_${instructorCount}" name="instructors[${instructorCount}][image]"
@@ -907,26 +907,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const limitInfo = document.querySelector('.instructor-limit-info');
         if (instructorCount >= maxInstructors) {
             addButton.disabled = true;
-            addButton.innerHTML = '<i class="fas fa-check"></i> 최대 강사 수 도달';
+            addButton.innerHTML = '<i data-lucide="check" width="20" height="20"></i> 최대 강사 수 도달';
             addButton.classList.add('btn-disabled');
 
             // 안내 메시지 업데이트
             if (limitInfo) {
                 limitInfo.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
+                    <i data-lucide="check-circle" width="20" height="20"></i>
                     <span>최대 ${maxInstructors}명의 강사가 모두 등록되었습니다</span>
                 `;
                 limitInfo.classList.add('limit-reached');
             }
         } else {
             addButton.disabled = false;
-            addButton.innerHTML = '<i class="fas fa-plus"></i> 강사 추가';
+            addButton.innerHTML = '<i data-lucide="plus" width="20" height="20"></i> 강사 추가';
             addButton.classList.remove('btn-disabled');
 
             // 안내 메시지 원상복귀
             if (limitInfo) {
                 limitInfo.innerHTML = `
-                    <i class="fas fa-info-circle"></i>
+                    <i data-lucide="info" width="20" height="20"></i>
                     <span>최대 ${maxInstructors}명까지 강사를 추가할 수 있습니다 (현재 ${instructorCount}명)</span>
                 `;
                 limitInfo.classList.remove('limit-reached');
@@ -1171,11 +1171,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="image-container">
                     <img src="${e.target.result}" alt="강의 이미지">
                     <div class="drag-handle">
-                        <i class="fas fa-grip-lines"></i>
+                        <i data-lucide="grip-horizontal" width="20" height="20"></i>
                     </div>
                     <div class="image-order">${currentOrder}</div>
                     <button type="button" class="remove-lecture-image">
-                        <i class="fas fa-times"></i>
+                        <i data-lucide="x" width="20" height="20"></i>
                     </button>
                 </div>
                 <div class="image-info">
@@ -2644,7 +2644,7 @@ function createAdditionalInstructorField(container, index) {
         <div class="instructor-header">
             <h3>강사 ${index + 1}</h3>
             <button type="button" class="remove-instructor-btn" onclick="removeInstructorField(this.closest('.instructor-item'))">
-                <i class="fas fa-times"></i> 제거
+                <i data-lucide="x" width="20" height="20"></i> 제거
             </button>
         </div>
         <!-- 강사 이미지 업로드 -->
@@ -2652,11 +2652,11 @@ function createAdditionalInstructorField(container, index) {
             <label class="form-label">강사 프로필 이미지</label>
             <div class="instructor-image-container" onclick="document.getElementById('instructor_image_${index}').click()">
                 <div class="instructor-image-placeholder">
-                    <i class="fas fa-user-circle"></i>
+                    <i data-lucide="user-circle" width="20" height="20"></i>
                     <span>클릭하여 이미지 선택</span>
                 </div>
                 <button type="button" class="remove-instructor-image" onclick="removeInstructorImage(${index})">
-                    <i class="fas fa-times"></i>
+                    <i data-lucide="x" width="20" height="20"></i>
                 </button>
             </div>
             <input type="file" id="instructor_image_${index}" name="instructors[${index}][image]"
@@ -2752,7 +2752,7 @@ function loadInstructorImageDirect(index, imageUrl) {
             removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'remove-instructor-image';
-            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.innerHTML = '<i data-lucide="x" width="20" height="20"></i>';
             removeBtn.style.display = 'flex';
             removeBtn.onclick = function() { removeInstructorImage(index); };
             container.appendChild(removeBtn);
@@ -2790,11 +2790,11 @@ function displayExistingImages(images) {
                      style="width: 100%; height: 100%; object-fit: cover; display: block;" 
                      onerror="this.src='<?= DEFAULT_AVATAR_PATH ?>';">
                 <div class="drag-handle">
-                    <i class="fas fa-grip-lines"></i>
+                    <i data-lucide="grip-horizontal" width="20" height="20"></i>
                 </div>
                 <div class="image-order">${index + 1}</div>
                 <button type="button" class="remove-lecture-image" onclick="removeExistingImage(${index})">
-                    <i class="fas fa-times"></i>
+                    <i data-lucide="x" width="20" height="20"></i>
                 </button>
             </div>
             <div class="image-info">
