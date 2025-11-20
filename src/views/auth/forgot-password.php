@@ -95,7 +95,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="phone" class="form-label">
-                            <i class="fas fa-mobile-alt" aria-hidden="true"></i>
+                            <i data-lucide="smartphone" width="20" height="20" aria-hidden="true"></i>
                             <span class="label-text">휴대폰 번호</span>
                         </label>
                         <div class="input-wrapper">
@@ -111,8 +111,8 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 autocomplete="tel"
                             >
                             <div class="input-status" aria-hidden="true">
-                                <i class="fas fa-check-circle success-icon"></i>
-                                <i class="fas fa-exclamation-circle error-icon"></i>
+                                <i data-lucide="check-circle" width="20" height="20" class="success-icon"></i>
+                                <i data-lucide="alert-circle" width="20" height="20" class="error-icon"></i>
                             </div>
                         </div>
                         <div class="form-help">
@@ -123,11 +123,11 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <button type="submit" class="submit-button" id="step1Button">
                         <span class="button-content">
-                            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                            <i data-lucide="send" width="20" height="20" aria-hidden="true"></i>
                             <span class="button-text">인증 코드 발송</span>
                         </span>
                         <span class="loading-spinner" aria-hidden="true">
-                            <i class="fas fa-spinner fa-spin"></i>
+                            <i data-lucide="loader-2" width="20" height="20" class="lucide-spin"></i>
                             <span class="loading-text">발송 중...</span>
                         </span>
                     </button>
@@ -147,7 +147,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="verification_code" class="form-label">
-                            <i class="fas fa-key" aria-hidden="true"></i>
+                            <i data-lucide="key" width="20" height="20" aria-hidden="true"></i>
                             <span class="label-text">인증 코드</span>
                         </label>
                         <div class="input-wrapper">
@@ -163,8 +163,8 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 autocomplete="one-time-code"
                             >
                             <div class="input-status" aria-hidden="true">
-                                <i class="fas fa-check-circle success-icon"></i>
-                                <i class="fas fa-exclamation-circle error-icon"></i>
+                                <i data-lucide="check-circle" width="20" height="20" class="success-icon"></i>
+                                <i data-lucide="alert-circle" width="20" height="20" class="error-icon"></i>
                             </div>
                         </div>
                         <div class="form-help">
@@ -176,11 +176,11 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <div class="button-group">
                         <button type="submit" class="submit-button primary full-width" id="step2Button">
                             <span class="button-content">
-                                <i class="fas fa-check" aria-hidden="true"></i>
+                                <i data-lucide="check" width="20" height="20" aria-hidden="true"></i>
                                 <span class="button-text">인증 코드 확인</span>
                             </span>
                             <span class="loading-spinner" aria-hidden="true">
-                                <i class="fas fa-spinner fa-spin"></i>
+                                <i data-lucide="loader-2" width="20" height="20" class="lucide-spin"></i>
                                 <span class="loading-text">확인 중...</span>
                             </span>
                         </button>
@@ -190,7 +190,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <div class="resend-section">
                         <p class="resend-text">인증 코드를 받지 못하셨나요?</p>
                         <button type="button" class="resend-button" id="resendCode">
-                            <i class="fas fa-redo"></i>
+                            <i data-lucide="refresh-cw" width="18" height="18"></i>
                             인증 코드 재발송
                         </button>
                     </div>
@@ -209,7 +209,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="new_password" class="form-label">
-                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <i data-lucide="lock" width="20" height="20" aria-hidden="true"></i>
                             <span class="label-text">새 비밀번호</span>
                         </label>
                         <div class="input-wrapper">
@@ -224,7 +224,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 autocomplete="new-password"
                             >
                             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('new_password')">
-                                <i class="fas fa-eye" id="new_password_eye"></i>
+                                <i data-lucide="eye" width="20" height="20" id="new_password_eye"></i>
                             </button>
                         </div>
                         <div class="form-help">
@@ -235,7 +235,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="confirm_password" class="form-label">
-                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <i data-lucide="lock" width="20" height="20" aria-hidden="true"></i>
                             <span class="label-text">비밀번호 확인</span>
                         </label>
                         <div class="input-wrapper">
@@ -250,11 +250,11 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 autocomplete="new-password"
                             >
                             <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirm_password')">
-                                <i class="fas fa-eye" id="confirm_password_eye"></i>
+                                <i data-lucide="eye" width="20" height="20" id="confirm_password_eye"></i>
                             </button>
                         </div>
                         <div class="password-match-indicator" id="passwordMatch" style="display: none;">
-                            <i class="fas fa-check-circle text-success"></i>
+                            <i data-lucide="check-circle" width="20" height="20" class="text-success"></i>
                             <span>비밀번호가 일치합니다</span>
                         </div>
                         <div class="error-message" role="alert"></div>
@@ -263,11 +263,11 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <div class="button-group">
                         <button type="submit" class="submit-button primary full-width" id="step3Button">
                             <span class="button-content">
-                                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                <i data-lucide="check-circle" width="20" height="20" aria-hidden="true"></i>
                                 <span class="button-text">비밀번호 재설정 완료</span>
                             </span>
                             <span class="loading-spinner" aria-hidden="true">
-                                <i class="fas fa-spinner fa-spin"></i>
+                                <i data-lucide="loader-2" width="20" height="20" class="lucide-spin"></i>
                                 <span class="loading-text">처리 중...</span>
                             </span>
                         </button>
@@ -277,14 +277,14 @@ require_once SRC_PATH . '/views/templates/header.php';
 
             <!-- 네비게이션 링크 -->
             <nav class="auth-navigation" role="navigation" aria-label="인증 페이지 내비게이션">
-                <a href="/auth/login" class="nav-link primary" 
+                <a href="/auth/login" class="nav-link primary"
                    title="로그인 페이지로 이동">
-                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    <i data-lucide="arrow-left" width="18" height="18" aria-hidden="true"></i>
                     <span>로그인으로 돌아가기</span>
                 </a>
                 <a href="/auth/signup" class="nav-link secondary"
                    title="회원가입 페이지로 이동">
-                    <i class="fas fa-user-plus" aria-hidden="true"></i>
+                    <i data-lucide="user-plus" width="18" height="18" aria-hidden="true"></i>
                     <span>회원가입</span>
                 </a>
             </nav>
@@ -1264,6 +1264,16 @@ main.forgot-password-main div.content-wrapper div.form-container {
     outline-offset: 2px;
 }
 
+/* Lucide spinner animation */
+@keyframes lucide-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.lucide-spin {
+    animation: lucide-spin 1s linear infinite;
+}
+
 /* ========== 화이트 배경 기반 깔끔한 색상 시스템 ========== */
 /* 화이트 배경에 최적화된 텍스트 색상 */
 .forgot-password-main .main-title,
@@ -1632,13 +1642,18 @@ class MultiStepPasswordResetManager {
         alert.className = `alert alert-${type}`;
         alert.setAttribute('role', 'alert');
         
-        const iconClass = type === 'error' ? 'exclamation-triangle' : 
-                         type === 'success' ? 'check-circle' : 'info-circle';
-        
+        const iconClass = type === 'error' ? 'alert-triangle' :
+                         type === 'success' ? 'check-circle' : 'info';
+
         alert.innerHTML = `
-            <i class="fas fa-${iconClass}"></i>
+            <i data-lucide="${iconClass}" width="20" height="20"></i>
             <span class="alert-message">${message}</span>
         `;
+
+        // Initialize Lucide icons for the alert
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
         
         this.alertZone.appendChild(alert);
         
@@ -1654,23 +1669,34 @@ class MultiStepPasswordResetManager {
     togglePasswordVisibility(inputId) {
         const input = document.getElementById(inputId);
         const eyeIcon = document.getElementById(inputId + '_eye');
-        
+
         if (!input || !eyeIcon) {
             return;
         }
-        
+
         if (input.type === 'password') {
             input.type = 'text';
-            eyeIcon.className = 'fas fa-eye-slash';
+            eyeIcon.setAttribute('data-lucide', 'eye-off');
+            eyeIcon.setAttribute('width', '20');
+            eyeIcon.setAttribute('height', '20');
+            lucide.createIcons();
         } else {
             input.type = 'password';
-            eyeIcon.className = 'fas fa-eye';
+            eyeIcon.setAttribute('data-lucide', 'eye');
+            eyeIcon.setAttribute('width', '20');
+            eyeIcon.setAttribute('height', '20');
+            lucide.createIcons();
         }
     }
 }
 // DOM 로드 완료 후 초기화
 document.addEventListener('DOMContentLoaded', () => {
     window.multiStepPasswordReset = new MultiStepPasswordResetManager();
+
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 
 // 전역 함수로 비밀번호 보기/숨기기 함수 제공

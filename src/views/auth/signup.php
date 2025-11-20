@@ -31,7 +31,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <div class="auth-header">
                     <div class="auth-logo">
                         <div class="logo-icon">
-                            <i class="fas fa-rocket"></i>
+                            <i data-lucide="rocket" width="32" height="32"></i>
                         </div>
                         <span class="logo-text"><?= APP_NAME ?? '탑마케팅' ?></span>
                     </div>
@@ -43,7 +43,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <form class="auth-form" method="POST" action="/auth/signup" id="signup-form">
                     <div class="form-group">
                         <label for="nickname" class="form-label">
-                            <i class="fas fa-user"></i>
+                            <i data-lucide="user" width="20" height="20"></i>
                             닉네임 <span class="required">*</span>
                         </label>
                         <div class="input-wrapper">
@@ -63,7 +63,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                         </div>
                         <div class="field-status-message" id="nickname-status-message" style="display: none;">
                             <div class="status-indicator" id="nickname-indicator">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                                 <span id="nickname-message-text">닉네임을 확인하는 중...</span>
                             </div>
                         </div>
@@ -72,7 +72,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="phone" class="form-label">
-                            <i class="fas fa-mobile-alt"></i>
+                            <i data-lucide="smartphone" width="20" height="20"></i>
                             휴대폰 번호 <span class="required">*</span>
                         </label>
                         <div class="phone-verification-group">
@@ -97,7 +97,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                         </div>
                         <div class="field-status-message" id="phone-status-message" style="display: none;">
                             <div class="status-indicator" id="phone-indicator">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                                 <span id="phone-message-text">휴대폰 번호를 확인하는 중...</span>
                             </div>
                         </div>
@@ -107,7 +107,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <!-- 인증번호 입력 필드 -->
                     <div class="form-group" id="verification-group" style="display: none;">
                         <label for="verification_code" class="form-label">
-                            <i class="fas fa-shield-alt"></i>
+                            <i data-lucide="shield" width="20" height="20"></i>
                             인증번호 <span class="required">*</span>
                         </label>
                         <div class="verification-input-group">
@@ -132,7 +132,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="email" class="form-label">
-                            <i class="fas fa-envelope"></i>
+                            <i data-lucide="mail" width="20" height="20"></i>
                             이메일 <span class="required">*</span>
                         </label>
                         <input 
@@ -150,7 +150,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="password" class="form-label">
-                            <i class="fas fa-lock"></i>
+                            <i data-lucide="lock" width="20" height="20"></i>
                             비밀번호 <span class="required">*</span>
                         </label>
                         <div class="password-input-wrapper">
@@ -165,25 +165,25 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 minlength="8"
                             >
                             <button type="button" class="password-toggle" id="password-toggle">
-                                <i class="fas fa-eye"></i>
+                                <i data-lucide="eye" width="20" height="20"></i>
                             </button>
                             <i class="input-status-icon" id="password-status-icon"></i>
                         </div>
                         <div class="password-requirements" id="password-requirements" style="display: none;">
                             <div class="requirement" id="req-length">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                                 <span>8자 이상</span>
                             </div>
                             <div class="requirement" id="req-letter">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                                 <span>영문 포함</span>
                             </div>
                             <div class="requirement" id="req-number">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                                 <span>숫자 포함</span>
                             </div>
                             <div class="requirement" id="req-special">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                                 <span>특수문자 포함</span>
                             </div>
                         </div>
@@ -198,7 +198,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 
                     <div class="form-group">
                         <label for="password_confirm" class="form-label">
-                            <i class="fas fa-lock"></i>
+                            <i data-lucide="lock" width="20" height="20"></i>
                             비밀번호 확인 <span class="required">*</span>
                         </label>
                         <div class="password-input-wrapper">
@@ -213,13 +213,13 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 minlength="8"
                             >
                             <button type="button" class="password-toggle" id="password-confirm-toggle">
-                                <i class="fas fa-eye"></i>
+                                <i data-lucide="eye" width="20" height="20"></i>
                             </button>
                             <i class="input-status-icon" id="password-confirm-status-icon"></i>
                         </div>
                         <div class="password-match-status" id="password-match-status" style="display: none;">
                             <div class="match-indicator" id="match-indicator">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                                 <span id="match-text">비밀번호가 일치하지 않습니다</span>
                             </div>
                         </div>
@@ -250,14 +250,14 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <input type="hidden" id="recaptcha_token" name="recaptcha_token" value="">
 
                     <button type="submit" class="btn btn-primary-gradient btn-large btn-full" id="signup-btn" disabled>
-                        <i class="fas fa-user-plus"></i>
+                        <i data-lucide="user-plus" width="20" height="20"></i>
                         <span>회원가입</span>
                     </button>
                     
                     <div class="recaptcha-notice">
-                        <i class="fas fa-shield-alt"></i>
-                        이 사이트는 reCAPTCHA로 보호되며, Google의 
-                        <a href="https://policies.google.com/privacy" target="_blank">개인정보처리방침</a>과 
+                        <i data-lucide="shield" width="16" height="16"></i>
+                        이 사이트는 reCAPTCHA로 보호되며, Google의
+                        <a href="https://policies.google.com/privacy" target="_blank">개인정보처리방침</a>과
                         <a href="https://policies.google.com/terms" target="_blank">서비스 약관</a>이 적용됩니다.
                     </div>
                 </form>
@@ -265,10 +265,10 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <!-- 로그인 링크 -->
                 <div class="auth-footer">
                     <p class="auth-switch">
-                        이미 계정이 있으신가요? 
+                        이미 계정이 있으신가요?
                         <a href="/auth/login" class="auth-link">
                             로그인하기
-                            <i class="fas fa-arrow-right"></i>
+                            <i data-lucide="arrow-right" width="18" height="18"></i>
                         </a>
                     </p>
                 </div>
@@ -278,7 +278,7 @@ require_once SRC_PATH . '/views/templates/header.php';
             <div class="auth-side-info">
                 <div class="side-info-content">
                     <div class="side-info-icon">
-                        <i class="fas fa-users"></i>
+                        <i data-lucide="users" width="64" height="64"></i>
                     </div>
                     <h2>성공의 시작</h2>
                     <p>전 세계 네트워크 마케팅 전문가들과 함께 새로운 기회를 발견하고 성장하세요</p>
@@ -301,10 +301,10 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <div class="signup-benefits">
                         <h3>가입 혜택</h3>
                         <ul>
-                            <li><i class="fas fa-check"></i> 무료 커뮤니티 액세스</li>
-                            <li><i class="fas fa-check"></i> 전문가 네트워킹 기회</li>
-                            <li><i class="fas fa-check"></i> 독점 행사 및 강의 참여</li>
-                            <li><i class="fas fa-check"></i> 실시간 마케팅 인사이트</li>
+                            <li><i data-lucide="check" width="20" height="20"></i> 무료 커뮤니티 액세스</li>
+                            <li><i data-lucide="check" width="20" height="20"></i> 전문가 네트워킹 기회</li>
+                            <li><i data-lucide="check" width="20" height="20"></i> 독점 행사 및 강의 참여</li>
+                            <li><i data-lucide="check" width="20" height="20"></i> 실시간 마케팅 인사이트</li>
                         </ul>
                     </div>
                 </div>
@@ -365,10 +365,14 @@ document.addEventListener('DOMContentLoaded', function() {
         toggle.addEventListener('click', function() {
             const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
             input.setAttribute('type', type);
-            
+
             const icon = toggle.querySelector('i');
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
+            if (type === 'text') {
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
         });
     }
 
@@ -519,7 +523,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // 로딩 상태 표시
         statusMessage.style.display = 'block';
         statusIndicator.className = 'status-indicator checking';
-        statusIcon.className = 'input-status-icon show checking fas fa-spinner';
+        statusIcon.className = 'input-status-icon show checking';
+        statusIcon.innerHTML = '<i data-lucide="loader-2" width="16" height="16" class="lucide-spin"></i>';
+        lucide.createIcons();
         messageText.textContent = '닉네임을 확인하는 중...';
         nicknameInput.classList.remove('valid', 'invalid');
 
@@ -534,7 +540,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.data.available) {
                     // 사용 가능
                     statusIndicator.className = 'status-indicator available';
-                    statusIcon.className = 'input-status-icon show valid fas fa-check';
+                    statusIcon.className = 'input-status-icon show valid';
+                    statusIcon.innerHTML = '<i data-lucide="check" width="16" height="16"></i>';
+                    lucide.createIcons();
                     messageText.textContent = result.message;
                     nicknameInput.classList.add('valid');
                     nicknameInput.classList.remove('invalid');
@@ -542,7 +550,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // 사용 불가능
                     statusIndicator.className = 'status-indicator';
-                    statusIcon.className = 'input-status-icon show invalid fas fa-times';
+                    statusIcon.className = 'input-status-icon show invalid';
+                    statusIcon.innerHTML = '<i data-lucide="x" width="16" height="16"></i>';
+                    lucide.createIcons();
                     messageText.textContent = result.message;
                     nicknameInput.classList.add('invalid');
                     nicknameInput.classList.remove('valid');
@@ -555,7 +565,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             Toast.error('닉네임 중복 검사 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
             statusIndicator.className = 'status-indicator';
-            statusIcon.className = 'input-status-icon show invalid fas fa-exclamation-triangle';
+            statusIcon.className = 'input-status-icon show invalid';
+            statusIcon.innerHTML = '<i data-lucide="alert-triangle" width="16" height="16"></i>';
+            lucide.createIcons();
             messageText.textContent = '중복 검사 중 오류가 발생했습니다. 다시 시도해주세요.';
             nicknameInput.classList.add('invalid');
             nicknameInput.classList.remove('valid');
@@ -588,7 +600,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // 로딩 상태 표시
         statusMessage.style.display = 'block';
         statusIndicator.className = 'status-indicator checking';
-        statusIcon.className = 'input-status-icon show checking fas fa-spinner';
+        statusIcon.className = 'input-status-icon show checking';
+        statusIcon.innerHTML = '<i data-lucide="loader-2" width="16" height="16" class="lucide-spin"></i>';
+        lucide.createIcons();
         messageText.textContent = '휴대폰 번호를 확인하는 중...';
         phoneInput.classList.remove('valid', 'invalid');
 
@@ -603,7 +617,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.data.available) {
                     // 사용 가능
                     statusIndicator.className = 'status-indicator available';
-                    statusIcon.className = 'input-status-icon show valid fas fa-check';
+                    statusIcon.className = 'input-status-icon show valid';
+                    statusIcon.innerHTML = '<i data-lucide="check" width="16" height="16"></i>';
+                    lucide.createIcons();
                     messageText.textContent = result.message;
                     phoneInput.classList.add('valid');
                     phoneInput.classList.remove('invalid');
@@ -611,7 +627,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // 사용 불가능
                     statusIndicator.className = 'status-indicator';
-                    statusIcon.className = 'input-status-icon show invalid fas fa-times';
+                    statusIcon.className = 'input-status-icon show invalid';
+                    statusIcon.innerHTML = '<i data-lucide="x" width="16" height="16"></i>';
+                    lucide.createIcons();
                     messageText.textContent = result.message;
                     phoneInput.classList.add('invalid');
                     phoneInput.classList.remove('valid');
@@ -624,7 +642,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             Toast.error('휴대폰 중복 검사 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
             statusIndicator.className = 'status-indicator';
-            statusIcon.className = 'input-status-icon show invalid fas fa-exclamation-triangle';
+            statusIcon.className = 'input-status-icon show invalid';
+            statusIcon.innerHTML = '<i data-lucide="alert-triangle" width="16" height="16"></i>';
+            lucide.createIcons();
             messageText.textContent = '중복 검사 중 오류가 발생했습니다. 다시 시도해주세요.';
             phoneInput.classList.add('invalid');
             phoneInput.classList.remove('valid');
@@ -778,15 +798,20 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isValid) {
                 passwordInput.classList.add('valid');
                 passwordInput.classList.remove('invalid');
-                passwordStatusIcon.className = 'input-status-icon show valid fas fa-check';
+                passwordStatusIcon.className = 'input-status-icon show valid';
+                passwordStatusIcon.innerHTML = '<i data-lucide="check" width="16" height="16"></i>';
+                lucide.createIcons();
             } else {
                 passwordInput.classList.add('invalid');
                 passwordInput.classList.remove('valid');
-                passwordStatusIcon.className = 'input-status-icon show invalid fas fa-times';
+                passwordStatusIcon.className = 'input-status-icon show invalid';
+                passwordStatusIcon.innerHTML = '<i data-lucide="x" width="16" height="16"></i>';
+                lucide.createIcons();
             }
         } else {
             passwordInput.classList.remove('valid', 'invalid');
             passwordStatusIcon.className = 'input-status-icon';
+            passwordStatusIcon.innerHTML = '';
         }
 
         // 비밀번호 강도 업데이트
@@ -854,14 +879,18 @@ document.addEventListener('DOMContentLoaded', function() {
             matchText.textContent = '비밀번호가 일치합니다';
             passwordConfirmInput.classList.add('valid');
             passwordConfirmInput.classList.remove('invalid');
-            passwordConfirmStatusIcon.className = 'input-status-icon show valid fas fa-check';
+            passwordConfirmStatusIcon.className = 'input-status-icon show valid';
+            passwordConfirmStatusIcon.innerHTML = '<i data-lucide="check" width="16" height="16"></i>';
+            lucide.createIcons();
             return true;
         } else {
             matchIndicator.classList.remove('valid');
             matchText.textContent = '비밀번호가 일치하지 않습니다';
             passwordConfirmInput.classList.add('invalid');
             passwordConfirmInput.classList.remove('valid');
-            passwordConfirmStatusIcon.className = 'input-status-icon show invalid fas fa-times';
+            passwordConfirmStatusIcon.className = 'input-status-icon show invalid';
+            passwordConfirmStatusIcon.innerHTML = '<i data-lucide="x" width="16" height="16"></i>';
+            lucide.createIcons();
             return false;
         }
     }
@@ -1340,6 +1369,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // 초기화
     validateForm();
     updateSendButtonState();
+
+    // Lucide 아이콘 초기화
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 </script>
 

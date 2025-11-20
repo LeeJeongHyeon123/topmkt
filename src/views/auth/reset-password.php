@@ -28,7 +28,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <div class="auth-header">
                     <div class="auth-logo">
                         <div class="logo-icon">
-                            <i class="fas fa-shield-alt"></i>
+                            <i data-lucide="shield" width="32" height="32"></i>
                         </div>
                         <span class="logo-text"><?= APP_NAME ?? '탑마케팅' ?></span>
                     </div>
@@ -66,7 +66,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <!-- 인증 코드 입력 -->
                     <div class="input-group">
                         <label for="verification_code" class="input-label">
-                            <i class="fas fa-key"></i>
+                            <i data-lucide="key" width="20" height="20"></i>
                             인증 코드
                         </label>
                         <input 
@@ -88,7 +88,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <!-- 새 비밀번호 입력 -->
                     <div class="input-group">
                         <label for="new_password" class="input-label">
-                            <i class="fas fa-lock"></i>
+                            <i data-lucide="lock" width="20" height="20"></i>
                             새 비밀번호
                         </label>
                         <div class="password-input-wrapper">
@@ -103,7 +103,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 autocomplete="new-password"
                             >
                             <button type="button" class="password-toggle" onclick="togglePassword('new_password')">
-                                <i class="fas fa-eye" id="new_password_eye"></i>
+                                <i data-lucide="eye" width="20" height="20" id="new_password_eye"></i>
                             </button>
                         </div>
                         <div class="input-help">
@@ -114,7 +114,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <!-- 비밀번호 확인 -->
                     <div class="input-group">
                         <label for="confirm_password" class="input-label">
-                            <i class="fas fa-lock"></i>
+                            <i data-lucide="lock" width="20" height="20"></i>
                             비밀번호 확인
                         </label>
                         <div class="password-input-wrapper">
@@ -129,11 +129,11 @@ require_once SRC_PATH . '/views/templates/header.php';
                                 autocomplete="new-password"
                             >
                             <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
-                                <i class="fas fa-eye" id="confirm_password_eye"></i>
+                                <i data-lucide="eye" width="20" height="20" id="confirm_password_eye"></i>
                             </button>
                         </div>
                         <div class="password-match-indicator" id="passwordMatchIndicator" style="display: none;">
-                            <i class="fas fa-check-circle text-success"></i>
+                            <i data-lucide="check-circle" width="20" height="20" class="text-success"></i>
                             <span>비밀번호가 일치합니다</span>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ require_once SRC_PATH . '/views/templates/header.php';
                     <button type="submit" class="btn btn-primary btn-auth" id="submitButton">
                         <span class="btn-text">비밀번호 재설정</span>
                         <span class="btn-loading" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
+                            <i data-lucide="loader-2" width="20" height="20" class="lucide-spin"></i>
                             처리 중...
                         </span>
                     </button>
@@ -151,11 +151,11 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <!-- 추가 링크 -->
                 <div class="auth-links">
                     <a href="/auth/forgot-password" class="auth-link">
-                        <i class="fas fa-arrow-left"></i>
+                        <i data-lucide="arrow-left" width="18" height="18"></i>
                         다시 인증 코드 발송
                     </a>
                     <a href="/auth/login" class="auth-link">
-                        <i class="fas fa-sign-in-alt"></i>
+                        <i data-lucide="log-in" width="18" height="18"></i>
                         로그인 페이지로 돌아가기
                     </a>
                 </div>
@@ -484,19 +484,34 @@ require_once SRC_PATH . '/views/templates/header.php';
         margin: 1rem;
         border-radius: 16px;
     }
-    
+
     .auth-title {
         font-size: 1.5rem;
     }
-    
+
     .auth-subtitle {
         font-size: 0.8rem;
     }
+}
+
+/* Lucide spinner animation */
+@keyframes lucide-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.lucide-spin {
+    animation: lucide-spin 1s linear infinite;
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
     const form = document.getElementById('resetPasswordForm');
     const verificationCodeInput = document.getElementById('verification_code');
     const newPasswordInput = document.getElementById('new_password');
@@ -597,13 +612,23 @@ document.addEventListener('DOMContentLoaded', function() {
 function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     const eyeIcon = document.getElementById(inputId + '_eye');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
-        eyeIcon.className = 'fas fa-eye-slash';
+        eyeIcon.setAttribute('data-lucide', 'eye-off');
+        eyeIcon.setAttribute('width', '20');
+        eyeIcon.setAttribute('height', '20');
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     } else {
         input.type = 'password';
-        eyeIcon.className = 'fas fa-eye';
+        eyeIcon.setAttribute('data-lucide', 'eye');
+        eyeIcon.setAttribute('width', '20');
+        eyeIcon.setAttribute('height', '20');
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 }
 </script>
