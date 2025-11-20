@@ -375,7 +375,7 @@ body {
                 'searchPlaceholder' => '검색어를 입력하세요...',
                 'searchValue' => $search ?? '',
                 'submitButton' => true,
-                'submitText' => '<i class="fas fa-search"></i>',
+                'submitText' => '<i data-lucide="search" width="18" height="18"></i>',
                 'resetButton' => !empty($search),  // 검색어 있을 때만 표시
                 'resetText' => '✖️ 검색 해제',
                 'cssClass' => 'community-search-filter'
@@ -396,7 +396,7 @@ body {
         <!-- 글쓰기 버튼 -->
         <?php if ($isLoggedIn): ?>
             <a href="/community/write" class="btn btn-write">
-                <i class="fas fa-pen"></i> 글쓰기
+                <i data-lucide="pen" width="20" height="20"></i> 글쓰기
             </a>
         <?php else: ?>
             <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-primary">
@@ -733,12 +733,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 브라우저 확장 프로그램 비동기 오류 무시
     window.addEventListener('unhandledrejection', function(event) {
-        if (event.reason && event.reason.message && 
+        if (event.reason && event.reason.message &&
             event.reason.message.includes('message channel closed')) {
             // 브라우저 확장 프로그램 오류는 조용히 무시
             event.preventDefault();
         }
     });
+
+    // Lucide 아이콘 초기화 (v5.0.0)
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 
 
