@@ -117,9 +117,11 @@ class Card
                 'fas fa-users' => 'users',
                 'fas fa-graduation-cap' => 'graduation-cap',
                 'fas fa-calendar' => 'calendar',
+                'fas fa-calendar-alt' => 'calendar',
                 'fas fa-comments' => 'message-square',
                 'fas fa-heart' => 'heart',
-                'fas fa-rocket' => 'rocket'
+                'fas fa-rocket' => 'rocket',
+                'fas fa-bullhorn' => 'megaphone'
             ];
 
             $lucideIcon = $faToLucideMap[$iconInput] ?? str_replace(['fas fa-', 'far fa-', 'fa-'], '', $iconInput);
