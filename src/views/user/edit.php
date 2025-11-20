@@ -595,7 +595,7 @@ if (!isset($_SESSION['csrf_token'])) {
     <!-- 헤더 -->
     <div class="edit-header">
         <h1 class="edit-title">
-            <i class="fas fa-edit"></i> 프로필 편집
+            <i data-lucide="edit" width="20" height="20"></i> 프로필 편집
         </h1>
         <p class="edit-subtitle">개인 정보와 소셜 링크를 관리하세요</p>
     </div>
@@ -610,7 +610,7 @@ if (!isset($_SESSION['csrf_token'])) {
         <!-- 프로필 이미지 섹션 -->
         <div class="form-section">
             <h2 class="section-title">
-                <i class="fas fa-camera"></i> 프로필 이미지
+                <i data-lucide="camera" width="20" height="20"></i> 프로필 이미지
             </h2>
             <div class="image-upload-section">
                 <div class="current-image">
@@ -632,7 +632,7 @@ if (!isset($_SESSION['csrf_token'])) {
                                name="profile_image"
                                class="file-input">
                         <label for="profile-image" class="file-input-label">
-                            <i class="fas fa-upload"></i> 이미지 선택
+                            <i data-lucide="upload" width="20" height="20"></i> 이미지 선택
                         </label>
                     </div>
                     <div class="image-info">
@@ -651,7 +651,7 @@ if (!isset($_SESSION['csrf_token'])) {
         <!-- 기본 정보 섹션 -->
         <div class="form-section">
             <h2 class="section-title">
-                <i class="fas fa-user"></i> 기본 정보
+                <i data-lucide="user" width="20" height="20"></i> 기본 정보
             </h2>
             
             <div class="form-group">
@@ -699,7 +699,7 @@ if (!isset($_SESSION['csrf_token'])) {
         <!-- 개인 정보 섹션 -->
         <div class="form-section">
             <h2 class="section-title">
-                <i class="fas fa-info-circle"></i> 개인 정보
+                <i data-lucide="info" width="20" height="20"></i> 개인 정보
             </h2>
             
             <div class="form-group">
@@ -711,7 +711,7 @@ if (!isset($_SESSION['csrf_token'])) {
                            class="form-input date-input"
                            value="<?= SecurityHelper::isEncrypted($user['birth_date'] ?? '') ? SecurityHelper::decrypt($user['birth_date']) : ($user['birth_date'] ?? '') ?>"
                            placeholder="YYYY-MM-DD">
-                    <i class="fas fa-calendar-alt date-icon" onclick="openDatePicker()"></i>
+                    <i data-lucide="calendar" width="20" height="20" class="date-icon" onclick="openDatePicker()"></i>
                 </div>
                 <div class="form-help">나이 표시에 사용됩니다 (선택사항)</div>
             </div>
@@ -741,13 +741,13 @@ if (!isset($_SESSION['csrf_token'])) {
         <!-- 소셜 링크 섹션 -->
         <div class="form-section">
             <h2 class="section-title">
-                <i class="fas fa-share-alt"></i> 소셜 링크
+                <i data-lucide="share-2" width="20" height="20"></i> 소셜 링크
             </h2>
             
             <div class="social-grid">
                 <div class="social-item">
                     <div class="social-icon website">
-                        <i class="fas fa-globe"></i>
+                        <i data-lucide="globe" width="20" height="20"></i>
                     </div>
                     <div class="social-input">
                         <label for="social_website" class="form-label">웹사이트</label>
@@ -762,7 +762,7 @@ if (!isset($_SESSION['csrf_token'])) {
                 
                 <div class="social-item">
                     <div class="social-icon kakao">
-                        <i class="fas fa-comment"></i>
+                        <i data-lucide="message-circle" width="20" height="20"></i>
                     </div>
                     <div class="social-input">
                         <label for="social_kakao" class="form-label">카카오톡</label>
@@ -840,13 +840,13 @@ if (!isset($_SESSION['csrf_token'])) {
         <!-- 버튼 그룹 -->
         <div class="button-group">
             <button type="button" class="btn btn-danger" id="delete-account-btn">
-                <i class="fas fa-user-times"></i> 회원탈퇴
+                <i data-lucide="user-x" width="20" height="20"></i> 회원탈퇴
             </button>
             <a href="/profile" class="btn btn-secondary">
-                <i class="fas fa-times"></i> 취소
+                <i data-lucide="x" width="20" height="20"></i> 취소
             </a>
             <button type="submit" class="btn btn-primary" id="save-btn">
-                <i class="fas fa-save"></i> 저장하기
+                <i data-lucide="save" width="20" height="20"></i> 저장하기
             </button>
         </div>
     </form>
@@ -866,10 +866,10 @@ if (!isset($_SESSION['csrf_token'])) {
         
         <div class="crop-buttons">
             <button type="button" class="btn btn-secondary" onclick="closeCropModal()">
-                <i class="fas fa-times"></i> 취소
+                <i data-lucide="x" width="20" height="20"></i> 취소
             </button>
             <button type="button" class="btn btn-primary" onclick="applyCrop()">
-                <i class="fas fa-check"></i> 적용
+                <i data-lucide="check" width="20" height="20"></i> 적용
             </button>
         </div>
     </div>
@@ -1384,7 +1384,7 @@ document.getElementById('delete-account-btn').addEventListener('click', async fu
                 overflow-y: auto;">
 
                 <h3 style="margin: 0 0 20px 0; color: #dc3545;">
-                    <i class="fas fa-exclamation-triangle"></i> 회원탈퇴 확인
+                    <i data-lucide="alert-triangle" width="20" height="20"></i> 회원탈퇴 확인
                 </h3>
 
                 <div style="margin-bottom: 20px;">
@@ -1412,11 +1412,11 @@ document.getElementById('delete-account-btn').addEventListener('click', async fu
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary"
                             style="padding: 10px 20px;">
-                        <i class="fas fa-times"></i> 취소
+                        <i data-lucide="x" width="20" height="20"></i> 취소
                     </button>
                     <button type="button" onclick="confirmDeleteAccount()" class="btn btn-danger"
                             style="padding: 10px 20px;">
-                        <i class="fas fa-user-times"></i> 회원탈퇴
+                        <i data-lucide="user-x" width="20" height="20"></i> 회원탈퇴
                     </button>
                 </div>
             </div>

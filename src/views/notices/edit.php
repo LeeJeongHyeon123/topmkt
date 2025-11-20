@@ -425,7 +425,7 @@ if (!isset($notice) || !$notice) {
             <label class="form-label">이미지 첨부 (선택사항)</label>
             <div class="upload-area" id="uploadArea">
                 <div class="upload-button" onclick="document.getElementById('images').click()">
-                    <i class="fas fa-plus"></i> 이미지 선택
+                    <i data-lucide="plus" width="20" height="20"></i> 이미지 선택
                 </div>
                 <input type="file" 
                        id="images" 
@@ -464,6 +464,17 @@ if (!isset($notice) || !$notice) {
 <!-- Quill.js 라이브러리 -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+// Lucide 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
 
 <!-- 🚀 v3.27.0: 공통 업로드 설정 -->
 <?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>

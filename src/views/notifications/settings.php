@@ -318,7 +318,7 @@
     <!-- 헤더 -->
     <div class="notification-settings-header">
         <h1>
-            <i class="fas fa-bell"></i>
+            <i data-lucide="bell" width="24" height="24"></i>
             알림 설정
         </h1>
         <p>FCM 앱 푸시 알림을 관리하세요. 원하는 알림만 받아볼 수 있습니다.</p>
@@ -329,7 +329,7 @@
         <!-- 안내 메시지 -->
         <div class="notification-guide">
             <h3>
-                <i class="fas fa-info-circle"></i>
+                <i data-lucide="info" width="20" height="20"></i>
                 알림 설정 안내
             </h3>
             <p>
@@ -348,7 +348,7 @@
                 <div class="notification-item master-item">
                     <div class="notification-info">
                         <div class="notification-label">
-                            <i class="fas fa-toggle-on"></i>
+                            <i data-lucide="toggle-right" width="20" height="20"></i>
                             전체 알림
                         </div>
                         <div class="notification-desc">
@@ -370,7 +370,7 @@
                 <div class="notification-item">
                     <div class="notification-info">
                         <div class="notification-label">
-                            <i class="fas fa-comment"></i>
+                            <i data-lucide="message-square" width="20" height="20"></i>
                             댓글, 대댓글 알림
                         </div>
                         <div class="notification-desc">
@@ -387,7 +387,7 @@
                 <div class="notification-item">
                     <div class="notification-info">
                         <div class="notification-label">
-                            <i class="fas fa-heart"></i>
+                            <i data-lucide="heart" width="20" height="20"></i>
                             좋아요 알림
                         </div>
                         <div class="notification-desc">
@@ -404,7 +404,7 @@
                 <div class="notification-item">
                     <div class="notification-info">
                         <div class="notification-label">
-                            <i class="fas fa-calendar-plus"></i>
+                            <i data-lucide="calendar-plus" width="20" height="20"></i>
                             신규 강의, 행사 알림
                         </div>
                         <div class="notification-desc">
@@ -421,7 +421,7 @@
                 <div class="notification-item">
                     <div class="notification-info">
                         <div class="notification-label">
-                            <i class="fas fa-check-circle"></i>
+                            <i data-lucide="check-circle" width="20" height="20"></i>
                             신청 승인, 거절 알림
                         </div>
                         <div class="notification-desc">
@@ -438,7 +438,7 @@
                 <div class="notification-item">
                     <div class="notification-info">
                         <div class="notification-label">
-                            <i class="fas fa-bullhorn"></i>
+                            <i data-lucide="megaphone" width="20" height="20"></i>
                             공지사항 알림
                         </div>
                         <div class="notification-desc">
@@ -455,11 +455,11 @@
             <!-- 버튼 그룹 -->
             <div class="notification-button-group">
                 <button type="button" class="btn-cancel" onclick="window.location.href='/'">
-                    <i class="fas fa-times"></i>
+                    <i data-lucide="x" width="20" height="20"></i>
                     취소
                 </button>
                 <button type="submit" class="btn-save">
-                    <i class="fas fa-save"></i>
+                    <i data-lucide="save" width="20" height="20"></i>
                     저장
                 </button>
             </div>

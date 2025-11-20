@@ -478,10 +478,10 @@ $content = '
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" onclick="exportUsers()">
-                    <i class="fas fa-download"></i> 내보내기
+                    <i data-lucide="download" width="20" height="20"></i> 내보내기
                 </button>
                 <button class="btn btn-primary" onclick="refreshData()">
-                    <i class="fas fa-refresh"></i> 새로고침
+                    <i data-lucide="refresh-cw" width="20" height="20"></i> 새로고침
                 </button>
             </div>
         </div>
@@ -611,9 +611,9 @@ $content .= SearchFilter::create([
             'searchPlaceholder' => '닉네임, 이메일, 전화번호로 검색...',
             'searchValue' => '',
             'submitButton' => true,
-            'submitText' => '<i class="fas fa-search"></i> 검색',
+            'submitText' => '<i data-lucide="search" width="20" height="20"></i> 검색',
             'resetButton' => true,
-            'resetText' => '<i class="fas fa-undo"></i> 초기화',
+            'resetText' => '<i data-lucide="rotate-ccw" width="20" height="20"></i> 초기화',
             'collapsible' => true,
             'collapsed' => false,
             'title' => '🔍 필터 및 검색',

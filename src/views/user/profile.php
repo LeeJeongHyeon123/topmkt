@@ -982,7 +982,7 @@ if (!empty($user['last_login'])) {
             <!-- 자기소개 -->
             <div class="profile-card">
                 <h2 class="card-title">
-                    <i class="fas fa-user"></i> 자기소개
+                    <i data-lucide="user" width="20" height="20"></i> 자기소개
                 </h2>
                 <?php if (!empty($user['bio'])): ?>
                     <div class="bio-content"><?= $user['bio'] ?></div>
@@ -996,7 +996,7 @@ if (!empty($user['last_login'])) {
             <!-- 최근 게시글 -->
             <div class="profile-card">
                 <h2 class="card-title">
-                    <i class="fas fa-newspaper"></i> 최근 게시글
+                    <i data-lucide="newspaper" width="20" height="20"></i> 최근 게시글
                 </h2>
                 <?php if (!empty($recentPosts)): ?>
                     <ul class="activity-list">
@@ -1026,7 +1026,7 @@ if (!empty($user['last_login'])) {
             <!-- 최근 댓글 -->
             <div class="profile-card">
                 <h2 class="card-title">
-                    <i class="fas fa-comments"></i> 최근 댓글
+                    <i data-lucide="message-circle" width="20" height="20"></i> 최근 댓글
                 </h2>
                 <?php if (!empty($recentComments)): ?>
                     <ul class="activity-list">
@@ -1078,7 +1078,7 @@ if (!empty($user['last_login'])) {
             <!-- 활동 통계 -->
             <div class="profile-card">
                 <h2 class="card-title">
-                    <i class="fas fa-chart-bar"></i> 활동 통계
+                    <i data-lucide="bar-chart-2" width="20" height="20"></i> 활동 통계
                 </h2>
                 <div class="stats-grid">
                     <div class="stat-item">
@@ -1103,12 +1103,12 @@ if (!empty($user['last_login'])) {
             <!-- 기본 정보 -->
             <div class="profile-card">
                 <h2 class="card-title">
-                    <i class="fas fa-info-circle"></i> 기본 정보
+                    <i data-lucide="info" width="20" height="20"></i> 기본 정보
                 </h2>
                 <ul class="info-list">
                     <?php if (!empty($user['email'])): ?>
                         <li class="info-item">
-                            <i class="info-icon fas fa-envelope"></i>
+                            <i data-lucide="mail" width="20" height="20" class="info-icon"></i>
                             <div class="info-content">
                                 <div class="info-label">이메일</div>
                                 <div class="info-value"><?= htmlspecialchars($user['email']) ?></div>
@@ -1118,7 +1118,7 @@ if (!empty($user['last_login'])) {
                     
                     <?php if (!empty($user['birth_date']) && $age !== null): ?>
                         <li class="info-item">
-                            <i class="info-icon fas fa-birthday-cake"></i>
+                            <i data-lucide="cake" width="20" height="20" class="info-icon"></i>
                             <div class="info-content">
                                 <div class="info-label">나이</div>
                                 <div class="info-value"><?= $age ?>세</div>
@@ -1128,7 +1128,7 @@ if (!empty($user['last_login'])) {
                     
                     <?php if (!empty($user['gender'])): ?>
                         <li class="info-item">
-                            <i class="info-icon fas fa-venus-mars"></i>
+                            <i data-lucide="users" width="20" height="20" class="info-icon"></i>
                             <div class="info-content">
                                 <div class="info-label">성별</div>
                                 <div class="info-value">
@@ -1152,7 +1152,7 @@ if (!empty($user['last_login'])) {
             ?>
                 <div class="profile-card social-connections-card">
                     <h2 class="card-title">
-                        <i class="fas fa-globe-americas"></i> 소셜 & 웹사이트
+                        <i data-lucide="globe" width="20" height="20"></i> 소셜 & 웹사이트
                     </h2>
                     
                     <!-- 소셜 링크 섹션 -->
@@ -1161,37 +1161,37 @@ if (!empty($user['last_login'])) {
                                 <?php
                                 $socialConfigs = [
                                     'website' => [
-                                        'icon' => 'fas fa-globe',
+                                        'icon' => 'globe',
                                         'name' => '웹사이트',
                                         'color' => '#6366f1',
                                         'textColor' => '#fff'
                                     ],
                                     'kakao' => [
-                                        'icon' => 'fas fa-comment',
+                                        'icon' => 'message-circle',
                                         'name' => '카카오톡',
                                         'color' => '#FEE500',
                                         'textColor' => '#000'
                                     ],
                                     'instagram' => [
-                                        'icon' => 'fab fa-instagram',
+                                        'icon' => 'instagram',
                                         'name' => '인스타그램',
                                         'color' => '#E4405F',
                                         'textColor' => '#fff'
                                     ],
                                     'facebook' => [
-                                        'icon' => 'fab fa-facebook',
+                                        'icon' => 'facebook',
                                         'name' => '페이스북',
                                         'color' => '#1877F2',
                                         'textColor' => '#fff'
                                     ],
                                     'youtube' => [
-                                        'icon' => 'fab fa-youtube',
+                                        'icon' => 'youtube',
                                         'name' => '유튜브',
                                         'color' => '#FF0000',
                                         'textColor' => '#fff'
                                     ],
                                     'tiktok' => [
-                                        'icon' => 'fab fa-tiktok',
+                                        'icon' => 'music',
                                         'name' => '틱톡',
                                         'color' => '#000000',
                                         'textColor' => '#fff'
@@ -1214,14 +1214,14 @@ if (!empty($user['last_login'])) {
                                        style="--social-color: <?= $config['color'] ?>; --social-text-color: <?= $config['textColor'] ?>;"
                                        title="<?= $config['name'] ?>에서 만나요">
                                         <div class="social-connection-icon">
-                                            <i class="<?= $config['icon'] ?>"></i>
+                                            <i data-lucide="<?= $config['icon'] ?>" width="20" height="20"></i>
                                         </div>
                                         <div class="social-connection-content">
                                             <div class="social-connection-name"><?= $config['name'] ?></div>
                                             <div class="social-connection-action">방문하기</div>
                                         </div>
                                         <div class="social-connection-arrow">
-                                            <i class="fas fa-chevron-right"></i>
+                                            <i data-lucide="chevron-right" width="20" height="20"></i>
                                         </div>
                                     </a>
                                 <?php
@@ -1236,18 +1236,18 @@ if (!empty($user['last_login'])) {
                 <?php if ($isOwnProfile): ?>
                     <div class="profile-card social-connections-card empty-social">
                         <h2 class="card-title">
-                            <i class="fas fa-globe-americas"></i> 소셜 & 웹사이트
+                            <i data-lucide="globe" width="20" height="20"></i> 소셜 & 웹사이트
                         </h2>
                         <div class="empty-social-content">
                             <div class="empty-social-icon">
-                                <i class="fas fa-share-alt"></i>
+                                <i data-lucide="share-2" width="32" height="32"></i>
                             </div>
                             <div class="empty-social-text">
                                 <h3>소셜 프로필을 연결해보세요</h3>
                                 <p>인스타그램, 유튜브, 개인 웹사이트 등을<br>프로필에 추가하여 더 많은 사람들과 소통하세요.</p>
                             </div>
                             <a href="/profile/edit" class="btn-add-social">
-                                <i class="fas fa-plus"></i> 소셜 링크 추가하기
+                                <i data-lucide="plus" width="20" height="20"></i> 소셜 링크 추가하기
                             </a>
                         </div>
                     </div>

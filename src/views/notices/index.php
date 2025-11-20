@@ -679,9 +679,9 @@ body {
                 'searchPlaceholder' => '검색어를 입력하세요...',
                 'searchValue' => $search ?? '',
                 'submitButton' => true,
-                'submitText' => '<i class="fas fa-search"></i> 검색',
+                'submitText' => '<i data-lucide="search" width="20" height="20"></i> 검색',
                 'resetButton' => !empty($search) || !empty($company),  // 검색어 또는 기업명 있을 때만
-                'resetText' => '<i class="fas fa-times"></i> 초기화',
+                'resetText' => '<i data-lucide="x" width="20" height="20"></i> 초기화',
                 'cssClass' => 'notices-search-filter'
             ]);
             ?>
@@ -690,16 +690,16 @@ body {
         <!-- 글쓰기 버튼 (기업 사용자만) -->
         <?php if ($isLoggedIn && $canWrite): ?>
             <a href="/notices/write" class="btn-write">
-                <i class="fas fa-edit"></i>
+                <i data-lucide="pen" width="20" height="20"></i>
                 <span>공지 작성</span>
             </a>
         <?php elseif ($isLoggedIn): ?>
             <span class="btn" style="background: #e2e8f0; color: #718096; cursor: not-allowed;">
-                <i class="fas fa-lock"></i> 기업 회원만 작성 가능
+                <i data-lucide="lock" width="20" height="20"></i> 기업 회원만 작성 가능
             </span>
         <?php else: ?>
             <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i> 로그인
+                <i data-lucide="log-in" width="20" height="20"></i> 로그인
             </a>
         <?php endif; ?>
     </div>
@@ -851,7 +851,7 @@ body {
         <!-- 빈 상태 -->
         <div class="notice-list">
             <div class="empty-state">
-                <i class="fas fa-megaphone" style="font-size: 3rem; margin-bottom: 20px; color: #cbd5e0;"></i>
+                <i data-lucide="megaphone" width="72" height="72" style="margin-bottom: 20px; color: #cbd5e0;"></i>
                 <h3>
                     <?php if (!empty($search) || !empty($company)): ?>
                         검색 조건에 맞는 공지사항이 없습니다
@@ -874,7 +874,7 @@ body {
                 </p>
                 <?php if ($isLoggedIn && $canWrite): ?>
                     <a href="/notices/write" class="btn-write">
-                        <i class="fas fa-edit"></i>
+                        <i data-lucide="pen" width="20" height="20"></i>
                         <span>공지 작성</span>
                     </a>
                 <?php endif; ?>
@@ -884,6 +884,17 @@ body {
 </div>
 
 <!-- 프로필 이미지 모달은 profile-modal.js에서 동적 생성됨 -->
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+// Lucide 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
 
 <script>
 // 공지사항 목록 페이지 JavaScript

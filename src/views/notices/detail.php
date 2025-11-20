@@ -923,12 +923,12 @@ body {
                     </div>
                 </div>
                 <div class="meta-item">
-                    <i class="fas fa-calendar-alt"></i>
+                    <i data-lucide="calendar" width="20" height="20"></i>
                     <span><?= date('Y년 m월 d일 H:i', strtotime($notice['created_at'])) ?></span>
                 </div>
                 <?php if ($notice['created_at'] !== $notice['updated_at']): ?>
                 <div class="meta-item">
-                    <i class="fas fa-edit"></i>
+                    <i data-lucide="edit" width="20" height="20"></i>
                     <span>수정: <?= date('Y-m-d H:i', strtotime($notice['updated_at'])) ?></span>
                 </div>
                 <?php endif; ?>
@@ -945,7 +945,7 @@ body {
             <?php if (!empty($notice['images'])): ?>
             <div class="notice-attachments">
                 <h4 class="attachments-header">
-                    <i class="fas fa-images"></i> 
+                    <i data-lucide="images" width="20" height="20"></i>
                     첨부 이미지 (<?= count($notice['images']) ?>개)
                 </h4>
                 <div class="attachment-images">
@@ -957,7 +957,7 @@ body {
                                  loading="lazy"
                                  onerror="this.onerror=null; const webpPath='<?= htmlspecialchars($image['file_path']) ?>'.replace(/\.(jpg|jpeg|png|gif)$/i, '.webp'); if(this.src !== webpPath) this.src = webpPath;">
                             <div class="image-overlay">
-                                <i class="fas fa-search-plus"></i>
+                                <i data-lucide="search" width="20" height="20"></i>
                                 <span>확대보기</span>
                             </div>
                         </div>
@@ -976,11 +976,11 @@ body {
         <div class="notice-footer">
             <div class="notice-stats">
                 <div class="stat-item">
-                    <i class="fas fa-eye"></i>
+                    <i data-lucide="eye" width="20" height="20"></i>
                     <span>조회 <?= number_format($notice['view_count']) ?></span>
                 </div>
                 <div class="stat-item">
-                    <i class="fas fa-comments"></i>
+                    <i data-lucide="message-circle" width="20" height="20"></i>
                     <span>댓글 <?= number_format($notice['comment_count'] ?? 0) ?></span>
                 </div>
             </div>
@@ -994,18 +994,18 @@ body {
                 <!-- 목록으로 버튼 -->
                 <?= renderButton('목록으로', 'secondary', 'md', [
                     'href' => '/notices',
-                    'icon' => 'fas fa-list'
+                    'icon' => 'list'
                 ]) ?>
 
                 <!-- 수정/삭제 버튼 (소유자만) -->
                 <?php if ($canEdit): ?>
                     <?= renderButton('수정', 'warning', 'md', [
                         'href' => '/notices/' . $notice['id'] . '/edit',
-                        'icon' => 'fas fa-edit'
+                        'icon' => 'edit'
                     ]) ?>
                     <?= renderButton('삭제', 'danger', 'md', [
                         'onclick' => 'deleteNotice(' . $notice['id'] . ')',
-                        'icon' => 'fas fa-trash',
+                        'icon' => 'trash-2',
                         'buttonType' => 'button'
                     ]) ?>
                 <?php endif; ?>
@@ -1016,7 +1016,7 @@ body {
     <!-- 댓글 섹션 -->
     <div class="comments-section">
         <h3>
-            <i class="fas fa-comments"></i>
+            <i data-lucide="message-circle" width="20" height="20"></i>
             댓글 <span id="commentCount"><?= number_format($data['notice']['comment_count'] ?? 0) ?></span>개
         </h3>
         
@@ -1029,12 +1029,12 @@ body {
             <div class="comment-form-actions">
                 <?= renderButton('취소', 'secondary', 'md', [
                     'onclick' => 'clearComment()',
-                    'icon' => 'fas fa-times',
+                    'icon' => 'x',
                     'buttonType' => 'button'
                 ]) ?>
                 <?= renderButton('댓글 작성', 'primary', 'md', [
                     'onclick' => 'submitComment()',
-                    'icon' => 'fas fa-paper-plane',
+                    'icon' => 'send',
                     'buttonType' => 'button'
                 ]) ?>
             </div>
@@ -1080,7 +1080,7 @@ body {
                 <?php endforeach; ?>
             <?php else: ?>
                 <div style="text-align: center; padding: 40px; color: #718096;">
-                    <i class="fas fa-comment-slash" style="font-size: 2rem; margin-bottom: 15px; color: #cbd5e0;"></i>
+                    <i data-lucide="message-circle-off" width="48" height="48" style="margin-bottom: 15px; color: #cbd5e0;"></i>
                     <p>첫 번째 댓글을 작성해보세요!</p>
                 </div>
             <?php endif; ?>
@@ -1100,7 +1100,7 @@ function renderComment($comment, $currentUserId, $depth = 0, $parentComment = nu
     // 답글인 경우 부모 댓글 정보 표시
     if ($isReply && $parentComment) {
         $html .= '<div class="reply-to-info">';
-        $html .= '<i class="fas fa-reply" style="color: #3b82f6; margin-right: 6px;"></i>';
+        $html .= '<i data-lucide="corner-down-right" width="20" height="20" style="color: #3b82f6; margin-right: 6px;"></i>';
         $html .= '<span style="color: #1e40af;">@' . htmlspecialchars($parentComment['nickname'] ?? '익명') . '님에게 답글</span>';
         $html .= '</div>';
     }
@@ -1691,6 +1691,17 @@ function showShareModal(title, url) {
 </script>
 
 <!-- 프로필 이미지 모달은 profile-modal.js에서 동적 생성됨 -->
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+// Lucide 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
 
 <script>
 // 기존 프로필 이미지 모달 JavaScript 함수들 제거됨 - profile-modal.js 통합 시스템 사용

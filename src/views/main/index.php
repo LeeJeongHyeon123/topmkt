@@ -8,12 +8,12 @@
             <div class="success-message">
                 <div class="container">
                     <div class="message-content">
-                        <i class="fas fa-check-circle"></i>
+                        <i data-lucide="check-circle" width="20" height="20"></i>
                         <span><?= htmlspecialchars($_SESSION['success']) ?></span>
                         <?= renderButton('', 'secondary', 'sm', [
                             'class' => 'close-message',
                             'onclick' => 'this.parentElement.parentElement.remove()',
-                            'icon' => 'fas fa-times',
+                            'icon' => 'x',
                             'ariaLabel' => '닫기'
                         ]) ?>
                     </div>
@@ -30,7 +30,7 @@
                         <!-- 로그인된 사용자 환영 메시지 -->
                         <div class="welcome-back">
                             <div class="welcome-icon">
-                                <i class="fas fa-hand-peace"></i>
+                                <i data-lucide="hand" width="48" height="48"></i>
                             </div>
                             <h1 class="hero-title">안녕하세요, <?= htmlspecialchars($_SESSION['username'] ?? '회원') ?>님!</h1>
                             <p class="hero-subtitle">
@@ -41,7 +41,7 @@
                             <div class="user-quick-stats">
                                 <div class="quick-stat">
                                     <div class="stat-icon">
-                                        <i class="fas fa-calendar-check"></i>
+                                        <i data-lucide="calendar-check" width="24" height="24"></i>
                                     </div>
                                     <div class="stat-info">
                                         <div class="stat-number">
@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="quick-stat">
                                     <div class="stat-icon">
-                                        <i class="fas fa-heart"></i>
+                                        <i data-lucide="heart" width="24" height="24"></i>
                                     </div>
                                     <div class="stat-info">
                                         <div class="stat-number">
@@ -72,11 +72,11 @@
                             
                             <div class="hero-actions">
                                 <a href="/community" class="btn btn-primary-gradient">
-                                    <i class="fas fa-comments"></i>
+                                    <i data-lucide="message-circle" width="20" height="20"></i>
                                     커뮤니티 참여하기
                                 </a>
                                 <a href="/profile" class="btn btn-outline-white">
-                                    <i class="fas fa-user-cog"></i>
+                                    <i data-lucide="user-cog" width="20" height="20"></i>
                                     프로필 관리
                                 </a>
                             </div>
@@ -91,26 +91,26 @@
                         
                         <div class="hero-actions">
                             <a href="/auth/signup" class="btn btn-primary-gradient rocket-launch-btn">
-                                <i class="fas fa-rocket rocket-icon"></i>
+                                <i data-lucide="rocket" width="20" height="20" class="rocket-icon"></i>
                                 무료로 시작하기
                             </a>
                             <a href="/auth/login" class="btn btn-outline-white">
-                                <i class="fas fa-sign-in-alt"></i>
+                                <i data-lucide="log-in" width="20" height="20"></i>
                                 로그인
                             </a>
                         </div>
                         
                         <div class="hero-features">
                             <div class="feature-item">
-                                <i class="fas fa-check"></i>
+                                <i data-lucide="check" width="20" height="20"></i>
                                 <span>무료 가입</span>
                             </div>
                             <div class="feature-item">
-                                <i class="fas fa-check"></i>
+                                <i data-lucide="check" width="20" height="20"></i>
                                 <span>전문가 네트워킹</span>
                             </div>
                             <div class="feature-item">
-                                <i class="fas fa-check"></i>
+                                <i data-lucide="check" width="20" height="20"></i>
                                 <span>실시간 교육</span>
                             </div>
                         </div>
@@ -120,15 +120,15 @@
                 <div class="hero-visual">
                     <div class="floating-cards">
                         <div class="card card-1">
-                            <i class="fas fa-chart-line"></i>
+                            <i data-lucide="trending-up" width="24" height="24"></i>
                             <span>성장 분석</span>
                         </div>
                         <div class="card card-2">
-                            <i class="fas fa-users"></i>
+                            <i data-lucide="users" width="24" height="24"></i>
                             <span>네트워킹</span>
                         </div>
                         <div class="card card-3">
-                            <i class="fas fa-graduation-cap"></i>
+                            <i data-lucide="graduation-cap" width="24" height="24"></i>
                             <span>전문 교육</span>
                         </div>
                     </div>

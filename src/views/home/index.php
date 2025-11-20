@@ -39,10 +39,10 @@ require_once SRC_PATH . '/views/templates/header.php';
             <div class="hero-actions">
                 <a href="<?= isset($_SESSION['user_id']) ? '/community' : '/auth/signup' ?>" class="btn btn-primary-gradient rocket-launch-btn">
                     <span>무료로 시작하기</span>
-                    <i class="fas fa-rocket rocket-icon"></i>
+                    <i data-lucide="rocket" width="20" height="20" class="rocket-icon"></i>
                 </a>
                 <a href="/community" class="btn btn-ghost">
-                    <i class="fas fa-play"></i>
+                    <i data-lucide="play" width="20" height="20"></i>
                     <span>둘러보기</span>
                 </a>
             </div>
@@ -61,7 +61,7 @@ require_once SRC_PATH . '/views/templates/header.php';
         
         <div class="features-grid">
             <?= Card::feature([
-                'icon' => 'fas fa-users',
+                'icon' => 'users',
                 'iconBg' => 'blue',
                 'title' => '커뮤니티 네트워킹',
                 'description' => '전 세계 네트워크 마케팅 전문가들과 연결되어 경험과 노하우를 공유하세요',
@@ -70,7 +70,7 @@ require_once SRC_PATH . '/views/templates/header.php';
             ]) ?>
 
             <?= Card::feature([
-                'icon' => 'fas fa-graduation-cap',
+                'icon' => 'graduation-cap',
                 'iconBg' => 'green',
                 'title' => '전문 강의',
                 'description' => '업계 전문가들의 실전 강의를 통해 실무 역량을 키워보세요',
@@ -79,7 +79,7 @@ require_once SRC_PATH . '/views/templates/header.php';
             ]) ?>
 
             <?= Card::feature([
-                'icon' => 'fas fa-calendar-alt',
+                'icon' => 'calendar',
                 'iconBg' => 'purple',
                 'title' => '행사 참여',
                 'description' => '다양한 네트워킹 행사와 컨퍼런스에 참여하여 새로운 기회를 만나보세요',
@@ -88,7 +88,7 @@ require_once SRC_PATH . '/views/templates/header.php';
             ]) ?>
 
             <?= Card::feature([
-                'icon' => 'fas fa-bullhorn',
+                'icon' => 'megaphone',
                 'iconBg' => 'orange',
                 'title' => '공지사항',
                 'description' => '플랫폼의 최신 소식과 중요한 공지사항을 확인하고 소통하세요',
@@ -111,15 +111,15 @@ require_once SRC_PATH . '/views/templates/header.php';
                 <h2>성공의 여정을 함께 시작하세요</h2>
                 <p>전 세계 네트워크 마케팅 리더들과 연결되어 새로운 기회를 발견하고 성공을 만들어가세요</p>
                 <ul class="cta-benefits">
-                    <li><i class="fas fa-check"></i> 무료 회원가입 및 기본 기능 이용</li>
-                    <li><i class="fas fa-check"></i> 전문가 네트워크 액세스</li>
-                    <li><i class="fas fa-check"></i> 독점 행사 및 강의 참여</li>
+                    <li><i data-lucide="check" width="20" height="20"></i> 무료 회원가입 및 기본 기능 이용</li>
+                    <li><i data-lucide="check" width="20" height="20"></i> 전문가 네트워크 액세스</li>
+                    <li><i data-lucide="check" width="20" height="20"></i> 독점 행사 및 강의 참여</li>
                 </ul>
             </div>
             <div class="cta-actions">
                 <a href="<?= isset($_SESSION['user_id']) ? '/community' : '/auth/signup' ?>" class="btn btn-primary-gradient btn-large rocket-launch-btn">
                     <span>지금 시작하기</span>
-                    <i class="fas fa-rocket rocket-icon"></i>
+                    <i data-lucide="rocket" width="20" height="20" class="rocket-icon"></i>
                 </a>
                 <p class="cta-note">가입은 무료이며, 언제든지 탈퇴 가능합니다</p>
             </div>

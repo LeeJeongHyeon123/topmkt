@@ -175,11 +175,11 @@ require_once SRC_PATH . '/views/templates/header.php';
         
         <div class="error-actions">
             <a href="/" class="btn-home">
-                <i class="fas fa-home"></i>
+                <i data-lucide="home" width="20" height="20"></i>
                 홈으로 돌아가기
             </a>
             <a href="javascript:history.back()" class="btn-back">
-                <i class="fas fa-arrow-left"></i>
+                <i data-lucide="arrow-left" width="20" height="20"></i>
                 이전 페이지
             </a>
         </div>

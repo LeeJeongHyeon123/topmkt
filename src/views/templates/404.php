@@ -168,11 +168,11 @@ require_once SRC_PATH . '/views/templates/header.php';
         
         <div class="error-actions">
             <a href="/" class="btn-home">
-                <i class="fas fa-home"></i>
+                <i data-lucide="home" width="20" height="20"></i>
                 홈으로 돌아가기
             </a>
             <a href="javascript:history.back()" class="btn-back">
-                <i class="fas fa-arrow-left"></i>
+                <i data-lucide="arrow-left" width="20" height="20"></i>
                 이전 페이지
             </a>
         </div>
@@ -181,19 +181,19 @@ require_once SRC_PATH . '/views/templates/header.php';
             <h3>도움이 될 만한 링크</h3>
             <div class="links-grid">
                 <a href="/community" class="helpful-link">
-                    <i class="fas fa-comments"></i>
+                    <i data-lucide="message-circle" width="20" height="20"></i>
                     커뮤니티
                 </a>
                 <a href="/events" class="helpful-link">
-                    <i class="fas fa-calendar-alt"></i>
+                    <i data-lucide="calendar" width="20" height="20"></i>
                     행사 일정
                 </a>
                 <a href="/lectures" class="helpful-link">
-                    <i class="fas fa-graduation-cap"></i>
+                    <i data-lucide="graduation-cap" width="20" height="20"></i>
                     강의 일정
                 </a>
                 <a href="/auth/login" class="helpful-link">
-                    <i class="fas fa-sign-in-alt"></i>
+                    <i data-lucide="log-in" width="20" height="20"></i>
                     로그인
                 </a>
             </div>

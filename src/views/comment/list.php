@@ -450,7 +450,7 @@ function renderComment($comment, $currentUserId = null, $depth = 0, $parentAutho
                 <div class="comment-actions-btn">
                     <?php if ($currentUserId && !$isOwner && $comment['user_id']): ?>
                         <button onclick="startChatWithCommentAuthor(<?= $comment['user_id'] ?>, '<?= addslashes(htmlspecialchars($comment['author_name'])) ?>')" class="comment-btn chat" title="채팅하기">
-                            <i class="fas fa-comment"></i>
+                            <i data-lucide="message-circle" width="20" height="20"></i>
                         </button>
                     <?php endif; ?>
                     <?php if ($isOwner): ?>

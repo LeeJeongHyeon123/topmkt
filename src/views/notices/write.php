@@ -468,10 +468,10 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
         <div class="form-group">
             <label class="form-label">이미지 첨부 (선택사항)</label>
             <div class="upload-area" id="uploadArea">
-                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #cbd5e0; margin-bottom: 10px;"></i>
+                <i data-lucide="cloud-upload" width="48" height="48" style="color: #cbd5e0; margin-bottom: 10px;"></i>
                 <p>이미지를 드래그하여 올리거나 클릭하여 선택하세요</p>
                 <div class="upload-button" onclick="document.getElementById('imageInput').click()">
-                    <i class="fas fa-plus"></i> 이미지 선택
+                    <i data-lucide="plus" width="20" height="20"></i> 이미지 선택
                 </div>
                 <input type="file" 
                        id="imageInput" 
@@ -501,7 +501,7 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
                         <div class="uploaded-image" data-image-id="<?= htmlspecialchars($image['id']) ?>">
                             <img src="<?= htmlspecialchars($image['file_path']) ?>" alt="첨부 이미지">
                             <button type="button" class="remove-image" onclick="removeImage(this, <?= htmlspecialchars($image['id']) ?>)">
-                                <i class="fas fa-times"></i>
+                                <i data-lucide="x" width="16" height="16"></i>
                             </button>
                         </div>
                     <?php endforeach; ?>
@@ -512,14 +512,14 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
         <!-- 버튼 그룹 -->
         <div class="form-buttons">
             <a href="/notices" class="btn btn-secondary" onclick="isFormSubmitted = true;">
-                <i class="fas fa-times"></i> 취소
+                <i data-lucide="x" width="20" height="20"></i> 취소
             </a>
             <button type="submit" class="btn btn-primary" id="submitBtn">
-                <i class="fas fa-save"></i> <?= $submitText ?>
+                <i data-lucide="save" width="20" height="20"></i> <?= $submitText ?>
             </button>
             <?php if ($isEdit): ?>
                 <button type="button" class="btn btn-danger" onclick="deleteNotice(<?= $notice['id'] ?>)">
-                    <i class="fas fa-trash"></i> 삭제
+                    <i data-lucide="trash-2" width="20" height="20"></i> 삭제
                 </button>
             <?php endif; ?>
         </div>
@@ -529,6 +529,17 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
 <!-- Quill.js 라이브러리 -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+// Lucide 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
 
 <!-- 🚀 v3.27.0: 공통 업로드 설정 -->
 <?php include '/var/www/html/topmkt/src/views/includes/upload-config.js.php'; ?>
@@ -858,7 +869,7 @@ function addImagePreview(imagePath, imageId) {
     imageDiv.innerHTML = `
         <img src="${imagePath}" alt="첨부 이미지" loading="lazy">
         <button type="button" class="remove-image" onclick="removeImage(this, ${imageId})">
-            <i class="fas fa-times"></i>
+            <i data-lucide="x" width="16" height="16"></i>
         </button>
     `;
     

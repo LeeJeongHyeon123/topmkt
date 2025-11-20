@@ -32,7 +32,7 @@ if (file_exists($styleFile)) {
             </div>
             <!-- 모바일 채팅방 목록 토글 버튼 -->
             <button class="mobile-chat-toggle" onclick="toggleMobileChatSidebar()">
-                <i class="fas fa-bars"></i>
+                <i data-lucide="menu" width="20" height="20"></i>
                 <span>채팅방</span>
             </button>
         </div>
@@ -45,7 +45,7 @@ if (file_exists($styleFile)) {
             <div class="sidebar-header">
                 <div class="sidebar-title">채팅방</div>
                 <button class="new-chat-btn" onclick="openNewChatModal()">
-                    <i class="fas fa-plus"></i> 새 채팅
+                    <i data-lucide="plus" width="20" height="20"></i> 새 채팅
                 </button>
             </div>
             
@@ -65,7 +65,7 @@ if (file_exists($styleFile)) {
             <!-- 채팅 시작 안내 -->
             <div class="chat-welcome" id="chatWelcome">
                 <div class="chat-welcome-icon">
-                    <i class="fas fa-comments"></i>
+                    <i data-lucide="message-circle" width="20" height="20"></i>
                 </div>
                 <h3>채팅을 시작해보세요!</h3>
                 <p>왼쪽에서 채팅방을 선택하거나 새로운 채팅을 시작하세요.</p>
@@ -77,7 +77,7 @@ if (file_exists($styleFile)) {
                 <div class="chat-header-bar">
                     <!-- 모바일 뒤로가기 버튼 -->
                     <button class="mobile-back-btn" onclick="backToChatList()" style="display: none;">
-                        <i class="fas fa-arrow-left"></i>
+                        <i data-lucide="arrow-left" width="20" height="20"></i>
                     </button>
                     <div class="chat-partner-avatar" id="chatPartnerAvatar">
                         U
@@ -87,10 +87,10 @@ if (file_exists($styleFile)) {
                     </div>
                     <div class="chat-options">
                         <button class="chat-option-btn" id="visitProfileBtn" title="프로필 방문" onclick="visitPartnerProfile()" style="display: none;">
-                            <i class="fas fa-user"></i>
+                            <i data-lucide="user" width="20" height="20"></i>
                         </button>
                         <button class="chat-option-btn" title="더보기" onclick="showChatOptionsMenu(event)">
-                            <i class="fas fa-ellipsis-v"></i>
+                            <i data-lucide="more-vertical" width="20" height="20"></i>
                         </button>
                     </div>
                 </div>
@@ -110,7 +110,7 @@ if (file_exists($styleFile)) {
                             rows="1"
                             maxlength="1000"></textarea>
                         <button type="submit" class="chat-send-btn" id="chatSendBtn">
-                            <i class="fas fa-paper-plane"></i>
+                            <i data-lucide="send" width="20" height="20"></i>
                         </button>
                     </form>
                 </div>
@@ -136,7 +136,7 @@ if (file_exists($styleFile)) {
                         placeholder="정확한 닉네임 입력 후 엔터 또는 돋보기 클릭..." 
                         autocomplete="off">
                     <button type="button" class="search-btn" id="userSearchBtn" onclick="performUserSearch()">
-                        <i class="fas fa-search"></i>
+                        <i data-lucide="search" width="20" height="20"></i>
                     </button>
                 </div>
             </div>
@@ -144,7 +144,7 @@ if (file_exists($styleFile)) {
             <div class="users-list" id="usersList">
                 <!-- 초기 상태 -->
                 <div style="text-align: center; padding: 40px 20px; color: #718096;" id="usersInitial">
-                    <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                    <i data-lucide="search" width="32" height="32" style="margin-bottom: 12px; opacity: 0.5;"></i>
                     <p style="margin: 0; font-size: 0.9rem;">정확한 닉네임으로 검색하세요</p>
                 </div>
             </div>
@@ -405,7 +405,7 @@ function loadChatRooms() {
         if (currentRoomIds.length === 0) {
             roomsListContainer.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px; color: #718096;" id="noRoomsMessage">
-                    <i class="fas fa-comments" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                    <i data-lucide="message-circle" width="32" height="32" style="margin-bottom: 12px; opacity: 0.5;"></i>
                     <p style="margin: 0; font-size: 0.9rem;">아직 채팅방이 없습니다.<br>새 채팅을 시작해보세요!</p>
                 </div>
             `;
@@ -1045,7 +1045,7 @@ function renderMessages(messages) {
         
         const emptyMessage = `
             <div style="text-align: center; padding: 40px 20px; color: #718096;">
-                <i class="fas fa-comment-dots" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                <i data-lucide="message-square" width="32" height="32" style="margin-bottom: 12px; opacity: 0.5;"></i>
                 <p style="margin: 0; font-size: 0.9rem;">첫 메시지를 보내보세요!</p>
             </div>
         `;
@@ -1223,7 +1223,7 @@ function openNewChatModal() {
 function closeNewChatModal() {
     document.getElementById('newChatModal').style.display = 'none';
     document.getElementById('userSearchInput').value = '';
-    document.getElementById('usersList').innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #718096;" id="usersInitial"><i class="fas fa-search" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i><p style="margin: 0; font-size: 0.9rem;">정확한 닉네임으로 검색하세요</p></div>';
+    document.getElementById('usersList').innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #718096;" id="usersInitial"><i data-lucide="search" width="32" height="32" style="margin-bottom: 12px; opacity: 0.5;"></i><p style="margin: 0; font-size: 0.9rem;">정확한 닉네임으로 검색하세요</p></div>';
 }
 
 /**
@@ -1251,7 +1251,7 @@ function searchUsers(query = null) {
     const usersList = document.getElementById('usersList');
     
     if (query.length < 2) {
-        usersList.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #718096;"><i class="fas fa-search" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i><p style="margin: 0; font-size: 0.9rem;">정확한 닉네임으로 검색하세요</p></div>';
+        usersList.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #718096;"><i data-lucide="search" width="32" height="32" style="margin-bottom: 12px; opacity: 0.5;"></i><p style="margin: 0; font-size: 0.9rem;">정확한 닉네임으로 검색하세요</p></div>';
         return;
     }
     
@@ -1640,11 +1640,11 @@ function showChatOptionsMenu(event) {
     
     menu.innerHTML = `
         <button class="chat-options-menu-item" onclick="closeChatRoom()">
-            <i class="fas fa-times"></i>
+            <i data-lucide="x" width="20" height="20"></i>
             <span>채팅방 닫기</span>
         </button>
         <button class="chat-options-menu-item danger" onclick="leaveChatRoom()">
-            <i class="fas fa-sign-out-alt"></i>
+            <i data-lucide="log-out" width="20" height="20"></i>
             <span>채팅방 나가기</span>
         </button>
     `;
@@ -1761,12 +1761,12 @@ function showInactiveRoomModal(roomId, roomName) {
             <div class="inactive-room-modal-header">
                 <h3>종료된 대화</h3>
                 <button class="inactive-room-modal-close" onclick="closeInactiveRoomModal()">
-                    <i class="fas fa-times"></i>
+                    <i data-lucide="x" width="20" height="20"></i>
                 </button>
             </div>
             <div class="inactive-room-modal-body">
                 <div class="inactive-room-info">
-                    <i class="fas fa-user-slash" style="font-size: 2rem; color: #718096; margin-bottom: 16px;"></i>
+                    <i data-lucide="user-x" width="32" height="32" style="color: #718096; margin-bottom: 16px;"></i>
                     <h4>${roomName}</h4>
                     <p>상대방이 채팅방을 나가서 대화가 종료되었습니다.</p>
                     <p style="font-size: 0.9rem; color: #718096; margin-top: 8px;">
@@ -1940,7 +1940,7 @@ async function leaveChatRoom() {
                 if (remainingRooms.length === 0) {
                     roomsList.innerHTML = `
                         <div style="text-align: center; padding: 40px 20px; color: #718096;">
-                            <i class="fas fa-comments" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                            <i data-lucide="message-circle" width="32" height="32" style="margin-bottom: 12px; opacity: 0.5;"></i>
                             <p style="margin: 0; font-size: 0.9rem;">아직 채팅방이 없습니다.<br>새 채팅을 시작해보세요!</p>
                         </div>
                     `;
@@ -2239,7 +2239,7 @@ function toggleMobileChatSidebar() {
         if (sidebarHeader && !sidebarHeader.querySelector('.mobile-close-btn')) {
             const closeBtn = document.createElement('button');
             closeBtn.className = 'mobile-close-btn';
-            closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            closeBtn.innerHTML = '<i data-lucide="x" width="20" height="20"></i>';
             closeBtn.style.cssText = `
                 position: absolute;
                 top: 50%;
