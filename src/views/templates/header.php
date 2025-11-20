@@ -373,7 +373,7 @@
                     <h1 class="logo">
                         <a href="/" class="logo-link">
                             <div class="logo-icon">
-                                <i data-lucide="rocket" width="28" height="28" class="header-rocket"></i>
+                                <i data-lucide="rocket" width="32" height="32" class="header-rocket"></i>
                             </div>
                             <span class="logo-text">탑마케팅</span>
                         </a>
@@ -1085,14 +1085,15 @@
         overflow: visible !important;
     }
     
-    /* 🚀 헤더 로켓 애니메이션 - 완전 짤림 방지 */
+    /* 🚀 헤더 로켓 애니메이션 - 완전 짤림 방지 (v5.0.0: Lucide SVG) */
     .header-rocket {
         display: inline-block;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         transform-origin: center center;
         position: relative;
         color: #3b82f6;
-        font-size: 1.8rem;
+        /* v5.0.0: Lucide SVG는 width/height 속성으로 크기 제어 (32px) */
+        stroke-width: 2;
         padding: 10px; /* 패딩을 크게 늘려서 안전 영역 확보 */
         margin: -8px; /* 네거티브 마진으로 시각적 위치는 유지 */
         z-index: 9999 !important;
@@ -1466,7 +1467,8 @@
     /* 태블릿/모바일 반응형 */
     @media (max-width: 768px) {
         .header-rocket {
-            font-size: 1.5rem;
+            /* v5.0.0: Lucide SVG 크기는 HTML에서 제어 (모바일: 28px) */
+            stroke-width: 2;
         }
 
         .logo-text {
@@ -1765,7 +1767,8 @@
         }
 
         .header-rocket {
-            font-size: 1.4rem !important;
+            /* v5.0.0: Lucide SVG 크기는 HTML에서 제어 (작은 모바일: 24px) */
+            stroke-width: 2;
         }
     }
     </style>
