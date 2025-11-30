@@ -1820,15 +1820,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             window.location.href = '?year=<?= $nextYear ?>&month=<?= $nextMonth ?>&view=<?= $view ?>';
         }
-        
-        // 'c'키로 캘린더 뷰, 'l'키로 리스트 뷰
-        if (e.key === 'c' && !e.target.matches('input, textarea')) {
-            e.preventDefault();
-            window.location.href = '?year=<?= $currentYear ?>&month=<?= $currentMonth ?>&view=calendar';
-        } else if (e.key === 'l' && !e.target.matches('input, textarea')) {
-            e.preventDefault();
-            window.location.href = '?year=<?= $currentYear ?>&month=<?= $currentMonth ?>&view=list';
-        }
     });
     
     // 전역 오류 핸들러

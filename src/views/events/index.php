@@ -197,15 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             window.location.href = '?year=<?= $next_month['year'] ?>&month=<?= $next_month['month'] ?>&view=<?= $view ?>';
         }
-
-        // 'c'키로 캘린더 뷰, 'l'키로 리스트 뷰
-        if (e.key === 'c' && !e.target.matches('input, textarea')) {
-            e.preventDefault();
-            window.location.href = '?year=<?= $year ?>&month=<?= $month ?>&view=calendar';
-        } else if (e.key === 'l' && !e.target.matches('input, textarea')) {
-            e.preventDefault();
-            window.location.href = '?year=<?= $year ?>&month=<?= $month ?>&view=list';
-        }
     });
 });
 </script>
