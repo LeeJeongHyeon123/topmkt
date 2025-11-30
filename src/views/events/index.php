@@ -141,7 +141,10 @@ if (file_exists($styleFile)) {
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="empty-sidebar">
-                            <p>📅 이번 달에 예정된 행사가 없습니다.</p>
+                            <p>
+                                <i data-lucide="calendar" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>
+                                이번 달에 예정된 행사가 없습니다.
+                            </p>
                             <?php if ($isLoggedIn && in_array($_SESSION['user_role'] ?? '', ['ROLE_CORPORATE', 'ADMIN', 'SUPER_ADMIN'])): ?>
                                 <a href="/events/create" class="btn-create" style="margin-top: 10px; display: inline-block;">
                                     ➕ 첫 번째 행사 등록하기

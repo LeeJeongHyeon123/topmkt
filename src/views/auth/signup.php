@@ -1320,7 +1320,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         '회원 정보 암호화 중...',
                         '데이터베이스 연결 중...',
                         '계정 생성 중...',
-                        '환영합니다! 🎉'
+                        '환영합니다!'
                     ],
                     duration: 5000,
                     autoHide: false

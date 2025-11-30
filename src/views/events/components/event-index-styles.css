@@ -1,5 +1,5 @@
 /* 🌟 ULTRA THINK 모드 - 간단하고 깔끔한 레이아웃 v4.0 */
-/* 📅 행사 일정 페이지 - 파란색 테마 유지 */
+/* 행사 일정 페이지 - 파란색 테마 유지 */
 
 /* 🏗️ 메인 컨테이너 - 강의 일정과 완전 동일 */
 .events-container {
@@ -10,7 +10,7 @@
 }
 
 /* 📱 레이아웃 구조 - 강의 일정과 완전 동일한 단순 구조 */
-/* 💬 레이아웃 그리드는 events-common.css에서 관리됨 */
+/* 레이아웃 그리드는 events-common.css에서 관리됨 */
 
 /* 화면 크기별 캘린더 너비 제한 - 강의 일정과 동일 */
 @media (min-width: 1441px) {
@@ -112,7 +112,7 @@
 }
 
 
-/* 📅 캘린더 뷰 - 완전 중앙 정렬 (중복 제거됨) */
+/* 캘린더 뷰 - 완전 중앙 정렬 (중복 제거됨) */
 
 /* 📋 목록 뷰 */
 .list-view {
@@ -332,7 +332,7 @@ body .events-container .events-layout .events-sidebar,
     }
 }
 
-/* 📅 캘린더 테이블 스타일 */
+/* 캘린더 테이블 스타일 */
 .calendar-table {
     width: 100%;
     border-collapse: collapse;
@@ -494,7 +494,7 @@ html body .events-header p,
     text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
 }
 
-/* 📅 월 네비게이션 - 완전 중앙 정렬 */
+/* 월 네비게이션 - 완전 중앙 정렬 */
 .month-navigation {
     display: flex;
     align-items: center;

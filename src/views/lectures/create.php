@@ -176,7 +176,10 @@ if (file_exists($styleFile)) {
         
         <!-- 일정 정보 -->
         <div class="form-section">
-            <h2 class="section-title">📅 일정 정보</h2>
+            <h2 class="section-title">
+                <i data-lucide="calendar" width="22" height="22" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>
+                일정 정보
+            </h2>
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label for="timezone" class="form-label">시간대</label>

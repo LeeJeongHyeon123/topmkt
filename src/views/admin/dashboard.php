@@ -405,7 +405,10 @@ $content = '
             <!-- 최근 댓글 -->
             <div class="activity-section">
                 <div class="section-header">
-                    <h3 class="section-title">💬 최근 댓글</h3>
+                    <h3 class="section-title">
+                        <i data-lucide="message-square" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>
+                        최근 댓글
+                    </h3>
                 </div>
                 
                 ' . (isset($recentActivities['comments']) && !empty($recentActivities['comments']) ?
@@ -428,7 +431,9 @@ $content = '
                             </div>';
                     }, array_slice($recentActivities['comments'], 0, 5))) : '
                         <div class="activity-item">
-                            <div class="activity-icon">💬</div>
+                            <div class="activity-icon">
+                                <i data-lucide="message-square" width="18" height="18"></i>
+                            </div>
                             <div class="activity-content">
                                 <div class="activity-title">댓글이 없습니다</div>
                                 <div class="activity-meta">아직 작성된 댓글이 없습니다.</div>
