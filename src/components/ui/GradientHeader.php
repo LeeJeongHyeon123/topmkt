@@ -50,7 +50,8 @@ function renderGradientHeader($options = []) {
         'size' => 'md',
         'align' => 'left',
         'className' => '',
-        'style' => ''
+        'style' => '',
+        'allowHtml' => false  // HTML 태그 허용 여부 (v5.0.1: Lucide 아이콘 지원)
     ];
 
     $options = array_merge($defaults, $options);
@@ -86,8 +87,8 @@ function renderGradientHeader($options = []) {
 
     $alignStyle = $alignStyles[$options['align']] ?? $alignStyles['left'];
 
-    // HTML 이스케이프
-    $title = htmlspecialchars($options['title'], ENT_QUOTES, 'UTF-8');
+    // HTML 이스케이프 (v5.0.1: allowHtml 옵션 지원)
+    $title = $options['allowHtml'] ? $options['title'] : htmlspecialchars($options['title'], ENT_QUOTES, 'UTF-8');
     $subtitle = htmlspecialchars($options['subtitle'], ENT_QUOTES, 'UTF-8');
     $badge = htmlspecialchars($options['badge'], ENT_QUOTES, 'UTF-8');
     $badgeIcon = $options['badgeIcon']; // 이모지는 이스케이프 불필요

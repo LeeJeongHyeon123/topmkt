@@ -9,10 +9,11 @@
 require_once SRC_PATH . '/components/ui/GradientHeader.php';
 
 echo renderGradientHeader([
-    'title' => '💬 커뮤니티 게시판',
+    'title' => '<i data-lucide="message-square" width="32" height="32" style="display: inline; vertical-align: middle; margin-right: 10px;"></i>커뮤니티 게시판',
     'subtitle' => '탑마케팅 커뮤니티에서 정보를 공유하고 함께 성장하세요',
     'theme' => 'purple',
     'size' => 'md',
-    'align' => 'center'
+    'align' => 'center',
+    'allowHtml' => true
 ]);
 ?>

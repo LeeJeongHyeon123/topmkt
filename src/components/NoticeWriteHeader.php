@@ -9,10 +9,11 @@
 require_once SRC_PATH . '/components/ui/GradientHeader.php';
 
 echo renderGradientHeader([
-    'title' => '📢 ' . $pageTitle,
+    'title' => '<i data-lucide="megaphone" width="32" height="32" style="display: inline; vertical-align: middle; margin-right: 10px;"></i>' . $pageTitle,
     'subtitle' => '중요한 소식을 공유해주세요',
     'theme' => 'purple',
     'size' => 'md',
-    'align' => 'center'
+    'align' => 'center',
+    'allowHtml' => true
 ]);
 ?>

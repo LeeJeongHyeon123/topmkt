@@ -11,10 +11,11 @@
 require_once SRC_PATH . '/components/ui/GradientHeader.php';
 
 echo renderGradientHeader([
-    'title' => '🎉 행사 일정',
+    'title' => '<i data-lucide="calendar-days" width="32" height="32" style="display: inline; vertical-align: middle; margin-right: 10px;"></i>행사 일정',
     'subtitle' => '다양한 마케팅 행사와 네트워킹 행사에 참여하세요',
     'theme' => 'purple',
     'size' => 'md',
-    'align' => 'center'
+    'align' => 'center',
+    'allowHtml' => true
 ]);
 ?>
