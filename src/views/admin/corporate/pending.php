@@ -458,33 +458,33 @@ $content = '
     <!-- 통계 요약 -->
     <div class="summary-cards">
         <div class="summary-card">
-            <div class="summary-card-icon">⏱️</div>
+            <div class="summary-card-icon"><i data-lucide="clock" width="24" height="24"></i></div>
             <div class="summary-card-number">' . number_format(count($applications)) . '</div>
             <div class="summary-card-label">대기 중인 신청</div>
         </div>
         <div class="summary-card">
-            <div class="summary-card-icon">📅</div>
+            <div class="summary-card-icon"><i data-lucide="calendar" width="24" height="24"></i></div>
             <div class="summary-card-number">
-                ' . number_format(count(array_filter($applications, function($app) { 
-                    return (time() - strtotime($app['created_at'])) > 86400; 
+                ' . number_format(count(array_filter($applications, function($app) {
+                    return (time() - strtotime($app['created_at'])) > 86400;
                 }))) . '
             </div>
             <div class="summary-card-label">1일 이상 대기</div>
         </div>
         <div class="summary-card">
-            <div class="summary-card-icon">⚡</div>
+            <div class="summary-card-icon"><i data-lucide="zap" width="24" height="24"></i></div>
             <div class="summary-card-number">
-                ' . number_format(count(array_filter($applications, function($app) { 
-                    return (time() - strtotime($app['created_at'])) > 259200; 
+                ' . number_format(count(array_filter($applications, function($app) {
+                    return (time() - strtotime($app['created_at'])) > 259200;
                 }))) . '
             </div>
             <div class="summary-card-label">3일 이상 대기</div>
         </div>
         <div class="summary-card">
-            <div class="summary-card-icon">🔔</div>
+            <div class="summary-card-icon"><i data-lucide="bell" width="24" height="24"></i></div>
             <div class="summary-card-number">
-                ' . number_format(count(array_filter($applications, function($app) { 
-                    return (time() - strtotime($app['created_at'])) > 604800; 
+                ' . number_format(count(array_filter($applications, function($app) {
+                    return (time() - strtotime($app['created_at'])) > 604800;
                 }))) . '
             </div>
             <div class="summary-card-label">1주 이상 대기</div>

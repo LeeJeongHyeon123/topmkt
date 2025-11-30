@@ -263,8 +263,8 @@ function showChatNotification(senderName, message, roomId, profileImageUrl = nul
 
     // 프로필 이미지 HTML 생성
     const profileImageHtml = profileImageUrl
-        ? `<img src="${escapeHtml(profileImageUrl)}" alt="${escapeHtml(senderName)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`
-        : `<i class="fas fa-user"></i>`;
+        ? `<img src="${escapeHtml(profileImageUrl)}" alt="${escapeHtml(senderName)}" onerror="this.parentElement.innerHTML='<i data-lucide=\\'user\\' style=\\'width:24px;height:24px\\'></i>'; if(window.lucide) window.lucide.createIcons();">`
+        : `<i data-lucide="user" style="width:24px;height:24px"></i>`;
 
     // 현재 시간 생성 (옵션)
     const currentTime = new Date().toLocaleTimeString('ko-KR', {
@@ -286,7 +286,7 @@ function showChatNotification(senderName, message, roomId, profileImageUrl = nul
                 </div>
             </div>
             <button class="alert-close" onclick="event.stopPropagation(); this.parentElement.remove()">
-                <i class="fas fa-times"></i>
+                <i data-lucide="x" style="width:16px;height:16px"></i>
             </button>
         </div>
     `;
@@ -297,6 +297,10 @@ function showChatNotification(senderName, message, roomId, profileImageUrl = nul
     const notification = alertElement.firstElementChild;
     document.body.appendChild(notification);
 
+    // Lucide 아이콘 렌더링
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 
     // 7초 후 자동 제거 (프로필 이미지 있으니 조금 더 길게)
     setTimeout(() => {

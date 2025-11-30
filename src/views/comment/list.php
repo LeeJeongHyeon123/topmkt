@@ -413,9 +413,9 @@ function renderComment($comment, $currentUserId = null, $depth = 0, $parentAutho
             <?php if ($isReply): ?>
                 <div class="reply-to-info">
                     <?php if ($isReplyToDeleted): ?>
-                        📌 삭제된 댓글에 대한 답글
+                        <i data-lucide="pin" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>삭제된 댓글에 대한 답글
                     <?php else: ?>
-                        📌 <?= htmlspecialchars($parentAuthor) ?>님에게 답글
+                        <i data-lucide="pin" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i><?= htmlspecialchars($parentAuthor) ?>님에게 답글
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -578,7 +578,7 @@ $commentCount = count($comments);
 <!-- 댓글 헤더 -->
 <div class="comments-header">
     <h3 class="comments-title">
-        💬 댓글 <span class="comments-count"><?= number_format($totalComments ?? $commentCount) ?></span>
+        <i data-lucide="message-circle" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>댓글 <span class="comments-count"><?= number_format($totalComments ?? $commentCount) ?></span>
     </h3>
 </div>
 
@@ -622,7 +622,7 @@ $commentCount = count($comments);
 <div class="comments-list" id="comments-list">
     <?php if (empty($commentTree)): ?>
         <div class="no-comments">
-            <div class="no-comments-icon">💭</div>
+            <div class="no-comments-icon"><i data-lucide="message-circle" width="48" height="48"></i></div>
             <p>아직 댓글이 없습니다.<br>첫 번째 댓글을 작성해보세요!</p>
         </div>
     <?php else: ?>
@@ -636,7 +636,7 @@ $commentCount = count($comments);
                 <div class="comment-item deleted-placeholder" id="comment-<?= $comment['id'] ?>">
                     <div class="comment-card deleted-comment">
                         <div class="comment-content deleted-content">
-                            <span class="deleted-text">🗑️ 삭제된 댓글입니다.</span>
+                            <span class="deleted-text"><i data-lucide="trash-2" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>삭제된 댓글입니다.</span>
                         </div>
                     </div>
                 </div>

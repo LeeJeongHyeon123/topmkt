@@ -72,11 +72,8 @@
     <link rel="stylesheet" href="//www.topmktx.com/assets/css/loading.css">
     <link rel="stylesheet" href="//www.topmktx.com/assets/css/badges.css"><!-- 🚀 v3.28.0: 통합 배지 시스템 -->
     <link rel="stylesheet" href="//www.topmktx.com/assets/css/search-filter.css"><!-- 🚀 v3.37.0: 검색/필터 컴포넌트 시스템 -->
-    <!-- Font Awesome 6.4.0 with fallback for connection issues -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 
-    <!-- Lucide Icons 0.460.0 (v5.0.0: Font Awesome과 병행 사용) -->
+    <!-- Lucide Icons 0.460.0 (v5.0.0: Font Awesome 완전 대체) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
       // Lucide 아이콘 초기화 (DOM 로드 후)
@@ -90,28 +87,6 @@
     <!-- Lucide Custom CSS (v5.0.0) -->
     <link rel="stylesheet" href="/assets/css/lucide-custom.css">
 
-    <style>
-    /* Font Awesome fallback - 연결 오류시 대체 스타일 */
-    .fa-solid::before, .fas::before { 
-        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", sans-serif !important; 
-        font-weight: 900 !important;
-    }
-    .fa-regular::before, .far::before { 
-        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", sans-serif !important; 
-        font-weight: 400 !important;
-    }
-    /* CDN 연결 실패시 대체 텍스트 */
-    .fa-user::before { content: "👤"; }
-    .fa-home::before { content: "🏠"; }
-    .fa-search::before { content: "🔍"; }
-    .fa-bell::before { content: "🔔"; }
-    .fa-envelope::before { content: "✉️"; }
-    .fa-cog::before { content: "⚙️"; }
-    .fa-plus::before { content: "+"; }
-    .fa-edit::before { content: "✏️"; }
-    .fa-trash::before { content: "🗑️"; }
-    .fa-check::before { content: "✓"; }
-    </style>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -409,10 +384,10 @@
                                 $defaultImage = '/assets/images/default-avatar.png';
                                 $imageUrl = $profileImage ? $profileImage : $defaultImage;
                                 ?>
-                                <img src="<?= htmlspecialchars($imageUrl) ?>" alt="프로필" 
+                                <img src="<?= htmlspecialchars($imageUrl) ?>" alt="프로필"
                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="avatar-fallback">
-                                    👤
+                                    <i data-lucide="user" width="20" height="20"></i>
                                 </div>
                             </div>
                             <?php 
@@ -922,10 +897,10 @@
                         $defaultImage = '/assets/images/default-avatar.png';
                         $imageUrl = $profileImage ? $profileImage : $defaultImage;
                         ?>
-                        <img src="<?= htmlspecialchars($imageUrl) ?>" alt="프로필" 
+                        <img src="<?= htmlspecialchars($imageUrl) ?>" alt="프로필"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="avatar-fallback-large">
-                            👤
+                            <i data-lucide="user" width="32" height="32"></i>
                         </div>
                     </div>
                     <div class="profile-info">
@@ -942,7 +917,7 @@
                             }
                             ?>
                         </div>
-                        <div class="user-welcome">안녕하세요! 👋</div>
+                        <div class="user-welcome">안녕하세요! <i data-lucide="hand" width="16" height="16" style="display: inline-block; vertical-align: middle;"></i></div>
                     </div>
                 </div>
                 <?php else: ?>
@@ -2124,7 +2099,7 @@
             // 관리자 메뉴 HTML 생성
             const adminMenuHtml = isAdmin ? `
                 <a href="/admin" class="dropdown-item admin-item">
-                    <span>⚙️</span>
+                    <i data-lucide="settings" width="18" height="18"></i>
                     <span>관리자 페이지</span>
                 </a>
                 <div class="dropdown-divider"></div>` : '';

@@ -401,7 +401,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
         <div class="form-body">
             <!-- 기본 정보 섹션 -->
             <div class="form-section">
-                <h3 class="section-title">📋 기본 정보</h3>
+                <h3 class="section-title"><i class="lucide lucide-clipboard-list"></i> 기본 정보</h3>
                 
                 <div class="form-group">
                     <label for="company_name" class="form-label">
@@ -450,7 +450,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
             <!-- 대표자 정보 섹션 -->
             <div class="form-section">
-                <h3 class="section-title">👤 대표자 정보</h3>
+                <h3 class="section-title"><i class="lucide lucide-user"></i> 대표자 정보</h3>
                 
                 <div class="form-group">
                     <label for="representative_name" class="form-label">
@@ -483,7 +483,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
             <!-- 회사 주소 섹션 -->
             <div class="form-section">
-                <h3 class="section-title">📍 회사 주소</h3>
+                <h3 class="section-title"><i class="lucide lucide-map-pin"></i> 회사 주소</h3>
                 
                 <div class="form-group">
                     <label for="company_address" class="form-label">
@@ -500,7 +500,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
             <!-- 사업자등록증 업로드 섹션 -->
             <div class="form-section">
-                <h3 class="section-title">📎 사업자등록증 업로드</h3>
+                <h3 class="section-title"><i class="lucide lucide-paperclip"></i> 사업자등록증 업로드</h3>
                 
                 <div class="form-group">
                     <label for="business_registration_file" class="form-label">
@@ -508,7 +508,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
                     </label>
                     
                     <div class="file-upload-area" onclick="document.getElementById('business_registration_file').click()">
-                        <div class="file-upload-icon">📄</div>
+                        <div class="file-upload-icon"><i class="lucide lucide-file-text" style="font-size: 3rem;"></i></div>
                         <div class="file-upload-text">클릭하거나 파일을 드래그하여 업로드</div>
                         <div class="file-upload-hint">JPG, PNG, WebP, PDF 파일 (최대 30MB)</div>
                     </div>
@@ -525,7 +525,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
                             <div class="file-name"></div>
                             <div class="file-size"></div>
                         </div>
-                        <button type="button" class="file-remove" onclick="removeFile()">✕</button>
+                        <button type="button" class="file-remove" onclick="removeFile()"><i class="lucide lucide-x"></i></button>
                     </div>
                     
                     <div class="form-help">
@@ -538,10 +538,10 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
             <!-- 제출 버튼 -->
             <div class="form-actions">
                 <button type="submit" class="btn-submit" id="submitBtn">
-                    <span>📤</span> <?= $isReapply ? '재신청하기' : '신청하기' ?>
+                    <i class="lucide lucide-upload"></i> <?= $isReapply ? '재신청하기' : '신청하기' ?>
                 </button>
                 <a href="/corp/info" class="btn-cancel">
-                    <span>↩️</span> 취소
+                    <i class="lucide lucide-arrow-left"></i> 취소
                 </a>
             </div>
         </div>
@@ -696,7 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 제출 버튼 비활성화
         submitBtn.disabled = true;
         submitBtn.classList.add('loading');
-        submitBtn.innerHTML = '<span>⏳</span> ' + (<?= $isReapply ? 'true' : 'false' ?> ? '재신청 중...' : '신청 중...');
+        submitBtn.innerHTML = '<i class="lucide lucide-loader"></i> ' + (<?= $isReapply ? 'true' : 'false' ?> ? '재신청 중...' : '신청 중...');
         
         // Ajax로 폼 제출 후 리다이렉트 처리
         e.preventDefault();
@@ -730,7 +730,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 버튼 원상복구
             submitBtn.disabled = false;
             submitBtn.classList.remove('loading');
-            submitBtn.innerHTML = '<span>📤</span> ' + (<?= $isReapply ? 'true' : 'false' ?> ? '재신청하기' : '신청하기');
+            submitBtn.innerHTML = '<i class="lucide lucide-upload"></i> ' + (<?= $isReapply ? 'true' : 'false' ?> ? '재신청하기' : '신청하기');
         });
     });
 

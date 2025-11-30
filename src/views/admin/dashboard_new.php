@@ -148,7 +148,7 @@ $content = '
         <div class="stats-grid">
             <div class="stat-card primary">
                 <div class="stat-header">
-                    <div class="stat-icon">👥</div>
+                    <div class="stat-icon"><i data-lucide="users" width="24" height="24"></i></div>
                 </div>
                 <div class="stat-number">' . number_format($todayStats['signups']) . '</div>
                 <div class="stat-label">오늘 신규 가입</div>
@@ -186,7 +186,7 @@ $content = '
                 <div class="stat-number">' . number_format($todayStats['pendingCorps']) . '</div>
                 <div class="stat-label">기업인증 대기</div>
                 <div class="stat-change negative">
-                    <span>⚠️</span> 긴급 처리 필요
+                    <i data-lucide="alert-triangle" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i> 긴급 처리 필요
                 </div>
             </div>
         </div>
@@ -194,7 +194,7 @@ $content = '
         <!-- 메인 그리드 -->
         <div class="main-grid">
             <div class="dashboard-section">
-                <h3 class="section-title">📊 최근 활동</h3>
+                <h3 class="section-title"><i data-lucide="bar-chart-2" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i> 최근 활동</h3>
                 <p>최근 플랫폼 활동 내역이 여기에 표시됩니다.</p>
             </div>
             

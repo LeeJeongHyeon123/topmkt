@@ -15,24 +15,24 @@ $monthNames = [
     7 => '7월', 8 => '8월', 9 => '9월', 10 => '10월', 11 => '11월', 12 => '12월'
 ];
 
-// 🔥 CRITICAL: 캐시 무효화를 위한 타임스탬프
+// CRITICAL: 캐시 무효화를 위한 타임스탬프
 $cache_buster = time();
 ?>
 
-<!-- 🔥 CACHE BUSTER: 브라우저 캐시 강제 새로고침 -->
+<!-- CACHE BUSTER: 브라우저 캐시 강제 새로고침 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="cache-version" content="v2.2-<?php echo time(); ?>">
 
-<!-- 🎨 공통 CSS 파일 -->
+<!-- 공통 CSS 파일 -->
 <link rel="stylesheet" href="/assets/css/events-common.css?v=<?php echo time(); ?>">
 
 <style>
-/* 🔥 CACHE BUSTER v2.2 - <?php echo date('Y-m-d H:i:s'); ?> - ULTRA HIGH PRIORITY CSS */
+/* CACHE BUSTER v2.2 - <?php echo date('Y-m-d H:i:s'); ?> - ULTRA HIGH PRIORITY CSS */
 /* 행사 일정 리스트 페이지 스타일 (파란색 테마) - 사이드바 추가 */
 
-/* 🚨 ABSOLUTE CSS OVERRIDE - 최고 우선순위로 중앙정렬 강제 적용 */
+/* ABSOLUTE CSS OVERRIDE - 최고 우선순위로 중앙정렬 강제 적용 */
 html body .events-container .calendar-controls,
 html body .calendar-controls,
 .events-container .calendar-controls,
@@ -51,7 +51,7 @@ html body .month-navigation,
     align-items: center !important;
 }
 
-/* 🔥 모바일 events-header 좌우 여백 완전 통일 */
+/* 모바일 events-header 좌우 여백 완전 통일 */
 @media (max-width: 768px) {
     html body .events-header,
     .events-container .events-header,
@@ -65,7 +65,7 @@ html body .month-navigation,
     }
 }
 
-/* 🚨 CRITICAL: 목록 UI events-header 좌우 여백 강제 추가 */
+/* CRITICAL: 목록 UI events-header 좌우 여백 강제 추가 */
 /* 캘린더 UI와 완전 동일한 여백 적용 */
 html body .events-header,
 .events-container .events-header,
@@ -78,7 +78,7 @@ html body .events-header,
     position: relative !important;
 }
 
-/* 🔥 데스크톱에서도 여백 보장 */
+/* 데스크톱에서도 여백 보장 */
 @media (min-width: 769px) {
     html body .events-header,
     .events-container .events-header,
@@ -92,7 +92,7 @@ html body .events-header,
     }
 }
 
-/* 🚨 모바일에서 헤더 간격 최적화 */
+/* 모바일에서 헤더 간격 최적화 */
 @media (max-width: 768px) {
     html body .events-header,
     .events-container .events-header,
@@ -100,13 +100,13 @@ html body .events-header,
         padding: 30px 20px !important; /* 패딩도 줄임 */
     }
 
-    /* 🔥 모바일 컨테이너 패딩 강제 통일 */
+    /* 모바일 컨테이너 패딩 강제 통일 */
     html body .events-container,
     .events-container {
         padding: 20px 15px 15px 15px !important; /* 모바일에서 더 컴팩트 */
     }
 }
-/* 🚨 EVENTS CONTAINER 완전 통일 - 강제 패딩 적용 */
+/* EVENTS CONTAINER 완전 통일 - 강제 패딩 적용 */
 html body .events-container,
 .events-container {
     max-width: 1600px !important;
@@ -117,7 +117,7 @@ html body .events-container,
     box-sizing: border-box !important;
 }
 
-/* 🚨 EVENTS HEADER 완전 통일 - 간격 수정 */
+/* EVENTS HEADER 완전 통일 - 간격 수정 */
 html body .events-header,
 .events-container .events-header,
 .events-header {
@@ -133,7 +133,7 @@ html body .events-header,
     margin-right: auto !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    /* 🔥 모바일 좌우 여백 강제 통일 */
+    /* 모바일 좌우 여백 강제 통일 */
     margin-left: auto !important;
     margin-right: auto !important;
     left: 0 !important;
@@ -157,7 +157,7 @@ html body .events-header,
     text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
 }
 
-/* 🔥 CACHE BUSTER v2.1 - 강제 CSS 새로고침 */
+/* CACHE BUSTER v2.1 - 강제 CSS 새로고침 */
 .calendar-controls,
 .events-container .calendar-controls,
 body .calendar-controls {
@@ -173,7 +173,7 @@ body .calendar-controls {
     /* 캐시 방지를 위한 높은 특이성 적용 */
 }
 
-/* 🔥 ULTRA HIGH PRIORITY - 월 네비게이션 강제 중앙정렬 */
+/* ULTRA HIGH PRIORITY - 월 네비게이션 강제 중앙정렬 */
 html body div.events-container div.calendar-controls div.month-navigation,
 html body div.calendar-controls div.month-navigation,
 html body .events-container .calendar-controls .month-navigation,
@@ -188,7 +188,7 @@ body .calendar-controls .month-navigation,
     align-items: center !important;
     gap: 20px !important;
     justify-content: center !important;
-    /* 🚨 FORCE CENTER ALIGNMENT - NO SPACE-BETWEEN ALLOWED */
+    /* FORCE CENTER ALIGNMENT - NO SPACE-BETWEEN ALLOWED */
     flex-direction: row !important;
     text-align: center !important;
     margin: 0 auto !important;
@@ -284,7 +284,7 @@ body .calendar-controls .month-navigation,
     text-decoration: none !important;
 }
 
-/* 🧠 Ultra Think 해결책: List 뷰 전용 Flexbox (캘린더 뷰 영향 없음) */
+/* Ultra Think 해결책: List 뷰 전용 Flexbox (캘린더 뷰 영향 없음) */
 
 <script>
 // List 뷰에서만 Flexbox 레이아웃 적용
@@ -400,7 +400,7 @@ if (window.innerWidth <= 768) {
     }
 }
 
-/* 💬 사이드바 스타일은 events-common.css에서 관리됨 */
+/* 사이드바 스타일은 events-common.css에서 관리됨 */
 
 .sidebar-section {
     margin-bottom: 30px;
@@ -608,7 +608,7 @@ if (window.innerWidth <= 768) {
 
 /* 768px 이하 모바일 반응형 - 패딩 제거로 오버플로우 해결 */
 @media (max-width: 768px) {
-    /* 🔥 긴급 해결: html, body 가로 스크롤 완전 차단 */
+    /* 긴급 해결: html, body 가로 스크롤 완전 차단 */
     html, body {
         overflow-x: hidden !important;
         max-width: 100% !important;
@@ -616,7 +616,7 @@ if (window.innerWidth <= 768) {
         box-sizing: border-box !important;
     }
 
-    /* 🔥 main-content도 동일하게 제한 */
+    /* main-content도 동일하게 제한 */
     main.main-content {
         overflow-x: hidden !important;
         max-width: 100% !important;
@@ -626,7 +626,7 @@ if (window.innerWidth <= 768) {
         padding: 0 !important;
     }
 
-    /* 🔥 모든 하위 요소 강제 제한 */
+    /* 모든 하위 요소 강제 제한 */
     .events-header {
         max-width: 100% !important;
         width: 100% !important;
@@ -648,7 +648,7 @@ if (window.innerWidth <= 768) {
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
-    /* 🔥 핵심 해결: events-container 패딩 완전 제거 - 최대 우선순위 */
+    /* 핵심 해결: events-container 패딩 완전 제거 - 최대 우선순위 */
     html body main.main-content div.events-container,
     body main.main-content div.events-container,
     main.main-content div.events-container,
@@ -666,7 +666,7 @@ if (window.innerWidth <= 768) {
         box-sizing: border-box !important;
     }
 
-    /* 🔥 핵심 해결: events-layout gap 제거로 20px 오버플로우 해결 */
+    /* 핵심 해결: events-layout gap 제거로 20px 오버플로우 해결 */
     html body div.events-container div.events-layout,
     body div.events-container div.events-layout,
     div.events-container div.events-layout,
@@ -676,7 +676,7 @@ if (window.innerWidth <= 768) {
         margin-bottom: 20px !important;
     }
 
-    /* 🔥 핵심 해결: events-sidebar 마진으로 여백, 패딩은 유지 */
+    /* 핵심 해결: events-sidebar 마진으로 여백, 패딩은 유지 */
     html body div.events-container div.events-sidebar,
     body div.events-container div.events-sidebar,
     div.events-container div.events-sidebar,
@@ -689,7 +689,7 @@ if (window.innerWidth <= 768) {
         box-sizing: border-box !important;
     }
 
-    /* 🔥 핵심 해결: events-main 영역도 동일한 마진 적용 */
+    /* 핵심 해결: events-main 영역도 동일한 마진 적용 */
     html body div.events-container div.events-main,
     body div.events-container div.events-main,
     div.events-container div.events-main,
@@ -1068,7 +1068,7 @@ if (window.innerWidth <= 768) {
     }
 }
 
-/* 🎯 세련된 모던 호버 효과 */
+/* 세련된 모던 호버 효과 */
 html body .events-list .event-card,
 html body .event-card,
 .events-list .event-card,
@@ -1134,11 +1134,11 @@ div.event-card {
                         <p>새로운 행사를 등록하거나 다른 달을 확인해보세요.</p>
                         <?php if ($isLoggedIn && isset($permission) && $permission['hasPermission']): ?>
                             <a href="/events/create" class="btn-create" style="margin-top: 10px; display: inline-block;">
-                                ➕ 첫 번째 행사 등록하기
+                                 첫 번째 행사 등록하기
                             </a>
                         <?php elseif ($isLoggedIn): ?>
                             <p style="margin-top: 10px; color: #718096; font-size: 0.9rem;">
-                                🏢 기업회원만 행사를 등록할 수 있습니다
+                                기업회원만 행사를 등록할 수 있습니다
                             </p>
                         <?php endif; ?>
                     </div>
@@ -1214,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // JavaScript 임시 제거 - CSS로 근본 해결 필요
 
 
-    // 🚨 FORCE CENTER ALIGNMENT - JavaScript 강제 적용
+    // FORCE CENTER ALIGNMENT - JavaScript 강제 적용
     const monthNavigation = document.querySelector('.month-navigation');
     if (monthNavigation) {
         monthNavigation.style.setProperty('justify-content', 'center', 'important');
@@ -1283,7 +1283,7 @@ if (window.innerWidth <= 768) {
 
 }
 
-// 🎯 event-card 경계선 강제 추가 - 즉시 적용
+// event-card 경계선 강제 추가 - 즉시 적용
 function addEventCardBorders() {
 
     // 모든 event-card 찾아서 경계선 추가

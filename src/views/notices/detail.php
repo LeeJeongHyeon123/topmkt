@@ -987,8 +987,9 @@ body {
             
             <div class="notice-actions">
                 <!-- 공유 버튼 -->
-                <?= renderButton('🔗 공유하기', 'secondary', 'md', [
-                    'onclick' => 'shareContent()'
+                <?= renderButton('공유하기', 'secondary', 'md', [
+                    'onclick' => 'shareContent()',
+                    'icon' => 'share-2'
                 ]) ?>
 
                 <!-- 목록으로 버튼 -->
@@ -1452,10 +1453,9 @@ function shareContent() {
 /**
  * 폴백 공유 기능 (클립보드 복사)
  */
-// 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
 function fallbackShare(title, url) {
     copyToClipboard(url, {
-        successMessage: '🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
+        successMessage: '링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
     }).catch(() => {
         showShareModal(title, url);
     });
@@ -1523,14 +1523,14 @@ function openImageModal(imagePath) {
     
     modal.innerHTML = `
         <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: default; padding: 20px; box-sizing: border-box;">
-            <img id="modal-image" src="${imagePath}" alt="이미지 확대보기" 
+            <img id="modal-image" src="${imagePath}" alt="이미지 확대보기"
                  style="max-width: ${maxWidth}px; max-height: ${maxHeight}px; width: auto; height: auto; object-fit: contain; border-radius: 12px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5); cursor: zoom-out; display: block;"
                  onclick="closeImageModal()">
-            <button onclick="closeImageModal()" 
-                    style="position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95); color: #333; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); transition: all 0.2s ease; z-index: 10001; backdrop-filter: blur(10px);"
+            <button onclick="closeImageModal()"
+                    style="position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95); color: #333; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); transition: all 0.2s ease; z-index: 10001; backdrop-filter: blur(10px); padding: 0;"
                     onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='scale(1.15)'"
                     onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.transform='scale(1)'">
-                ✕
+                <i data-lucide="x" width="24" height="24" style="color: #333;"></i>
             </button>
         </div>
     `;
@@ -1601,8 +1601,13 @@ function openImageModal(imagePath) {
     
     // body 스크롤 방지
     document.body.style.overflow = 'hidden';
-    
+
     document.body.appendChild(modal);
+
+    // Lucide 아이콘 초기화
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 /**
@@ -1649,7 +1654,10 @@ function showShareModal(title, url) {
     
     modal.innerHTML = `
         <div style="background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);">
-            <h3 style="margin-bottom: 20px; color: #2d3748;">🔗 공지사항 공유하기</h3>
+            <h3 style="margin-bottom: 20px; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="share-2" width="20" height="20"></i>
+                공지사항 공유하기
+            </h3>
             
             <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
                 <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px;">
@@ -1685,8 +1693,13 @@ function showShareModal(title, url) {
             modal.remove();
         }
     });
-    
+
     document.body.appendChild(modal);
+
+    // Lucide 아이콘 초기화
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 </script>
 

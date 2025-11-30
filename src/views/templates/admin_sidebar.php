@@ -15,14 +15,14 @@
         <div class="nav-section">
             <div class="nav-section-title">회원 관리</div>
             <a href="/admin/users" class="nav-item">
-                <i>👥</i> 회원 목록
+                <i data-lucide="users" width="16" height="16"></i> 회원 목록
             </a>
         </div>
 
         <div class="nav-section">
             <div class="nav-section-title">기업회원</div>
             <a href="/admin/corporate/pending" class="nav-item <?= ($current_page ?? '') === 'corporate-pending' ? 'active' : '' ?>">
-                <i>⏱️</i> 인증 대기
+                <i data-lucide="clock" width="16" height="16"></i> 인증 대기
                 <?php
                 // 대기 중인 기업인증 수 표시 (향후 구현)
                 if (isset($pending_corps_count) && $pending_corps_count > 0): ?>
@@ -30,7 +30,7 @@
                 <?php endif; ?>
             </a>
             <a href="/admin/corporate/list" class="nav-item <?= ($current_page ?? '') === 'corporate-list' ? 'active' : '' ?>">
-                <i>📋</i> 기업회원 목록
+                <i data-lucide="clipboard" width="16" height="16"></i> 기업회원 목록
             </a>
         </div>
 

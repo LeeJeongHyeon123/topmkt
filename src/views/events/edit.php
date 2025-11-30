@@ -434,7 +434,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
         <!-- 일정 정보 섹션 -->
         <div class="form-section">
-            <h2 class="section-title">📅 일정 정보</h2>
+            <h2 class="section-title"><i data-lucide="calendar" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>일정 정보</h2>
             
             <div class="form-row">
                 <div class="form-group">
@@ -463,7 +463,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
         <!-- 장소 정보 섹션 -->
         <div class="form-section">
-            <h2 class="section-title">📍 장소 정보</h2>
+            <h2 class="section-title"><i data-lucide="map-pin" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>장소 정보</h2>
             
             <div class="form-group">
                 <label class="form-label required">행사 형태</label>
@@ -523,7 +523,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
         <!-- 강사 정보 섹션 -->
         <div class="form-section">
-            <h2 class="section-title">👨‍🏫 강사 정보</h2>
+            <h2 class="section-title"><i data-lucide="user" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>강사 정보</h2>
             
             <div id="instructors-container">
                 <?php if (!empty($instructors)): ?>

@@ -1226,7 +1226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 성공 메시지 표시
         const statusDiv = document.createElement('div');
         statusDiv.className = 'verification-status success';
-        statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 휴대폰 인증이 완료되었습니다.';
+        statusDiv.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle" style="display:inline-block;vertical-align:middle;margin-right:8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> 휴대폰 인증이 완료되었습니다.';
         phoneGroup.appendChild(statusDiv);
         
         validateForm();
@@ -1306,7 +1306,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!validateForm()) {
             Toast.error('모든 필드를 올바르게 입력하고 휴대폰 인증을 완료해주세요.');
-            Toast.error('⚠️ 디버깅: 폼 유효성 검사 실패\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
+            Toast.error('디버깅: 폼 유효성 검사 실패\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
             return;
         }
 
@@ -1362,7 +1362,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             Toast.error('보안 검증에 실패했습니다. 새로고침 후 다시 시도해주세요.');
-            Toast.error('⚠️ 디버깅: reCAPTCHA 토큰 생성 실패\n\n' + error.message + '\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
+            Toast.error('디버깅: reCAPTCHA 토큰 생성 실패\n\n' + error.message + '\n\n콘솔 로그를 확인하세요.\n확인을 누르면 계속됩니다.');
         }
     });
 

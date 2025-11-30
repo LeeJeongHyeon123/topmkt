@@ -580,7 +580,7 @@ require_once SRC_PATH . '/components/ui/Card.php';
     <!-- 대시보드 헤더 -->
     <div class="dashboard-header">
         <h1 class="dashboard-title">
-            📊 신청 관리 대시보드
+            <i class="lucide" data-lucide="bar-chart-3"></i> 신청 관리 대시보드
         </h1>
         <p class="dashboard-subtitle">
             <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 신청 현황을 한눈에 확인하고 효율적으로 관리하세요
@@ -590,18 +590,18 @@ require_once SRC_PATH . '/components/ui/Card.php';
         <div class="content-type-tabs">
             <button class="tab-button <?= ($contentType ?? 'lecture') === 'lecture' ? 'active' : '' ?>"
                     onclick="switchContentType('lecture')">
-                🎓 강의 관리
+                <i class="lucide" data-lucide="graduation-cap"></i> 강의 관리
             </button>
             <button class="tab-button <?= ($contentType ?? 'lecture') === 'event' ? 'active' : '' ?>"
                     onclick="switchContentType('event')">
-                🎉 행사 관리
+                <i class="lucide" data-lucide="party-popper"></i> 행사 관리
             </button>
         </div>
     </div>
 
     <!-- 글로벌 대시보드 필터 (v3.98.15 - 전체 보기 체크박스) -->
     <div class="dashboard-filter-wrapper">
-        <h3 class="dashboard-filter-title">📊 신청 현황</h3>
+        <h3 class="dashboard-filter-title"><i class="lucide" data-lucide="bar-chart-3" style="display: inline; width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"></i> 신청 현황</h3>
 
         <div class="dashboard-filter-controls">
             <label class="filter-checkbox-label">
@@ -616,28 +616,28 @@ require_once SRC_PATH . '/components/ui/Card.php';
     <!-- 통계 카드 (Card 컴포넌트 사용 - v3.38.0) -->
     <div class="stats-grid">
         <?= Card::stat([
-            'icon' => ($contentType ?? 'lecture') === 'event' ? '🎉' : '📚',
+            'icon' => ($contentType ?? 'lecture') === 'event' ? 'party-popper' : 'school',
             'value' => number_format($stats['total_lectures']),
             'label' => '등록된 ' . (($contentType ?? 'lecture') === 'event' ? '행사' : '강의'),
             'variant' => 'primary'
         ]) ?>
 
         <?= Card::stat([
-            'icon' => '✅',
+            'icon' => 'check',
             'value' => number_format($stats['approved_applications']),
             'label' => '승인된 신청',
             'variant' => 'success'
         ]) ?>
 
         <?= Card::stat([
-            'icon' => '⏳',
+            'icon' => 'hourglass',
             'value' => number_format($stats['pending_applications']),
             'label' => '대기중인 신청',
             'variant' => 'warning'
         ]) ?>
 
         <?= Card::stat([
-            'icon' => '❌',
+            'icon' => 'x',
             'value' => number_format($stats['rejected_applications']),
             'label' => '거절된 신청',
             'variant' => 'danger'
@@ -648,26 +648,27 @@ require_once SRC_PATH . '/components/ui/Card.php';
     <div class="section">
         <div class="section-header">
             <h2 class="section-title">
-                <?= ($contentType ?? 'lecture') === 'event' ? '🎉 최근 행사 목록' : '🎯 최근 강의 목록' ?>
+                <i class="lucide" data-lucide="<?= ($contentType ?? 'lecture') === 'event' ? 'party-popper' : 'target' ?>" style="display: inline; width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;"></i>
+                <?= ($contentType ?? 'lecture') === 'event' ? '최근 행사 목록' : '최근 강의 목록' ?>
             </h2>
             <a href="<?= ($contentType ?? 'lecture') === 'event' ? '/events/create' : '/lectures/create' ?>"
                class="btn btn-primary">
-                ➕ <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 등록하기
+                <i class="lucide" data-lucide="plus"></i> <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 등록하기
             </a>
         </div>
 
         <?php if (empty($lectures)): ?>
             <div style="text-align: center; padding: 60px 20px; color: #718096;">
                 <div style="font-size: 3rem; margin-bottom: 16px;">
-                    <?= ($contentType ?? 'lecture') === 'event' ? '🎉' : '📚' ?>
+                    <i class="lucide" data-lucide="<?= ($contentType ?? 'lecture') === 'event' ? 'party-popper' : 'school' ?>" style="width: 48px; height: 48px;"></i>
                 </div>
                 <h3 style="margin-bottom: 8px;">
                     등록된 <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?>가 없습니다
                 </h3>
                 <p>새로운 <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?>를 등록하여 참가자들을 모집해보세요!</p>
-                <a href="<?= ($contentType ?? 'lecture') === 'event' ? '/events/create' : '/lectures/create' ?>" 
+                <a href="<?= ($contentType ?? 'lecture') === 'event' ? '/events/create' : '/lectures/create' ?>"
                    class="btn btn-primary" style="margin-top: 20px;">
-                    ➕ <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 등록하기
+                    <i class="lucide" data-lucide="plus"></i> <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 등록하기
                 </a>
             </div>
         <?php else: ?>
@@ -682,16 +683,16 @@ require_once SRC_PATH . '/components/ui/Card.php';
                                 </span>
                             </div>
                             <div class="lecture-meta">
-                                <span>📅 <?= date('Y-m-d H:i', strtotime($lecture['start_date'] . ' ' . $lecture['start_time'])) ?></span>
-                                <span>👥 
-                                    <?= number_format($lecture['approved_count']) ?>/<?= 
-                                        $lecture['max_participants'] ? number_format($lecture['max_participants']) . '명' : '무제한' 
+                                <span><i class="lucide" data-lucide="calendar" style="display: inline-block; width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i> <?= date('Y-m-d H:i', strtotime($lecture['start_date'] . ' ' . $lecture['start_time'])) ?></span>
+                                <span><i class="lucide" data-lucide="users" style="display: inline-block; width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i>
+                                    <?= number_format($lecture['approved_count']) ?>/<?=
+                                        $lecture['max_participants'] ? number_format($lecture['max_participants']) . '명' : '무제한'
                                     ?>
                                 </span>
                                 <?php if ($lecture['content_type'] === 'event' && $lecture['location_type'] === 'offline'): ?>
-                                    <span>📍 현장 행사</span>
+                                    <span><i class="lucide" data-lucide="map-pin" style="display: inline-block; width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i> 현장 행사</span>
                                 <?php elseif ($lecture['content_type'] === 'event' && $lecture['location_type'] === 'online'): ?>
-                                    <span>💻 온라인 행사</span>
+                                    <span><i class="lucide" data-lucide="laptop" style="display: inline-block; width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i> 온라인 행사</span>
                                 <?php endif; ?>
                                 
                                 <!-- 신청 상태 배지 -->
@@ -719,10 +720,10 @@ require_once SRC_PATH . '/components/ui/Card.php';
                             
                             <div class="lecture-actions">
                                 <a href="/registrations/lectures/<?= $lecture['id'] ?>" class="btn btn-primary">
-                                    👥 신청자 관리
+                                    <i class="lucide" data-lucide="users"></i> 신청자 관리
                                 </a>
                                 <a href="<?= $lecture['content_type'] === 'event' ? '/events/detail?id=' : '/lectures/' ?><?= $lecture['id'] ?>" class="btn btn-outline">
-                                    📋 <?= $lecture['content_type'] === 'event' ? '행사' : '강의' ?> 상세
+                                    <i class="lucide" data-lucide="clipboard-list"></i> <?= $lecture['content_type'] === 'event' ? '행사' : '강의' ?> 상세
                                 </a>
                             </div>
                         </div>
@@ -738,7 +739,7 @@ require_once SRC_PATH . '/components/ui/Card.php';
         <div class="section">
             <div class="section-header">
                 <h2 class="section-title">
-                    ⏰ 최근 <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 신청 현황
+                    <i class="lucide" data-lucide="clock" style="display: inline; width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;"></i> 최근 <?= ($contentType ?? 'lecture') === 'event' ? '행사' : '강의' ?> 신청 현황
                 </h2>
             </div>
             
@@ -773,12 +774,15 @@ require_once SRC_PATH . '/components/ui/Card.php';
                                     </td>
                                     <td>
                                         <span class="status-badge status-<?= $registration['status'] ?>">
-                                            <?= [
-                                                'pending' => '⏳ 대기중',
-                                                'approved' => '✅ 승인됨',
-                                                'rejected' => '❌ 거절됨',
-                                                'waiting' => '⏰ 대기자'
-                                            ][$registration['status']] ?? $registration['status'] ?>
+                                            <?php
+                                            $statusIcons = [
+                                                'pending' => '<i class="lucide" data-lucide="hourglass" style="display: inline-block; width: 14px; height: 14px; margin-right: 4px; vertical-align: middle;"></i> 대기중',
+                                                'approved' => '<i class="lucide" data-lucide="check" style="display: inline-block; width: 14px; height: 14px; margin-right: 4px; vertical-align: middle;"></i> 승인됨',
+                                                'rejected' => '<i class="lucide" data-lucide="x" style="display: inline-block; width: 14px; height: 14px; margin-right: 4px; vertical-align: middle;"></i> 거절됨',
+                                                'waiting' => '<i class="lucide" data-lucide="clock" style="display: inline-block; width: 14px; height: 14px; margin-right: 4px; vertical-align: middle;"></i> 대기자'
+                                            ];
+                                            echo $statusIcons[$registration['status']] ?? htmlspecialchars($registration['status']);
+                                            ?>
                                         </span>
                                         <?php if ($registration['is_waiting_list']): ?>
                                             <small style="color: #718096;">(<?= $registration['waiting_order'] ?>번째)</small>

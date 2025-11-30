@@ -777,13 +777,13 @@ class LectureController extends BaseController {
                 ORDER BY sort_order ASC
             ");
         } catch (Exception $e) {
-            // 데이터베이스 오류 시 기본 카테고리 반환
+            // 데이터베이스 오류 시 기본 카테고리 반환 (v5.0.0: Lucide 아이콘)
             return [
-                ['id' => 1, 'name' => '세미나', 'color_code' => '#007bff', 'icon' => 'fas fa-microphone'],
-                ['id' => 2, 'name' => '워크샵', 'color_code' => '#28a745', 'icon' => 'fas fa-tools'],
-                ['id' => 3, 'name' => '컨퍼런스', 'color_code' => '#dc3545', 'icon' => 'fas fa-users'],
-                ['id' => 4, 'name' => '웨비나', 'color_code' => '#6f42c1', 'icon' => 'fas fa-video'],
-                ['id' => 5, 'name' => '교육과정', 'color_code' => '#fd7e14', 'icon' => 'fas fa-graduation-cap']
+                ['id' => 1, 'name' => '세미나', 'color_code' => '#007bff', 'icon' => 'mic'],
+                ['id' => 2, 'name' => '워크샵', 'color_code' => '#28a745', 'icon' => 'wrench'],
+                ['id' => 3, 'name' => '컨퍼런스', 'color_code' => '#dc3545', 'icon' => 'users'],
+                ['id' => 4, 'name' => '웨비나', 'color_code' => '#6f42c1', 'icon' => 'video'],
+                ['id' => 5, 'name' => '교육과정', 'color_code' => '#fd7e14', 'icon' => 'graduation-cap']
             ];
         }
     }

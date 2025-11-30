@@ -365,21 +365,21 @@ $profile = $applicationStatus['profile'];
     <div class="status-card">
         <div class="status-header">
             <?php if ($status === 'pending'): ?>
-                <div class="status-badge status-pending">⏳ 심사 중</div>
+                <div class="status-badge status-pending"><i class="lucide lucide-clock"></i> 심사 중</div>
                 <div class="status-title">기업 인증 심사가 진행 중입니다</div>
                 <div class="status-description">
                     신청해주신 기업 인증이 현재 심사 중입니다.<br>
                     1~3일 내 심사 완료 후 결과를 알려드리겠습니다.
                 </div>
             <?php elseif ($status === 'approved'): ?>
-                <div class="status-badge status-approved">✅ 승인 완료</div>
+                <div class="status-badge status-approved"><i class="lucide lucide-check"></i> 승인 완료</div>
                 <div class="status-title">축하합니다! 기업회원으로 승인되었습니다</div>
                 <div class="status-description">
                     이제 강의와 행사를 자유롭게 등록하고 관리하실 수 있습니다.<br>
                     기업회원 전용 혜택을 마음껏 누려보세요!
                 </div>
             <?php elseif ($status === 'rejected'): ?>
-                <div class="status-badge status-rejected">❌ 승인 거절</div>
+                <div class="status-badge status-rejected"><i class="lucide lucide-x"></i> 승인 거절</div>
                 <div class="status-title">기업 인증이 거절되었습니다</div>
                 <div class="status-description">
                     제출하신 서류나 정보에 문제가 있어 승인이 어렵습니다.<br>
@@ -393,7 +393,7 @@ $profile = $applicationStatus['profile'];
     <?php if ($profile): ?>
     <div class="company-info-card">
         <div class="card-header">
-            <h3>🏢 등록된 기업 정보</h3>
+            <h3><i class="lucide lucide-building-2"></i> 등록된 기업 정보</h3>
         </div>
         <div class="card-body">
             <div class="info-grid">
@@ -424,7 +424,7 @@ $profile = $applicationStatus['profile'];
                 <?php if ($profile['is_overseas']): ?>
                 <div class="info-item">
                     <div class="info-label">기업 유형</div>
-                    <div class="info-value overseas">🌍 해외 기업</div>
+                    <div class="info-value overseas"><i class="lucide lucide-globe"></i> 해외 기업</div>
                 </div>
                 <?php endif; ?>
                 <?php if ($profile['processed_at']): ?>
@@ -444,7 +444,7 @@ $profile = $applicationStatus['profile'];
             <!-- 관리자 노트 (거절된 경우) -->
             <?php if ($status === 'rejected' && !empty($profile['admin_notes'])): ?>
             <div class="admin-notes">
-                <h4>📝 거절 사유</h4>
+                <h4><i class="lucide lucide-file-text"></i> 거절 사유</h4>
                 <p><?= nl2br(htmlspecialchars($profile['admin_notes'])) ?></p>
             </div>
             <?php endif; ?>
@@ -456,29 +456,29 @@ $profile = $applicationStatus['profile'];
     <div class="action-buttons">
         <?php if ($status === 'approved'): ?>
             <a href="/lectures/create" class="btn btn-primary">
-                <span>📚</span> 강의 등록하기
+                <i class="lucide lucide-book"></i> 강의 등록하기
             </a>
             <a href="/events/create" class="btn btn-primary">
-                <span>🎯</span> 행사 등록하기
+                <i class="lucide lucide-target"></i> 행사 등록하기
             </a>
             <a href="/corp/edit" class="btn btn-secondary">
-                <span>✏️</span> 기업 정보 수정
+                <i class="lucide lucide-pencil"></i> 기업 정보 수정
             </a>
         <?php elseif ($status === 'rejected'): ?>
             <a href="/corp/apply" class="btn btn-warning">
-                <span>🔄</span> 재신청하기
+                <i class="lucide lucide-refresh-cw"></i> 재신청하기
             </a>
             <a href="/corp/info" class="btn btn-secondary">
-                <span>📋</span> 신청 안내 보기
+                <i class="lucide lucide-clipboard-list"></i> 신청 안내 보기
             </a>
         <?php elseif ($status === 'pending'): ?>
             <a href="/corp/info" class="btn btn-secondary">
-                <span>📋</span> 기업회원 안내
+                <i class="lucide lucide-clipboard-list"></i> 기업회원 안내
             </a>
         <?php endif; ?>
-        
+
         <a href="/community" class="btn btn-secondary">
-            <span>🏠</span> 커뮤니티로 이동
+            <i class="lucide lucide-home"></i> 커뮤니티로 이동
         </a>
     </div>
 
@@ -487,7 +487,7 @@ $profile = $applicationStatus['profile'];
     <div class="history-section">
         <div class="company-info-card">
             <div class="card-header">
-                <h3>📈 신청 이력</h3>
+                <h3><i class="lucide lucide-activity"></i> 신청 이력</h3>
             </div>
             <div class="card-body">
                 <div class="history-timeline">
@@ -497,11 +497,11 @@ $profile = $applicationStatus['profile'];
                             <div class="history-action">
                                 <?php
                                 $actionNames = [
-                                    'apply' => '🆕 최초 신청',
-                                    'reapply' => '🔄 재신청',
-                                    'modify' => '✏️ 정보 수정',
-                                    'approve' => '✅ 승인',
-                                    'reject' => '❌ 거절'
+                                    'apply' => '<i class="lucide lucide-file-plus"></i> 최초 신청',
+                                    'reapply' => '<i class="lucide lucide-refresh-cw"></i> 재신청',
+                                    'modify' => '<i class="lucide lucide-pencil"></i> 정보 수정',
+                                    'approve' => '<i class="lucide lucide-check"></i> 승인',
+                                    'reject' => '<i class="lucide lucide-x"></i> 거절'
                                 ];
                                 echo $actionNames[$item['action_type']] ?? $item['action_type'];
                                 ?>
@@ -527,7 +527,7 @@ $profile = $applicationStatus['profile'];
     <!-- 문의 안내 -->
     <div style="text-align: center; color: #718096; font-size: 0.9rem; margin-top: 40px; padding: 20px; background: #f8fafc; border-radius: 12px;">
         <p>
-            <strong>📞 문의사항이 있으시면</strong><br>
+            <strong><i class="lucide lucide-phone"></i> 문의사항이 있으시면</strong><br>
             전화: <strong>1577-9794</strong> | 이메일: <strong>jh@wincard.kr</strong>
         </p>
     </div>

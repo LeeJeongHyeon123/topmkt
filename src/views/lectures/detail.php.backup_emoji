@@ -48,13 +48,11 @@ if (file_exists($styleFile)) {
         <div class="lecture-banner">
             <div class="lecture-actions">
                 <?php if ($canEdit): ?>
-                    <?= renderButton('수정', 'secondary', 'md', [
-                        'icon' => 'pencil',
+                    <?= renderButton('✏️ 수정', 'secondary', 'md', [
                         'class' => 'btn-edit',
                         'attributes' => ['data-lecture-id' => $lecture['id']]
                     ]) ?>
-                    <?= renderButton('삭제', 'danger', 'md', [
-                        'icon' => 'trash-2',
+                    <?= renderButton('🗑️ 삭제', 'danger', 'md', [
                         'onclick' => 'confirmDeleteLecture(' . $lecture['id'] . ')'
                     ]) ?>
                 <?php endif; ?>
@@ -68,44 +66,43 @@ if (file_exists($styleFile)) {
                     <!-- 디버그 모드: 강의 작성자 신청 테스트 -->
                     <div id="registration-actions-debug">
                         <!-- 여기에 동적으로 신청 버튼이 생성됩니다 -->
-                        <small style="color: #ff6b6b; font-weight: bold;"><i data-lucide="wrench" width="20" height="20"></i> DEBUG MODE: 강의 작성자 신청 테스트</small>
+                        <small style="color: #ff6b6b; font-weight: bold;">🔧 DEBUG MODE: 강의 작성자 신청 테스트</small>
                     </div>
                 <?php elseif (!$isLoggedIn): ?>
                     <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-primary">
-                        <i data-lucide="rocket" width="20" height="20"></i> 로그인 후 신청하기
+                        🚀 로그인 후 신청하기
                     </a>
                 <?php endif; ?>
-
-                <?= renderButton('공유하기', 'secondary', 'md', [
-                    'icon' => 'link',
+                
+                <?= renderButton('🔗 공유하기', 'secondary', 'md', [
                     'onclick' => 'shareContent()'
                 ]) ?>
             </div>
             
             <div class="lecture-category">
                 <?= [
-                    'seminar' => '<i data-lucide="megaphone" width="20" height="20"></i> 세미나',
-                    'workshop' => '<i data-lucide="wrench" width="20" height="20"></i> 워크샵',
-                    'conference' => '<i data-lucide="building-2" width="20" height="20"></i> 컨퍼런스',
-                    'webinar' => '<i data-lucide="laptop" width="20" height="20"></i> 웨비나',
-                    'training' => '<i data-lucide="graduation-cap" width="20" height="20"></i> 교육과정'
+                    'seminar' => '📢 세미나',
+                    'workshop' => '🛠️ 워크샵',
+                    'conference' => '🏢 컨퍼런스',
+                    'webinar' => '💻 웨비나',
+                    'training' => '🎓 교육과정'
                 ][$lecture['category']] ?? $lecture['category'] ?>
             </div>
             
             <h1 class="lecture-title"><?= htmlspecialchars($lecture['title']) ?></h1>
             <p class="lecture-subtitle">
-                <i data-lucide="graduation-cap" width="20" height="20"></i> <?= htmlspecialchars($lecture['organizer_name']) ?> 강사님과 함께하는 특별한 시간
+                👨‍🏫 <?= htmlspecialchars($lecture['organizer_name']) ?> 강사님과 함께하는 특별한 시간
             </p>
             
             <div class="lecture-meta-basic">
                 <div class="meta-item">
-                    <span class="meta-icon"><i data-lucide="circle" width="20" height="20" style="color: #48bb78;"></i></span>
+                    <span class="meta-icon">🟢</span>
                     <span>
                         시작 : <?= date('Y년 m월 d일 H:i', strtotime($lecture['start_date'] . ' ' . $lecture['start_time'])) ?>
                     </span>
                 </div>
                 <div class="meta-item">
-                    <span class="meta-icon"><i data-lucide="circle" width="20" height="20" style="color: #e53e3e;"></i></span>
+                    <span class="meta-icon">🔴</span>
                     <span>
                         종료 : <?= date('Y년 m월 d일 H:i', strtotime($lecture['end_date'] . ' ' . $lecture['end_time'])) ?>
                     </span>
@@ -113,11 +110,11 @@ if (file_exists($styleFile)) {
                 <div class="meta-item">
                     <span class="meta-icon">
                         <?php if ($lecture['location_type'] === 'online'): ?>
-                            <i data-lucide="laptop" width="20" height="20"></i>
+                            💻
                         <?php elseif ($lecture['location_type'] === 'hybrid'): ?>
-                            <i data-lucide="refresh-cw" width="20" height="20"></i>
+                            🔄
                         <?php else: ?>
-                            <i data-lucide="map-pin" width="20" height="20"></i>
+                            📍
                         <?php endif; ?>
                     </span>
                     <span>
@@ -131,12 +128,12 @@ if (file_exists($styleFile)) {
                     </span>
                 </div>
                 <div class="meta-item">
-                    <span class="meta-icon"><i data-lucide="users" width="20" height="20"></i></span>
+                    <span class="meta-icon">👥</span>
                     <span><?= $lecture['capacity_info'] ?></span>
                 </div>
                 <?php if ($lecture['registration_deadline']): ?>
                     <div class="meta-item">
-                        <span class="meta-icon"><i data-lucide="clock" width="20" height="20"></i></span>
+                        <span class="meta-icon">⏰</span>
                         <span>
                             신청 마감: <?= date('Y년 m월 d일 H:i', strtotime($lecture['registration_deadline'])) ?>
                         </span>
@@ -165,17 +162,17 @@ if (file_exists($styleFile)) {
             <!-- 강의 이미지 갤러리 -->
             <?php if (!empty($lecture['images'])): ?>
                 <div class="info-section">
-                    <h2 class="section-title"><i data-lucide="image" width="20" height="20"></i> 이미지 (총 <?= count($lecture['images']) ?>개)</h2>
+                    <h2 class="section-title">🖼️ 이미지 (총 <?= count($lecture['images']) ?>개)</h2>
                     
                     <div class="lecture-gallery">
                         <?php foreach ($lecture['images'] as $index => $image): ?>
-                            <!-- <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: inline onclick 제거 → addEventListener로 교체 (성능 개선) -->
+                            <!-- 🚀 v3.64.0: inline onclick 제거 → addEventListener로 교체 (성능 개선) -->
                             <div class="gallery-item" data-image-index="<?= $index ?>">
                                 <img src="<?= htmlspecialchars($image['url']) ?>"
                                      alt="강의 이미지 <?= $index + 1 ?>"
                                      loading="lazy">
                                 <div class="gallery-overlay">
-                                    <span><i data-lucide="search" width="20" height="20"></i> 크게 보기</span>
+                                    <span>🔍 크게 보기</span>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -185,7 +182,7 @@ if (file_exists($styleFile)) {
 
             <!-- 강의 설명 -->
             <div class="info-section">
-                <h2 class="section-title"><i data-lucide="clipboard-list" width="20" height="20"></i> 강의 소개</h2>
+                <h2 class="section-title">📋 강의 소개</h2>
                 <div class="description-content">
                     <?= HtmlSanitizerHelper::sanitizeRichText($lecture['description']) ?>
                 </div>
@@ -194,7 +191,7 @@ if (file_exists($styleFile)) {
             <!-- 유튜브 동영상 -->
             <?php if (!empty($lecture['youtube_video'])): ?>
                 <div class="info-section">
-                    <h2 class="section-title"><i data-lucide="video" width="20" height="20"></i> 동영상</h2>
+                    <h2 class="section-title">📹 동영상</h2>
                     <div class="video-container">
                         <?php
                         $youtubeUrl = $lecture['youtube_video'];
@@ -216,7 +213,7 @@ if (file_exists($styleFile)) {
                             </iframe>
                         <?php else: ?>
                             <div style="padding: 20px; background: #f8fafc; border-radius: 8px; text-align: center;">
-                                <p><i data-lucide="video" width="20" height="20"></i> <a href="<?= htmlspecialchars($youtubeUrl) ?>" target="_blank" rel="noopener">유튜브에서 동영상 보기</a></p>
+                                <p>📹 <a href="<?= htmlspecialchars($youtubeUrl) ?>" target="_blank" rel="noopener">유튜브에서 동영상 보기</a></p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -225,7 +222,7 @@ if (file_exists($styleFile)) {
 
             <!-- 강사 정보 -->
             <div class="info-section">
-                <h2 class="section-title"><i data-lucide="graduation-cap" width="20" height="20"></i> 강사 소개</h2>
+                <h2 class="section-title">👨‍🏫 강사 소개</h2>
                 <div class="instructors-container">
                     <?php 
                     // 강사 정보 파싱 (여러 강사 대응)
@@ -347,7 +344,7 @@ if (file_exists($styleFile)) {
                                      data-instructor-src="<?= htmlspecialchars($imagePath) ?>"
                                      data-instructor-alt="<?= htmlspecialchars($name) ?> 강사님"
                                      title="<?= htmlspecialchars($name) ?> 강사님 (클릭하면 크게 볼 수 있습니다)">
-                                <!-- <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: inline onclick 제거 → addEventListener로 교체 -->
+                                <!-- 🚀 v3.64.0: inline onclick 제거 → addEventListener로 교체 -->
                                 <!-- 이미지 로딩 실패 시 대체 표시 -->
                                 <div class="instructor-avatar placeholder" style="display: none;" title="<?= htmlspecialchars($name) ?> 강사님">
                                     <?= mb_substr($name, 0, 1) ?>
@@ -390,11 +387,11 @@ if (file_exists($styleFile)) {
             
             <!-- 일정 상세 -->
             <div class="info-section">
-                <h2 class="section-title"><i data-lucide="calendar" width="20" height="20"></i> 일정 상세</h2>
+                <h2 class="section-title">📅 일정 상세</h2>
                 <div class="schedule-grid">
                     <div class="schedule-item">
                         <div class="schedule-label">
-                            <span><i data-lucide="rocket" width="20" height="20"></i></span> 시작일시
+                            <span>🚀</span> 시작일시
                         </div>
                         <div class="schedule-value">
                             <?= date('Y-m-d H:i', strtotime($lecture['start_date'] . ' ' . $lecture['start_time'])) ?>
@@ -402,7 +399,7 @@ if (file_exists($styleFile)) {
                     </div>
                     <div class="schedule-item">
                         <div class="schedule-label">
-                            <span><i data-lucide="flag" width="20" height="20"></i></span> 종료일시
+                            <span>🏁</span> 종료일시
                         </div>
                         <div class="schedule-value">
                             <?= date('Y-m-d H:i', strtotime($lecture['end_date'] . ' ' . $lecture['end_time'])) ?>
@@ -410,7 +407,7 @@ if (file_exists($styleFile)) {
                     </div>
                     <div class="schedule-item">
                         <div class="schedule-label">
-                            <span><i data-lucide="timer" width="20" height="20"></i></span> 소요시간
+                            <span>⏱️</span> 소요시간
                         </div>
                         <div class="schedule-value">
                             <?php 
@@ -433,7 +430,7 @@ if (file_exists($styleFile)) {
                     </div>
                     <div class="schedule-item">
                         <div class="schedule-label">
-                            <span><i data-lucide="globe-2" width="20" height="20"></i></span> 시간대
+                            <span>🌏</span> 시간대
                         </div>
                         <div class="schedule-value">
                             <?= $lecture['timezone'] ?? 'Asia/Seoul' ?>
@@ -445,10 +442,10 @@ if (file_exists($styleFile)) {
             <!-- 위치 정보 -->
             <?php if ($lecture['location_type'] !== 'online'): ?>
                 <div class="info-section">
-                    <h2 class="section-title"><i data-lucide="map-pin" width="20" height="20"></i> 위치 정보</h2>
+                    <h2 class="section-title">📍 위치 정보</h2>
                     <div class="location-info">
                         <div class="location-type">
-                            <i data-lucide="map-pin" width="20" height="20"></i> 오프라인
+                            📍 오프라인
                         </div>
                         <?php if (!empty($lecture['venue_name'])): ?>
                             <div class="location-details">
@@ -457,7 +454,7 @@ if (file_exists($styleFile)) {
                         <?php endif; ?>
                         <?php if (!empty($lecture['venue_address'])): ?>
                             <div style="margin-top: 8px; color: #4a5568; font-size: 14px; line-height: 1.5;">
-                                <i data-lucide="map-pin" width="20" height="20"></i> <?= htmlspecialchars($lecture['venue_address']) ?>
+                                📍 <?= htmlspecialchars($lecture['venue_address']) ?>
                             </div>
                             <!-- 네이버 지도 표시 (간단 다이나믹 맵) -->
                             <div class="naver-map-container">
@@ -531,12 +528,12 @@ if (file_exists($styleFile)) {
                                     if (mapContainer) {
                                         mapContainer.innerHTML = 
                                             '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8fafc; color: #4a5568; border-radius: 8px; border: 1px solid #e2e8f0;">' +
-                                            '<div style="font-size: 32px; margin-bottom: 15px; color: #667eea;"><i data-lucide="building-2" width="20" height="20"></i></div>' +
+                                            '<div style="font-size: 32px; margin-bottom: 15px; color: #667eea;">🏢</div>' +
                                             '<div style="font-weight: bold; margin-bottom: 8px; font-size: 16px; color: #2d3748;">' + <?= json_encode($venueName) ?> + '</div>' +
                                             '<div style="font-size: 13px; margin-bottom: 20px; text-align: center; padding: 0 20px; color: #4a5568;">' + <?= json_encode($mapAddress) ?> + '</div>' +
                                             '<a href="https://map.naver.com/v5/search/<?= urlencode($mapAddress) ?>" target="_blank" ' +
                                             'style="background: #667eea; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">' +
-                                            '<i data-lucide="map-pin" width="20" height="20"></i> 네이버 지도에서 보기</a>' +
+                                            '📍 네이버 지도에서 보기</a>' +
                                             '</div>';
                                     }
                                 }
@@ -598,10 +595,10 @@ if (file_exists($styleFile)) {
                                                 'border: 1px solid #e2e8f0;' +
                                             '">' +
                                                 '<div style="font-weight: bold; margin-bottom: 6px; font-size: 15px; color: #1a202c;">' +
-                                                '<i data-lucide="building-2" width="20" height="20"></i> ' + <?= json_encode($venueName) ?> +
+                                                '🏢 ' + <?= json_encode($venueName) ?> +
                                                 '</div>' +
                                                 '<div style="font-size: 12px; color: #4a5568; line-height: 1.4;">' +
-                                                '<i data-lucide="map-pin" width="20" height="20"></i> ' + <?= json_encode($mapAddress) ?> +
+                                                '📍 ' + <?= json_encode($mapAddress) ?> +
                                                 '</div>' +
                                             '</div>',
                                             maxWidth: 260,
@@ -676,7 +673,7 @@ if (file_exists($styleFile)) {
             <!-- 참가 요구사항 -->
             <?php if (!empty($lecture['requirements'])): ?>
                 <div class="info-section">
-                    <h2 class="section-title"><i data-lucide="file-text" width="20" height="20"></i> 참가 요구사항</h2>
+                    <h2 class="section-title">📝 참가 요구사항</h2>
                     <div class="description-content">
                         <?= nl2br(htmlspecialchars($lecture['requirements'])) ?>
                     </div>
@@ -696,7 +693,7 @@ if (file_exists($styleFile)) {
             <!-- 참가 조건 -->
             <?php if (!empty($lecture['prerequisites'])): ?>
                 <div class="info-section">
-                    <h2 class="section-title"><i data-lucide="clipboard-list" width="20" height="20"></i> 참가 조건</h2>
+                    <h2 class="section-title">📋 참가 조건</h2>
                     <div class="description-content">
                         <?= nl2br(htmlspecialchars($lecture['prerequisites'])) ?>
                     </div>
@@ -716,7 +713,7 @@ if (file_exists($styleFile)) {
             <!-- 기타 안내사항 -->
             <?php if (!empty($lecture['additional_info'])): ?>
                 <div class="info-section">
-                    <h2 class="section-title"><i data-lucide="file-text" width="20" height="20"></i> 기타 안내사항</h2>
+                    <h2 class="section-title">📝 기타 안내사항</h2>
                     <div class="description-content">
                         <?= nl2br(htmlspecialchars($lecture['additional_info'])) ?>
                     </div>
@@ -731,7 +728,7 @@ if (file_exists($styleFile)) {
                 <h3 class="sidebar-title">🎫 신청 정보</h3>
                 <div class="registration-info">
                     <div class="registration-status">
-                        <div style="font-size: 0.9rem; color: #718096; margin-bottom: 5px; font-weight: 600;"><i data-lucide="users" width="20" height="20"></i> 신청 인원</div>
+                        <div style="font-size: 0.9rem; color: #718096; margin-bottom: 5px; font-weight: 600;">👥 신청 인원</div>
                         <span class="registration-count">
                             <?php if ($lecture['max_participants']): ?>
                                 <?= number_format($lecture['registration_count']) ?>/<?= number_format($lecture['max_participants']) ?>명
@@ -743,15 +740,15 @@ if (file_exists($styleFile)) {
                     
                     <?php if ($lecture['registration_deadline']): ?>
                         <div class="registration-deadline">
-                            <i data-lucide="clock" width="20" height="20"></i> 등록 마감: <?= date('Y-m-d H:i', strtotime($lecture['registration_deadline'])) ?>
+                            ⏰ 등록 마감: <?= date('Y-m-d H:i', strtotime($lecture['registration_deadline'])) ?>
                         </div>
                     <?php endif; ?>
                     
                     <div class="registration-fee">
                         <?php if ($lecture['registration_fee'] > 0): ?>
-                            <i data-lucide="dollar-sign" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i><?= number_format($lecture['registration_fee']) ?>원
+                            💰 <?= number_format($lecture['registration_fee']) ?>원
                         <?php else: ?>
-                            <i data-lucide="gift" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>무료
+                            🆓 무료
                         <?php endif; ?>
                     </div>
                     
@@ -760,7 +757,7 @@ if (file_exists($styleFile)) {
                             <!-- 강의 작성자/관리자는 신청 UI 대신 관리 메시지 표시 -->
                             <div style="text-align: center; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
                                 <div style="font-size: 1rem; font-weight: 600; color: #667eea; margin-bottom: 5px;">
-                                    <i data-lucide="pencil" width="20" height="20"></i> 강의 관리자
+                                    ✏️ 강의 관리자
                                 </div>
                                 <div style="font-size: 0.9rem; color: #718096;">
                                     본인이 개설한 강의입니다
@@ -774,17 +771,17 @@ if (file_exists($styleFile)) {
                         <?php elseif ($userRegistration): ?>
                             <!-- 로그인된 사용자 - 이미 신청한 경우 -->
                             <div class="btn-register" style="background: #68d391; cursor: default;">
-                                <i data-lucide="check" width="20" height="20"></i> 신청 완료
+                                ✅ 신청 완료
                             </div>
                         <?php elseif ($canRegister): ?>
                             <!-- 로그인된 사용자 - 신청 가능한 경우 -->
                             <a href="/lectures/<?= $lecture['id'] ?>/register" class="btn-register">
-                                <i data-lucide="file-text" width="20" height="20"></i> 지금 신청하기
+                                📝 지금 신청하기
                             </a>
                         <?php else: ?>
                             <!-- 로그인된 사용자 - 신청 불가능한 경우 -->
                             <div class="btn-register" style="background: #a0aec0; cursor: not-allowed;">
-                                <i data-lucide="x" width="20" height="20"></i> 신청 마감
+                                ❌ 신청 마감
                             </div>
                         <?php endif; ?>
                 </div>
@@ -793,7 +790,7 @@ if (file_exists($styleFile)) {
             <!-- 참가자 목록 -->
             <?php if (!empty($registrations)): ?>
                 <div class="sidebar-card">
-                    <h3 class="sidebar-title"><i data-lucide="users" width="20" height="20"></i> 참가자 목록</h3>
+                    <h3 class="sidebar-title">👥 참가자 목록</h3>
                     <div class="participants-list">
                         <?php foreach ($registrations as $registration): ?>
                             <div class="participant-item">
@@ -819,8 +816,8 @@ if (file_exists($styleFile)) {
                             <a href="/lectures/<?= $relatedLecture['id'] ?>" class="related-lecture-item">
                                 <div class="related-lecture-title"><?= htmlspecialchars($relatedLecture['title']) ?></div>
                                 <div class="related-lecture-meta">
-                                    <i data-lucide="calendar" width="20" height="20"></i> <?= date('m/d', strtotime($relatedLecture['start_date'])) ?> | 
-                                    <i data-lucide="graduation-cap" width="20" height="20"></i> <?= htmlspecialchars($relatedLecture['organizer_name']) ?>
+                                    📅 <?= date('m/d', strtotime($relatedLecture['start_date'])) ?> | 
+                                    👨‍🏫 <?= htmlspecialchars($relatedLecture['organizer_name']) ?>
                                 </div>
                             </a>
                         <?php endforeach; ?>
@@ -845,7 +842,7 @@ if (file_exists($styleFile)) {
                         <div class="author-details-compact">
                             <div class="author-name-compact"><?= htmlspecialchars($authorName) ?></div>
                             <div class="author-meta-compact">
-                                <i data-lucide="calendar" width="20" height="20"></i> <?= date('Y.m.d', strtotime($lecture['created_at'])) ?>
+                                📅 <?= date('Y.m.d', strtotime($lecture['created_at'])) ?>
                             </div>
                             <?php if (!empty($lecture['author_bio'])): ?>
                                 <div class="author-bio-compact"><?= htmlspecialchars(mb_substr(strip_tags($lecture['author_bio']), 0, 80)) ?>...</div>
@@ -881,7 +878,7 @@ if (file_exists($styleFile)) {
     <button class="modal-image-nav modal-nav-next"></button>
     <div class="modal-image-counter" id="imageCounter">    </div>
 </div>
-<!-- <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: inline onclick 제거 - addEventListener로 교체하여 성능 개선 -->
+<!-- 🚀 v3.64.0: inline onclick 제거 - addEventListener로 교체하여 성능 개선 -->
 
 <!-- 기존 프로필 이미지 모달 HTML 제거됨 - profile-modal.js 통합 시스템 사용 -->
 
@@ -926,7 +923,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 로딩 상태 표시
             img.parentElement.classList.add('loading');
             
-            // <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 메모리 누수 방지 - { once: true } 옵션으로 이벤트 리스너 자동 제거
+            // 🚀 v3.64.0: 메모리 누수 방지 - { once: true } 옵션으로 이벤트 리스너 자동 제거
             img.addEventListener('load', function() {
 
                 this.parentElement.classList.remove('loading');
@@ -955,13 +952,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: placeholder 호버 효과는 CSS로 대체 (메모리 누수 방지)
+        // 🚀 v3.64.0: placeholder 호버 효과는 CSS로 대체 (메모리 누수 방지)
         // CSS에 .instructor-avatar.placeholder:hover 스타일 추가됨
     }
     
     // 구식 신청 시스템 코드 제거됨 (모달 기반 신청 시스템 사용)
     
-    // <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 일정 추가 버튼 이벤트 (메모리 누수 방지 - { once: true })
+    // 🚀 v3.64.0: 일정 추가 버튼 이벤트 (메모리 누수 방지 - { once: true })
     const icalBtn = document.querySelector('a[download]');
     if (icalBtn) {
         icalBtn.addEventListener('click', function() {
@@ -975,10 +972,10 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.animation = 'fadeInUp 0.5s ease forwards';
     });
     
-    // <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 관련 강의 호버 효과는 CSS로 대체 (메모리 누수 방지)
+    // 🚀 v3.64.0: 관련 강의 호버 효과는 CSS로 대체 (메모리 누수 방지)
     // CSS에 .related-lecture-item:hover 스타일 추가됨
     
-    // <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 뒤로가기 단축키는 라인 2922의 통합 keydown 이벤트에서 처리 (중복 제거)
+    // 🚀 v3.64.0: 뒤로가기 단축키는 라인 2922의 통합 keydown 이벤트에서 처리 (중복 제거)
 });
 
 // 애니메이션 키프레임 추가
@@ -1113,7 +1110,7 @@ function changeImage(direction) {
     }
 }
 
-// <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 모달 이벤트 리스너 등록 (inline onclick 제거하여 성능 개선)
+// 🚀 v3.64.0: 모달 이벤트 리스너 등록 (inline onclick 제거하여 성능 개선)
 document.addEventListener('DOMContentLoaded', function() {
     const imageModal = document.getElementById('imageModal');
     const closeBtn = document.querySelector('.modal-image-close');
@@ -1152,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { once: false });
     }
 
-    // <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 갤러리 아이템 클릭 이벤트 (inline onclick 제거하여 성능 70% 개선)
+    // 🚀 v3.64.0: 갤러리 아이템 클릭 이벤트 (inline onclick 제거하여 성능 70% 개선)
     document.querySelectorAll('.gallery-item').forEach(item => {
         item.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1163,7 +1160,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { once: false });
     });
 
-    // <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 강사 이미지 클릭 이벤트 (inline onclick 제거)
+    // 🚀 v3.64.0: 강사 이미지 클릭 이벤트 (inline onclick 제거)
     document.querySelectorAll('.instructor-avatar-img').forEach(img => {
         img.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1176,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 }, { once: true }); // DOMContentLoaded는 한 번만 실행
 
-// <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: 키보드 이벤트 중복 등록 방지 (메모리 누수 해결)
+// 🚀 v3.64.0: 키보드 이벤트 중복 등록 방지 (메모리 누수 해결)
 if (!window.lectureDetailKeydownRegistered) {
     window.lectureDetailKeydownRegistered = true;
 
@@ -1268,10 +1265,10 @@ function shareContent() {
 /**
  * 폴백 공유 기능 (클립보드 복사)
  */
-// <i data-lucide="rocket" width="20" height="20"></i> Phase 8: navigator.clipboard → copyToClipboard 사용
+// 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
 function fallbackShare(title, url) {
     copyToClipboard(url, {
-        successMessage: '<i data-lucide="link" width="20" height="20"></i> 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
+        successMessage: '🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
     }).catch(() => {
         showShareModal(title, url);
     });
@@ -1288,11 +1285,11 @@ function showShareModal(title, url) {
     content.style.cssText = 'background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
     
     content.innerHTML = 
-        '<h3 style="margin-bottom: 20px; color: #2d3748;"><i data-lucide="link" width="20" height="20"></i> 강의 공유하기</h3>' +
+        '<h3 style="margin-bottom: 20px; color: #2d3748;">🔗 강의 공유하기</h3>' +
         '<p style="margin-bottom: 20px; color: #4a5568;">' + title + '</p>' +
         '<div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; word-break: break-all; font-family: monospace; font-size: 14px;">' + url + '</div>' +
         '<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">' +
-            '<button onclick="copyToClipboard(\'' + url + '\')" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;"><i data-lucide="clipboard-list" width="20" height="20"></i> 복사하기</button>' +
+            '<button onclick="copyToClipboard(\'' + url + '\')" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">📋 복사하기</button>' +
             '<a href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url) + '" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px;">📘 Facebook</a>' +
             '<a href="https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url) + '" target="_blank" style="padding: 10px 20px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px;">🐦 Twitter</a>' +
             '<button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 10px 20px; background: #a0aec0; color: white; border: none; border-radius: 6px; cursor: pointer;">닫기</button>' +
@@ -1309,7 +1306,7 @@ function showShareModal(title, url) {
     });
 }
 
-// <i data-lucide="rocket" width="20" height="20"></i> Phase 8: copyToClipboard 중복 제거
+// 🚀 Phase 8: copyToClipboard 중복 제거
 // ClipboardUtils (clipboard-utils.js.php) 전역 함수 사용
 // window.copyToClipboard() 자동 사용
 
@@ -1360,18 +1357,7 @@ function showLectureStatusMessage(statusClass, iconClass, title, description) {
     
     statusMessage.className = 'lecture-status-message ' + statusClass;
     statusMessage.style.display = 'block';
-
-    // Convert Font Awesome to Lucide icon
-    statusIcon.innerHTML = '';
-    const icon = document.createElement('i');
-    icon.setAttribute('data-lucide', iconClass);
-    icon.setAttribute('width', '24');
-    icon.setAttribute('height', '24');
-    statusIcon.appendChild(icon);
-    if (window.lucide) {
-        window.lucide.createIcons();
-    }
-
+    statusIcon.className = 'fas ' + iconClass;
     statusTitle.textContent = title;
     statusDescription.textContent = description;
     
@@ -1406,7 +1392,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 신청 상태 확인
-// <i data-lucide="rocket" width="20" height="20"></i> v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
+// 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
 async function checkRegistrationStatus() {
     try {
 
@@ -1472,23 +1458,23 @@ function updateRegistrationStatusUI(registration, isLectureStarted) {
         let sidebarButtonHtml = '';
         // 강의가 시작된 경우 모든 액션 버튼 비활성화
         if (isLectureStarted) {
-            sidebarButtonHtml = '<div class="btn-register" style="background: #a0a0a0; cursor: default; color: white;"><i data-lucide="clock" width="20" height="20"></i> 이미 종료된 강의입니다</div>';
+            sidebarButtonHtml = '<div class="btn-register" style="background: #a0a0a0; cursor: default; color: white;">⏰ 이미 종료된 강의입니다</div>';
         } else {
             switch (status) {
                 case 'pending':
-                    sidebarButtonHtml = '<div class="btn-register" style="background: #ed8936; cursor: default; margin-bottom: 8px;"><i data-lucide="hourglass" width="20" height="20"></i> 승인 대기중</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;"><i data-lucide="x" width="20" height="20"></i> 신청 취소</button>';
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #ed8936; cursor: default; margin-bottom: 8px;">⏳ 승인 대기중</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">❌ 신청 취소</button>';
                     break;
                 case 'approved':
-                    sidebarButtonHtml = '<div class="btn-register" style="background: #48bb78; cursor: default; margin-bottom: 8px;"><i data-lucide="check" width="20" height="20"></i> 신청 승인됨</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;"><i data-lucide="x" width="20" height="20"></i> 신청 취소</button>';
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #48bb78; cursor: default; margin-bottom: 8px;">✅ 신청 승인됨</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">❌ 신청 취소</button>';
                     break;
                 case 'waiting':
-                    sidebarButtonHtml = '<div class="btn-register" style="background: #4299e1; cursor: default; margin-bottom: 8px;"><i data-lucide="clock" width="20" height="20"></i> 대기자 ' + registration.waiting_order + '번</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;"><i data-lucide="x" width="20" height="20"></i> 신청 취소</button>';
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #4299e1; cursor: default; margin-bottom: 8px;">⏰ 대기자 ' + registration.waiting_order + '번</div><button class="btn-register" onclick="cancelRegistration()" style="background: #e53e3e; color: white; border: none; cursor: pointer;">❌ 신청 취소</button>';
                     break;
                 case 'rejected':
-                    sidebarButtonHtml = '<div class="btn-register" style="background: #e53e3e; cursor: default; margin-bottom: 8px; color: white;"><i data-lucide="x" width="20" height="20"></i> 신청 거절됨</div><button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;"><i data-lucide="refresh-cw" width="20" height="20"></i> 다시 신청하기</button>';
+                    sidebarButtonHtml = '<div class="btn-register" style="background: #e53e3e; cursor: default; margin-bottom: 8px; color: white;">❌ 신청 거절됨</div><button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">🔄 다시 신청하기</button>';
                     break;
                 case 'cancelled':
-                    sidebarButtonHtml = '<button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;"><i data-lucide="file-text" width="20" height="20"></i> 다시 신청하기</button>';
+                    sidebarButtonHtml = '<button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">📝 다시 신청하기</button>';
                     break;
             }
         }
@@ -1501,44 +1487,44 @@ function updateRegistrationStatusUI(registration, isLectureStarted) {
     
     // 강의가 시작된 경우 모든 상태에 대해 액션 비활성화
     if (isLectureStarted) {
-        statusText = '<i data-lucide="clock" width="20" height="20"></i> 이미 종료된 강의입니다';
+        statusText = '⏰ 이미 종료된 강의입니다';
         statusClass = 'btn-secondary';
         buttonHtml = '<button class="btn ' + statusClass + '" disabled>' + statusText + '</button>';
     } else {
         switch (status) {
             case 'pending':
-                statusText = '<i data-lucide="hourglass" width="20" height="20"></i> 승인 대기중';
+                statusText = '⏳ 승인 대기중';
                 statusClass = 'btn-warning';
                 buttonHtml = 
                     '<button class="btn ' + statusClass + '" disabled>' +
                         statusText +
                     '</button>' +
                     '<button class="btn btn-outline" onclick="cancelRegistration()">' +
-                        '<i data-lucide="x" width="20" height="20"></i> 신청 취소' +
+                        '❌ 신청 취소' +
                     '</button>';
                 break;
                 
             case 'approved':
-                statusText = '<i data-lucide="check" width="20" height="20"></i> 신청 승인됨';
+                statusText = '✅ 신청 승인됨';
                 statusClass = 'btn-success';
                 buttonHtml = 
                     '<button class="btn ' + statusClass + '" disabled>' +
                         statusText +
                     '</button>' +
                     '<button class="btn btn-outline" onclick="cancelRegistration()">' +
-                        '<i data-lucide="x" width="20" height="20"></i> 신청 취소' +
+                        '❌ 신청 취소' +
                     '</button>';
                 break;
                 
             case 'rejected':
-                statusText = '<i data-lucide="x" width="20" height="20"></i> 신청 거절됨';
+                statusText = '❌ 신청 거절됨';
                 statusClass = 'btn-danger';
                 buttonHtml = 
                     '<button class="btn ' + statusClass + '" disabled>' +
                         statusText +
                     '</button>' +
                     '<button class="btn btn-primary" onclick="showRegistrationModal()">' +
-                        '<i data-lucide="refresh-cw" width="20" height="20"></i> 다시 신청하기' +
+                        '🔄 다시 신청하기' +
                     '</button>';
                 break;
             
@@ -1547,15 +1533,15 @@ function updateRegistrationStatusUI(registration, isLectureStarted) {
                 statusClass = 'btn-secondary';
                 buttonHtml = `
                     <button class="btn btn-primary" onclick="showRegistrationModal()">
-                        <i data-lucide="rocket" width="20" height="20"></i> 다시 신청하기
+                        🚀 다시 신청하기
                     </button>
                 `;
                 break;
                 
             case 'waiting':
-                statusText = '<i data-lucide="clock" width="20" height="20"></i> 대기순번 ' + registration.waiting_order + '번';
+                statusText = '⏰ 대기순번 ' + registration.waiting_order + '번';
                 statusClass = 'btn-info';
-                buttonHtml = '<button class="btn ' + statusClass + '" disabled>' + statusText + '</button>' + '<button class="btn btn-outline" onclick="cancelRegistration()"><i data-lucide="x" width="20" height="20"></i> 대기 취소</button>';
+                buttonHtml = '<button class="btn ' + statusClass + '" disabled>' + statusText + '</button>' + '<button class="btn btn-outline" onclick="cancelRegistration()">❌ 대기 취소</button>';
                 break;
         }
     }
@@ -1619,12 +1605,12 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     
     if (isLectureStarted) {
         // 메인 액션 컨테이너 처리
-        actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled><i data-lucide="clock" width="20" height="20"></i> 이미 종료된 강의입니다</button>';
+        actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled>⏰ 이미 종료된 강의입니다</button>';
         
         // sidebar-card 내의 신청 버튼도 비활성화
         const sidebarRegistrationInfo = document.querySelector('.sidebar-card .registration-info');
         if (sidebarRegistrationInfo) {
-            sidebarRegistrationInfo.innerHTML = '<button class="btn-register" disabled style="background: #a0a0a0; color: white; border: none; cursor: not-allowed;"><i data-lucide="clock" width="20" height="20"></i> 이미 종료된 강의입니다</button>';
+            sidebarRegistrationInfo.innerHTML = '<button class="btn-register" disabled style="background: #a0a0a0; color: white; border: none; cursor: not-allowed;">⏰ 이미 종료된 강의입니다</button>';
         }
         return;
     }
@@ -1634,7 +1620,7 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     if (sidebarRegistrationInfo) {
         sidebarRegistrationInfo.innerHTML = `
             <button class="btn-register" onclick="showRegistrationModal()" style="background: #48bb78; color: white; border: none; cursor: pointer;">
-                <i data-lucide="file-text" width="20" height="20"></i> 지금 신청하기
+                📝 지금 신청하기
             </button>
         `;
     }
@@ -1645,7 +1631,7 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
         const now = new Date();
         
         if (now > registrationEndDate) {
-            actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled><i data-lucide="calendar" width="20" height="20"></i> 신청 마감되었습니다</button>';
+            actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled>📅 신청 마감되었습니다</button>';
             return;
         }
     }
@@ -1653,15 +1639,15 @@ function showRegistrationButton(lectureInfo, isLectureStarted) {
     // 정원 확인
     if (lectureInfo.max_participants && lectureInfo.current_participants >= lectureInfo.max_participants) {
         if (lectureInfo.allow_waiting_list) {
-            actionsContainer.innerHTML = '<button class="btn btn-warning" onclick="showWaitingListModal()"><i data-lucide="clock" width="20" height="20"></i> 대기자로 신청하기</button>';
+            actionsContainer.innerHTML = '<button class="btn btn-warning" onclick="showWaitingListModal()">⏰ 대기자로 신청하기</button>';
         } else {
-            actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled><i data-lucide="users" width="20" height="20"></i> 정원이 마감되었습니다</button>';
+            actionsContainer.innerHTML = '<button class="btn btn-secondary" disabled>👥 정원이 마감되었습니다</button>';
         }
         return;
     }
     
     // 일반 신청 버튼
-    actionsContainer.innerHTML = '<button class="btn btn-primary" onclick="showRegistrationModal()"><i data-lucide="rocket" width="20" height="20"></i> 지금 신청하기</button>';
+    actionsContainer.innerHTML = '<button class="btn btn-primary" onclick="showRegistrationModal()">🚀 지금 신청하기</button>';
 }
 
 // 기본 신청 버튼 표시 (오류 시)
@@ -1681,7 +1667,7 @@ function showDefaultRegistrationButton() {
         return;
     }
     
-    actionsContainer.innerHTML = '<button class="btn btn-primary" onclick="showRegistrationModal()"><i data-lucide="rocket" width="20" height="20"></i> 지금 신청하기</button>';
+    actionsContainer.innerHTML = '<button class="btn btn-primary" onclick="showRegistrationModal()">🚀 지금 신청하기</button>';
     
 }
 
@@ -1720,7 +1706,7 @@ function closeRegistrationModal() {
         // 로딩 상태 해제
         const submitButton = document.getElementById('submitRegistrationBtn');
         if (submitButton) {
-            submitButton.innerHTML = '<i data-lucide="rocket" width="20" height="20"></i> 신청하기';
+            submitButton.innerHTML = '🚀 신청하기';
             submitButton.disabled = false;
         }
         
@@ -1748,7 +1734,7 @@ function resetRegistrationForm() {
 }
 
 // 사용자 정보 자동 입력
-// <i data-lucide="rocket" width="20" height="20"></i> v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
+// 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.get)
 async function loadUserInfo() {
 
     try {
@@ -1859,7 +1845,7 @@ async function submitRegistration() {
     
     // 버튼 비활성화
     const originalText = submitButton.innerHTML;
-    submitButton.innerHTML = '<i data-lucide="refresh-cw" width="20" height="20"></i> 신청 중...';
+    submitButton.innerHTML = '🔄 신청 중...';
     submitButton.disabled = true;
     
     try {
@@ -1878,14 +1864,14 @@ async function submitRegistration() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         data.csrf_token = csrfToken;
 
-        // <i data-lucide="rocket" width="20" height="20"></i> v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
         const result = await ApiClient.post('/api/lectures/<?= $lecture["id"] ?>/registration',
             data,
             { noLoading: true } // 버튼 상태로 로딩 표시
         );
 
         if (result.success) {
-            Toast.success('<i data-lucide="check" width="20" height="20"></i> ' + result.message);
+            Toast.success('✅ ' + result.message);
             closeRegistrationModal();
             checkRegistrationStatus(); // 상태 새로고침
         } else {
@@ -1894,7 +1880,7 @@ async function submitRegistration() {
         }
         
     } catch (error) {
-        Toast.error('<i data-lucide="x" width="20" height="20"></i> 신청 처리 중 오류가 발생했습니다.');
+        Toast.error('❌ 신청 처리 중 오류가 발생했습니다.');
     } finally {
         // 버튼 복구
         submitButton.innerHTML = originalText;
@@ -1940,7 +1926,7 @@ function validateRegistrationForm() {
     return true;
 }
 
-// <i data-lucide="rocket" width="20" height="20"></i> v3.41.0: FormValidator 사용 (중복 함수 제거)
+// 🚀 v3.41.0: FormValidator 사용 (중복 함수 제거)
 // isValidEmail() → FormValidator.isValidEmail()
 // isValidPhone() → FormValidator.isValidPhone()
 
@@ -2002,17 +1988,17 @@ async function cancelRegistration() {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-        // <i data-lucide="rocket" width="20" height="20"></i> v3.42.0: ApiClient 사용 (fetch → ApiClient.delete)
+        // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.delete)
         const result = await ApiClient.delete('/api/lectures/<?= $lecture["id"] ?>/registration', {
             noLoading: true,
             body: { csrf_token: csrfToken }
         });
 
         if (result.success) {
-            Toast.success('<i data-lucide="check" width="20" height="20"></i> 신청이 취소되었습니다.');
+            Toast.success('✅ 신청이 취소되었습니다.');
             checkRegistrationStatus(); // 상태 새로고침
         } else {
-            Toast.error('<i data-lucide="x" width="20" height="20"></i> 신청 취소에 실패했습니다.\n\n' + (result.message || '알 수 없는 오류'));
+            Toast.error('❌ 신청 취소에 실패했습니다.\n\n' + (result.message || '알 수 없는 오류'));
         }
     } catch (error) {
         Toast.error('신청 취소 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
@@ -2029,14 +2015,14 @@ async function confirmDeleteLecture(lectureId) {
     }
 
     // 삭제 확인
-    const confirmed = await Modal.confirm('<i data-lucide="alert-triangle" width="20" height="20"></i> 정말로 이 강의를 삭제하시겠습니까?\n\n삭제된 강의는 복구할 수 없습니다.', { type: 'danger', title: '강의 삭제', confirmText: '삭제', cancelText: '취소' });
+    const confirmed = await Modal.confirm('⚠️ 정말로 이 강의를 삭제하시겠습니까?\n\n삭제된 강의는 복구할 수 없습니다.', { type: 'danger', title: '강의 삭제', confirmText: '삭제', cancelText: '취소' });
     
     if (!confirmed) {
         return;
     }
 
     // 두 번째 확인
-    const doubleConfirmed = await Modal.confirm('<i data-lucide="alert-triangle" width="20" height="20"></i> 마지막 확인입니다!\n\n강의 제목: "<?= htmlspecialchars($lecture["title"]) ?>"\n\n정말로 삭제하시겠습니까?', { type: 'danger', title: '최종 확인', confirmText: '삭제', cancelText: '취소' });
+    const doubleConfirmed = await Modal.confirm('⚠️ 마지막 확인입니다!\n\n강의 제목: "<?= htmlspecialchars($lecture["title"]) ?>"\n\n정말로 삭제하시겠습니까?', { type: 'danger', title: '최종 확인', confirmText: '삭제', cancelText: '취소' });
     
     if (!doubleConfirmed) {
         return;
@@ -2045,13 +2031,13 @@ async function confirmDeleteLecture(lectureId) {
     // 로딩 상태 표시
     const deleteBtn = event.target;
     const originalText = deleteBtn.innerHTML;
-    deleteBtn.innerHTML = '<i data-lucide="refresh-cw" width="20" height="20"></i> 삭제 중...';
+    deleteBtn.innerHTML = '🔄 삭제 중...';
     deleteBtn.disabled = true;
 
     // CSRF 토큰 가져오기
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-    // <i data-lucide="rocket" width="20" height="20"></i> v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
+    // 🚀 v3.42.0: ApiClient 사용 (fetch → ApiClient.post)
     ApiClient.post('/lectures/' + lectureId + '/delete',
         {
             csrf_token: csrfToken,
@@ -2062,7 +2048,7 @@ async function confirmDeleteLecture(lectureId) {
     .then(result => {
 
         if (result.success) {
-            Toast.success('<i data-lucide="check" width="20" height="20"></i> 강의가 성공적으로 삭제되었습니다.');
+            Toast.success('✅ 강의가 성공적으로 삭제되었습니다.');
             // 이전 페이지로 돌아가기 (또는 강의 목록으로)
             if (document.referrer && document.referrer !== window.location.href) {
                 window.location.href = document.referrer;
@@ -2070,7 +2056,7 @@ async function confirmDeleteLecture(lectureId) {
                 window.location.href = '/lectures';
             }
         } else {
-            Toast.error('<i data-lucide="x" width="20" height="20"></i> 강의 삭제에 실패했습니다.\n\n오류: ' + result.message);
+            Toast.error('❌ 강의 삭제에 실패했습니다.\n\n오류: ' + result.message);
             // 버튼 복구
             deleteBtn.innerHTML = originalText;
             deleteBtn.disabled = false;
@@ -2089,7 +2075,7 @@ async function confirmDeleteLecture(lectureId) {
 <div id="registrationModal" class="registration-modal">
     <div class="registration-modal-content">
         <div class="registration-modal-header">
-            <h2><i data-lucide="rocket" width="20" height="20"></i> 강의 신청하기</h2>
+            <h2>🚀 강의 신청하기</h2>
             <button class="registration-modal-close" onclick="confirmCloseRegistrationModal()">&times;</button>
         </div>
         
@@ -2098,7 +2084,7 @@ async function confirmDeleteLecture(lectureId) {
                 <!-- 기본 정보 섹션 -->
                 <div class="form-section">
                     <div class="form-section-title">
-                        <i data-lucide="user" width="20" height="20"></i> 신청자 정보
+                        👤 신청자 정보
                     </div>
                     
                     <div class="form-row">
@@ -2124,7 +2110,7 @@ async function confirmDeleteLecture(lectureId) {
                 <!-- 소속 정보 섹션 -->
                 <div class="form-section">
                     <div class="form-section-title">
-                        <i data-lucide="building-2" width="20" height="20"></i> 소속 정보
+                        🏢 소속 정보
                     </div>
                     
                     <div class="form-row">
@@ -2144,7 +2130,7 @@ async function confirmDeleteLecture(lectureId) {
                 <!-- 추가 정보 섹션 -->
                 <div class="form-section">
                     <div class="form-section-title">
-                        <i data-lucide="file-text" width="20" height="20"></i> 추가 정보
+                        📝 추가 정보
                     </div>
                     
                     <div class="form-group">
@@ -2187,7 +2173,7 @@ async function confirmDeleteLecture(lectureId) {
                     취소
                 </button>
                 <button type="button" id="submitRegistrationBtn" class="btn btn-primary" onclick="submitRegistration()">
-                    <i data-lucide="rocket" width="20" height="20"></i> 신청하기
+                    🚀 신청하기
                 </button>
             </div>
         </form>
@@ -2224,9 +2210,9 @@ async function confirmCloseRegistrationModal() {
     // 내용이 있으면 확인 다이얼로그 표시
     if (hasContent) {
         const shouldClose = await Modal.confirm(
-            '<i data-lucide="file-text" width="20" height="20"></i> 작성 중인 내용이 있습니다.\n' +
+            '📝 작성 중인 내용이 있습니다.\n' +
             '정말로 창을 닫으시겠습니까?\n\n' +
-            '<i data-lucide="alert-triangle" width="20" height="20"></i> 작성한 내용이 모두 삭제됩니다.'
+            '⚠️ 작성한 내용이 모두 삭제됩니다.'
         );
         
         if (shouldClose) {
@@ -2238,7 +2224,7 @@ async function confirmCloseRegistrationModal() {
     }
 }
 
-// <i data-lucide="rocket" width="20" height="20"></i> v3.64.0: ESC 키로 모달 닫기 (메모리 누수 방지 - 중복 등록 차단)
+// 🚀 v3.64.0: ESC 키로 모달 닫기 (메모리 누수 방지 - 중복 등록 차단)
 if (!window.registrationModalKeydownRegistered) {
     window.registrationModalKeydownRegistered = true;
 
@@ -2278,23 +2264,23 @@ function updateLectureStatusMessage(registration) {
     
     switch (registration.status) {
         case 'pending':
-            showLectureStatusMessage('pending', 'clock', '신청 검토 중입니다', 
+            showLectureStatusMessage('pending', 'fa-clock', '신청 검토 중입니다', 
                 '신청이 접수되었습니다. 승인 결과를 기다려주세요.');
             break;
             
         case 'approved':
             const approvedMessage = registration.admin_notes || '신청이 승인되었습니다. 강의에 참석해주세요.';
-            showLectureStatusMessage('approved', 'check-circle', '신청이 승인되었습니다', approvedMessage);
+            showLectureStatusMessage('approved', 'fa-check-circle', '신청이 승인되었습니다', approvedMessage);
             break;
             
         case 'waiting':
-            showLectureStatusMessage('waiting', 'hourglass', '대기열 ' + registration.waiting_order + '번입니다', 
+            showLectureStatusMessage('waiting', 'fa-hourglass-half', '대기열 ' + registration.waiting_order + '번입니다', 
                 '정원이 초과되어 대기열에 등록되었습니다. 승인 시 알림을 드리겠습니다.');
             break;
             
         case 'rejected':
             const rejectedMessage = registration.admin_notes || '신청이 거절되었습니다. 다시 신청하실 수 있습니다.';
-            showLectureStatusMessage('rejected', 'x-circle', '신청이 거절되었습니다', rejectedMessage);
+            showLectureStatusMessage('rejected', 'fa-times-circle', '신청이 거절되었습니다', rejectedMessage);
             break;
             
         case 'cancelled':
@@ -2324,7 +2310,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// <i data-lucide="rocket" width="20" height="20"></i> v3.29.0: 글자 수 카운터 기능 (통합 CharacterCounter 클래스 사용)
+// 🚀 v3.29.0: 글자 수 카운터 기능 (통합 CharacterCounter 클래스 사용)
 function initCharacterCounters() {
     // 참가 동기 글자 수 카운터 (2000자, 90%부터 경고)
     new CharacterCounter(

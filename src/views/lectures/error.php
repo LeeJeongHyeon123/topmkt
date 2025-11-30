@@ -143,7 +143,7 @@
 
 <div class="error-container">
     <div class="error-header">
-        <h1>❌ 오류 발생</h1>
+        <h1><i data-lucide="x-circle" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>오류 발생</h1>
         <p>강의 시스템에서 문제가 발생했습니다</p>
     </div>
     
@@ -151,7 +151,7 @@
         <h2>시스템 오류</h2>
         
         <div class="error-message">
-            <h3>🚨 오류 메시지</h3>
+            <h3><i data-lucide="alert-octagon" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>오류 메시지</h3>
             <p><?= htmlspecialchars($errorMessage ?? '알 수 없는 오류가 발생했습니다.') ?></p>
         </div>
 
@@ -164,15 +164,15 @@
         
         <div class="error-actions">
             <a href="/lectures" class="btn btn-primary">
-                🔄 다시 시도
+                <i data-lucide="refresh-cw" width="16" height="16"></i> 다시 시도
             </a>
             <a href="/" class="btn btn-secondary">
-                🏠 홈으로
+                <i data-lucide="home" width="16" height="16"></i> 홈으로
             </a>
         </div>
         
         <div class="troubleshooting">
-            <h3>🔧 문제 해결 방법</h3>
+            <h3><i data-lucide="wrench" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>문제 해결 방법</h3>
             <p><strong>다음 단계를 시도해보세요:</strong></p>
             <ul>
                 <li><strong>데이터베이스 연결 확인:</strong> 데이터베이스 서버가 실행 중인지 확인하세요</li>

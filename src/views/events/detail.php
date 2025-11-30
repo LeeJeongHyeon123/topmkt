@@ -57,11 +57,13 @@ if (isset($styleFile) && file_exists($styleFile)) {
     <div class="event-hero">
         <div class="event-admin-actions">
             <?php if ($canEdit): ?>
-                <?= renderButton('✏️ 수정', 'secondary', 'md', [
+                <?= renderButton('수정', 'secondary', 'md', [
+                    'icon' => 'pencil',
                     'class' => 'btn-edit',
                     'attributes' => ['data-event-id' => $event['id']]
                 ]) ?>
-                <?= renderButton('🗑️ 삭제', 'danger', 'md', [
+                <?= renderButton('삭제', 'danger', 'md', [
+                    'icon' => 'trash-2',
                     'onclick' => 'confirmDeleteEvent(' . $event['id'] . ')'
                 ]) ?>
             <?php endif; ?>
@@ -146,7 +148,8 @@ if (isset($styleFile) && file_exists($styleFile)) {
             </div>
             
             <div class="event-share-actions">
-                <?= renderButton('🔗 공유하기', 'secondary', 'md', [
+                <?= renderButton('공유하기', 'secondary', 'md', [
+                    'icon' => 'link',
                     'class' => 'btn-share',
                     'onclick' => 'shareEventContent()'
                 ]) ?>
@@ -160,7 +163,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
         <div class="event-main">
             <?php if (!empty($event['youtube_video'])): ?>
             <div class="content-section">
-                <h2>🎬 관련 영상</h2>
+                <h2><i data-lucide="video" width="24" height="24"></i> 관련 영상</h2>
                 <div class="youtube-container">
                     <?php
                     // YouTube URL을 embed 형식으로 변환
@@ -195,7 +198,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
             
             <?php if (!empty($event['images'])): ?>
             <div class="content-section">
-                <h2>🖼️ 이미지</h2>
+                <h2><i data-lucide="image" width="24" height="24"></i> 이미지</h2>
                 <div class="event-gallery">
                     <?php foreach ($event['images'] as $index => $image): ?>
                         <div class="gallery-item" onclick="openImageModal(<?= $index ?>)">
@@ -203,7 +206,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                                  alt="<?= htmlspecialchars($image['alt_text']) ?>"
                                  loading="lazy">
                             <div class="gallery-overlay">
-                                <span>🔍 크게 보기</span>
+                                <span><i data-lucide="search" width="20" height="20"></i> 크게 보기</span>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -275,8 +278,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(255, 193, 7, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i data-lucide="user-cog" width="20" height="20" style="
-                                    font-size: 2rem;
+                                <i data-lucide="user-cog" width="32" height="32" style="
                                     color: #ffc107;
                                     margin-bottom: 8px;
                                 "></i>
@@ -306,8 +308,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i data-lucide="users" width="20" height="20" style="
-                                    font-size: 2rem;
+                                <i data-lucide="users" width="32" height="32" style="
                                     color: #dc3545;
                                     margin-bottom: 8px;
                                 "></i>
@@ -352,8 +353,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(23, 162, 184, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i data-lucide="play-circle" width="20" height="20" style="
-                                    font-size: 2rem;
+                                <i data-lucide="play-circle" width="32" height="32" style="
                                     color: #17a2b8;
                                     margin-bottom: 8px;
                                 "></i>
@@ -401,8 +401,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i data-lucide="clock" width="20" height="20" style="
-                                    font-size: 2rem;
+                                <i data-lucide="clock" width="32" height="32" style="
                                     color: #dc3545;
                                     margin-bottom: 8px;
                                 "></i>
@@ -487,8 +486,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
                         ">
                             <div style="margin-bottom: 12px;">
-                                <i data-lucide="clock" width="20" height="20" style="
-                                    font-size: 2rem;
+                                <i data-lucide="clock" width="32" height="32" style="
                                     color: #dc3545;
                                     margin-bottom: 8px;
                                 "></i>
@@ -755,7 +753,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                         <div class="author-details-compact">
                             <div class="author-name-compact"><?= htmlspecialchars($authorName) ?></div>
                             <div class="author-meta-compact">
-                                📅 <?= date('Y.m.d', strtotime($event['created_at'])) ?>
+                                <i data-lucide="calendar" width="16" height="16"></i> <?= date('Y.m.d', strtotime($event['created_at'])) ?>
                             </div>
                             <?php if (!empty($event['author_bio'])): ?>
                                 <div class="author-bio-compact"><?= htmlspecialchars(mb_substr(strip_tags($event['author_bio']), 0, 80)) ?>...</div>
@@ -788,7 +786,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
 <div id="eventRegistrationModal" class="event-registration-modal" style="display: none;">
     <div class="event-modal-content">
         <div class="event-modal-header">
-            <h3 class="event-modal-title">📋 행사 신청</h3>
+            <h3 class="event-modal-title"><i data-lucide="clipboard-list" width="24" height="24"></i> 행사 신청</h3>
             <button class="event-modal-close" onclick="closeEventRegistrationModal()">&times;</button>
         </div>
         <div class="event-modal-body">
@@ -818,7 +816,7 @@ if (isset($styleFile) && file_exists($styleFile)) {
                 <!-- 소속 정보 섹션 -->
                 <div class="form-section">
                     <h4 class="form-section-title">
-                        <i data-lucide="building" width="20" height="20"></i> 소속 정보 (선택)
+                        <i data-lucide="building-2" width="20" height="20"></i> 소속 정보 (선택)
                     </h4>
                     <div class="form-row">
                         <div class="form-group">
@@ -959,15 +957,20 @@ function checkNaverMapsAPI() {
 function showEventMapFallback() {
     var mapContainer = document.getElementById('eventVenueMap');
     if (mapContainer) {
-        mapContainer.innerHTML = 
+        mapContainer.innerHTML =
             '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8fafc; color: #4a5568; border-radius: 8px; border: 1px solid #e2e8f0;">' +
-            '<div style="font-size: 32px; margin-bottom: 15px; color: #4A90E2;">🏢</div>' +
+            '<i data-lucide="building-2" width="32" height="32" style="color: #4A90E2; margin-bottom: 15px;"></i>' +
             '<div style="font-weight: bold; margin-bottom: 8px; font-size: 16px; color: #2d3748;"><?= addslashes($venueName) ?></div>' +
             '<div style="font-size: 13px; margin-bottom: 20px; text-align: center; padding: 0 20px; color: #4a5568;"><?= addslashes($mapAddress) ?></div>' +
             '<a href="https://map.naver.com/v5/search/<?= urlencode($mapAddress) ?>" target="_blank" ' +
-            'style="background: #4A90E2; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">' +
-            '📍 네이버 지도에서 보기</a>' +
+            'style="background: #4A90E2; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">' +
+            '<i data-lucide="map-pin" width="16" height="16"></i> 네이버 지도에서 보기</a>' +
             '</div>';
+
+        // Lucide 아이콘 초기화
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
     }
 }
 
@@ -1022,11 +1025,11 @@ window.initEventVenueMap = function() {
                 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); ' +
                 'border: 1px solid #e2e8f0;' +
             '">' +
-                '<div style="font-weight: bold; margin-bottom: 6px; font-size: 15px; color: #1a202c;">' +
-                '🎉 <?= addslashes($venueName) ?>' +
+                '<div style="font-weight: bold; margin-bottom: 6px; font-size: 15px; color: #1a202c; display: flex; align-items: center; gap: 6px; justify-content: center;">' +
+                '<i data-lucide="party-popper" width="18" height="18"></i> <?= addslashes($venueName) ?>' +
                 '</div>' +
-                '<div style="font-size: 12px; color: #4a5568; line-height: 1.4;">' +
-                '📍 <?= addslashes($mapAddress) ?>' +
+                '<div style="font-size: 12px; color: #4a5568; line-height: 1.4; display: flex; align-items: center; gap: 6px; justify-content: center;">' +
+                '<i data-lucide="map-pin" width="16" height="16"></i> <?= addslashes($mapAddress) ?>' +
                 '</div>' +
             '</div>',
             maxWidth: 260,
@@ -1176,7 +1179,7 @@ function updateEventRegistrationUI(status, registration) {
             cancelBtn.style.color = 'white';
 
             // 대기 상태 메시지 표시
-            showStatusMessage('pending', '🕒', '신청 검토 중입니다',
+            showStatusMessage('pending', 'clock', '신청 검토 중입니다',
                 '신청이 접수되었습니다. 승인 결과를 기다려주세요.');
             break;
             
@@ -1189,7 +1192,7 @@ function updateEventRegistrationUI(status, registration) {
 
             // 승인 상태 메시지 표시
             const approvedMessage = registration?.admin_notes || '신청이 승인되었습니다. 행사에 참석해주세요.';
-            showStatusMessage('approved', '✅', '신청이 승인되었습니다', approvedMessage);
+            showStatusMessage('approved', 'check', '신청이 승인되었습니다', approvedMessage);
             break;
             
         case 'waiting':
@@ -1200,7 +1203,7 @@ function updateEventRegistrationUI(status, registration) {
             cancelBtn.style.color = 'white';
 
             // 대기열 상태 메시지 표시
-            showStatusMessage('waiting', '⏳', `대기열 ${registration.waiting_order}번입니다`,
+            showStatusMessage('waiting', 'hourglass', `대기열 ${registration.waiting_order}번입니다`,
                 '정원이 초과되어 대기열에 등록되었습니다. 승인 시 알림을 드리겠습니다.');
             break;
             
@@ -1211,7 +1214,7 @@ function updateEventRegistrationUI(status, registration) {
             
             // 거절 상태 메시지 표시
             const rejectedMessage = registration?.admin_notes || '신청이 거절되었습니다. 다시 신청하실 수 있습니다.';
-            showStatusMessage('rejected', '❌', '신청이 거절되었습니다', rejectedMessage);
+            showStatusMessage('rejected', 'x', '신청이 거절되었습니다', rejectedMessage);
             break;
             
         case 'cancelled':
@@ -1237,14 +1240,21 @@ function updateEventRegistrationUI(status, registration) {
     }
     
     // 상태 메시지 표시 함수
-    function showStatusMessage(statusClass, iconClass, title, description) {
+    function showStatusMessage(statusClass, iconName, title, description) {
         if (!statusMessage || !statusTitle || !statusDescription || !statusIcon) return;
-        
+
         statusMessage.className = `event-status-message ${statusClass}`;
         statusMessage.style.display = 'block';
-        statusIcon.className = `fas ${getIconClass(iconClass)}`;
+        statusIcon.setAttribute('data-lucide', getIconClass(iconName));
+        statusIcon.setAttribute('width', '20');
+        statusIcon.setAttribute('height', '20');
         statusTitle.textContent = title;
         statusDescription.textContent = description;
+
+        // Lucide 아이콘 다시 렌더링
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
     }
     
     // 상태 메시지 숨김 함수
@@ -1254,15 +1264,15 @@ function updateEventRegistrationUI(status, registration) {
         }
     }
     
-    // 아이콘 클래스 매핑
+    // 아이콘 클래스 매핑 (Lucide 아이콘명 반환)
     function getIconClass(iconText) {
         const iconMap = {
-            '🕒': 'fa-clock',
-            '✅': 'fa-check-circle',
-            '⏳': 'fa-hourglass-half',
-            '❌': 'fa-times-circle'
+            'clock': 'clock',
+            'check': 'check-circle',
+            'hourglass': 'hourglass',
+            'x': 'x-circle'
         };
-        return iconMap[iconText] || 'fa-info-circle';
+        return iconMap[iconText] || 'info';
     }
 }
 
@@ -1327,10 +1337,10 @@ async function registerEvent() {
         if (!validation.canRegister) {
             // 마감 조건에 걸린 경우 사용자에게 안내
             const alertMessages = {
-                'own_event': '⚠️ 본인이 등록한 행사입니다\n\n자신이 등록한 행사에는 참가 신청할 수 없습니다.',
-                'capacity_full': '🈵 정원이 마감되었습니다\n\n취소가 발생하면 선착순으로 신청 가능합니다.',
-                'event_started': '⏰ 행사가 이미 시작되었습니다\n\n다른 진행 예정인 행사를 확인해보세요.',
-                'deadline_passed': '⏳ 등록 마감일이 지났습니다\n\n다른 진행 예정인 행사를 확인해보세요.'
+                'own_event': '본인이 등록한 행사입니다\n\n자신이 등록한 행사에는 참가 신청할 수 없습니다.',
+                'capacity_full': '정원이 마감되었습니다\n\n취소가 발생하면 선착순으로 신청 가능합니다.',
+                'event_started': '행사가 이미 시작되었습니다\n\n다른 진행 예정인 행사를 확인해보세요.',
+                'deadline_passed': '등록 마감일이 지났습니다\n\n다른 진행 예정인 행사를 확인해보세요.'
             };
 
             Toast.error(alertMessages[validation.type] || validation.message);
@@ -1444,10 +1454,10 @@ async function submitEventRegistration() {
 
         if (!validation.canRegister) {
             const alertMessages = {
-                'own_event': '❌ 본인이 등록한 행사에는 신청할 수 없습니다.',
-                'capacity_full': '❌ 정원이 마감되어 신청할 수 없습니다.',
-                'event_started': '❌ 행사가 이미 시작되어 신청할 수 없습니다.',
-                'deadline_passed': '❌ 등록 마감일이 지나 신청할 수 없습니다.'
+                'own_event': '본인이 등록한 행사에는 신청할 수 없습니다.',
+                'capacity_full': '정원이 마감되어 신청할 수 없습니다.',
+                'event_started': '행사가 이미 시작되어 신청할 수 없습니다.',
+                'deadline_passed': '등록 마감일이 지나 신청할 수 없습니다.'
             };
 
             Toast.error(alertMessages[validation.type] || validation.message);
@@ -1475,7 +1485,7 @@ async function submitEventRegistration() {
         );
 
         if (result.success) {
-            Toast.success('✅ ' + result.message);
+            Toast.success(result.message);
             closeEventRegistrationModal();
 
             // UI 업데이트
@@ -1490,7 +1500,7 @@ async function submitEventRegistration() {
                 }
                 Toast.error(errorMsg);
             } else {
-                Toast.error('❌ ' + (result.message || '신청 처리 중 오류가 발생했습니다.'));
+                Toast.error(result.message || '신청 처리 중 오류가 발생했습니다.');
             }
         }
     } catch (error) {
@@ -1514,12 +1524,12 @@ async function cancelEventRegistration() {
         });
 
         if (result.success) {
-            Toast.success('✅ ' + result.message);
+            Toast.success(result.message);
 
             // UI 업데이트
             updateEventRegistrationUI('cancelled', null);
         } else {
-            Toast.error('❌ ' + (result.message || '신청 취소 중 오류가 발생했습니다.'));
+            Toast.error(result.message || '신청 취소 중 오류가 발생했습니다.');
         }
     } catch (error) {
         Toast.error('신청 취소 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
@@ -1758,33 +1768,38 @@ function showShareModal(title, url) {
     `;
     
     content.innerHTML = `
-        <h3 style="margin-bottom: 20px; color: #2d3748;">🔗 행사 공유하기</h3>
+        <h3 style="margin-bottom: 20px; color: #2d3748; display: flex; align-items: center; gap: 8px; justify-content: center;"><i data-lucide="link" width="24" height="24"></i> 행사 공유하기</h3>
         <p style="margin-bottom: 20px; color: #4a5568;">${title}</p>
         <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; word-break: break-all; font-family: monospace; font-size: 14px;">
             ${url}
         </div>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button onclick="copyToClipboard('${url}')" style="padding: 10px 20px; background: #4A90E2; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                📋 복사하기
+            <button onclick="copyToClipboard('${url}')" style="padding: 10px 20px; background: #4A90E2; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="clipboard" width="18" height="18"></i> 복사하기
             </button>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px;">
-                📘 Facebook
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="facebook" width="18" height="18"></i> Facebook
             </a>
-            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px;">
-                🐦 Twitter
+            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="twitter" width="18" height="18"></i> Twitter
             </a>
-            <a href="https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}" target="_blank" style="padding: 10px 20px; background: #0088CC; color: white; text-decoration: none; border-radius: 6px;">
-                📤 Telegram
+            <a href="https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}" target="_blank" style="padding: 10px 20px; background: #0088CC; color: white; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="send" width="18" height="18"></i> Telegram
             </a>
             <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 10px 20px; background: #a0aec0; color: white; border: none; border-radius: 6px; cursor: pointer;">
                 닫기
             </button>
         </div>
     `;
-    
+
     modal.appendChild(content);
     document.body.appendChild(modal);
-    
+
+    // Lucide 아이콘 초기화
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+    }
+
     // 모달 외부 클릭 시 닫기
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -1818,14 +1833,14 @@ async function confirmDeleteEvent(eventId) {
     }
 
     // 삭제 확인
-    const confirmed = await Modal.confirm('⚠️ 정말로 이 행사를 삭제하시겠습니까?\n\n삭제된 행사는 복구할 수 없습니다.', { type: 'danger' });
-    
+    const confirmed = await Modal.confirm('정말로 이 행사를 삭제하시겠습니까?\n\n삭제된 행사는 복구할 수 없습니다.', { type: 'danger' });
+
     if (!confirmed) {
         return;
     }
 
     // 두 번째 확인
-    const doubleConfirmed = await Modal.confirm('⚠️ 마지막 확인입니다!\n\n행사 제목: "<?= htmlspecialchars($event['title']) ?>"\n\n정말로 삭제하시겠습니까?', {
+    const doubleConfirmed = await Modal.confirm('마지막 확인입니다!\n\n행사 제목: "<?= htmlspecialchars($event['title']) ?>"\n\n정말로 삭제하시겠습니까?', {
         type: 'danger',
         title: '최종 확인',
         confirmText: '삭제',
@@ -1839,7 +1854,7 @@ async function confirmDeleteEvent(eventId) {
     // 로딩 상태 표시
     const deleteBtn = event.target;
     const originalText = deleteBtn.innerHTML;
-    deleteBtn.innerHTML = '🔄 삭제 중...';
+    deleteBtn.innerHTML = '<i data-lucide="loader" width="20" height="20"></i> 삭제 중...';
     deleteBtn.disabled = true;
 
     // CSRF 토큰 가져오기
@@ -1858,7 +1873,7 @@ async function confirmDeleteEvent(eventId) {
     .then(result => {
 
         if (result.success) {
-            Toast.success('✅ 행사가 성공적으로 삭제되었습니다.');
+            Toast.success('행사가 성공적으로 삭제되었습니다.');
             // 이전 페이지로 돌아가기 (또는 행사 목록으로)
             if (document.referrer && document.referrer !== window.location.href) {
                 window.location.href = document.referrer;
@@ -1866,7 +1881,7 @@ async function confirmDeleteEvent(eventId) {
                 window.location.href = '/events';
             }
         } else {
-            Toast.error('❌ 행사 삭제에 실패했습니다: ' + result.message);
+            Toast.error('행사 삭제에 실패했습니다: ' + result.message);
 
             // 버튼 상태 복원
             deleteBtn.innerHTML = originalText;
@@ -1888,3 +1903,13 @@ async function confirmDeleteEvent(eventId) {
 
 <!-- 이벤트 페이지 디버깅 스크립트 -->
 <script src="/debug_events.js"></script>
+
+<!-- Lucide 아이콘 초기화 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lucide 아이콘 초기화
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+    }
+});
+</script>

@@ -683,7 +683,7 @@ if (!isset($_SESSION['csrf_token'])) {
             <div class="form-group">
                 <label for="bio" class="form-label">자기소개</label>
                 <div id="bio-editor" style="min-height: 120px; border: 2px solid #e2e8f0; border-radius: 8px; background: #fafafa;"></div>
-                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
+                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;"><i data-lucide="camera" width="16" height="16" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></i> 이미지: 0 / 20</div>
                 <textarea id="bio" 
                           name="bio" 
                           class="form-input form-textarea"
@@ -777,7 +777,7 @@ if (!isset($_SESSION['csrf_token'])) {
                 
                 <div class="social-item">
                     <div class="social-icon instagram">
-                        <i class="fab fa-instagram"></i>
+                        <i data-lucide="instagram" width="20" height="20"></i>
                     </div>
                     <div class="social-input">
                         <label for="social_instagram" class="form-label">인스타그램</label>
@@ -792,7 +792,7 @@ if (!isset($_SESSION['csrf_token'])) {
                 
                 <div class="social-item">
                     <div class="social-icon facebook">
-                        <i class="fab fa-facebook"></i>
+                        <i data-lucide="facebook" width="20" height="20"></i>
                     </div>
                     <div class="social-input">
                         <label for="social_facebook" class="form-label">페이스북</label>
@@ -807,7 +807,7 @@ if (!isset($_SESSION['csrf_token'])) {
                 
                 <div class="social-item">
                     <div class="social-icon youtube">
-                        <i class="fab fa-youtube"></i>
+                        <i data-lucide="youtube" width="20" height="20"></i>
                     </div>
                     <div class="social-input">
                         <label for="social_youtube" class="form-label">유튜브</label>
@@ -822,7 +822,7 @@ if (!isset($_SESSION['csrf_token'])) {
                 
                 <div class="social-item">
                     <div class="social-icon tiktok">
-                        <i class="fab fa-tiktok"></i>
+                        <i data-lucide="video" width="20" height="20"></i>
                     </div>
                     <div class="social-input">
                         <label for="social_tiktok" class="form-label">틱톡</label>
@@ -884,7 +884,7 @@ let quill;
 let cropper;
 let croppedImageBlob = null;
 
-// 🚀 v3.30.0: showAlert 함수 제거 (Toast 클래스로 대체됨)
+// v3.30.0: showAlert 함수 제거 (Toast 클래스로 대체됨)
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('profile-form');
@@ -987,7 +987,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateImageCounter, 100);
     });
     
-    // 🚀 v3.29.0: 자기소개 글자수 카운터 (Quill 전용)
+    // v3.29.0: 자기소개 글자수 카운터 (Quill 전용)
     // Quill 에디터는 input 이벤트를 발생시키지 않고 text-change 이벤트를 사용하므로
     // CharacterCounter 클래스 대신 Quill 전용 수동 카운터 사용
     function updateBioCounter(text) {
@@ -1022,19 +1022,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // 색상 및 스타일 설정
         let counterClass = '';
         let warningText = '';
-        
+
         if (currentImages >= 18) { // 90% 이상
             counterClass = 'error'; // 빨간색
-            warningText = ' ⚠️';
+            warningText = ' <i data-lucide="alert-triangle" width="16" height="16" style="display: inline-block; vertical-align: middle;"></i>';
         } else if (currentImages >= 15) { // 75% 이상
             counterClass = 'warning'; // 주황색
-            warningText = ' ⚠️';
+            warningText = ' <i data-lucide="alert-triangle" width="16" height="16" style="display: inline-block; vertical-align: middle;"></i>';
         } else {
             counterClass = ''; // 기본 색상
         }
-        
+
         imageCounter.className = `char-counter ${counterClass}`;
-        imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
+        imageCounter.innerHTML = `<i data-lucide="camera" width="16" height="16" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></i> 이미지: ${currentImages} / ${maxImages}${warningText}`;
         
     }
     
@@ -1104,7 +1104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Quill 내용을 textarea에 동기화 (HTML로 저장)
         bioTextarea.value = quill.root.innerHTML;
         
-        // 🚀 v3.31.0: Loading 클래스 사용
+        // v3.31.0: Loading 클래스 사용
         Loading.button(saveBtn, true, { text: '저장 중...' });
         form.classList.add('loading');
         
@@ -1119,7 +1119,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
         ApiClient.post('/profile/update', formData, {
-            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
             noLoading: true
         })
         .then(data => {
@@ -1154,7 +1153,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
         ApiClient.post('/profile/upload-image', imageFormData, {
-            headers: {}, // Content-Type 자동 설정을 위해 빈 객체 전달
             noLoading: true
         })
         .then(data => {
@@ -1276,7 +1274,7 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script>
-// 🔧 v3.53.1: 동적 accept 속성 설정 (UploadConfig 시스템 사용)
+// v3.53.1: 동적 accept 속성 설정 (UploadConfig 시스템 사용)
 if (window.getImageAcceptAttribute) {
     const profileImageInput = document.getElementById('profile-image');
     if (profileImageInput) {
@@ -1346,7 +1344,7 @@ document.getElementById('delete-account-btn').addEventListener('click', async fu
     // 1차 확인 - 경고 메시지
     const warningMessage = `
 <div style="text-align: left; line-height: 1.8;">
-    <h4 style="color: #dc3545; margin-bottom: 15px;">⚠️ 회원탈퇴 주의사항</h4>
+    <h4 style="color: #dc3545; margin-bottom: 15px;"><i data-lucide="alert-triangle" width="18" height="18" style="display: inline-block; vertical-align: middle; margin-right: 6px;"></i> 회원탈퇴 주의사항</h4>
     <ul style="margin: 0; padding-left: 20px;">
         <li>탈퇴 시 모든 개인정보가 <strong>삭제되며 복구할 수 없습니다</strong>.</li>
         <li>작성한 게시글과 댓글은 유지되나 <strong>"탈퇴한 회원"</strong>으로 표시됩니다.</li>
@@ -1463,12 +1461,12 @@ async function confirmDeleteAccount() {
         return;
     }
 
-    // 🚀 v3.31.0: Loading 클래스 사용
+    // v3.31.0: Loading 클래스 사용
     const deleteBtn = document.querySelector('#delete-account-modal .btn-danger');
     Loading.button(deleteBtn, true, { text: '처리 중...' });
 
-    // v3.42.0: ApiClient 사용
-    // fetch 직접 사용으로 변경 (ApiClient가 400 오류에서 throw하므로)
+    // v3.42.0: fetch 직접 사용
+    // (ApiClient가 400 오류에서 throw하므로 fetch 직접 사용)
     fetch('/api/user/delete-account', {
         method: 'POST',
         headers: {

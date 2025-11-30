@@ -212,7 +212,7 @@ class NoticeController extends BaseController {
                     
                     // 빈 img 태그는 업로드 실패 안내로 교체
                     return '<div class="missing-image-notice" style="padding: 15px; margin: 10px 0; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; text-align: center; color: #92400e;">' .
-                           '<i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>' .
+                           '<i data-lucide="alert-triangle" style="display:inline-block; width:16px; height:16px; margin-right:8px; vertical-align:middle;"></i>' .
                            '이미지 업로드 중 오류가 발생했습니다. 다시 시도해 주세요.' .
                            '</div>';
                 }, $content);

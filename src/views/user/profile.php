@@ -950,12 +950,12 @@ if (!empty($user['last_login'])) {
             <div class="profile-details">
                 <h1 class="profile-name"><?= htmlspecialchars($user['nickname'] ?? '사용자') ?></h1>
                 <div class="profile-meta">
-                    <span>🗓️ 가입일: <?= $joinDate ?></span>
+                    <span><i data-lucide="calendar" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>가입일: <?= $joinDate ?></span>
                     <?php if ($stats['join_days'] ?? 0 > 0): ?>
-                        <span>⏰ 활동 <?= $stats['join_days'] ?>일째</span>
+                        <span><i data-lucide="clock" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>활동 <?= $stats['join_days'] ?>일째</span>
                     <?php endif; ?>
                     <?php if (!$isOwnProfile): ?>
-                        <span>👀 최근 접속: <?= $lastLogin ?></span>
+                        <span><i data-lucide="eye" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>최근 접속: <?= $lastLogin ?></span>
                     <?php endif; ?>
                 </div>
             </div>
@@ -963,13 +963,13 @@ if (!empty($user['last_login'])) {
             <div class="profile-actions">
                 <?php if ($isOwnProfile): ?>
                     <a href="/profile/edit" class="btn btn-secondary">
-                        ✏️ 프로필 편집
+                        <i data-lucide="pencil" width="16" height="16"></i> 프로필 편집
                     </a>
                 <?php endif; ?>
-                
+
                 <!-- 프로필 공유 버튼 -->
                 <button class="btn btn-secondary" onclick="shareContent()">
-                    🔗 공유하기
+                    <i data-lucide="share-2" width="16" height="16"></i> 공유하기
                 </button>
             </div>
         </div>
@@ -1008,10 +1008,10 @@ if (!empty($user['last_login'])) {
                                     </a>
                                 </div>
                                 <div class="activity-meta">
-                                    <span>📅 <?= date('Y-m-d H:i', strtotime($post['created_at'])) ?></span>
-                                    <span>👁️ <?= number_format($post['view_count'] ?? 0) ?></span>
-                                    <span>💬 <?= number_format($post['comment_count'] ?? 0) ?></span>
-                                    <span>❤️ <?= number_format($post['like_count'] ?? 0) ?></span>
+                                    <span><i data-lucide="calendar" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 3px;"></i><?= date('Y-m-d H:i', strtotime($post['created_at'])) ?></span>
+                                    <span><i data-lucide="eye" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 3px;"></i><?= number_format($post['view_count'] ?? 0) ?></span>
+                                    <span><i data-lucide="message-circle" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 3px;"></i><?= number_format($post['comment_count'] ?? 0) ?></span>
+                                    <span><i data-lucide="heart" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 3px;"></i><?= number_format($post['like_count'] ?? 0) ?></span>
                                 </div>
                             </li>
                         <?php endforeach; ?>
@@ -1039,28 +1039,28 @@ if (!empty($user['last_login'])) {
                                     $linkPath = ($commentType === 'notice')
                                         ? "/notices/{$comment['post_id']}#comment-{$comment['id']}"
                                         : "/community/posts/{$comment['post_id']}#comment-{$comment['id']}";
-                                    $linkIcon = ($commentType === 'notice') ? '📢' : '💬';
+                                    $linkIcon = ($commentType === 'notice') ? 'bell' : 'message-circle';
                                     ?>
                                     <a href="<?= $linkPath ?>">
                                         <?= htmlspecialchars($comment['post_title']) ?>
-                                    </a>에 댓글 <?= $linkIcon ?>
+                                    </a>에 댓글 <i data-lucide="<?= $linkIcon ?>" width="14" height="14" style="display: inline; vertical-align: middle;"></i>
                                     <?php
                                     // 삭제된 부모 댓글에 대한 답글인지 확인
                                     $isReplyToDeleted = !empty($comment['parent_id']) && ($comment['parent_status'] ?? '') === 'deleted';
                                     ?>
                                     <?php if ($isReplyToDeleted): ?>
                                         <span class="deleted-parent-indicator">
-                                            🗑️ (삭제된 댓글에 대한 답글)
+                                            <i data-lucide="trash-2" width="12" height="12" style="display: inline; vertical-align: middle; margin-right: 2px;"></i>(삭제된 댓글에 대한 답글)
                                         </span>
                                     <?php elseif (!empty($comment['parent_id'])): ?>
                                         <span class="reply-indicator">
-                                            💬 (<?= htmlspecialchars($comment['parent_author_name'] ?? '사용자') ?>님에게 답글)
+                                            <i data-lucide="message-circle" width="12" height="12" style="display: inline; vertical-align: middle; margin-right: 2px;"></i>(<?= htmlspecialchars($comment['parent_author_name'] ?? '사용자') ?>님에게 답글)
                                         </span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="activity-meta">
-                                    <span>📅 <?= date('Y-m-d H:i', strtotime($comment['created_at'])) ?></span>
-                                    <span>💬 <?= htmlspecialchars(mb_substr(strip_tags($comment['content']), 0, 50)) ?>...</span>
+                                    <span><i data-lucide="calendar" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 3px;"></i><?= date('Y-m-d H:i', strtotime($comment['created_at'])) ?></span>
+                                    <span><i data-lucide="message-circle" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 3px;"></i><?= htmlspecialchars(mb_substr(strip_tags($comment['content']), 0, 50)) ?>...</span>
                                 </div>
                             </li>
                         <?php endforeach; ?>
@@ -1268,7 +1268,7 @@ function shareContent() {
         const profileTitle = <?= json_encode(($user['nickname'] ?? '사용자') . '님의 프로필 - 탑마케팅', JSON_UNESCAPED_UNICODE) ?>;
         const profileUrl = <?= json_encode('https://' . $_SERVER['HTTP_HOST'] . '/profile/' . urlencode($user['nickname'])) ?>;
         const profileDescription = <?= json_encode('탑마케팅에서 ' . ($user['nickname'] ?? '사용자') . '님의 프로필을 확인해보세요!', JSON_UNESCAPED_UNICODE) ?>;
-        
+
         // Web Share API 지원 확인
         if (navigator.share) {
             navigator.share({
@@ -1289,10 +1289,10 @@ function shareContent() {
 }
 
 // 폴백 공유 기능 (클립보드 복사)
-// 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
+// Phase 8: navigator.clipboard → copyToClipboard 사용
 function fallbackShare(title, url) {
     copyToClipboard(url, {
-        successMessage: '🔗 링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
+        successMessage: '링크가 클립보드에 복사되었습니다!\n다른 곳에 붙여넣기하여 공유하세요.'
     }).catch(() => {
         showShareModal(title, url);
     });
@@ -1326,20 +1326,20 @@ function showShareModal(title, url) {
     `;
     
     content.innerHTML = `
-        <h3 style="margin-bottom: 20px; color: #2d3748;">🔗 프로필 공유하기</h3>
+        <h3 style="margin-bottom: 20px; color: #2d3748;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;"><polyline points="4 12 10 18 20 8"></polyline></svg> 프로필 공유하기</h3>
         <p style="margin-bottom: 20px; color: #4a5568;">${title}</p>
         <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; word-break: break-all; font-family: monospace; font-size: 14px;">
             ${url}
         </div>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button onclick="copyToClipboard('${url}')" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                📋 복사하기
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 6px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>복사하기
             </button>
             <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #4267B2; color: white; text-decoration: none; border-radius: 6px;">
-                📘 Facebook
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; vertical-align: middle; margin-right: 6px;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>Facebook
             </a>
             <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}" target="_blank" style="padding: 10px 20px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px;">
-                🐦 Twitter
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; vertical-align: middle; margin-right: 6px;"><path d="M23.953 4.57a10 10 0 002.856 2.871c.15.798.023 1.643-.383 2.398a9.723 9.723 0 01-2.906 2.662c.042 1.268-.045 2.531-.356 3.755a15.02 15.02 0 01-5.954 5.75 9.888 9.888 0 01-12.964-9.572c-1.359-.23-2.671-.641-3.955-1.042a.563.563 0 01.412-.933 10.122 10.122 0 006.11-2.291 9.823 9.823 0 01-9.141-5.05.563.563 0 01.772-.727 8.685 8.685 0 004.898.456 10.026 10.026 0 01-4.034-3.26.562.562 0 01.909-.66 9.045 9.045 0 005.203 2.88 10.005 10.005 0 018.94-13.22c.467-.04.953.048 1.294.368.345.32.565.833.514 1.331a9.914 9.914 0 01-1.422 4.291l.001-.001z"></path></svg>Twitter
             </a>
             <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 10px 20px; background: #a0aec0; color: white; border: none; border-radius: 6px; cursor: pointer;">
                 닫기

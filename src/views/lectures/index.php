@@ -1542,11 +1542,11 @@ body {
     <div class="color-legend">
         <div class="legend-item">
             <div class="legend-color offline"></div>
-            <span>🏢 오프라인 강의</span>
+            <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 오프라인 강의</span>
         </div>
         <div class="legend-item">
             <div class="legend-color online"></div>
-            <span>💻 온라인 강의</span>
+            <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M2 17h20"/><path d="M6 20h12"/></svg> 온라인 강의</span>
         </div>
     </div>
     
@@ -1568,13 +1568,13 @@ body {
         <!-- 뷰 전환 및 액션 -->
         <div class="view-controls">
             <div class="view-toggle">
-                <a href="?year=<?= $currentYear ?>&month=<?= $currentMonth ?>&view=calendar" 
+                <a href="?year=<?= $currentYear ?>&month=<?= $currentMonth ?>&view=calendar"
                    class="view-btn <?= $view === 'calendar' ? 'active' : '' ?>">
-                    📅 캘린더
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 9h18"/></svg> 캘린더
                 </a>
-                <a href="?year=<?= $currentYear ?>&month=<?= $currentMonth ?>&view=list" 
+                <a href="?year=<?= $currentYear ?>&month=<?= $currentMonth ?>&view=list"
                    class="view-btn <?= $view === 'list' ? 'active' : '' ?>">
-                    📋 목록
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 목록
                 </a>
             </div>
             
@@ -1586,17 +1586,17 @@ body {
                 
                 if ($permission['hasPermission']): ?>
                     <a href="/lectures/create" class="btn-create">
-                        ➕ 강의 등록
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 강의 등록
                     </a>
                 <?php else: ?>
-                    <a href="/corp/info" class="btn-create" style="background: #a0aec0;" 
+                    <a href="/corp/info" class="btn-create" style="background: #a0aec0;"
                        title="<?= htmlspecialchars($permission['message']) ?>">
-                        📝 강의 일정 등록
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> 강의 일정 등록
                     </a>
                 <?php endif; ?>
             <?php else: ?>
                 <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn-create">
-                    🔑 로그인 후 등록
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> 로그인 후 등록
                 </a>
             <?php endif; ?>
         </div>
@@ -1644,7 +1644,7 @@ body {
                                         <?php endforeach; ?>
                                         
                                         <?php if ($remainingCount > 0): ?>
-                                            <div class="more-lectures-btn" 
+                                            <div class="more-lectures-btn"
                                                  onclick="showDayLectures('<?= sprintf('%04d-%02d-%02d', $currentYear, $currentMonth, $day['day']) ?>', <?= $day['day'] ?>, <?= htmlspecialchars(json_encode($day['lectures']), ENT_QUOTES) ?>)">
                                                 <span class="more-text">+<?= $remainingCount ?>개 더보기</span>
                                             </div>
@@ -1667,19 +1667,19 @@ body {
                                         <div class="lecture-list-title"><?= htmlspecialchars($lecture['title']) ?></div>
                                         <div class="lecture-list-meta">
                                             <div class="meta-item">
-                                                📅 <?= date('Y-m-d', strtotime($lecture['start_date'])) ?>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 9h18"/></svg> <?= date('Y-m-d', strtotime($lecture['start_date'])) ?>
                                             </div>
                                             <div class="meta-item">
-                                                🕒 <?= date('H:i', strtotime($lecture['start_time'])) ?> - <?= date('H:i', strtotime($lecture['end_time'])) ?>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <?= date('H:i', strtotime($lecture['start_time'])) ?> - <?= date('H:i', strtotime($lecture['end_time'])) ?>
                                             </div>
                                             <div class="meta-item">
-                                                👨‍🏫 <?= htmlspecialchars($lecture['instructor_name']) ?>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <?= htmlspecialchars($lecture['instructor_name']) ?>
                                             </div>
                                             <div class="meta-item">
                                                 <?php if ($lecture['location_type'] === 'online'): ?>
-                                                    💻 온라인
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M2 17h20"/><path d="M6 20h12"/></svg> 온라인
                                                 <?php else: ?>
-                                                    📍 <?= htmlspecialchars($lecture['venue_name'] ?? '오프라인') ?>
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> <?= htmlspecialchars($lecture['venue_name'] ?? '오프라인') ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -1702,14 +1702,14 @@ body {
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="empty-sidebar">
-                            <p>📅 이번 달에 예정된 강의가 없습니다.</p>
+                            <p><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 9h18"/></svg> 이번 달에 예정된 강의가 없습니다.</p>
                             <?php if ($isLoggedIn && in_array($_SESSION['user_role'] ?? '', ['PREMIUM', 'ADMIN', 'SUPER_ADMIN'])): ?>
                                 <a href="/lectures/create" class="btn-create" style="margin-top: 10px; display: inline-block;">
-                                    ➕ 첫 번째 강의 등록하기
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 첫 번째 강의 등록하기
                                 </a>
                             <?php elseif ($isLoggedIn): ?>
                                 <p style="margin-top: 10px; color: #718096; font-size: 0.9rem;">
-                                    🏢 기업회원만 강의를 등록할 수 있습니다
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 기업회원만 강의를 등록할 수 있습니다
                                 </p>
                             <?php endif; ?>
                         </div>
@@ -1722,15 +1722,15 @@ body {
         <div class="lectures-sidebar">
             <!-- 오늘의 강의 -->
             <div class="sidebar-section">
-                <h3 class="sidebar-title">🚀 오늘의 강의</h3>
+                <h3 class="sidebar-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M13.89 13.89 18 17.98M3.5 3.5a2.121 2.121 0 0 1 3 3L7 10.5 3.5 7M10.5 7L7 3.5"/></svg> 오늘의 강의</h3>
                 <?php if (!empty($todayLectures)): ?>
                     <div class="today-lectures">
                         <?php foreach ($todayLectures as $lecture): ?>
                             <a href="/lectures/<?= $lecture['id'] ?>" class="sidebar-lecture-item">
                                 <div class="sidebar-lecture-title"><?= htmlspecialchars($lecture['title']) ?></div>
                                 <div class="sidebar-lecture-meta">
-                                    <span>🕒 <?= date('H:i', strtotime($lecture['start_time'])) ?></span>
-                                    <span>👨‍🏫 <?= htmlspecialchars($lecture['organizer_name']) ?></span>
+                                    <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <?= date('H:i', strtotime($lecture['start_time'])) ?></span>
+                                    <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <?= htmlspecialchars($lecture['organizer_name']) ?></span>
                                 </div>
                             </a>
                         <?php endforeach; ?>
@@ -1741,19 +1741,19 @@ body {
                     </div>
                 <?php endif; ?>
             </div>
-            
+
             <!-- 다가오는 강의 -->
             <div class="sidebar-section">
-                <h3 class="sidebar-title">📋 다가오는 강의</h3>
+                <h3 class="sidebar-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 다가오는 강의</h3>
                 <?php if (!empty($upcomingLectures)): ?>
                     <div class="upcoming-lectures">
                         <?php foreach ($upcomingLectures as $lecture): ?>
                             <a href="/lectures/<?= $lecture['id'] ?>" class="sidebar-lecture-item">
                                 <div class="sidebar-lecture-title"><?= htmlspecialchars($lecture['title']) ?></div>
                                 <div class="sidebar-lecture-meta">
-                                    <span>📅 <?= date('m/d', strtotime($lecture['start_date'])) ?></span>
-                                    <span>🕒 <?= date('H:i', strtotime($lecture['start_time'])) ?></span>
-                                    <span>👨‍🏫 <?= htmlspecialchars($lecture['organizer_name']) ?></span>
+                                    <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 9h18"/></svg> <?= date('m/d', strtotime($lecture['start_date'])) ?></span>
+                                    <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <?= date('H:i', strtotime($lecture['start_time'])) ?></span>
+                                    <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <?= htmlspecialchars($lecture['organizer_name']) ?></span>
                                 </div>
                             </a>
                         <?php endforeach; ?>
@@ -1871,7 +1871,7 @@ function showDayLectures(date, day, lectures) {
         let modalContent = '';
         
         if (lectures.length === 0) {
-            modalContent = '<div class="modal-empty">📅 이 날에는 예정된 일정이 없습니다.</div>';
+            modalContent = '<div class="modal-empty"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 9h18"/></svg> 이 날에는 예정된 일정이 없습니다.</div>';
         } else {
             // 시간 순으로 정렬
             lectures.sort((a, b) => {
@@ -1884,11 +1884,11 @@ function showDayLectures(date, day, lectures) {
                 
                 let locationInfo = '';
                 if (lecture.location_type === 'online') {
-                    locationInfo = '💻 온라인';
+                    locationInfo = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M2 17h20"/><path d="M6 20h12"/></svg> 온라인';
                 } else if (lecture.location_type === 'hybrid') {
-                    locationInfo = '🔄 하이브리드';
+                    locationInfo = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg> 하이브리드';
                 } else {
-                    locationInfo = '📍 ' + (lecture.venue_name || '오프라인');
+                    locationInfo = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ' + (lecture.venue_name || '오프라인');
                 }
                 
                 const categoryMap = {
@@ -1906,9 +1906,9 @@ function showDayLectures(date, day, lectures) {
                         <div class="modal-lecture-time">${startTime} - ${endTime}</div>
                         <div class="modal-lecture-title">${escapeHtml(lecture.title)}</div>
                         <div class="modal-lecture-meta">
-                            <span>👨‍🏫 ${escapeHtml(lecture.instructor_name || '미정')}</span>
+                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${escapeHtml(lecture.instructor_name || '미정')}</span>
                             <span>${locationInfo}</span>
-                            <span>🏷️ ${categoryName}</span>
+                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg> ${categoryName}</span>
                         </div>
                     </a>
                 `;

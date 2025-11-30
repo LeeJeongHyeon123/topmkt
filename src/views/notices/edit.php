@@ -452,10 +452,10 @@ if (!isset($notice) || !$notice) {
         <!-- 버튼 -->
         <div class="form-actions">
             <a href="/notices/<?= $notice['id'] ?>" class="btn btn-secondary">
-                ❌ 취소
+                <i data-lucide="x" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>취소
             </a>
             <button type="submit" class="btn btn-primary" id="submitBtn">
-                ✅ 수정하기
+                <i data-lucide="check" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>수정하기
             </button>
         </div>
     </form>

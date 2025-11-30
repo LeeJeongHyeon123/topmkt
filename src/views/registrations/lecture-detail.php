@@ -408,18 +408,18 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     <!-- 페이지 헤더 -->
     <div class="page-header">
         <div class="breadcrumb">
-            <a href="/registrations">📊 대시보드</a> / 강의 신청자 관리
+            <a href="/registrations"><i class="lucide lucide-bar-chart-3" style="width: 16px; height: 16px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 대시보드</a> / 강의 신청자 관리
         </div>
         
         <h1 class="page-title"><?= htmlspecialchars($lecture['title']) ?></h1>
         
         <div class="page-meta">
-            <span>📅 <?= date('Y-m-d H:i', strtotime($lecture['start_date'] . ' ' . $lecture['start_time'])) ?></span>
-            <span>⏰ <?= date('Y-m-d H:i', strtotime($lecture['end_date'] . ' ' . $lecture['end_time'])) ?></span>
+            <span><i class="lucide lucide-calendar" style="width: 16px; height: 16px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> <?= date('Y-m-d H:i', strtotime($lecture['start_date'] . ' ' . $lecture['start_time'])) ?></span>
+            <span><i class="lucide lucide-clock" style="width: 16px; height: 16px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> <?= date('Y-m-d H:i', strtotime($lecture['end_date'] . ' ' . $lecture['end_time'])) ?></span>
             <?php if ($lecture['max_participants']): ?>
-                <span>👥 정원 <?= $lecture['max_participants'] ?>명</span>
+                <span><i class="lucide lucide-users" style="width: 16px; height: 16px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 정원 <?= $lecture['max_participants'] ?>명</span>
             <?php endif; ?>
-            <span>⚙️ <?= $lecture['auto_approval'] ? '자동 승인' : '수동 승인' ?></span>
+            <span><i class="lucide lucide-settings" style="width: 16px; height: 16px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> <?= $lecture['auto_approval'] ? '자동 승인' : '수동 승인' ?></span>
         </div>
         
         <?php if ($lectureStats): ?>
@@ -459,7 +459,7 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     <!-- 필터 및 검색 -->
     <div class="controls-section">
         <div class="controls-header">
-            <h2 class="controls-title">🔍 신청자 필터링</h2>
+            <h2 class="controls-title"><i class="lucide lucide-search" style="width: 20px; height: 20px; display: inline; margin-right: 8px; vertical-align: -3px;"></i> 신청자 필터링</h2>
         </div>
         
         <form method="GET" action="">
@@ -468,10 +468,10 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                     <label for="status">상태</label>
                     <select name="status" id="status">
                         <option value="">전체</option>
-                        <option value="pending" <?= $statusFilter === 'pending' ? 'selected' : '' ?>>⏳ 대기중</option>
-                        <option value="approved" <?= $statusFilter === 'approved' ? 'selected' : '' ?>>✅ 승인됨</option>
-                        <option value="rejected" <?= $statusFilter === 'rejected' ? 'selected' : '' ?>>❌ 거절됨</option>
-                        <option value="waiting" <?= $statusFilter === 'waiting' ? 'selected' : '' ?>>⏰ 대기자</option>
+                        <option value="pending" <?= $statusFilter === 'pending' ? 'selected' : '' ?>>대기중</option>
+                        <option value="approved" <?= $statusFilter === 'approved' ? 'selected' : '' ?>>승인됨</option>
+                        <option value="rejected" <?= $statusFilter === 'rejected' ? 'selected' : '' ?>>거절됨</option>
+                        <option value="waiting" <?= $statusFilter === 'waiting' ? 'selected' : '' ?>>대기자</option>
                     </select>
                 </div>
                 
@@ -483,7 +483,7 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                 </div>
                 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-approve">🔍 검색</button>
+                    <button type="submit" class="btn btn-approve"><i class="lucide lucide-search" style="width: 16px; height: 16px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 검색</button>
                 </div>
             </div>
         </form>
@@ -493,13 +493,13 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
     <div class="registrations-section">
         <div class="section-header">
             <h2 class="section-title">
-                👥 신청자 목록 (총 <?= number_format($totalCount) ?>명)
+                <i class="lucide lucide-users" style="width: 20px; height: 20px; display: inline; margin-right: 8px; vertical-align: -3px;"></i> 신청자 목록 (총 <?= number_format($totalCount) ?>명)
             </h2>
         </div>
         
         <?php if (empty($registrations)): ?>
             <div style="text-align: center; padding: 60px 20px; color: #718096;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">📋</div>
+                <div style="font-size: 3rem; margin-bottom: 16px;"><i class="lucide lucide-clipboard-list" style="width: 48px; height: 48px; display: inline;"></i></div>
                 <h3 style="margin-bottom: 8px;">신청자가 없습니다</h3>
                 <p>아직 이 강의에 신청한 사람이 없습니다.</p>
             </div>
@@ -524,31 +524,31 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                                         <?= htmlspecialchars($registration['participant_name']) ?>
                                     </div>
                                     <div class="participant-contact">
-                                        📧 <?= htmlspecialchars($registration['participant_email']) ?>
+                                        <i class="lucide lucide-mail" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -1px;"></i> <?= htmlspecialchars($registration['participant_email']) ?>
                                     </div>
                                     <div class="participant-contact">
-                                        📞 <?= htmlspecialchars($registration['participant_phone']) ?>
+                                        <i class="lucide lucide-phone" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -1px;"></i> <?= htmlspecialchars($registration['participant_phone']) ?>
                                     </div>
                                 </td>
                                 <td>
                                     <?php if ($registration['company_name']): ?>
                                         <div class="participant-company">
-                                            🏢 <?= htmlspecialchars($registration['company_name']) ?>
+                                            <i class="lucide lucide-building-2" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -1px;"></i> <?= htmlspecialchars($registration['company_name']) ?>
                                         </div>
                                     <?php endif; ?>
                                     <?php if ($registration['position']): ?>
                                         <div class="participant-company">
-                                            💼 <?= htmlspecialchars($registration['position']) ?>
+                                            <i class="lucide lucide-briefcase" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -1px;"></i> <?= htmlspecialchars($registration['position']) ?>
                                         </div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <span class="status-badge status-<?= $registration['status'] ?>">
                                         <?= [
-                                            'pending' => '⏳ 대기중',
-                                            'approved' => '✅ 승인됨',
-                                            'rejected' => '❌ 거절됨',
-                                            'waiting' => '⏰ 대기자'
+                                            'pending' => '대기중',
+                                            'approved' => '승인됨',
+                                            'rejected' => '거절됨',
+                                            'waiting' => '대기자'
                                         ][$registration['status']] ?? $registration['status'] ?>
                                     </span>
                                     <?php if ($registration['is_waiting_list']): ?>
@@ -573,18 +573,18 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                                 <td>
                                     <div class="action-buttons">
                                         <?php if ($registration['status'] === 'pending' || $registration['status'] === 'waiting'): ?>
-                                            <button class="btn btn-approve" 
+                                            <button class="btn btn-approve"
                                                     onclick="showStatusModal(<?= $registration['id'] ?>, 'approved')">
-                                                ✅ 승인
+                                                <i class="lucide lucide-check" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 승인
                                             </button>
-                                            <button class="btn btn-reject" 
+                                            <button class="btn btn-reject"
                                                     onclick="showStatusModal(<?= $registration['id'] ?>, 'rejected')">
-                                                ❌ 거절
+                                                <i class="lucide lucide-x" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 거절
                                             </button>
                                         <?php endif; ?>
-                                        <button class="btn btn-info" 
+                                        <button class="btn btn-info"
                                                 onclick="showDetailModal(<?= htmlspecialchars(json_encode($registration)) ?>)">
-                                            📋 상세
+                                            <i class="lucide lucide-clipboard-list" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 상세
                                         </button>
                                     </div>
                                 </td>
@@ -602,8 +602,8 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                     'preserveParams' => ['status', 'search'],
                     'containerClass' => 'pagination',
                     'activeClass' => 'current',
-                    'prevText' => '⬅️ 이전',
-                    'nextText' => '다음 ➡️'
+                    'prevText' => '이전',
+                    'nextText' => '다음'
                 ]);
             }
             ?>
@@ -674,11 +674,11 @@ function showStatusModal(registrationId, status) {
     
     if (status === 'approved') {
         title.textContent = '신청 승인';
-        confirmBtn.textContent = '✅ 승인하기';
+        confirmBtn.innerHTML = '<i class="lucide lucide-check" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 승인하기';
         confirmBtn.className = 'btn btn-approve';
     } else {
         title.textContent = '신청 거절';
-        confirmBtn.textContent = '❌ 거절하기';
+        confirmBtn.innerHTML = '<i class="lucide lucide-x" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 거절하기';
         confirmBtn.className = 'btn btn-reject';
     }
     
@@ -703,45 +703,45 @@ function showDetailModal(registration) {
     
     body.innerHTML = `
         <div style="margin-bottom: 20px;">
-            <h4 style="margin-bottom: 12px;">👤 기본 정보</h4>
+            <h4 style="margin-bottom: 12px;"><i class="lucide lucide-user" style="width: 16px; height: 16px; display: inline; margin-right: 6px; vertical-align: -2px;"></i> 기본 정보</h4>
             <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
                 <p><strong>이름:</strong> ${escapeHtml(registration.participant_name)}</p>
                 <p><strong>이메일:</strong> ${escapeHtml(registration.participant_email)}</p>
                 <p><strong>연락처:</strong> ${escapeHtml(registration.participant_phone)}</p>
             </div>
         </div>
-        
+
         ${registration.company_name || registration.position ? `
         <div style="margin-bottom: 20px;">
-            <h4 style="margin-bottom: 12px;">🏢 소속 정보</h4>
+            <h4 style="margin-bottom: 12px;"><i class="lucide lucide-building-2" style="width: 16px; height: 16px; display: inline; margin-right: 6px; vertical-align: -2px;"></i> 소속 정보</h4>
             <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
                 ${registration.company_name ? `<p><strong>회사명:</strong> ${escapeHtml(registration.company_name)}</p>` : ''}
                 ${registration.position ? `<p><strong>직책:</strong> ${escapeHtml(registration.position)}</p>` : ''}
             </div>
         </div>
         ` : ''}
-        
+
         ${registration.motivation ? `
         <div style="margin-bottom: 20px;">
-            <h4 style="margin-bottom: 12px;">💭 참가 동기</h4>
+            <h4 style="margin-bottom: 12px;"><i class="lucide lucide-lightbulb" style="width: 16px; height: 16px; display: inline; margin-right: 6px; vertical-align: -2px;"></i> 참가 동기</h4>
             <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
                 <p>${escapeHtml(registration.motivation).replace(/\n/g, '<br>')}</p>
             </div>
         </div>
         ` : ''}
-        
+
         ${registration.special_requests ? `
         <div style="margin-bottom: 20px;">
-            <h4 style="margin-bottom: 12px;">📝 특별 요청사항</h4>
+            <h4 style="margin-bottom: 12px;"><i class="lucide lucide-file-text" style="width: 16px; height: 16px; display: inline; margin-right: 6px; vertical-align: -2px;"></i> 특별 요청사항</h4>
             <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
                 <p>${escapeHtml(registration.special_requests).replace(/\n/g, '<br>')}</p>
             </div>
         </div>
         ` : ''}
-        
+
         ${registration.admin_notes ? `
         <div style="margin-bottom: 20px;">
-            <h4 style="margin-bottom: 12px;">📋 관리자 메모</h4>
+            <h4 style="margin-bottom: 12px;"><i class="lucide lucide-clipboard-list" style="width: 16px; height: 16px; display: inline; margin-right: 6px; vertical-align: -2px;"></i> 관리자 메모</h4>
             <div style="background: #fed7d7; padding: 16px; border-radius: 8px;">
                 <p>${escapeHtml(registration.admin_notes).replace(/\n/g, '<br>')}</p>
             </div>
@@ -769,8 +769,8 @@ document.getElementById('confirmStatusBtn').addEventListener('click', async func
     
     // 버튼 비활성화
     const button = this;
-    const originalText = button.textContent;
-    button.textContent = '🔄 처리 중...';
+    const originalHtml = button.innerHTML;
+    button.innerHTML = '<i class="lucide lucide-refresh-cw" style="width: 14px; height: 14px; display: inline; margin-right: 4px; vertical-align: -2px;"></i> 처리 중...';
     button.disabled = true;
 
     try {
@@ -784,23 +784,23 @@ document.getElementById('confirmStatusBtn').addEventListener('click', async func
         if (result.status === 'success') {
             // 메시지가 문자열인지 확인
             const message = typeof result.message === 'string' ? result.message : '처리가 완료되었습니다.';
-            Toast.success('✅ ' + message);
+            Toast.success(message);
             location.reload(); // 페이지 새로고침
         } else {
             // 오류 메시지가 문자열인지 확인
             const message = typeof result.message === 'string' ? result.message : '처리 중 오류가 발생했습니다.';
-            Toast.error('❌ ' + message);
+            Toast.error(message);
         }
-        
+
     } catch (error) {
         // 네트워크 오류와 기타 오류를 구분
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            Toast.error('❌ 네트워크 연결을 확인해주세요.');
+            Toast.error('네트워크 연결을 확인해주세요.');
         } else {
-            Toast.error('❌ 처리 중 오류가 발생했습니다.');
+            Toast.error('처리 중 오류가 발생했습니다.');
         }
     } finally {
-        button.textContent = originalText;
+        button.innerHTML = originalHtml;
         button.disabled = false;
         closeStatusModal();
     }

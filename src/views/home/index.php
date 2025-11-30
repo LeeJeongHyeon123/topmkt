@@ -25,7 +25,7 @@ require_once SRC_PATH . '/views/templates/header.php';
     <div class="container">
         <div class="hero-content">
             <div class="hero-badge">
-                <span class="badge-icon">🚀</span>
+                <i data-lucide="rocket" width="20" height="20" class="badge-icon"></i>
                 <span class="badge-text">네트워크 마케팅의 새로운 패러다임</span>
             </div>
             <h1 class="hero-title">
@@ -127,7 +127,7 @@ require_once SRC_PATH . '/views/templates/header.php';
     </div>
 </section>
 
-<!-- 🚀 로켓 애니메이션 CSS -->
+<!-- 로켓 애니메이션 CSS -->
 <style>
 /* 기본 레이아웃 및 반응형 스타일 */
 * {
@@ -371,7 +371,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 }
 
 .rocket-launch-btn::after {
-    content: '💨';
+    content: '';
     position: absolute;
     left: -30px;
     top: 50%;
@@ -488,7 +488,7 @@ require_once SRC_PATH . '/views/templates/header.php';
 }
 
 .rocket-launch-btn:active::after {
-    content: '💨💨💨';
+    content: '';
     left: -40px;
     font-size: 1rem;
     animation: intenseSmokeTrail 0.4s ease-in-out infinite;

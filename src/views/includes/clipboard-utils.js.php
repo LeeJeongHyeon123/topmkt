@@ -39,16 +39,16 @@
      *
      * @param {string} text - 복사할 텍스트
      * @param {Object} options - 옵션 객체
-     * @param {string} options.successMessage - 성공 시 Toast 메시지 (기본: '✅ 복사되었습니다!')
-     * @param {string} options.errorMessage - 실패 시 Toast 메시지 (기본: '❌ 복사에 실패했습니다')
+     * @param {string} options.successMessage - 성공 시 Toast 메시지 (기본: '복사되었습니다!')
+     * @param {string} options.errorMessage - 실패 시 Toast 메시지 (기본: '복사에 실패했습니다')
      * @param {boolean} options.noToast - Toast 표시 비활성화 (기본: false)
      * @returns {Promise<void>} 복사 성공/실패 Promise
      */
     window.copyToClipboard = function(text, options = {}) {
         // 옵션 기본값 설정
         const config = {
-            successMessage: options.successMessage || '✅ 복사되었습니다!',
-            errorMessage: options.errorMessage || '❌ 복사에 실패했습니다',
+            successMessage: options.successMessage || '복사되었습니다!',
+            errorMessage: options.errorMessage || '복사에 실패했습니다',
             noToast: options.noToast || false
         };
 

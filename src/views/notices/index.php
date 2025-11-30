@@ -233,6 +233,14 @@ a.btn-write:active {
     border-left: 4px solid #2563eb;
 }
 
+.board-stats i[data-lucide] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
 .stats-text {
     color: #4a5568;
     font-size: 14px;
@@ -341,6 +349,12 @@ a.btn-write:active {
     margin-bottom: 10px;
 }
 
+.notice-meta i[data-lucide] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
 .notice-company {
     font-weight: 600;
     color: #4a5568;
@@ -373,6 +387,12 @@ a.btn-write:active {
     display: flex;
     align-items: center;
     gap: 4px;
+}
+
+.stat-item i[data-lucide] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 .pagination {
@@ -417,6 +437,16 @@ a.btn-write:active {
     color: #718096;
 }
 
+.empty-state i[data-lucide] {
+    width: 72px !important;
+    height: 72px !important;
+    margin-bottom: 20px;
+    color: #cbd5e0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .empty-state i {
     font-size: 3rem;
     margin-bottom: 20px;
@@ -457,6 +487,12 @@ a.btn-write:active {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.search-performance i[data-lucide] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 /* 검색 결과 요약 */
@@ -707,7 +743,7 @@ body {
     <!-- 검색 성능 정보 -->
     <?php if (!empty($search)): ?>
         <div class="search-performance">
-            <span class="icon">⚡</span>
+            <i data-lucide="zap" width="16" height="16" style="display: inline;"></i>
             <span>검색 완료: <?= $searchTime ?>ms | 총 <?= number_format($totalCount) ?>건 발견</span>
             <?php if ($totalCount > $pageSize): ?>
                 <span style="margin-left: 8px; opacity: 0.7;">
@@ -746,7 +782,7 @@ body {
     <!-- 게시판 통계 -->
     <div class="board-stats">
         <p class="stats-text">
-            📊 총 <strong><?= number_format($totalCount) ?></strong>개의 공지사항이 있습니다
+            <i data-lucide="bar-chart-2" width="16" height="16" style="display: inline; margin-right: 4px;"></i>총 <strong><?= number_format($totalCount) ?></strong>개의 공지사항이 있습니다
             <?php if (!empty($search) || !empty($company)): ?>
                 (검색/필터 결과)
             <?php endif; ?>
@@ -796,8 +832,8 @@ body {
                         </div>
                         
                         <div class="notice-meta">
-                            <span class="notice-company">🏢 <?= htmlspecialchars($notice['company_name']) ?></span>
-                            <span class="notice-date">📅 <?= date('Y-m-d H:i', strtotime($notice['created_at'])) ?></span>
+                            <span class="notice-company"><i data-lucide="building-2" width="16" height="16" style="display: inline; margin-right: 4px;"></i><?= htmlspecialchars($notice['company_name']) ?></span>
+                            <span class="notice-date"><i data-lucide="calendar" width="16" height="16" style="display: inline; margin-right: 4px;"></i><?= date('Y-m-d H:i', strtotime($notice['created_at'])) ?></span>
                         </div>
                         
                         <div class="notice-content-preview">
@@ -824,10 +860,10 @@ body {
                         
                         <div class="notice-stats">
                             <span class="stat-item">
-                                👁️ <?= number_format($notice['view_count'] ?? 0) ?>
+                                <i data-lucide="eye" width="16" height="16" style="display: inline; margin-right: 4px;"></i><?= number_format($notice['view_count'] ?? 0) ?>
                             </span>
                             <span class="stat-item">
-                                💬 <?= number_format($notice['comment_count'] ?? 0) ?>
+                                <i data-lucide="message-circle" width="16" height="16" style="display: inline; margin-right: 4px;"></i><?= number_format($notice['comment_count'] ?? 0) ?>
                             </span>
                         </div>
                     </div>
@@ -861,7 +897,7 @@ body {
                 </h3>
                 <p>
                     <?php if (!empty($search)): ?>
-                        💡 검색 팁:<br>
+                        <i data-lucide="lightbulb" width="16" height="16" style="display: inline; margin-right: 4px;"></i>검색 팁:<br>
                         • 검색어의 철자를 확인해보세요<br>
                         • 더 간단한 키워드로 다시 검색해보세요<br>
                         • 전체 기업에서 검색해보세요

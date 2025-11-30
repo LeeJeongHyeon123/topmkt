@@ -114,7 +114,7 @@ $additional_styles = '
 }
 
 /* 필터 섹션 */
-/* 🚀 v3.37.0: 필터 CSS는 이제 /assets/css/search-filter.css에서 통합 관리 */
+/* 🚀 v3.37.0 (rocket): 필터 CSS는 이제 /assets/css/search-filter.css에서 통합 관리 */
 /* .filters-section, .filters-header 등은 SearchFilter 컴포넌트에서 자동 제공 */
 
 /* 테이블 섹션 */
@@ -227,7 +227,7 @@ $additional_styles = '
     text-transform: uppercase;
 }
 
-/* 🚀 v3.28.0: 상태 배지 스타일은 /assets/css/badges.css에서 통합 관리 */
+/* 🚀 v3.28.0 (rocket): 상태 배지 스타일은 /assets/css/badges.css에서 통합 관리 */
 
 .role-badge {
     padding: 4px 8px;
@@ -415,10 +415,7 @@ $additional_styles = '
 }
 
 .loading::before {
-    content: "⏳";
-    font-size: 24px;
-    display: block;
-    margin-bottom: 12px;
+    display: none; /* clock 아이콘은 HTML에서 처리 */
 }
 
 /* 빈 상태 */
@@ -429,15 +426,12 @@ $additional_styles = '
 }
 
 .empty-state::before {
-    content: "📋";
-    font-size: 48px;
-    display: block;
-    margin-bottom: 16px;
+    display: none; /* clipboard-list 아이콘은 HTML에서 처리 */
 }
 
 /* 반응형 */
 @media (max-width: 1200px) {
-    /* 🚀 v3.37.0: .filters-grid는 SearchFilter 컴포넌트에서 자동 관리 */
+    /* 🚀 v3.37.0 (rocket): .filters-grid는 SearchFilter 컴포넌트에서 자동 관리 */
     /* .filters-grid { grid-template-columns: repeat(3, 1fr); } */
 
     .stats-row {
@@ -446,7 +440,7 @@ $additional_styles = '
 }
 
 @media (max-width: 768px) {
-    /* 🚀 v3.37.0: .filters-grid, .search-row는 SearchFilter 컴포넌트에서 자동 관리 */
+    /* 🚀 v3.37.0 (rocket): .filters-grid, .search-row는 SearchFilter 컴포넌트에서 자동 관리 */
     /* .filters-grid { grid-template-columns: 1fr; } */
     /* .search-row { grid-template-columns: 1fr; } */
 
@@ -616,7 +610,7 @@ $content .= SearchFilter::create([
             'resetText' => '<i data-lucide="rotate-ccw" width="20" height="20"></i> 초기화',
             'collapsible' => true,
             'collapsed' => false,
-            'title' => '🔍 필터 및 검색',
+            'title' => '<i data-lucide="search" width="16" height="16"></i> 필터 및 검색',
             'onSubmit' => 'applyFilters()',
             'onReset' => 'resetFilters()',
             'cssClass' => 'admin-users-filter'
@@ -846,7 +840,8 @@ async function loadUsersData(page = 1) {
         Toast.error('사용자 데이터를 불러올 수 없습니다.\n잠시 후 다시 시도해주세요.');
         tableContainer.innerHTML = `
             <div class="empty-state">
-                <div>❌ 데이터 로드에 실패했습니다</div>
+                <i data-lucide="x" width="48" height="48" style="color: #e53e3e; display: block; margin-bottom: 16px;"></i>
+                <div>데이터 로드에 실패했습니다</div>
                 <div style="font-size: 14px; margin-top: 8px;">${error.message}</div>
                 <button class="btn btn-primary" onclick="loadUsersData(${page})" style="margin-top: 16px;">다시 시도</button>
             </div>
@@ -907,8 +902,9 @@ function renderUsersTable(data) {
                         </td>
                         <td>
                             <div class="user-phone">${formatPhone(decryptIfNeeded(user.phone))}</div>
-                            <div style="font-size: 11px; color: #718096;">
-                                ${user.phone_verified ? "📱 인증됨" : "📱 미인증"}
+                            <div style="font-size: 11px; color: #718096; display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                                <i data-lucide="phone" width="14" height="14"></i>
+                                ${user.phone_verified ? "인증됨" : "미인증"}
                             </div>
                         </td>
                         <td>
@@ -943,16 +939,16 @@ function renderUsersTable(data) {
                         <td>
                             <div class="action-buttons">
                                 <button class="action-btn btn-view" onclick="viewUserDetail(${user.id})" title="상세보기">
-                                    👁️
+                                    <i data-lucide="eye" width="16" height="16"></i>
                                 </button>
                                 <button class="action-btn btn-edit" onclick="openStatusChangeModal(${user.id}, \"${user.status}\")" title="상태변경">
-                                    ⚙️
+                                    <i data-lucide="settings" width="16" height="16"></i>
                                 </button>
                                 <button class="action-btn btn-edit" onclick="openRoleChangeModal(${user.id}, \"${user.role}\")" title="권한변경">
-                                    🔑
+                                    <i data-lucide="key" width="16" height="16"></i>
                                 </button>
                                 <button class="action-btn btn-view" onclick="openNotifyModal(${user.id})" title="알림발송">
-                                    📨
+                                    <i data-lucide="mail" width="16" height="16"></i>
                                 </button>
                             </div>
                         </td>
@@ -1373,8 +1369,8 @@ function isBase64(str) {
     }
 }
 
-// 🚀 v3.63.0: formatNumber, formatPhone은 utils.js.php 통합 시스템 사용 (admin_layout.php 전역 로드)
-// 🚀 v3.62.0: formatDate는 date-utils.js.php 통합 시스템 사용 (footer.php 전역 로드)
+// 🚀 v3.63.0 (rocket): formatNumber, formatPhone은 utils.js.php 통합 시스템 사용 (admin_layout.php 전역 로드)
+// 🚀 v3.62.0 (rocket): formatDate는 date-utils.js.php 통합 시스템 사용 (footer.php 전역 로드)
 
 function getStatusText(status) {
     const statusMap = {

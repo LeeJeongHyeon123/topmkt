@@ -420,7 +420,7 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
 
     <!-- 작성 안내 팁 -->
     <div class="form-tips">
-        <h4>💡 공지사항 작성 가이드</h4>
+        <h4><i data-lucide="lightbulb" width="18" height="18" style="display: inline; margin-right: 6px; vertical-align: middle;"></i> 공지사항 작성 가이드</h4>
         <ul>
             <li>명확하고 간결한 제목을 작성해주세요</li>
             <li>이미지는 최대 5개까지 첨부 가능합니다</li>
@@ -461,7 +461,7 @@ $submitText = $isEdit ? '수정하기' : '작성하기';
                       name="content" 
                       style="display: none;" 
                       required><?= $isEdit ? htmlspecialchars($notice['content'] ?? '') : '' ?></textarea>
-            <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
+            <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;"><i data-lucide="camera" width="16" height="16" style="display: inline; margin-right: 4px; vertical-align: middle;"></i> 이미지: 0 / 20</div>
         </div>
         
         <!-- 이미지 업로드 -->
@@ -657,17 +657,21 @@ function updateImageCounter() {
     
     if (currentImages >= 18) { // 90% 이상
         counterClass = 'error'; // 빨간색
-        warningText = ' ⚠️';
+        warningText = ' <i data-lucide="alert-triangle" width="14" height="14" style="display: inline; vertical-align: middle;"></i>';
     } else if (currentImages >= 15) { // 75% 이상
         counterClass = 'warning'; // 주황색
-        warningText = ' ⚠️';
+        warningText = ' <i data-lucide="alert-triangle" width="14" height="14" style="display: inline; vertical-align: middle;"></i>';
     } else {
         counterClass = ''; // 기본 색상
     }
     
     imageCounter.className = `char-counter ${counterClass}`;
-    imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
-    
+    imageCounter.innerHTML = `<i data-lucide="camera" width="16" height="16" style="display: inline; margin-right: 4px; vertical-align: middle;"></i> 이미지: ${currentImages} / ${maxImages}${warningText}`;
+
+    // Lucide 아이콘 재렌더링
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 // Quill 에디터 초기화

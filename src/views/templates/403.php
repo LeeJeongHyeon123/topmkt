@@ -185,7 +185,7 @@ require_once SRC_PATH . '/views/templates/header.php';
         </div>
         
         <div class="permission-info">
-            <h3>🔒 접근 제한 안내</h3>
+            <h3><i data-lucide="lock" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>접근 제한 안내</h3>
             <p>
                 이 기능은 특정 권한을 가진 회원만 사용할 수 있습니다.<br>
                 현재 회원 등급으로는 접근이 제한됩니다.
@@ -194,17 +194,17 @@ require_once SRC_PATH . '/views/templates/header.php';
         
         <?php if (strpos($page_description, '기업회원') !== false): ?>
         <div class="upgrade-info">
-            <h3>🏢 기업회원 혜택</h3>
+            <h3><i data-lucide="building" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>기업회원 혜택</h3>
             <p><strong>기업회원으로 업그레이드하시면 다음 기능을 이용하실 수 있습니다:</strong></p>
             <ul>
-                <li>📚 강의 및 세미나 등록</li>
-                <li>🎯 회사 소개 및 비전 게시판 작성</li>
-                <li>🤝 파트너 매칭 서비스 이용</li>
-                <li>✨ 기업 인증 배지 제공</li>
-                <li>📧 참가자 대상 이메일/SMS 발송</li>
+                <li><i data-lucide="book-open" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>강의 및 세미나 등록</li>
+                <li><i data-lucide="target" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>회사 소개 및 비전 게시판 작성</li>
+                <li><i data-lucide="handshake" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>파트너 매칭 서비스 이용</li>
+                <li><i data-lucide="star" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>기업 인증 배지 제공</li>
+                <li><i data-lucide="mail" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>참가자 대상 이메일/SMS 발송</li>
             </ul>
             <p style="margin-top: 15px; font-size: 0.9rem; color: #718096;">
-                💡 기업회원 인증은 사업자등록증 제출 후 관리자 승인을 통해 진행됩니다.
+                <i data-lucide="lightbulb" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i>기업회원 인증은 사업자등록증 제출 후 관리자 승인을 통해 진행됩니다.
             </p>
         </div>
         <?php endif; ?>

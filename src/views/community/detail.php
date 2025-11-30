@@ -474,7 +474,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
     <div class="detail-navigation">
         
         <div class="breadcrumb">
-            <a href="<?= htmlspecialchars($listUrl) ?>">📋 커뮤니티</a>
+            <a href="<?= htmlspecialchars($listUrl) ?>"><i class="lucide lucide-clipboard-list"></i> 커뮤니티</a>
             <span>›</span>
             <span>게시글 보기</span>
         </div>
@@ -512,7 +512,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                     <span><strong><?= htmlspecialchars($authorName) ?></strong></span>
                 </div>
                 <div class="meta-item">
-                    📅 <?= date('Y년 m월 d일 H:i', strtotime($post['created_at'])) ?>
+                    <i class="lucide lucide-calendar" style="width: 18px; height: 18px;"></i> <?= date('Y년 m월 d일 H:i', strtotime($post['created_at'])) ?>
                 </div>
             </div>
         </div>
@@ -522,7 +522,7 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
             <!-- 디버깅 정보 (임시) -->
             <?php if (isset($_GET['debug'])): ?>
                 <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 3px solid #007cba;">
-                    <h4>🔍 디버깅 정보</h4>
+                    <h4><i class="lucide lucide-search" style="width: 18px; height: 18px; vertical-align: middle;"></i> 디버깅 정보</h4>
                     <p><strong>원본 Content:</strong></p>
                     <pre style="background: white; padding: 10px; font-size: 12px; overflow-x: auto;"><?= htmlspecialchars($post['content']) ?></pre>
                     <p><strong>Sanitized Content:</strong></p>
@@ -540,13 +540,13 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
             <!-- 통계 -->
             <div class="post-stats">
                 <div class="stat-item">
-                    👁️ 조회 <?= number_format($post['view_count'] ?? 0) ?>
+                    <i class="lucide lucide-eye" style="width: 18px; height: 18px;"></i> 조회 <?= number_format($post['view_count'] ?? 0) ?>
                 </div>
                 <div class="stat-item">
-                    💬 댓글 <?= number_format($post['comment_count'] ?? 0) ?>
+                    <i class="lucide lucide-message-circle" style="width: 18px; height: 18px;"></i> 댓글 <?= number_format($post['comment_count'] ?? 0) ?>
                 </div>
                 <div class="stat-item">
-                    ❤️ 좋아요 <?= number_format($post['like_count'] ?? 0) ?>
+                    <i class="lucide lucide-heart" style="width: 18px; height: 18px;"></i> 좋아요 <?= number_format($post['like_count'] ?? 0) ?>
                 </div>
             </div>
             
@@ -554,20 +554,23 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
             <div class="post-actions">
                 <?php if ($isLoggedIn): ?>
                     <?= renderButton(
-                        ($isLiked ? '❤️' : '🤍') . ' 좋아요 ' . $post['like_count'],
+                        '좋아요 ' . $post['like_count'],
                         'primary',
                         'md',
                         [
                             'id' => 'likeBtn',
-                            'class' => $isLiked ? 'liked' : ''
+                            'class' => $isLiked ? 'liked' : '',
+                            'icon' => $isLiked ? 'heart' : 'heart'
                         ]
                     ) ?>
-                    <?= renderButton('📤 공유', 'success', 'md', [
-                        'id' => 'shareBtn'
+                    <?= renderButton('공유', 'success', 'md', [
+                        'id' => 'shareBtn',
+                        'icon' => 'share-2'
                     ]) ?>
                     <?php if (!$isOwner && isset($post['user_id']) && $post['user_id']): ?>
-                        <?= renderButton('💬 채팅하기', 'info', 'md', [
+                        <?= renderButton('채팅하기', 'info', 'md', [
                             'id' => 'chatBtn',
+                            'icon' => 'message-circle',
                             'attributes' => [
                                 'data-author-id' => htmlspecialchars($post['user_id']),
                                 'data-author-name' => htmlspecialchars($authorName)
@@ -578,15 +581,16 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
                 
                 <?php if ($isOwner): ?>
                     <a href="/community/posts/<?= $post['id'] ?>/edit" class="btn btn-warning">
-                        ✏️ 수정
+                        <i class="lucide lucide-pencil" style="width: 20px; height: 20px;"></i> 수정
                     </a>
-                    <?= renderButton('🗑️ 삭제', 'danger', 'md', [
-                        'id' => 'deleteBtn'
+                    <?= renderButton('삭제', 'danger', 'md', [
+                        'id' => 'deleteBtn',
+                        'icon' => 'trash-2'
                     ]) ?>
                 <?php endif; ?>
                 
                 <a href="<?= htmlspecialchars($listUrl) ?>" class="btn btn-secondary">
-                    📋 목록으로
+                    <i class="lucide lucide-clipboard-list" style="width: 20px; height: 20px;"></i> 목록으로
                 </a>
             </div>
         </div>
@@ -620,9 +624,10 @@ include SRC_PATH . '/views/components/profile-modal-resources.php';
 </div>
 
 <!-- 목록으로 돌아가기 플로팅 버튼 -->
-<?= renderButton('📋', 'secondary', 'md', [
+<?= renderButton('', 'secondary', 'md', [
     'id' => 'backToListBtn',
     'class' => 'back-to-list',
+    'icon' => 'clipboard-list',
     'ariaLabel' => '목록으로 돌아가기'
 ]) ?>
 
@@ -684,9 +689,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const buttonElement = this; // this 컨텍스트 저장
 
             // 로딩 상태 표시
-            const originalText = buttonElement.textContent;
+            const originalHTML = buttonElement.innerHTML;
             buttonElement.disabled = true;
-            buttonElement.textContent = '🔄 처리 중...';
+            buttonElement.innerHTML = '<i class="lucide lucide-refresh-cw" style="width: 20px; height: 20px; animation: spin 0.6s linear infinite;"></i> 처리 중...';
+
+            // 로딩 애니메이션 CSS 추가
+            if (!document.getElementById('lucide-spin-animation')) {
+                const style = document.createElement('style');
+                style.id = 'lucide-spin-animation';
+                style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
 
             // v3.42.0: ApiClient 사용
             ApiClient.post(`/api/posts/${postId}/like`, {}, { noLoading: true })
@@ -699,10 +712,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // 좋아요 상태에 따라 버튼 텍스트 및 스타일 변경
                     if (data.data.action === 'liked') {
-                        buttonElement.textContent = '❤️ 좋아요 ' + formattedCount;
+                        buttonElement.innerHTML = '<i class="lucide lucide-heart" style="width: 20px; height: 20px;"></i> 좋아요 ' + formattedCount;
                         buttonElement.classList.add('liked');
                     } else if (data.data.action === 'unliked') {
-                        buttonElement.textContent = '🤍 좋아요 ' + formattedCount;
+                        buttonElement.innerHTML = '<i class="lucide lucide-heart" style="width: 20px; height: 20px;"></i> 좋아요 ' + formattedCount;
                         buttonElement.classList.remove('liked');
                     }
 
@@ -710,19 +723,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     const likeStats = document.querySelectorAll('.stat-item');
                     likeStats.forEach(stat => {
                         if (stat.textContent.includes('좋아요')) {
-                            stat.textContent = '❤️ 좋아요 ' + formattedCount;
+                            stat.innerHTML = '<i class="lucide lucide-heart" style="width: 18px; height: 18px;"></i> 좋아요 ' + formattedCount;
                         }
                     });
 
                     Toast.success(data.message || '처리되었습니다.');
                 } else {
                     Toast.error(data.message || '좋아요 처리 중 오류가 발생했습니다.');
-                    buttonElement.textContent = originalText;
+                    buttonElement.innerHTML = originalHTML;
                 }
             })
             .catch(error => {
                 Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
-                buttonElement.textContent = originalText;
+                buttonElement.innerHTML = originalHTML;
             })
             .finally(() => {
                 buttonElement.disabled = false;
@@ -742,9 +755,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     url: window.location.href
                 }).catch(() => {}); // 에러 무시
             } else {
-                // 🚀 Phase 8: navigator.clipboard → copyToClipboard 사용
+                // Phase 8: navigator.clipboard → copyToClipboard 사용
                 copyToClipboard(window.location.href, {
-                    successMessage: '게시글 링크가 클립보드에 복사되었습니다! 📋'
+                    successMessage: '게시글 링크가 클립보드에 복사되었습니다!'
                 });
             }
         });
@@ -760,7 +773,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 로딩 표시
             deleteBtn.disabled = true;
-            deleteBtn.innerHTML = '🔄 삭제 중...';
+            const originalDeleteHTML = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<i class="lucide lucide-refresh-cw" style="width: 20px; height: 20px; animation: spin 0.6s linear infinite;"></i> 삭제 중...';
             
             // CSRF 토큰 가져오기
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -781,13 +795,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     Toast.error(response.message || '삭제 중 오류가 발생했습니다.');
                     deleteBtn.disabled = false;
-                    deleteBtn.innerHTML = '🗑️ 삭제';
+                    deleteBtn.innerHTML = originalDeleteHTML;
                 }
             })
             .catch(error => {
                 Toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 deleteBtn.disabled = false;
-                deleteBtn.innerHTML = '🗑️ 삭제';
+                deleteBtn.innerHTML = originalDeleteHTML;
             });
         });
     }

@@ -23,7 +23,7 @@ ob_start();
 
 <div class="admin-content">
     <div class="page-header">
-        <h1>👥 회원 관리</h1>
+        <h1><i data-lucide="users" width="24" height="24" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>회원 관리</h1>
         <p>등록된 회원들을 관리하고 모니터링하세요</p>
     </div>
 
@@ -105,7 +105,7 @@ ob_start();
 <div id="userDetailModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>👤 사용자 상세 정보</h2>
+            <h2><i data-lucide="user" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>사용자 상세 정보</h2>
             <button class="modal-close" onclick="closeUserDetailModal()">&times;</button>
         </div>
         <div class="modal-body">
@@ -567,8 +567,8 @@ function renderUsersTable(users) {
             <td>${formatDate(user.created_at)}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="action-btn btn-view" onclick="viewUserDetail(${user.id})" title="상세보기">👁️</button>
-                    <button class="action-btn btn-edit" onclick="editUser(${user.id})" title="편집">✏️</button>
+                    <button class="action-btn btn-view" onclick="viewUserDetail(${user.id})" title="상세보기"><i data-lucide="eye" width="16" height="16"></i></button>
+                    <button class="action-btn btn-edit" onclick="editUser(${user.id})" title="편집"><i data-lucide="edit" width="16" height="16"></i></button>
                 </div>
             </td>
         </tr>
@@ -637,8 +637,8 @@ async function viewUserDetail(userId) {
         renderUserDetail(data.data || data);
         
     } catch (error) {
-        document.getElementById('userDetailContent').innerHTML = 
-            '<div class="no-data-message"><p>❌ 사용자 정보를 불러올 수 없습니다</p><p><strong>오류:</strong> ' + error.message + '</p></div>';
+        document.getElementById('userDetailContent').innerHTML =
+            '<div class="no-data-message"><p>사용자 정보를 불러올 수 없습니다</p><p><strong>오류:</strong> ' + error.message + '</p></div>';
     }
 }
 
@@ -658,7 +658,7 @@ function renderUserDetail(user) {
         '</div>' +
         
         '<div class="user-detail-section">' +
-            '<h3>📋 기본 정보</h3>' +
+            '<h3><i data-lucide="clipboard" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>기본 정보</h3>' +
             '<div class="detail-grid">' +
                 '<div class="detail-item"><div class="detail-label">사용자 ID</div><div class="detail-value">' + user.id + '</div></div>' +
                 '<div class="detail-item"><div class="detail-label">닉네임</div><div class="detail-value">' + escapeHtml(user.nickname) + '</div></div>' +
@@ -670,7 +670,7 @@ function renderUserDetail(user) {
         '</div>' +
         
         '<div class="user-detail-section">' +
-            '<h3>🏢 기업 정보</h3>' +
+            '<h3><i data-lucide="briefcase" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>기업 정보</h3>' +
             '<div class="detail-grid">' +
                 '<div class="detail-item"><div class="detail-label">기업 상태</div><div class="detail-value">' + getCorpStatusText(user.corp_status) + '</div></div>' +
                 (user.company_name ? '<div class="detail-item"><div class="detail-label">회사명</div><div class="detail-value">' + escapeHtml(user.company_name) + '</div></div>' : '') +
@@ -680,7 +680,7 @@ function renderUserDetail(user) {
         '</div>' +
         
         '<div class="user-detail-section">' +
-            '<h3>📊 활동 통계</h3>' +
+            '<h3><i data-lucide="bar-chart-2" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>활동 통계</h3>' +
             '<div class="detail-grid">' +
                 '<div class="detail-item"><div class="detail-label">게시글 수</div><div class="detail-value">' + (user.post_count || 0) + '개</div></div>' +
                 '<div class="detail-item"><div class="detail-label">댓글 수</div><div class="detail-value">' + (user.comment_count || 0) + '개</div></div>' +

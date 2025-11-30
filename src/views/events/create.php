@@ -113,7 +113,8 @@ window.getCoordinates = function(address) {
                         longitude: lng
                     });
                     
-                    updateCoordinateStatus('✅ 주소 위치가 정상적으로 설정되었습니다', true);
+                    updateCoordinateStatus('<i data-lucide="check-circle" width="16" height="16" style="display: inline-block; vertical-align: text-bottom;"></i> 주소 위치가 정상적으로 설정되었습니다', true);
+                    lucide.createIcons();
                     return;
                 }
             }
@@ -142,7 +143,8 @@ window.getCoordinates = function(address) {
                     addressField.style.borderColor = '#f97316';
                 }
                 
-                updateCoordinateStatus('⚠️ 근사 위치로 설정되었습니다 (지역: ' + regionCoordinates.region + ')', true);
+                updateCoordinateStatus('<i data-lucide="alert-triangle" width="16" height="16" style="display: inline-block; vertical-align: text-bottom;"></i> 근사 위치로 설정되었습니다 (지역: ' + regionCoordinates.region + ')', true);
+                lucide.createIcons();
             } else {
                 // Fallback도 실패한 경우
                 document.getElementById('venue_latitude').value = '';
@@ -155,14 +157,16 @@ window.getCoordinates = function(address) {
                     addressField.style.borderColor = '#ef4444';
                 }
                 
-                updateCoordinateStatus('❌ 주소 위치를 찾을 수 없습니다', false);
+                updateCoordinateStatus('<i data-lucide="x-circle" width="16" height="16" style="display: inline-block; vertical-align: text-bottom;"></i> 주소 위치를 찾을 수 없습니다', false);
+                lucide.createIcons();
                 Toast.error('주소의 정확한 좌표를 찾을 수 없습니다.\n다른 주소를 시도해보세요.');
             }
         });
     } else {
         // 네이버 Maps API가 로드되지 않은 경우
         console.error('네이버 Maps API가 로드되지 않았습니다');
-        updateCoordinateStatus('❌ 지도 API 로드 실패', false);
+        updateCoordinateStatus('<i data-lucide="x-circle" width="16" height="16" style="display: inline-block; vertical-align: text-bottom;"></i> 지도 API 로드 실패', false);
+        lucide.createIcons();
         Toast.error('지도 서비스를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
     }
 };
@@ -183,7 +187,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }).catch(error => {
         console.error('네이버 Maps API 로딩 실패:', error);
         Toast.warning('지도 기능을 불러올 수 없습니다.\n주소 검색은 정상 작동합니다.');
-        updateCoordinateStatus('❌ 지도 API 로딩 실패', false);
+        updateCoordinateStatus('<i data-lucide="x-circle" width="16" height="16" style="display: inline-block; vertical-align: text-bottom;"></i> 지도 API 로딩 실패', false);
+        lucide.createIcons();
     });
 });
 </script>
@@ -805,7 +810,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div id="descriptionCounter" class="character-counter" style="margin-top: 8px;">
                     <span id="description-counter">0</span><span class="counter-limit">/10,000자 (최소 10자)</span>
                 </div>
-                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500; margin-top: 8px;">📷 이미지: 0 / 20</div>
+                <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500; margin-top: 8px;"><i data-lucide="camera" width="16" height="16"></i> 이미지: 0 / 20</div>
                 <textarea name="description" id="description" style="display: none;"></textarea>
             </div>
         </div>
@@ -872,10 +877,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="location-toggle">
                 <input type="radio" id="offline" name="location_type" value="offline" checked>
-                <label for="offline">🏢 오프라인 행사</label>
-                
+                <label for="offline"><i data-lucide="building-2" width="18" height="18"></i> 오프라인 행사</label>
+
                 <input type="radio" id="online" name="location_type" value="online">
-                <label for="online">💻 온라인 행사</label>
+                <label for="online"><i data-lucide="laptop" width="18" height="18"></i> 온라인 행사</label>
             </div>
 
             <div id="offline-fields" class="location-fields active">
@@ -892,7 +897,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                placeholder="주소 검색 버튼을 클릭하세요" readonly
                                value="<?= $isEditMode ? htmlspecialchars($event['venue_address'] ?? '', ENT_QUOTES, 'UTF-8') : '' ?>">
                         <button type="button" id="address_search_btn" class="address-search-btn">
-                            🔍 주소 검색
+                            <i data-lucide="search" width="16" height="16"></i> 주소 검색
                         </button>
                     </div>
                     <div class="help-text">정확한 주소를 입력하면 참가자들이 쉽게 찾아올 수 있습니다.</div>
@@ -979,7 +984,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <label class="form-label">행사 홍보 이미지</label>
                 <div class="image-upload-area" onclick="document.getElementById('event_images').click()">
                     <div class="upload-placeholder">
-                        <div class="upload-icon">📷</div>
+                        <div class="upload-icon"><i data-lucide="camera" width="48" height="48"></i></div>
                         <p>클릭하여 이미지 업로드</p>
                         <div class="upload-help">JPG, PNG, GIF, WebP (최대 30MB)</div>
                     </div>
@@ -1105,7 +1110,7 @@ function initializeForm() {
         });
         
         // 디버깅을 위한 로그
-        console.log('📤 FormData 전송:', {
+        console.log('FormData 전송:', {
             hasEventImages: uploadedEventImages.length > 0,
             eventImagesCount: uploadedEventImages.length,
             formAction: form.action
@@ -1252,7 +1257,7 @@ function imageHandler() {
             formData.append('csrf_token', csrfTokenElement.value);
             formData.append('upload_type', 'events');
             
-            console.log('🔄 이미지 업로드 시작:', file.name, 'Size:', file.size);
+            console.log('이미지 업로드 시작:', file.name, 'Size:', file.size);
 
             // v3.42.0: ApiClient 사용 (FormData는 자동으로 multipart/form-data로 처리)
             const result = await ApiClient.post('/api/media/upload-image', formData, {
@@ -1272,7 +1277,7 @@ function imageHandler() {
                 // 이미지 삽입
                 quill.insertEmbed(range.index, 'image', result.data.url);
                 quill.setSelection(range.index + 1);
-                console.log('✅ 이미지 업로드 성공:', result.data.url);
+                console.log('이미지 업로드 성공:', result.data.url);
                 
                 // 이미지 카운터 업데이트
                 window.updateImageCounter();
@@ -1281,7 +1286,7 @@ function imageHandler() {
             }
             
         } catch (error) {
-            console.error('❌ 이미지 업로드 오류 상세:', error);
+            console.error('이미지 업로드 오류 상세:', error);
             
             // 업로드 중 텍스트 제거 (오류 발생 시)
             if (loadingTextInserted && range && typeof quill !== 'undefined' && quill) {
@@ -1415,7 +1420,7 @@ function initializeImageUpload() {
                     file: file // 실제 파일 객체 저장
                 });
                 
-                console.log('📷 이미지 추가됨:', {
+                console.log('이미지 추가됨:', {
                     filename: file.name,
                     size: file.size,
                     type: file.type,
@@ -1540,7 +1545,7 @@ function addInstructor() {
             <label class="form-label">강사 프로필 이미지</label>
             <div class="instructor-image-container" onclick="document.getElementById('instructor_image_${instructorIndex}').click()">
                 <div class="instructor-image-placeholder">
-                    <div style="font-size: 1.5rem; margin-bottom: 5px;">👤</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 5px;"><i data-lucide="user" width="36" height="36"></i></div>
                     <div>이미지 선택</div>
                 </div>
             </div>
@@ -1806,7 +1811,8 @@ window.updateImageCounter = function() {
         const currentImages = window.quill.container.querySelectorAll('img').length;
         
         // 카운터 텍스트 업데이트
-        imageCounter.innerHTML = `📷 이미지: ${currentImages} / 20`;
+        imageCounter.innerHTML = `<i data-lucide="camera" width="16" height="16"></i> 이미지: ${currentImages} / 20`;
+        lucide.createIcons();
         
         // 카운터 색상 변경 (경고 표시)
         if (currentImages >= 18) {
@@ -1820,7 +1826,7 @@ window.updateImageCounter = function() {
             imageCounter.style.fontWeight = '500';
         }
         
-        console.log(`📷 이미지 카운터 업데이트: ${currentImages}/20`);
+        console.log(`이미지 카운터 업데이트: ${currentImages}/20`);
     }
 };
 
@@ -1830,7 +1836,7 @@ setTimeout(() => {
         window.quill.on('text-change', function(delta, oldDelta, source) {
             const currentImages = window.quill.container.querySelectorAll('img').length;
             if (currentImages > 20) {
-                console.log(`⚠️ 이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
+                console.log(`이미지 개수 초과: ${currentImages}개 → 20개로 제한`);
                 const images = window.quill.container.querySelectorAll('img');
                 for (let i = 20; i < images.length; i++) {
                     images[i].remove();
@@ -1844,9 +1850,9 @@ setTimeout(() => {
         // 초기 이미지 카운터 업데이트
         window.updateImageCounter();
         
-        console.log('✅ 이벤트 생성 페이지 - 이미지 제한 시스템 초기화 완료');
+        console.log('이벤트 생성 페이지 - 이미지 제한 시스템 초기화 완료');
     } else {
-        console.error('❌ Quill 에디터가 초기화되지 않았습니다.');
+        console.error('Quill 에디터가 초기화되지 않았습니다.');
         Toast.error('에디터 초기화에 실패했습니다.\n페이지를 새로고침해주세요.');
     }
 }, 1500);
@@ -1975,7 +1981,7 @@ async function removeExistingImage(button, imageId) {
         // UI에서 이미지 제거
         parentElement.remove();
         
-        console.log('🗑️ 기존 이미지 삭제 요청:', {
+        console.log('기존 이미지 삭제 요청:', {
             imageId: imageId,
             removeInputAdded: true,
             existingInputRemoved: !!existingInput
@@ -2160,13 +2166,13 @@ if (window.getImageAcceptAttribute) {
     const eventImagesInput = document.getElementById('event_images');
     if (eventImagesInput) {
         eventImagesInput.accept = window.getImageAcceptAttribute();
-        console.log('✅ 이미지 input accept 속성 동적 설정 완료:', eventImagesInput.accept);
+        console.log('이미지 input accept 속성 동적 설정 완료:', eventImagesInput.accept);
     }
 }
 
 // 페이지 로드 시 전역 변수 및 오류 상태 확인
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔍 이벤트 생성 페이지 디버깅 정보:');
+    console.log('이벤트 생성 페이지 디버깅 정보:');
     console.log('- 편집 모드:', <?= $isEditMode ? 'true' : 'false' ?>);
     console.log('- 네이버 지도 API 키:', '<?= htmlspecialchars(NAVER_MAPS_CLIENT_ID, ENT_QUOTES, 'UTF-8') ?>');
     console.log('- CSRF 토큰 길이:', '<?= strlen($_SESSION['csrf_token']) ?>');
@@ -2180,25 +2186,25 @@ document.addEventListener('DOMContentLoaded', function() {
     requiredElements.forEach(id => {
         const element = document.getElementById(id);
         if (!element) {
-            console.error('❌ 필수 요소 누락:', id);
+            console.error('필수 요소 누락:', id);
         } else {
-            console.log('✅ 요소 확인됨:', id);
+            console.log('요소 확인됨:', id);
         }
     });
     
     // 업로드 설정 확인
     if (window.TOPMKT_UPLOAD_CONFIG) {
-        console.log('✅ 업로드 설정 로드됨');
+        console.log('업로드 설정 로드됨');
     } else {
-        console.error('❌ 업로드 설정 로드 실패');
+        console.error('업로드 설정 로드 실패');
     }
     
     // Quill 에디터 상태 확인
     setTimeout(() => {
         if (typeof quill !== 'undefined' && quill) {
-            console.log('✅ Quill 에디터 초기화됨');
+            console.log('Quill 에디터 초기화됨');
         } else {
-            console.error('❌ Quill 에디터 초기화 실패');
+            console.error('Quill 에디터 초기화 실패');
         }
     }, 1000);
 
@@ -2227,7 +2233,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 전역 오류 핸들러
 window.addEventListener('error', function(e) {
-    console.error('🚨 JavaScript 오류 감지:', {
+    console.error('JavaScript 오류 감지:', {
         message: e.message,
         filename: e.filename,
         line: e.lineno,
@@ -2238,6 +2244,13 @@ window.addEventListener('error', function(e) {
 
 // Promise rejection 핸들러
 window.addEventListener('unhandledrejection', function(e) {
-    console.error('🚨 Promise 거부 감지:', e.reason);
+    console.error('Promise 거부 감지:', e.reason);
+});
+
+// Lucide 아이콘 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 </script>

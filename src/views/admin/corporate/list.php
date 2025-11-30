@@ -484,22 +484,22 @@ $content = '
     <!-- 통계 요약 -->
     <div class="summary-cards">
         <div class="summary-card">
-            <div class="summary-card-icon">✅</div>
+            <div class="summary-card-icon"><i data-lucide="check-circle" width="24" height="24"></i></div>
             <div class="summary-card-number">' . number_format(count(array_filter($members, function($m) { return $m['status'] === 'approved'; }))) . '</div>
             <div class="summary-card-label">승인된 기업</div>
         </div>
         <div class="summary-card">
-            <div class="summary-card-icon">⏸️</div>
+            <div class="summary-card-icon"><i data-lucide="pause-circle" width="24" height="24"></i></div>
             <div class="summary-card-number">' . number_format(count(array_filter($members, function($m) { return $m['status'] === 'suspended'; }))) . '</div>
             <div class="summary-card-label">일시정지</div>
         </div>
         <div class="summary-card">
-            <div class="summary-card-icon">📝</div>
+            <div class="summary-card-icon"><i data-lucide="file-text" width="24" height="24"></i></div>
             <div class="summary-card-number">' . number_format(array_sum(array_column($members, 'post_count'))) . '</div>
             <div class="summary-card-label">총 게시글</div>
         </div>
         <div class="summary-card">
-            <div class="summary-card-icon">🎓</div>
+            <div class="summary-card-icon"><i data-lucide="graduation-cap" width="24" height="24"></i></div>
             <div class="summary-card-number">' . number_format(array_sum(array_column($members, 'lecture_count'))) . '</div>
             <div class="summary-card-label">총 강의</div>
         </div>
@@ -570,7 +570,7 @@ $content .= '
     <!-- 기업회원 목록 -->
     <div class="members-section">
         <div class="section-header">
-            <h3 class="section-title">🏢 기업회원 목록</h3>
+            <h3 class="section-title"><i data-lucide="building-2" width="20" height="20"></i> 기업회원 목록</h3>
             <div id="filteredCount" style="color: #718096; font-size: 14px;">
                 총 ' . number_format(count($members)) . '개 기업
             </div>
@@ -578,7 +578,7 @@ $content .= '
         
         ' . (empty($members) ? '
             <div class="empty-message">
-                <div class="empty-icon">🏢</div>
+                <div class="empty-icon"><i data-lucide="building-2" width="48" height="48"></i></div>
                 <div class="empty-title">등록된 기업회원이 없습니다</div>
                 <div class="empty-description">기업인증이 완료되면 여기에 표시됩니다.</div>
             </div>

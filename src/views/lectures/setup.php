@@ -115,7 +115,7 @@
         <p>강의 일정 기능을 사용하려면 데이터베이스 테이블을 생성해야 합니다.</p>
         
         <div class="warning-box">
-            <h3>⚠️ 설정 필요</h3>
+            <h3><i data-lucide="alert-triangle" width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>설정 필요</h3>
             <p>
                 강의 시스템 데이터베이스 테이블이 존재하지 않습니다.<br>
                 관리자에게 문의하거나 다음 단계를 따라 설정을 완료해주세요.
@@ -148,7 +148,7 @@
         <div class="setup-action">
             <p><strong>관리자인 경우:</strong></p>
             <a href="/create_tables.php?token=create_lectures_2025" class="btn-setup" target="_blank">
-                🚀 테이블 생성하기
+                <i data-lucide="rocket" width="16" height="16"></i> 테이블 생성하기
             </a>
         </div>
         

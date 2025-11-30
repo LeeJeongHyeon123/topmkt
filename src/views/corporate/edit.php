@@ -270,12 +270,12 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 <div class="corp-edit-container">
     <!-- 헤더 -->
     <div class="corp-edit-header">
-        <h1>✏️ 기업 정보 수정</h1>
+        <h1><i class="lucide lucide-pencil"></i> 기업 정보 수정</h1>
         <p>승인된 기업 정보를 수정할 수 있습니다.</p>
     </div>
 
     <div class="edit-notice">
-        <strong>📝 수정 가능 항목 안내</strong><br>
+        <strong><i class="lucide lucide-file-text"></i> 수정 가능 항목 안내</strong><br>
         회사명, 대표자명, 대표자 연락처, 회사 주소는 수정 가능합니다.<br>
         사업자등록번호나 사업자등록증 변경이 필요한 경우 새로 신청해주세요.
     </div>
@@ -292,7 +292,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
         <div class="form-body">
             <!-- 기본 정보 섹션 -->
             <div class="form-section">
-                <h3 class="section-title">📋 기본 정보</h3>
+                <h3 class="section-title"><i class="lucide lucide-clipboard-list"></i> 기본 정보</h3>
                 
                 <div class="form-group">
                     <label for="company_name" class="form-label">
@@ -327,7 +327,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
                 <div class="form-group">
                     <label class="form-label">기업 유형</label>
                     <div style="padding: 12px 16px; background: #ebf8ff; border: 2px solid #90cdf4; border-radius: 8px; color: #2b6cb0; font-weight: 500;">
-                        🌍 해외 기업
+                        <i class="lucide lucide-globe"></i> 해외 기업
                     </div>
                 </div>
                 <?php endif; ?>
@@ -335,7 +335,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
             <!-- 대표자 정보 섹션 -->
             <div class="form-section">
-                <h3 class="section-title">👤 대표자 정보</h3>
+                <h3 class="section-title"><i class="lucide lucide-user"></i> 대표자 정보</h3>
                 
                 <div class="form-group">
                     <label for="representative_name" class="form-label">
@@ -368,7 +368,7 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
             <!-- 회사 주소 섹션 -->
             <div class="form-section">
-                <h3 class="section-title">📍 회사 주소</h3>
+                <h3 class="section-title"><i class="lucide lucide-map-pin"></i> 회사 주소</h3>
                 
                 <div class="form-group">
                     <label for="company_address" class="form-label">
@@ -385,12 +385,12 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
 
             <!-- 수정 불가 항목 안내 -->
             <div class="form-section">
-                <h3 class="section-title">🚫 수정 불가 항목</h3>
+                <h3 class="section-title"><i class="lucide lucide-ban"></i> 수정 불가 항목</h3>
                 
                 <div class="form-group">
                     <label class="form-label">사업자등록증 파일</label>
                     <div style="padding: 15px; background: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; color: #4a5568;">
-                        📄 <?= htmlspecialchars($profile['business_registration_file']) ?>
+                        <i class="lucide lucide-file-text"></i> <?= htmlspecialchars($profile['business_registration_file']) ?>
                     </div>
                     <div class="readonly-notice">
                         사업자등록증은 수정할 수 없습니다. 새로운 서류가 필요한 경우 새로 신청해주세요.
@@ -400,8 +400,8 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
                 <div class="form-group">
                     <label class="form-label">승인 정보</label>
                     <div style="padding: 15px; background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 8px; color: #22543d;">
-                        ✅ 승인일: <?= date('Y-m-d H:i', strtotime($profile['processed_at'])) ?><br>
-                        👤 처리자: <?= htmlspecialchars($profile['processed_by_name']) ?>
+                        <i class="lucide lucide-check"></i> 승인일: <?= date('Y-m-d H:i', strtotime($profile['processed_at'])) ?><br>
+                        <i class="lucide lucide-user"></i> 처리자: <?= htmlspecialchars($profile['processed_by_name']) ?>
                     </div>
                 </div>
             </div>
@@ -409,10 +409,10 @@ require_once SRC_PATH . '/helpers/SecurityHelper.php';
             <!-- 제출 버튼 -->
             <div class="form-actions">
                 <button type="submit" class="btn-submit" id="submitBtn">
-                    <span>💾</span> 정보 수정하기
+                    <i class="lucide lucide-save"></i> 정보 수정하기
                 </button>
                 <a href="/corp/status" class="btn-cancel">
-                    <span>↩️</span> 취소
+                    <i class="lucide lucide-arrow-left"></i> 취소
                 </a>
             </div>
         </div>
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 제출 버튼 비활성화
         submitBtn.disabled = true;
         submitBtn.classList.add('loading');
-        submitBtn.innerHTML = '<span>⏳</span> 수정 중...';
+        submitBtn.innerHTML = '<i class="lucide lucide-loader"></i> 수정 중...';
     });
 
     function validateForm() {

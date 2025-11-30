@@ -134,7 +134,7 @@ function showRealtimePendingAlert(count, message, details) {
     alertDiv.innerHTML = `
         <div class="realtime-alert-content">
             <div class="realtime-alert-icon">
-                <i class="fas fa-bell"></i>
+                <i data-lucide="bell" style="width:24px;height:24px"></i>
             </div>
             <div class="realtime-alert-text">
                 <div class="realtime-alert-title">실시간 신청 알림</div>
@@ -268,7 +268,12 @@ function showRealtimePendingAlert(count, message, details) {
     
     // 페이지에 알림 추가
     document.body.appendChild(alertDiv);
-    
+
+    // Lucide 아이콘 렌더링
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+
     RegistrationRealtimeNotifications.alertElement = alertDiv;
     
     // 20초 후 자동 숨김

@@ -259,10 +259,14 @@ class ProfileImageModal {
         const modalBody = this.modal.querySelector('.modal-body');
         modalBody.innerHTML = `
             <div style="text-align: center; padding: 40px; color: #e53e3e;">
-                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <i data-lucide="alert-triangle" style="width: 2rem; height: 2rem; margin-bottom: 10px;"></i>
                 <p>${message}</p>
             </div>
         `;
+        // Lucide 아이콘 렌더링
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     }
 
     /**

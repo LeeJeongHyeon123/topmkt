@@ -341,20 +341,20 @@
 
     <!-- 기업회원 혜택 -->
     <div class="benefits-section">
-        <h2 class="section-title">🌟 기업회원 혜택</h2>
+        <h2 class="section-title"><i class="lucide lucide-star"></i> 기업회원 혜택</h2>
         <div class="benefits-grid">
             <div class="benefit-card">
-                <span class="benefit-icon">📚</span>
+                <span class="benefit-icon"><i class="lucide lucide-book"></i></span>
                 <h3>강의 등록 및 관리</h3>
                 <p>전문 강의를 등록하고 참가자를 관리할 수 있습니다. 지식을 나누며 브랜드 인지도를 높여보세요.</p>
             </div>
             <div class="benefit-card">
-                <span class="benefit-icon">🎯</span>
+                <span class="benefit-icon"><i class="lucide lucide-target"></i></span>
                 <h3>행사 개최 권한</h3>
                 <p>세미나, 워크샵, 컨퍼런스 등 다양한 행사를 개최하고 홍보할 수 있습니다.</p>
             </div>
             <div class="benefit-card">
-                <span class="benefit-icon">🤝</span>
+                <span class="benefit-icon"><i class="lucide lucide-users"></i></span>
                 <h3>비즈니스 네트워킹</h3>
                 <p>다른 기업회원들과 네트워킹하며 파트너십 기회를 발견할 수 있습니다.</p>
             </div>
@@ -363,24 +363,24 @@
 
     <!-- 신청 자격 -->
     <div class="requirements-section">
-        <h2 class="section-title">📋 신청 자격 및 필요 서류</h2>
+        <h2 class="section-title"><i class="lucide lucide-clipboard-list"></i> 신청 자격 및 필요 서류</h2>
         <div class="requirements-list">
             <div class="requirement-item">
-                <span class="requirement-icon">🏢</span>
+                <span class="requirement-icon"><i class="lucide lucide-building-2"></i></span>
                 <div class="requirement-content">
                     <h4>개인사업자 또는 법인</h4>
                     <p>사업자등록증을 보유한 개인사업자나 법인 모두 신청 가능합니다.</p>
                 </div>
             </div>
             <div class="requirement-item">
-                <span class="requirement-icon">🌍</span>
+                <span class="requirement-icon"><i class="lucide lucide-globe"></i></span>
                 <div class="requirement-content">
                     <h4>해외 기업도 가능</h4>
                     <p>한국 외 해외 기업도 유사한 사업자 등록 서류로 신청할 수 있습니다.</p>
                 </div>
             </div>
             <div class="requirement-item">
-                <span class="requirement-icon">📄</span>
+                <span class="requirement-icon"><i class="lucide lucide-file-text"></i></span>
                 <div class="requirement-content">
                     <h4>필수 서류</h4>
                     <p>사업자등록증, 회사 정보, 대표자 정보 및 연락처가 필요합니다.</p>
@@ -391,7 +391,7 @@
 
     <!-- 신청 절차 -->
     <div class="process-section">
-        <h2 class="section-title">🚀 신청 절차</h2>
+        <h2 class="section-title"><i class="lucide lucide-rocket"></i> 신청 절차</h2>
         <div class="process-steps">
             <div class="process-step">
                 <div class="step-number">1</div>
@@ -419,28 +419,28 @@
         <div class="action-buttons">
             <?php if (!$applicationStatus || $applicationStatus['status'] === 'none'): ?>
                 <a href="/corp/apply" class="btn-apply">
-                    <span>📝</span> 기업 인증 신청하기
+                    <i class="lucide lucide-file-text"></i> 기업 인증 신청하기
                 </a>
             <?php elseif ($applicationStatus['status'] === 'rejected'): ?>
                 <a href="/corp/apply" class="btn-apply">
-                    <span>🔄</span> 기업 인증 재신청하기
+                    <i class="lucide lucide-refresh-cw"></i> 기업 인증 재신청하기
                 </a>
                 <a href="/corp/status" class="btn-cancel">
-                    <span>📊</span> 거절 사유 확인하기
+                    <i class="lucide lucide-bar-chart-2"></i> 거절 사유 확인하기
                 </a>
             <?php else: ?>
                 <a href="/corp/status" class="btn-apply">
-                    <span>📊</span> 신청 현황 확인하기
+                    <i class="lucide lucide-bar-chart-2"></i> 신청 현황 확인하기
                 </a>
             <?php endif; ?>
-            
+
             <?php if (isset($redirectUrl) && $redirectUrl): ?>
                 <a href="<?= htmlspecialchars($redirectUrl) ?>" class="btn-cancel">
-                    <span>↩️</span> 이전 페이지로
+                    <i class="lucide lucide-arrow-left"></i> 이전 페이지로
                 </a>
             <?php else: ?>
                 <a href="/community" class="btn-cancel">
-                    <span>🏠</span> 커뮤니티로 이동
+                    <i class="lucide lucide-home"></i> 커뮤니티로 이동
                 </a>
             <?php endif; ?>
         </div>
@@ -449,8 +449,8 @@
     <!-- 추가 안내 -->
     <div style="text-align: center; color: #718096; font-size: 0.9rem; margin-top: 40px;">
         <p>
-            📞 문의사항이 있으시면 <strong>1577-9794</strong>로 연락주세요.<br>
-            📧 이메일: <strong>jh@wincard.kr</strong>
+            <i class="lucide lucide-phone"></i> 문의사항이 있으시면 <strong>1577-9794</strong>로 연락주세요.<br>
+            <i class="lucide lucide-mail"></i> 이메일: <strong>jh@wincard.kr</strong>
         </p>
     </div>
 </div>

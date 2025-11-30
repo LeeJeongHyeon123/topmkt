@@ -110,16 +110,16 @@ if (file_exists($styleFile)) {
                                         <div class="event-list-title"><?= htmlspecialchars($event['title']) ?></div>
                                         <div class="event-list-meta">
                                             <div class="meta-item">
-                                                📅 <?= date('Y-m-d', strtotime($event['start_date'])) ?>
+                                                <i data-lucide="calendar" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i><?= date('Y-m-d', strtotime($event['start_date'])) ?>
                                             </div>
                                             <div class="meta-item">
-                                                🕒 <?= date('H:i', strtotime($event['start_time'])) ?> - <?= date('H:i', strtotime($event['end_time'])) ?>
+                                                <i data-lucide="clock" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i><?= date('H:i', strtotime($event['start_time'])) ?> - <?= date('H:i', strtotime($event['end_time'])) ?>
                                             </div>
                                             <div class="meta-item">
-                                                👨‍🏫 <?= htmlspecialchars($event['organizer_name']) ?>
+                                                <i data-lucide="user" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i><?= htmlspecialchars($event['organizer_name']) ?>
                                             </div>
                                             <div class="meta-item">
-                                                📍 <?= htmlspecialchars($event['venue_name'] ?? '오프라인') ?>
+                                                <i data-lucide="map-pin" width="14" height="14" style="display: inline; vertical-align: middle; margin-right: 4px;"></i><?= htmlspecialchars($event['venue_name'] ?? '오프라인') ?>
                                             </div>
                                         </div>
                                     </div>

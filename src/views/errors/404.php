@@ -75,12 +75,16 @@
         .error-icon {
             font-size: 48px;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #667eea;
         }
     </style>
 </head>
 <body>
     <div class="error-container">
-        <div class="error-icon">🔍</div>
+        <div class="error-icon"><i data-lucide="search" width="48" height="48"></i></div>
         <div class="error-code">404</div>
         <div class="error-title">페이지를 찾을 수 없습니다</div>
         <div class="error-message">
@@ -92,5 +96,7 @@
             <a href="javascript:history.back()" class="btn btn-secondary">이전 페이지로</a>
         </div>
     </div>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

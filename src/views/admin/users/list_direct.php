@@ -1087,7 +1087,7 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
 
                 // 값이 있고, 010-으로 시작하지 않으면 에러 표시
                 if (value && !value.startsWith('010-')) {
-                    Toast.error('❌ 전화번호는 010-으로 시작해야 합니다');
+                    Toast.error('전화번호는 010-으로 시작해야 합니다');
                     e.target.focus();
                 }
             });
@@ -1125,13 +1125,13 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
         })
         .then(data => {
             if (data.success) {
-                Toast.success('✅ ' + data.message);
-                
+                Toast.success(data.message);
+
                 // 변경 사항이 있다면 표시
                 if (data.changes && data.changes.length > 0) {
 
                 }
-                
+
                 closeEditUserModal();
 
                 // 사용자 목록 새로고침
@@ -1139,7 +1139,7 @@ require_once SRC_PATH . '/components/ui/Pagination.php';
                     loadUsersData();
                 }
             } else {
-                Toast.error('❌ 편집 실패: ' + data.error);
+                Toast.error('편집 실패: ' + data.error);
             }
         })
         .catch(error => {

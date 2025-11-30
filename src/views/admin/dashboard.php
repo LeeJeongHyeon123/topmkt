@@ -296,11 +296,11 @@ $content = '
                 <div class="stat-label">기업인증 대기</div>
                 ' . ($todayStats['pendingCorps'] > 0 ? '
                     <div class="stat-change negative">
-                        <span>⚠️</span> 처리 필요
+                        <i data-lucide="alert-triangle" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i> 처리 필요
                     </div>
                 ' : '
                     <div class="stat-change positive">
-                        <span>✅</span> 모두 처리됨
+                        <i data-lucide="check-circle" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i> 모두 처리됨
                     </div>
                 ') . '
             </div>
@@ -347,7 +347,7 @@ $content = '
                     }, $urgentTasks['pendingCorps'])) : '
                         <div class="urgent-item">
                             <div class="urgent-info">
-                                <div class="urgent-title">✅ 모든 작업 완료</div>
+                                <div class="urgent-title"><i data-lucide="check-circle" width="16" height="16" style="display: inline; vertical-align: middle; margin-right: 4px;"></i> 모든 작업 완료</div>
                                 <div class="urgent-meta">처리할 긴급 사항이 없습니다.</div>
                             </div>
                         </div>

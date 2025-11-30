@@ -23,7 +23,7 @@ ob_start();
 
 <div class="admin-content">
     <div class="page-header">
-        <h1>👥 회원 관리</h1>
+        <h1><i data-lucide="users" width="24" height="24" style="display: inline; vertical-align: middle; margin-right: 8px;"></i>회원 관리</h1>
         <p>등록된 회원들을 관리하고 모니터링하세요</p>
     </div>
 
@@ -637,8 +637,8 @@ async function viewUserDetail(userId) {
         renderUserDetail(data.data || data);
         
     } catch (error) {
-        document.getElementById('userDetailContent').innerHTML = 
-            '<div class="no-data-message"><p>❌ 사용자 정보를 불러올 수 없습니다</p><p><strong>오류:</strong> ' + error.message + '</p></div>';
+        document.getElementById('userDetailContent').innerHTML =
+            '<div class="no-data-message"><p>사용자 정보를 불러올 수 없습니다</p><p><strong>오류:</strong> ' + error.message + '</p></div>';
     }
 }
 
@@ -680,7 +680,7 @@ function renderUserDetail(user) {
         '</div>' +
         
         '<div class="user-detail-section">' +
-            '<h3>📊 활동 통계</h3>' +
+            '<h3><i data-lucide="bar-chart-2" width="18" height="18" style="display: inline; vertical-align: middle; margin-right: 6px;"></i>활동 통계</h3>' +
             '<div class="detail-grid">' +
                 '<div class="detail-item"><div class="detail-label">게시글 수</div><div class="detail-value">' + (user.post_count || 0) + '개</div></div>' +
                 '<div class="detail-item"><div class="detail-label">댓글 수</div><div class="detail-value">' + (user.comment_count || 0) + '개</div></div>' +

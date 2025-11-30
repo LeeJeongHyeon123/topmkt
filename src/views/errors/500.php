@@ -73,14 +73,18 @@
             background: #7f8c8d;
         }
         .error-icon {
-            font-size: 48px;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .error-icon svg {
+            color: #e74c3c;
         }
     </style>
 </head>
 <body>
     <div class="error-container">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><i data-lucide="alert-triangle" width="48" height="48"></i></div>
         <div class="error-code">500</div>
         <div class="error-title">내부 서버 오류</div>
         <div class="error-message">
@@ -92,5 +96,9 @@
             <a href="javascript:history.back()" class="btn btn-secondary">이전 페이지로</a>
         </div>
     </div>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>

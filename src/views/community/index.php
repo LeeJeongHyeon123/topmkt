@@ -377,14 +377,14 @@ body {
                 'submitButton' => true,
                 'submitText' => '<i data-lucide="search" width="18" height="18"></i>',
                 'resetButton' => !empty($search),  // 검색어 있을 때만 표시
-                'resetText' => '✖️ 검색 해제',
+                'resetText' => '<i data-lucide="x" width="18" height="18"></i> 검색 해제',
                 'cssClass' => 'community-search-filter'
             ]);
             ?>
 
             <!-- 검색 힌트 -->
             <div class="search-hints" id="searchHints">
-                💡 검색 팁:
+                <i data-lucide="lightbulb" width="16" height="16"></i> 검색 팁:
                 <span class="search-hint-item" data-search="마케팅">마케팅</span>
                 <span class="search-hint-item" data-search="SNS">SNS</span>
                 <span class="search-hint-item" data-search="광고">광고</span>
@@ -400,7 +400,7 @@ body {
             </a>
         <?php else: ?>
             <a href="/auth/login?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-primary">
-                🔑 로그인 후 글쓰기
+                <i data-lucide="key" width="18" height="18"></i> 로그인 후 글쓰기
             </a>
         <?php endif; ?>
     </div>
@@ -409,20 +409,20 @@ body {
     <div class="board-stats">
         <p class="stats-text">
             <?php if (!empty($search)): ?>
-                🔍 "<?= htmlspecialchars($search) ?>" 검색 결과: <strong><?= number_format($totalCount) ?></strong>개
+                <i data-lucide="search" width="16" height="16" style="display: inline; margin-right: 4px;"></i> "<?= htmlspecialchars($search) ?>" 검색 결과: <strong><?= number_format($totalCount) ?></strong>개
                 <?php
                 $filterText = '';
                 switch ($filter ?? 'all') {
                     case 'title': $filterText = '(제목에서 검색)'; break;
                     case 'content': $filterText = '(내용에서 검색)'; break;
                     case 'author': $filterText = '(작성자에서 검색)'; break;
-                    case 'all': 
+                    case 'all':
                     default: $filterText = '(전체에서 검색)'; break;
                 }
                 ?>
                 <span style="font-size: 0.9em; color: #666; margin-left: 8px;"><?= $filterText ?></span>
             <?php else: ?>
-                📊 총 <strong><?= number_format($totalCount) ?></strong>개의 게시글이 있습니다
+                <i data-lucide="bar-chart-2" width="16" height="16" style="display: inline; margin-right: 4px;"></i> 총 <strong><?= number_format($totalCount) ?></strong>개의 게시글이 있습니다
             <?php endif; ?>
         </p>
     </div>
@@ -480,8 +480,8 @@ body {
                         </div>
                         
                         <div class="post-meta">
-                            <span class="post-author">👤 <?= htmlspecialchars($authorName) ?></span>
-                            <span class="post-date">📅 <?= date('Y-m-d H:i', strtotime($post['created_at'])) ?></span>
+                            <span class="post-author"><i data-lucide="user" width="16" height="16" style="display: inline; margin-right: 4px;"></i> <?= htmlspecialchars($authorName) ?></span>
+                            <span class="post-date"><i data-lucide="calendar" width="16" height="16" style="display: inline; margin-right: 4px;"></i> <?= date('Y-m-d H:i', strtotime($post['created_at'])) ?></span>
                         </div>
                         
                         <div class="post-content-preview">
@@ -508,13 +508,13 @@ body {
                         
                         <div class="post-stats">
                             <span class="stat-item">
-                                👁️ <?= number_format($post['view_count'] ?? 0) ?>
+                                <i data-lucide="eye" width="16" height="16" style="display: inline; margin-right: 4px;"></i> <?= number_format($post['view_count'] ?? 0) ?>
                             </span>
                             <span class="stat-item">
-                                💬 <?= number_format($post['comment_count'] ?? 0) ?>
+                                <i data-lucide="message-circle" width="16" height="16" style="display: inline; margin-right: 4px;"></i> <?= number_format($post['comment_count'] ?? 0) ?>
                             </span>
                             <span class="stat-item">
-                                ❤️ <?= number_format($post['like_count'] ?? 0) ?>
+                                <i data-lucide="heart" width="16" height="16" style="display: inline; margin-right: 4px;"></i> <?= number_format($post['like_count'] ?? 0) ?>
                             </span>
                         </div>
                     </div>
@@ -538,7 +538,7 @@ body {
         <!-- 빈 상태 -->
         <div class="post-list">
             <div class="empty-state">
-                <i>📝</i>
+                <i data-lucide="file-text" width="32" height="32"></i>
                 <h3>
                     <?php if (!empty($search)): ?>
                         "<?= htmlspecialchars($search) ?>" 검색 결과가 없습니다
@@ -550,7 +550,7 @@ body {
                 </h3>
                 <p>
                     <?php if (!empty($search)): ?>
-                        💡 검색 팁:<br>
+                        <i data-lucide="lightbulb" width="16" height="16" style="display: inline; margin-right: 4px;"></i> 검색 팁:<br>
                         • 검색어의 철자를 확인해보세요<br>
                         • 더 간단한 키워드로 다시 검색해보세요<br>
                         • 관련된 다른 단어로 검색해보세요

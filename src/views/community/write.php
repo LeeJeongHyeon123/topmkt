@@ -468,7 +468,7 @@ html #quill-editor .ql-editor * {
 <div class="write-container">
     <!-- 헤더 컴포넌트 -->
     <?= renderGradientHeader([
-        'title' => $isEdit ? '📝 게시글 수정' : '✍️ 새 게시글 작성',
+        'title' => $isEdit ? 'Lucide:file-text 게시글 수정' : 'Lucide:pencil 새 게시글 작성',
         'subtitle' => $isEdit ? '게시글을 수정해주세요' : '커뮤니티에 새로운 이야기를 공유해주세요',
         'theme' => 'purple',
         'size' => 'md',
@@ -477,7 +477,7 @@ html #quill-editor .ql-editor * {
 
     <!-- 작성 팁 -->
     <div class="form-tips">
-        <h4>💡 게시글 작성 팁</h4>
+        <h4><i class="lucide lucide-lightbulb"></i> 게시글 작성 팁</h4>
         <ul>
             <li>제목은 간결하고 명확하게 작성해주세요 (200자 이내)</li>
             <li>내용은 구체적이고 유용한 정보를 포함해주세요 (10,000자 이내)</li>
@@ -514,9 +514,9 @@ html #quill-editor .ql-editor * {
                       style="display: none;"
                       required><?= isset($post) ? htmlspecialchars($post['content']) : '' ?></textarea>
             <div id="contentCounter" class="char-counter">0 / 10,000</div>
-            <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;">📷 이미지: 0 / 20</div>
+            <div id="imageCounter" class="char-counter" style="color: #2563eb; font-weight: 500;"><i class="lucide lucide-camera"></i> 이미지: 0 / 20</div>
             <div class="editor-tips" style="margin-top: 8px; font-size: 12px; color: #718096;">
-                💡 <strong>에디터 사용법:</strong> 
+                <i class="lucide lucide-lightbulb"></i> <strong>에디터 사용법:</strong>
                 텍스트 선택 후 포맷 적용 | 이미지 업로드 버튼 클릭 | Ctrl+Z로 실행 취소
             </div>
         </div>
@@ -525,14 +525,14 @@ html #quill-editor .ql-editor * {
         <div class="form-buttons">
             <?php if ($isEdit): ?>
                 <button type="button" id="deleteBtn" class="btn btn-danger">
-                    🗑️ 삭제
+                    <i class="lucide lucide-trash-2"></i> 삭제
                 </button>
             <?php endif; ?>
-            <button type="button" id="cancelBtn" class="btn btn-secondary" 
-                    data-version="v3.14.1-FINAL" 
+            <button type="button" id="cancelBtn" class="btn btn-secondary"
+                    data-version="v3.14.1-FINAL"
                     data-timestamp="<?= time() ?>"
                     title="v3.14.1-FINAL Enhanced Cancel Button - 작성된 내용이 있을 때만 확인">
-                ❌ 취소
+                <i class="lucide lucide-x"></i> 취소
             </button>
             <button type="submit" id="submitBtn" class="btn btn-primary">
                 <span id="submitText"><?= $submitText ?></span>
@@ -681,17 +681,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (currentImages >= 18) { // 90% 이상
             counterClass = 'error'; // 빨간색
-            warningText = ' ⚠️';
+            warningText = ' <i data-lucide="alert-triangle" width="14" height="14" style="display: inline; vertical-align: middle;"></i>';
         } else if (currentImages >= 15) { // 75% 이상
             counterClass = 'warning'; // 주황색
-            warningText = ' ⚠️';
+            warningText = ' <i data-lucide="alert-triangle" width="14" height="14" style="display: inline; vertical-align: middle;"></i>';
         } else {
             counterClass = ''; // 기본 색상
         }
         
         imageCounter.className = `char-counter ${counterClass}`;
         imageCounter.innerHTML = `📷 이미지: ${currentImages} / ${maxImages}${warningText}`;
-        
+
+        // Lucide 아이콘 렌더링 (새로 추가된 경고 아이콘)
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
     
     // Quill 에디터 초기화
@@ -1065,12 +1069,12 @@ document.addEventListener('DOMContentLoaded', function() {
         warningDiv.className = 'max-length-warning';
         warningDiv.innerHTML = `
             <div class="warning-content">
-                <div class="warning-icon">⚠️</div>
+                <div class="warning-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
                 <div class="warning-message">
                     <strong>글자 수 제한 도달</strong><br>
                     최대 10,000자까지만 입력할 수 있습니다.
                 </div>
-                <button class="warning-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                <button class="warning-close" onclick="this.parentElement.parentElement.remove()"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
         `;
         
